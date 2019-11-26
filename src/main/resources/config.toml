@@ -1,0 +1,15 @@
+# LambdaControls configuration.
+
+# The controls mode. Available modes: default, controller, touchscreen
+controls = "default"
+
+[hud]
+# Dertermines which side is used depending of the main hand.
+side = "right_handed"
+
+# Colors
+[colors]
+normal = "#ffffffff"
+pressed = "#ffa000ff"
+background_normal = "#000000aa"
+background_pressed = "#555555aa"
