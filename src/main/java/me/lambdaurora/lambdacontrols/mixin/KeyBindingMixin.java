@@ -19,9 +19,14 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(KeyBinding.class)
 public class KeyBindingMixin implements LambdaKeyBinding
 {
-    @Shadow private InputUtil.KeyCode keyCode;
+    @Shadow
+    private InputUtil.KeyCode keyCode;
 
-    @Shadow private int timesPressed;
+    @Shadow
+    private int timesPressed;
+
+    @Shadow
+    private boolean pressed;
 
     @Override
     public @NotNull InputUtil.KeyCode get_key_code()
@@ -30,8 +35,22 @@ public class KeyBindingMixin implements LambdaKeyBinding
     }
 
     @Override
-    public void lambdacontrols_press()
+    public boolean lambdacontrols_press()
     {
+        boolean old_pressed = this.pressed;
+        if (!this.pressed)
+            this.pressed = true;
         ++this.timesPressed;
+        return old_pressed != this.pressed;
+    }
+
+    @Override
+    public boolean lambdacontrols_unpress()
+    {
+        if (this.pressed) {
+            this.pressed = false;
+            return true;
+        }
+        return false;
     }
 }

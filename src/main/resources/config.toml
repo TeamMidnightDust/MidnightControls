@@ -7,6 +7,27 @@ controls = "default"
 # Dertermines which side is used depending of the main hand.
 side = "right_handed"
 
+# Controller settings
+[controller]
+attack = "button_7"
+back = "axe_1+"
+drop = "button_2"
+forward = "axe_1-"
+hotbar_left = "button_4"
+hotbar_right = "button_5"
+inventory = "button_3"
+jump = "button_0"
+left = "axe_0-"
+right = "axe_0+"
+sneak = "button_12"
+sprint = "button_11"
+start = "button_4"
+use = "button_6"
+view_down = "axe_3+"
+view_left = "axe_2-"
+view_right = "axe_2+"
+view_up = "axe_3-"
+
 # Colors
 [colors]
 normal = "#ffffffff"

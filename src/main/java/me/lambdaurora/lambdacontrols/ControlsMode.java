@@ -13,12 +13,17 @@ import net.minecraft.client.resource.language.I18n;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 /**
  * Represents the controls mode.
  */
 public enum ControlsMode implements Nameable
 {
-    ;
+    DEFAULT,
+    CONTROLLER,
+    TOUCHSCREEN;
 
     /**
      * Returns the next controls mode available.
@@ -47,5 +52,16 @@ public enum ControlsMode implements Nameable
     public @NotNull String get_name()
     {
         return this.name().toLowerCase();
+    }
+
+    /**
+     * Gets the controls mode from its identifier.
+     *
+     * @param id The identifier of the controls mode.
+     * @return The controls mode if found, else empty.
+     */
+    public static Optional<ControlsMode> by_id(@NotNull String id)
+    {
+        return Arrays.stream(values()).filter(mode -> mode.get_name().equalsIgnoreCase(id)).findFirst();
     }
 }

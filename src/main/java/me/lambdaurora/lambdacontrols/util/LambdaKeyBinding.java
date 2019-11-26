@@ -19,5 +19,15 @@ public interface LambdaKeyBinding
 {
     @NotNull InputUtil.KeyCode get_key_code();
 
-    void lambdacontrols_press();
+    boolean lambdacontrols_press();
+
+    boolean lambdacontrols_unpress();
+
+    default boolean handle_press_state(boolean pressed)
+    {
+        if (pressed)
+            return this.lambdacontrols_press();
+        else
+            return this.lambdacontrols_unpress();
+    }
 }
