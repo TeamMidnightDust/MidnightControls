@@ -51,4 +51,12 @@ public class TouchscreenButtonWidget extends TexturedButtonWidget
         } else
             return false;
     }
+
+    @Override
+    protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY)
+    {
+        super.onDrag(mouseX, mouseY, deltaX, deltaY);
+        if (this.active && !this.isHovered)
+            this.on_change_state.accept(false);
+    }
 }
