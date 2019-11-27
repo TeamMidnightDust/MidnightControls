@@ -3,8 +3,10 @@
   "package": "me.lambdaurora.lambdacontrols.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
+    "InGameHudMixin",
+    "KeyBindingMixin",
     "MinecraftClientMixin",
-    "KeyBindingMixin"
+    "MouseMixin"
   ],
   "injectors": {
     "defaultRequire": 1

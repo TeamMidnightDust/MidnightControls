@@ -10,7 +10,6 @@
 package me.lambdaurora.lambdacontrols;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +27,7 @@ public class LambdaControlsConfig
     private final Map<String, KeyBinding> keybinding_mappings = new HashMap<>();
     private final LambdaControls          mod;
     private       ControlsMode            controls_mode;
+    private       HudSide                 hud_side;
 
     public LambdaControlsConfig(@NotNull LambdaControls mod)
     {
@@ -40,6 +40,7 @@ public class LambdaControlsConfig
         this.config.load();
         this.mod.log("Configuration loaded.");
         this.controls_mode = ControlsMode.by_id(this.config.getOrElse("controls", "default")).orElse(ControlsMode.DEFAULT);
+        this.hud_side = HudSide.by_id(this.config.getOrElse("hud.side", "left")).orElse(HudSide.LEFT);
     }
 
     public void init_keybindings(GameOptions options)
@@ -104,6 +105,27 @@ public class LambdaControlsConfig
     {
         this.controls_mode = controls_mode;
         this.config.set("controls", controls_mode.get_name());
+    }
+
+    /**
+     * Returns the HUD side from the configuration.
+     *
+     * @return The HUD side.
+     */
+    public @NotNull HudSide get_hud_side()
+    {
+        return this.hud_side;
+    }
+
+    /**
+     * Sets the HUD side in the configuration.
+     *
+     * @param hud_side The HUD side.
+     */
+    public void set_hud_side(@NotNull HudSide hud_side)
+    {
+        this.hud_side = hud_side;
+        this.config.set("hud.side", hud_side.get_name());
     }
 
     /**

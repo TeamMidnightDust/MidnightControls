@@ -4,8 +4,8 @@
 controls = "default"
 
 [hud]
-# Dertermines which side is used depending of the main hand.
-side = "right_handed"
+# Dertermines where the movements buttons are.
+side = "left"
 
 # Controller settings
 [controller]
