@@ -3,10 +3,15 @@
   "package": "me.lambdaurora.lambdacontrols.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
+    "AbstractButtonWidgetAccessor",
+    "AbstractContainerScreenAccessor",
+    "CreativeInventoryScreenMixin",
+    "GameRendererMixin",
     "InGameHudMixin",
     "KeyBindingMixin",
     "MinecraftClientMixin",
-    "MouseMixin"
+    "MouseMixin",
+    "SettingsScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

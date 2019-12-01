@@ -102,9 +102,10 @@ public class TouchscreenOverlay extends Screen
             this.fly_button.visible = true;
             this.fly_up_button.visible = true;
             this.fly_down_button.visible = true;
-            if (old_state_fly != this.fly_button.visible)
+            if (old_state_fly != this.fly_button.visible) {
                 this.fly_button_enable_ticks = 5;
-            else if (this.fly_button_enable_ticks > 0)
+                this.handle_jump(false);
+            } else if (this.fly_button_enable_ticks > 0)
                 this.fly_button_enable_ticks--;
         } else {
             this.jump_button.visible = true;

@@ -31,7 +31,8 @@ public abstract class MinecraftClientMixin
     @Shadow
     public boolean skipGameRender;
 
-    @Shadow public Screen currentScreen;
+    @Shadow
+    public Screen currentScreen;
 
     @Inject(method = "init", at = @At("RETURN"))
     private void on_init(CallbackInfo ci)
@@ -39,11 +40,16 @@ public abstract class MinecraftClientMixin
         LambdaControls.get().on_mc_init((MinecraftClient) (Object) this);
     }
 
-    @Inject(method = "handleInputEvents", at = @At("HEAD"))
+    @Inject(method = "render", at = @At("HEAD"))
+    private void on_render(boolean full_render, CallbackInfo ci)
+    {
+        LambdaControls.get().on_render((MinecraftClient) (Object) (this));
+    }
+
+    @Inject(method = "tick", at = @At("HEAD"))
     private void on_handle_input_events(CallbackInfo ci)
     {
-        if (LambdaControls.get().config.get_controls_mode() == ControlsMode.CONTROLLER)
-            LambdaControls.get().on_tick((MinecraftClient) (Object) this);
+        LambdaControls.get().on_tick((MinecraftClient) (Object) this);
     }
 
     @Inject(method = "openScreen", at = @At("RETURN"))
@@ -55,6 +61,8 @@ public abstract class MinecraftClientMixin
             screen.init(((MinecraftClient) (Object) this), this.window.getScaledWidth(), this.window.getScaledHeight());
             this.skipGameRender = false;
             this.currentScreen = screen;
+        } else if (screen != null) {
+            mod.controller_input.on_screen_open(((MinecraftClient) (Object) this), this.window.getWidth(), this.window.getHeight());
         }
     }
 }

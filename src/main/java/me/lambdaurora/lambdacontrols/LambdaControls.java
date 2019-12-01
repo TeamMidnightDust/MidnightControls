@@ -9,19 +9,37 @@
 
 package me.lambdaurora.lambdacontrols;
 
+import me.lambdaurora.lambdacontrols.mixin.AbstractContainerScreenAccessor;
+import me.lambdaurora.lambdacontrols.util.CreativeInventoryScreenAccessor;
 import me.lambdaurora.lambdacontrols.util.LambdaKeyBinding;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
+import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.screen.world.WorldListWidget;
+import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
+import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.options.GameOptions;
+import net.minecraft.container.Slot;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.util.math.MathHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.lwjgl.glfw.GLFW.GLFW_JOYSTICK_1;
 
@@ -32,10 +50,22 @@ import static org.lwjgl.glfw.GLFW.GLFW_JOYSTICK_1;
 public class LambdaControls implements ClientModInitializer
 {
     private static LambdaControls        INSTANCE;
-    public final   Logger                logger        = LogManager.getLogger("LambdaControls");
-    public final   LambdaControlsConfig  config        = new LambdaControlsConfig(this);
-    private final  Map<Integer, Integer> BUTTON_STATES = new HashMap<>();
-    private        int                   cid           = GLFW_JOYSTICK_1;
+    public final   Logger                logger                 = LogManager.getLogger("LambdaControls");
+    public final   LambdaControlsConfig  config                 = new LambdaControlsConfig(this);
+    public final   ControllerInput       controller_input       = new ControllerInput(this);
+    private final  Map<Integer, Integer> BUTTON_STATES          = new HashMap<>();
+    private        float                 prev_x_axis            = 0.F;
+    private        float                 prev_y_axis            = 0.F;
+    private        int                   prev_target_mouse_x    = 0;
+    private        int                   prev_target_mouse_y    = 0;
+    private        int                   target_mouse_x         = 0;
+    private        int                   target_mouse_y         = 0;
+    private        float                 mouse_speed_x          = 0.F;
+    private        float                 mouse_speed_y          = 0.F;
+    private        boolean               last_a_state           = false;
+    private        int                   cid                    = GLFW_JOYSTICK_1;
+    private        boolean               allow_controller_mouse = true;
+    private        int                   action_gui_cooldown    = 0;
 
     @Override
     public void onInitializeClient()
@@ -64,82 +94,25 @@ public class LambdaControls implements ClientModInitializer
      *
      * @param client The client instance.
      */
-    public void on_tick(MinecraftClient client)
+    public void on_tick(@NotNull MinecraftClient client)
     {
-        GameOptions options = client.options;
-        ByteBuffer btn_buffer = GLFW.glfwGetJoystickButtons(GLFW.GLFW_JOYSTICK_3);
-        if (btn_buffer != null) {
-            for (int i = 0; i < btn_buffer.limit(); i++) {
-                boolean btn_state = btn_buffer.get() == (byte) 1;
+        if (this.config.get_controls_mode() == ControlsMode.CONTROLLER)
+            this.controller_input.on_tick(client);
+        /* Decreases the cooldown for the screen focus change.
+        if (this.action_gui_cooldown > 0)
+            --this.action_gui_cooldown;
+        if (this.action_gui_cooldown == 0)
+            this.allow_controller_mouse = true;
 
-                int current_state = BUTTON_STATES.getOrDefault(i, 0);
-                if (current_state == 0 && btn_state) {
-                    BUTTON_STATES.put(i, 1);
+        this.prev_target_mouse_x = this.target_mouse_x;
+        this.prev_target_mouse_y = this.target_mouse_y;
+        if (LambdaControls.get().config.get_controls_mode() == ControlsMode.CONTROLLER)
+            this.on_controller_tick(client);*/
+    }
 
-                    int f_i = i;
-                    this.config.get_keybind("button_" + i).ifPresent(key_binding -> {
-                        ((LambdaKeyBinding) key_binding).lambdacontrols_press();
-                        if (key_binding == options.keyInventory && client.player != null && client.player.container != client.player.playerContainer) {
-                            BUTTON_STATES.put(f_i, 2);
-                        }
-                    });
-                    if (this.config.is_hotbar_left_button(i)) {
-                        client.player.inventory.selectedSlot = client.player.inventory.selectedSlot == 0 ? 8 : client.player.inventory.selectedSlot - 1;
-                    } else if (this.config.is_hotbar_right_button(i)) {
-                        client.player.inventory.selectedSlot = client.player.inventory.selectedSlot == 8 ? 0 : client.player.inventory.selectedSlot + 1;
-                    }
-                } else if (current_state != 0 && !btn_state) {
-                    this.config.get_keybind("button_" + i).ifPresent(key_binding -> {
-                        if (key_binding == options.keyInventory && current_state == 2 && client.player != null && client.player.container != client.player.playerContainer) {
-                            client.player.closeContainer();
-                        }
-                        ((LambdaKeyBinding) key_binding).lambdacontrols_unpress();
-                    });
-
-                    BUTTON_STATES.put(i, 0);
-                }
-            }
-        }
-        FloatBuffer axes_buffer = GLFW.glfwGetJoystickAxes(GLFW.GLFW_JOYSTICK_3);
-        if (axes_buffer != null) {
-            for (int i = 0; i < axes_buffer.limit(); i++) {
-                float value = axes_buffer.get();
-                {
-                    int state = value > 0.5F ? 1 : (value < -0.5F ? 2 : 0);
-                    this.config.get_keybind("axe_" + i + "+").ifPresent(key_binding -> ((LambdaKeyBinding) key_binding).handle_press_state(state == 1));
-                    this.config.get_keybind("axe_" + i + "-").ifPresent(key_binding -> ((LambdaKeyBinding) key_binding).handle_press_state(state == 2));
-                }
-                if (this.config.is_look_axis(i) && (value > 0.25F || value < -0.25F)) {
-                    int state = value > 0.25F ? 1 : (value < -0.25F ? 2 : 0);
-                    float multiplier = 50.f;
-                    double x = 0.0D;
-                    double y = 0.0D;
-                    if (this.config.is_view_down_control(i, state)) {
-                        if (this.config.get_view_down_control().endsWith("+"))
-                            y = Math.abs(value * multiplier);
-                        else
-                            y = -Math.abs(value * multiplier);
-                    } else if (this.config.is_view_up_control(i, state)) {
-                        if (this.config.get_view_up_control().endsWith("+"))
-                            y = Math.abs(value * multiplier);
-                        else
-                            y = -Math.abs(value * multiplier);
-                    }
-                    if (this.config.is_view_left_control(i, state)) {
-                        if (this.config.get_view_left_control().endsWith("+"))
-                            x = Math.abs(value * multiplier);
-                        else
-                            x = -Math.abs(value * multiplier);
-                    } else if (this.config.is_view_right_control(i, state)) {
-                        if (this.config.get_view_right_control().endsWith("+"))
-                            x = Math.abs(value * multiplier);
-                        else
-                            x = -Math.abs(value * multiplier);
-                    }
-                    client.player.changeLookDirection(x, y);
-                }
-            }
-        }
+    public void on_render(MinecraftClient client)
+    {
+        this.controller_input.on_render(client);
     }
 
     /**

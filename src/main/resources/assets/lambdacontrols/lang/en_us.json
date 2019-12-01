@@ -1,0 +1,12 @@
+{
+  "lambdacontrols.menu.controller_controls": "Controller controls...",
+  "lambdacontrols.menu.controls_mode": "Controls mode",
+  "lambdacontrols.menu.dead_zone": "Dead zone",
+  "lambdacontrols.menu.hud_side": "HUD side",
+  "lambdacontrols.menu.rotation_speed": "Rotation speed",
+  "lambdacontrols.controls_mode.default": "Keyboard/Mouse",
+  "lambdacontrols.controls_mode.controller": "Controller",
+  "lambdacontrols.controls_mode.touchscreen": "Touchscreen",
+  "lambdacontrols.hud_side.left": "left",
+  "lambdacontrols.hud_side.right": "right"
+}
