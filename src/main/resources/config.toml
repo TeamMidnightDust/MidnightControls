@@ -9,13 +9,23 @@ controls = "default"
 
 # Controller settings
 [controller]
-    dead_zone = 0.25
-    rotation_speed = 25.0
+    # Controller to use.
+    id = 0
+    # Controller's dead zone.
+    dead_zone = 0.20
+    # Rotation speed for look directions.
+    rotation_speed = 40.0
+    # Mouse speed in GUI.
+    mouse_speed = 30.0
     # Controller controls
     [controller.controls]
         attack = "button_7"
+        b = "button_1"
         back = "axe_1+"
-        drop = "button_2"
+        dpad_up = "button_13"
+        dpad_right = "button_14"
+        dpad_down = "button_15"
+        dpad_left = "button_16"
         forward = "axe_1-"
         hotbar_left = "button_4"
         hotbar_right = "button_5"
@@ -31,6 +41,7 @@ controls = "default"
         view_left = "axe_2-"
         view_right = "axe_2+"
         view_up = "axe_3-"
+        x = "button_2"
 
 # Colors
 [colors]

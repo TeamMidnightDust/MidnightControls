@@ -9,39 +9,15 @@
 
 package me.lambdaurora.lambdacontrols;
 
-import me.lambdaurora.lambdacontrols.mixin.AbstractContainerScreenAccessor;
-import me.lambdaurora.lambdacontrols.util.CreativeInventoryScreenAccessor;
-import me.lambdaurora.lambdacontrols.util.LambdaKeyBinding;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.gui.screen.world.WorldListWidget;
-import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
-import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.client.options.GameOptions;
-import net.minecraft.container.Slot;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.toast.SystemToast;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.lwjgl.glfw.GLFW.GLFW_JOYSTICK_1;
 
 
 /**
@@ -49,23 +25,10 @@ import static org.lwjgl.glfw.GLFW.GLFW_JOYSTICK_1;
  */
 public class LambdaControls implements ClientModInitializer
 {
-    private static LambdaControls        INSTANCE;
-    public final   Logger                logger                 = LogManager.getLogger("LambdaControls");
-    public final   LambdaControlsConfig  config                 = new LambdaControlsConfig(this);
-    public final   ControllerInput       controller_input       = new ControllerInput(this);
-    private final  Map<Integer, Integer> BUTTON_STATES          = new HashMap<>();
-    private        float                 prev_x_axis            = 0.F;
-    private        float                 prev_y_axis            = 0.F;
-    private        int                   prev_target_mouse_x    = 0;
-    private        int                   prev_target_mouse_y    = 0;
-    private        int                   target_mouse_x         = 0;
-    private        int                   target_mouse_y         = 0;
-    private        float                 mouse_speed_x          = 0.F;
-    private        float                 mouse_speed_y          = 0.F;
-    private        boolean               last_a_state           = false;
-    private        int                   cid                    = GLFW_JOYSTICK_1;
-    private        boolean               allow_controller_mouse = true;
-    private        int                   action_gui_cooldown    = 0;
+    private static LambdaControls       INSTANCE;
+    public final   Logger               logger           = LogManager.getLogger("LambdaControls");
+    public final   LambdaControlsConfig config           = new LambdaControlsConfig(this);
+    public final   ControllerInput      controller_input = new ControllerInput(this);
 
     @Override
     public void onInitializeClient()
@@ -80,11 +43,16 @@ public class LambdaControls implements ClientModInitializer
      */
     public void on_mc_init(@NotNull MinecraftClient client)
     {
+        Controller.update_mappings();
         this.config.init_keybindings(client.options);
         GLFW.glfwSetJoystickCallback((jid, event) -> {
             if (event == GLFW.GLFW_CONNECTED) {
-                this.log("CONNECTED " + jid);
-                cid = jid;
+                Controller controller = Controller.by_id(jid);
+                client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, new TranslatableText("lambdacontrols.controller.connected", jid),
+                        new LiteralText(controller.get_name())));
+            } else if (event == GLFW.GLFW_DISCONNECTED) {
+                client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, new TranslatableText("lambdacontrols.controller.disconnected", jid),
+                        null));
             }
         });
     }
@@ -98,16 +66,6 @@ public class LambdaControls implements ClientModInitializer
     {
         if (this.config.get_controls_mode() == ControlsMode.CONTROLLER)
             this.controller_input.on_tick(client);
-        /* Decreases the cooldown for the screen focus change.
-        if (this.action_gui_cooldown > 0)
-            --this.action_gui_cooldown;
-        if (this.action_gui_cooldown == 0)
-            this.allow_controller_mouse = true;
-
-        this.prev_target_mouse_x = this.target_mouse_x;
-        this.prev_target_mouse_y = this.target_mouse_y;
-        if (LambdaControls.get().config.get_controls_mode() == ControlsMode.CONTROLLER)
-            this.on_controller_tick(client);*/
     }
 
     public void on_render(MinecraftClient client)

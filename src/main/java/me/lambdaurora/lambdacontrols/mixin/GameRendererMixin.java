@@ -27,7 +27,7 @@ public class GameRendererMixin
     @Final
     private MinecraftClient client;
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;render(IIF)V"))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Mouse;getX()D"))
     private void on_render(float tick_delta, long start_time, boolean full_render, CallbackInfo ci)
     {
         if (this.client.currentScreen != null && LambdaControls.get().config.get_controls_mode() == ControlsMode.CONTROLLER)

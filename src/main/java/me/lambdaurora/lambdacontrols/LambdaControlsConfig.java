@@ -13,6 +13,7 @@ import com.electronwill.nightconfig.core.file.FileConfig;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,13 +32,21 @@ public class LambdaControlsConfig
     // Controller settings
     private       double                  dead_zone;
     private       double                  rotation_speed;
+    private       double                  mouse_speed;
     // Controller controls
+    private       String                  b_button;
     private       String                  back_button;
+    private       String                  dpad_up;
+    private       String                  dpad_right;
+    private       String                  dpad_down;
+    private       String                  dpad_left;
     private       String                  forward_button;
+    private       String                  inventory_button;
     private       String                  jump_button;
     private       String                  left_button;
     private       String                  right_button;
     private       String                  sneak_button;
+    private       String                  x_button;
 
     public LambdaControlsConfig(@NotNull LambdaControls mod)
     {
@@ -52,15 +61,23 @@ public class LambdaControlsConfig
         this.controls_mode = ControlsMode.by_id(this.config.getOrElse("controls", "default")).orElse(ControlsMode.DEFAULT);
         this.hud_side = HudSide.by_id(this.config.getOrElse("hud.side", "left")).orElse(HudSide.LEFT);
         // Controller settings
-        this.dead_zone = this.config.getOrElse("controller.dead_zone", 0.25D);
-        this.rotation_speed = this.config.getOrElse("controller.rotation_speed", 25.D);
+        this.dead_zone = this.config.getOrElse("controller.dead_zone", 0.25);
+        this.rotation_speed = this.config.getOrElse("controller.rotation_speed", 40.0);
+        this.mouse_speed = this.config.getOrElse("controller.mouse_speed", 25.0);
         // Controller controls
+        this.b_button = this.config.getOrElse("controller.controls.b", "none").toLowerCase();
         this.back_button = this.config.getOrElse("controller.controls.back", "none").toLowerCase();
+        this.dpad_up = this.config.getOrElse("controller.controls.dpad_up", "none").toLowerCase();
+        this.dpad_right = this.config.getOrElse("controller.controls.dpad_right", "none").toLowerCase();
+        this.dpad_down = this.config.getOrElse("controller.controls.dpad_down", "none").toLowerCase();
+        this.dpad_left = this.config.getOrElse("controller.controls.dpad_left", "none").toLowerCase();
         this.forward_button = this.config.getOrElse("controller.controls.forward", "none").toLowerCase();
+        this.inventory_button = this.config.getOrElse("controller.controls.inventory", "none").toLowerCase();
         this.jump_button = this.config.getOrElse("controller.controls.jump", "none").toLowerCase();
         this.left_button = this.config.getOrElse("controller.controls.left", "none").toLowerCase();
         this.right_button = this.config.getOrElse("controller.controls.right", "none").toLowerCase();
         this.sneak_button = this.config.getOrElse("controller.controls.sneak", "none").toLowerCase();
+        this.x_button = this.config.getOrElse("controller.controls.x", "none").toLowerCase();
     }
 
     public void init_keybindings(GameOptions options)
@@ -70,14 +87,12 @@ public class LambdaControlsConfig
             this.keybinding_mappings.put(str, options.keyAttack);
         if (!this.back_button.equals("none"))
             this.keybinding_mappings.put(this.back_button, options.keyBack);
-        str = this.config.getOrElse("controller.controls.drop", "none").toLowerCase();
-        if (!str.equals("none"))
-            this.keybinding_mappings.put(str, options.keyDrop);
+        if (!this.b_button.equals("none"))
+            this.keybinding_mappings.put(this.b_button, options.keyDrop);
         if (!this.forward_button.equals("none"))
             this.keybinding_mappings.put(this.forward_button, options.keyForward);
-        str = this.config.getOrElse("controller.controls.inventory", "none").toLowerCase();
-        if (!str.equals("none"))
-            this.keybinding_mappings.put(str, options.keyInventory);
+        if (!this.inventory_button.equals("none"))
+            this.keybinding_mappings.put(this.inventory_button, options.keyInventory);
         if (!this.jump_button.equals("none"))
             this.keybinding_mappings.put(this.jump_button, options.keyJump);
         if (!this.left_button.equals("none"))
@@ -92,12 +107,15 @@ public class LambdaControlsConfig
         str = this.config.getOrElse("controller.controls.use", "none").toLowerCase();
         if (!str.equals("none"))
             this.keybinding_mappings.put(str, options.keyUse);
+        if (!this.x_button.equals("none"))
+            this.keybinding_mappings.put(this.x_button, options.keySwapHands);
     }
 
     public void save()
     {
         this.config.set("controller.dead_zone", this.dead_zone);
         this.config.set("controller.rotation_speed", this.rotation_speed);
+        this.config.set("controller.mouse_speed", this.mouse_speed);
         this.config.save();
         this.mod.log("Configuration saved.");
     }
@@ -145,6 +163,33 @@ public class LambdaControlsConfig
     }
 
     /**
+     * Gets the used controller.
+     *
+     * @return The used controller.
+     */
+    public @NotNull Controller get_controller()
+    {
+        Object raw = this.config.getRaw("controller.id");
+        if (raw instanceof Number) {
+            return Controller.by_id((Integer) raw);
+        } else if (raw instanceof String) {
+            return Controller.by_guid((String) raw).orElse(Controller.by_id(GLFW.GLFW_JOYSTICK_1));
+        }
+        return Controller.by_id(GLFW.GLFW_JOYSTICK_1);
+    }
+
+    /**
+     * Sets the used controller.
+     *
+     * @param controller The used controller.
+     */
+    public void set_controller(@NotNull Controller controller)
+    {
+        String guid = controller.get_guid();
+        this.config.set("controller.id", guid.equals("") ? controller.get_id() : guid);
+    }
+
+    /**
      * Gets the controller's dead zone from the configuration.
      *
      * @return The controller's dead zone value.
@@ -185,6 +230,26 @@ public class LambdaControlsConfig
     }
 
     /**
+     * Gets the controller's mouse speed.
+     *
+     * @return The mouse speed.
+     */
+    public double get_mouse_speed()
+    {
+        return this.mouse_speed;
+    }
+
+    /**
+     * Sets the controller's mouse speed.
+     *
+     * @param mouse_speed The mouse speed.
+     */
+    public void set_mouse_speed(double mouse_speed)
+    {
+        this.mouse_speed = mouse_speed;
+    }
+
+    /**
      * Returns the keybindings.
      *
      * @return The keybindings.
@@ -199,9 +264,39 @@ public class LambdaControlsConfig
         return Optional.ofNullable(this.keybinding_mappings.get(id));
     }
 
+    /**
+     * Returns the B button mapping.
+     *
+     * @return The B button mapping.
+     */
+    public String get_b_button()
+    {
+        return this.b_button;
+    }
+
     public String get_back_button()
     {
         return this.back_button;
+    }
+
+    public String get_dpad_up()
+    {
+        return this.dpad_up;
+    }
+
+    public String get_dpad_right()
+    {
+        return this.dpad_right;
+    }
+
+    public String get_dpad_down()
+    {
+        return this.dpad_down;
+    }
+
+    public String get_dpad_left()
+    {
+        return this.dpad_left;
     }
 
     public String get_forward_button()
@@ -217,6 +312,16 @@ public class LambdaControlsConfig
     public String get_hotbar_right_button()
     {
         return this.config.getOrElse("controller.controls.hotbar_right", "none").toLowerCase();
+    }
+
+    /**
+     * Gets the Inventory button mapping.
+     *
+     * @return The Inventory button mapping.
+     */
+    public String get_inventory_button()
+    {
+        return this.inventory_button;
     }
 
     public String get_jump_button()
@@ -244,6 +349,50 @@ public class LambdaControlsConfig
         return this.config.getOrElse("controller.controls.start", "none").toLowerCase();
     }
 
+    public String get_x_button()
+    {
+        return this.x_button;
+    }
+
+    public boolean is_b_button(int button)
+    {
+        return this.get_b_button().equals("button_" + button);
+    }
+
+    public boolean is_back_button(int btn, boolean is_btn, int state)
+    {
+        if (!is_btn && state == 0)
+            return false;
+        return this.get_back_button().equals((is_btn ? "button_" : "axe_") + btn + (is_btn ? "" : (state == 1 ? "+" : "-")));
+    }
+
+    public boolean is_dpad_up(int button)
+    {
+        return this.get_dpad_up().equals("button_" + button);
+    }
+
+    public boolean is_dpad_right(int button)
+    {
+        return this.get_dpad_right().equals("button_" + button);
+    }
+
+    public boolean is_dpad_down(int button)
+    {
+        return this.get_dpad_down().equals("button_" + button);
+    }
+
+    public boolean is_dpad_left(int button)
+    {
+        return this.get_dpad_left().equals("button_" + button);
+    }
+
+    public boolean is_forward_button(int btn, boolean is_btn, int state)
+    {
+        if (!is_btn && state == 0)
+            return false;
+        return this.get_forward_button().equals((is_btn ? "button_" : "axe_") + btn + (is_btn ? "" : (state == 1 ? "+" : "-")));
+    }
+
     public boolean is_hotbar_left_button(int button)
     {
         return this.get_hotbar_left_button().equals("button_" + button);
@@ -254,18 +403,9 @@ public class LambdaControlsConfig
         return this.get_hotbar_right_button().equals("button_" + button);
     }
 
-    public boolean is_back_button(int btn, boolean is_btn, int state)
+    public boolean is_inventory_button(int btn)
     {
-        if (!is_btn && state == 0)
-            return false;
-        return this.get_back_button().equals((is_btn ? "button_" : "axe_") + btn + (is_btn ? "" : (state == 1 ? "+" : "-")));
-    }
-
-    public boolean is_forward_button(int btn, boolean is_btn, int state)
-    {
-        if (!is_btn && state == 0)
-            return false;
-        return this.get_forward_button().equals((is_btn ? "button_" : "axe_") + btn + (is_btn ? "" : (state == 1 ? "+" : "-")));
+        return this.get_inventory_button().equals("button_" + btn);
     }
 
     public boolean is_jump_button(int btn)
@@ -295,6 +435,11 @@ public class LambdaControlsConfig
     public boolean is_start_button(int btn)
     {
         return this.get_start_button().equals("button_" + btn);
+    }
+
+    public boolean is_x_button(int btn)
+    {
+        return this.get_x_button().equals("button_" + btn);
     }
 
     public String get_view_down_control()

@@ -4,7 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "client": [
     "AbstractButtonWidgetAccessor",
-    "AbstractContainerScreenAccessor",
+    "AbstractContainerScreenMixin",
     "CreativeInventoryScreenMixin",
     "GameRendererMixin",
     "InGameHudMixin",
