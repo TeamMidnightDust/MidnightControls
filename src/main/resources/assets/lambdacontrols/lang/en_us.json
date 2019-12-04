@@ -1,15 +1,20 @@
 {
-  "lambdacontrols.menu.controller_controls": "Controller controls...",
-  "lambdacontrols.menu.controls_mode": "Controls mode",
-  "lambdacontrols.menu.dead_zone": "Dead zone",
-  "lambdacontrols.menu.hud_side": "HUD side",
-  "lambdacontrols.menu.rotation_speed": "Rotation speed",
-  "lambdacontrols.menu.mouse_speed": "Mouse speed",
   "lambdacontrols.controller.connected": "Controller %d connected.",
   "lambdacontrols.controller.disconnected": "Controller %d disconnected.",
+  "lambdacontrols.controller.mappings.1": "To configure the controller mappings, please use SDL2 Gamepad Tool",
+  "lambdacontrols.controller.mappings.2": "(http://generalarcade.com/gamepadtool/),",
+  "lambdacontrols.controller.mappings.3": "and put the mapping in `config/gamecontrollerdb.txt`.",
   "lambdacontrols.controls_mode.default": "Keyboard/Mouse",
   "lambdacontrols.controls_mode.controller": "Controller",
   "lambdacontrols.controls_mode.touchscreen": "Touchscreen",
   "lambdacontrols.hud_side.left": "left",
-  "lambdacontrols.hud_side.right": "right"
+  "lambdacontrols.hud_side.right": "right",
+  "lambdacontrols.menu.controller": "Controller",
+  "lambdacontrols.menu.controls_mode": "Controls mode",
+  "lambdacontrols.menu.dead_zone": "Dead zone",
+  "lambdacontrols.menu.hud_side": "HUD side",
+  "lambdacontrols.menu.invert_right_x_axis": "Invert right X",
+  "lambdacontrols.menu.invert_right_y_axis": "Invert right Y",
+  "lambdacontrols.menu.mouse_speed": "Mouse speed",
+  "lambdacontrols.menu.rotation_speed": "Rotation speed"
 }

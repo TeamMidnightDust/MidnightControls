@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.lwjgl.glfw.GLFW.*;
+
 /**
  * Represents LambdaControls configuration.
  */
@@ -34,19 +36,10 @@ public class LambdaControlsConfig
     private       double                  rotation_speed;
     private       double                  mouse_speed;
     // Controller controls
-    private       String                  b_button;
     private       String                  back_button;
-    private       String                  dpad_up;
-    private       String                  dpad_right;
-    private       String                  dpad_down;
-    private       String                  dpad_left;
     private       String                  forward_button;
-    private       String                  inventory_button;
-    private       String                  jump_button;
     private       String                  left_button;
     private       String                  right_button;
-    private       String                  sneak_button;
-    private       String                  x_button;
 
     public LambdaControlsConfig(@NotNull LambdaControls mod)
     {
@@ -65,50 +58,29 @@ public class LambdaControlsConfig
         this.rotation_speed = this.config.getOrElse("controller.rotation_speed", 40.0);
         this.mouse_speed = this.config.getOrElse("controller.mouse_speed", 25.0);
         // Controller controls
-        this.b_button = this.config.getOrElse("controller.controls.b", "none").toLowerCase();
         this.back_button = this.config.getOrElse("controller.controls.back", "none").toLowerCase();
-        this.dpad_up = this.config.getOrElse("controller.controls.dpad_up", "none").toLowerCase();
-        this.dpad_right = this.config.getOrElse("controller.controls.dpad_right", "none").toLowerCase();
-        this.dpad_down = this.config.getOrElse("controller.controls.dpad_down", "none").toLowerCase();
-        this.dpad_left = this.config.getOrElse("controller.controls.dpad_left", "none").toLowerCase();
         this.forward_button = this.config.getOrElse("controller.controls.forward", "none").toLowerCase();
-        this.inventory_button = this.config.getOrElse("controller.controls.inventory", "none").toLowerCase();
-        this.jump_button = this.config.getOrElse("controller.controls.jump", "none").toLowerCase();
         this.left_button = this.config.getOrElse("controller.controls.left", "none").toLowerCase();
         this.right_button = this.config.getOrElse("controller.controls.right", "none").toLowerCase();
-        this.sneak_button = this.config.getOrElse("controller.controls.sneak", "none").toLowerCase();
-        this.x_button = this.config.getOrElse("controller.controls.x", "none").toLowerCase();
     }
 
     public void init_keybindings(GameOptions options)
     {
-        String str = this.config.getOrElse("controller.controls.attack", "none").toLowerCase();
-        if (!str.equals("none"))
-            this.keybinding_mappings.put(str, options.keyAttack);
-        if (!this.back_button.equals("none"))
-            this.keybinding_mappings.put(this.back_button, options.keyBack);
-        if (!this.b_button.equals("none"))
-            this.keybinding_mappings.put(this.b_button, options.keyDrop);
-        if (!this.forward_button.equals("none"))
-            this.keybinding_mappings.put(this.forward_button, options.keyForward);
-        if (!this.inventory_button.equals("none"))
-            this.keybinding_mappings.put(this.inventory_button, options.keyInventory);
-        if (!this.jump_button.equals("none"))
-            this.keybinding_mappings.put(this.jump_button, options.keyJump);
-        if (!this.left_button.equals("none"))
-            this.keybinding_mappings.put(this.left_button, options.keyLeft);
-        if (!this.right_button.equals("none"))
-            this.keybinding_mappings.put(this.right_button, options.keyRight);
-        if (!this.sneak_button.equals("none"))
-            this.keybinding_mappings.put(this.sneak_button, options.keySneak);
-        str = this.config.getOrElse("controller.controls.sprint", "none").toLowerCase();
-        if (!str.equals("none"))
-            this.keybinding_mappings.put(str, options.keySprint);
-        str = this.config.getOrElse("controller.controls.use", "none").toLowerCase();
-        if (!str.equals("none"))
-            this.keybinding_mappings.put(str, options.keyUse);
-        if (!this.x_button.equals("none"))
-            this.keybinding_mappings.put(this.x_button, options.keySwapHands);
+        this.keybinding_mappings.put("axis_" + GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER + "+", options.keyAttack);
+        this.keybinding_mappings.put("axis_" + GLFW_GAMEPAD_AXIS_LEFT_TRIGGER + "+", options.keyUse);
+        this.keybinding_mappings.put("axis_" + GLFW_GAMEPAD_AXIS_LEFT_X + "+", options.keyRight);
+        this.keybinding_mappings.put("axis_" + GLFW_GAMEPAD_AXIS_LEFT_X + "-", options.keyLeft);
+        this.keybinding_mappings.put("axis_" + GLFW_GAMEPAD_AXIS_LEFT_Y + "+", options.keyBack);
+        this.keybinding_mappings.put("axis_" + GLFW_GAMEPAD_AXIS_LEFT_Y + "-", options.keyForward);
+        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_A, options.keyJump);
+        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_B, options.keyDrop);
+        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_X, options.keySwapHands);
+        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_Y, options.keyInventory);
+        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_BACK, options.keyPlayerList);
+        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_GUIDE, options.keyScreenshot);
+        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_RIGHT_THUMB, options.keySneak);
+        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_LEFT_THUMB, options.keySprint);
+        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_DPAD_UP, options.keyTogglePerspective);
     }
 
     public void save()
@@ -185,8 +157,7 @@ public class LambdaControlsConfig
      */
     public void set_controller(@NotNull Controller controller)
     {
-        String guid = controller.get_guid();
-        this.config.set("controller.id", guid.equals("") ? controller.get_id() : guid);
+        this.config.set("controller.id", controller.get_id());
     }
 
     /**
@@ -250,6 +221,66 @@ public class LambdaControlsConfig
     }
 
     /**
+     * Returns whether the right X axis is inverted or not.
+     *
+     * @return True if the right X axis is inverted, else false.
+     */
+    public boolean does_invert_right_x_axis()
+    {
+        return this.config.getOrElse("controller.invert_right_x_axis", false);
+    }
+
+    /**
+     * Sets whether the right X axis is inverted or not.
+     *
+     * @param invert True if the right X axis is inverted, else false.
+     */
+    public void set_invert_right_x_axis(boolean invert)
+    {
+        this.config.set("controller.invert_right_x_axis", invert);
+    }
+
+    /**
+     * Returns whether the right Y axis is inverted or not.
+     *
+     * @return True if the right Y axis is inverted, else false.
+     */
+    public boolean does_invert_right_y_axis()
+    {
+        return this.config.getOrElse("controller.invert_right_y_axis", false);
+    }
+
+    /**
+     * Sets whether the right Y axis is inverted or not.
+     *
+     * @param invert True if the right Y axis is inverted, else false.
+     */
+    public void set_invert_right_y_axis(boolean invert)
+    {
+        this.config.set("controller.invert_right_y_axis", invert);
+    }
+
+    /**
+     * Gets the right X axis sign.
+     *
+     * @return The right X axis sign.
+     */
+    public double get_right_x_axis_sign()
+    {
+        return this.does_invert_right_x_axis() ? -1.0 : 1.0;
+    }
+
+    /**
+     * Gets the right Y axis sign.
+     *
+     * @return The right Y axis sign.
+     */
+    public double get_right_y_axis_sign()
+    {
+        return this.does_invert_right_y_axis() ? -1.0 : 1.0;
+    }
+
+    /**
      * Returns the keybindings.
      *
      * @return The keybindings.
@@ -264,69 +295,14 @@ public class LambdaControlsConfig
         return Optional.ofNullable(this.keybinding_mappings.get(id));
     }
 
-    /**
-     * Returns the B button mapping.
-     *
-     * @return The B button mapping.
-     */
-    public String get_b_button()
-    {
-        return this.b_button;
-    }
-
     public String get_back_button()
     {
         return this.back_button;
     }
 
-    public String get_dpad_up()
-    {
-        return this.dpad_up;
-    }
-
-    public String get_dpad_right()
-    {
-        return this.dpad_right;
-    }
-
-    public String get_dpad_down()
-    {
-        return this.dpad_down;
-    }
-
-    public String get_dpad_left()
-    {
-        return this.dpad_left;
-    }
-
     public String get_forward_button()
     {
         return this.forward_button;
-    }
-
-    public String get_hotbar_left_button()
-    {
-        return this.config.getOrElse("controller.controls.hotbar_left", "none").toLowerCase();
-    }
-
-    public String get_hotbar_right_button()
-    {
-        return this.config.getOrElse("controller.controls.hotbar_right", "none").toLowerCase();
-    }
-
-    /**
-     * Gets the Inventory button mapping.
-     *
-     * @return The Inventory button mapping.
-     */
-    public String get_inventory_button()
-    {
-        return this.inventory_button;
-    }
-
-    public String get_jump_button()
-    {
-        return this.jump_button;
     }
 
     public String get_left_button()
@@ -339,26 +315,6 @@ public class LambdaControlsConfig
         return this.right_button;
     }
 
-    public String get_sneak_button()
-    {
-        return this.sneak_button;
-    }
-
-    public String get_start_button()
-    {
-        return this.config.getOrElse("controller.controls.start", "none").toLowerCase();
-    }
-
-    public String get_x_button()
-    {
-        return this.x_button;
-    }
-
-    public boolean is_b_button(int button)
-    {
-        return this.get_b_button().equals("button_" + button);
-    }
-
     public boolean is_back_button(int btn, boolean is_btn, int state)
     {
         if (!is_btn && state == 0)
@@ -366,51 +322,11 @@ public class LambdaControlsConfig
         return this.get_back_button().equals((is_btn ? "button_" : "axe_") + btn + (is_btn ? "" : (state == 1 ? "+" : "-")));
     }
 
-    public boolean is_dpad_up(int button)
-    {
-        return this.get_dpad_up().equals("button_" + button);
-    }
-
-    public boolean is_dpad_right(int button)
-    {
-        return this.get_dpad_right().equals("button_" + button);
-    }
-
-    public boolean is_dpad_down(int button)
-    {
-        return this.get_dpad_down().equals("button_" + button);
-    }
-
-    public boolean is_dpad_left(int button)
-    {
-        return this.get_dpad_left().equals("button_" + button);
-    }
-
     public boolean is_forward_button(int btn, boolean is_btn, int state)
     {
         if (!is_btn && state == 0)
             return false;
         return this.get_forward_button().equals((is_btn ? "button_" : "axe_") + btn + (is_btn ? "" : (state == 1 ? "+" : "-")));
-    }
-
-    public boolean is_hotbar_left_button(int button)
-    {
-        return this.get_hotbar_left_button().equals("button_" + button);
-    }
-
-    public boolean is_hotbar_right_button(int button)
-    {
-        return this.get_hotbar_right_button().equals("button_" + button);
-    }
-
-    public boolean is_inventory_button(int btn)
-    {
-        return this.get_inventory_button().equals("button_" + btn);
-    }
-
-    public boolean is_jump_button(int btn)
-    {
-        return this.get_jump_button().equals("button_" + btn);
     }
 
     public boolean is_left_button(int btn, boolean is_btn, int state)
@@ -425,81 +341,6 @@ public class LambdaControlsConfig
         if (!is_btn && state == 0)
             return false;
         return this.get_right_button().equals((is_btn ? "button_" : "axe_") + btn + (is_btn ? "" : (state == 1 ? "+" : "-")));
-    }
-
-    public boolean is_sneak_button(int btn)
-    {
-        return this.get_sneak_button().equals("button_" + btn);
-    }
-
-    public boolean is_start_button(int btn)
-    {
-        return this.get_start_button().equals("button_" + btn);
-    }
-
-    public boolean is_x_button(int btn)
-    {
-        return this.get_x_button().equals("button_" + btn);
-    }
-
-    public String get_view_down_control()
-    {
-        return this.config.getOrElse("controller.controls.view_down", "none").toLowerCase();
-    }
-
-    public String get_view_left_control()
-    {
-        return this.config.getOrElse("controller.controls.view_left", "none").toLowerCase();
-    }
-
-    public String get_view_right_control()
-    {
-        return this.config.getOrElse("controller.controls.view_right", "none").toLowerCase();
-    }
-
-    public String get_view_up_control()
-    {
-        return this.config.getOrElse("controller.controls.view_up", "none").toLowerCase();
-    }
-
-    public boolean is_view_down_control(int axe, int state)
-    {
-        if (state == 0)
-            return false;
-        return this.get_view_down_control().contains(axe + (state == 1 ? "+" : "-"));
-    }
-
-    public boolean is_view_left_control(int axe, int state)
-    {
-        if (state == 0)
-            return false;
-        return this.get_view_left_control().endsWith(axe + (state == 1 ? "+" : "-"));
-    }
-
-    public boolean is_view_right_control(int axe, int state)
-    {
-        if (state == 0)
-            return false;
-        return this.get_view_right_control().contains(axe + (state == 1 ? "+" : "-"));
-    }
-
-    public boolean is_view_up_control(int axe, int state)
-    {
-        if (state == 0)
-            return false;
-        return this.get_view_up_control().contains(axe + (state == 1 ? "+" : "-"));
-    }
-
-    /**
-     * Returns whether the specified axis is an axis used for look direction.
-     *
-     * @param i The axis index.
-     * @return True if the axis is used for look direction, else false.
-     */
-    public boolean is_look_axis(int i)
-    {
-        return this.get_view_down_control().startsWith("axe_" + i) || this.get_view_left_control().startsWith("axe_" + i) || this.get_view_right_control().startsWith("axe_" + i)
-                || this.get_view_up_control().startsWith("axe_" + i);
     }
 
     /**

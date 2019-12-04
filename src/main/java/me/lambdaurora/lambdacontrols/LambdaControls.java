@@ -44,6 +44,7 @@ public class LambdaControls implements ClientModInitializer
     public void on_mc_init(@NotNull MinecraftClient client)
     {
         Controller.update_mappings();
+        ButtonBinding.init(client.options);
         this.config.init_keybindings(client.options);
         GLFW.glfwSetJoystickCallback((jid, event) -> {
             if (event == GLFW.GLFW_CONNECTED) {

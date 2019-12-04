@@ -17,14 +17,12 @@ import org.lwjgl.glfw.GLFWGamepadState;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -94,7 +92,7 @@ public class Controller implements Nameable
     public @NotNull String get_name()
     {
         String name = this.is_gamepad() ? GLFW.glfwGetGamepadName(this.id) : GLFW.glfwGetJoystickName(this.id);
-        return name == null ? "" : name;
+        return name == null ? String.valueOf(this.get_id()) : name;
     }
 
     /**
@@ -130,7 +128,7 @@ public class Controller implements Nameable
     {
         return CONTROLLERS.values().stream().filter(Controller::is_connected)
                 .filter(controller -> controller.get_guid().equals(guid))
-                .findFirst();
+                .max(Comparator.comparingInt(Controller::get_id));
     }
 
     private static ByteBuffer resizeBuffer(ByteBuffer buffer, int new_capacity)
@@ -178,8 +176,6 @@ public class Controller implements Nameable
             if (!mappings_file.exists())
                 return;
             ByteBuffer buffer = io_resource_to_buffer(mappings_file.getPath(), 1024);
-            //buffer.rewind();
-            System.out.println(buffer);
             GLFW.glfwUpdateGamepadMappings(buffer);
         } catch (IOException e) {
             e.printStackTrace();

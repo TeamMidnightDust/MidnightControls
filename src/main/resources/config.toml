@@ -17,35 +17,7 @@ controls = "default"
     rotation_speed = 40.0
     # Mouse speed in GUI.
     mouse_speed = 30.0
-    # Controller controls
-    [controller.controls]
-        attack = "button_7"
-        b = "button_1"
-        back = "axe_1+"
-        dpad_up = "button_13"
-        dpad_right = "button_14"
-        dpad_down = "button_15"
-        dpad_left = "button_16"
-        forward = "axe_1-"
-        hotbar_left = "button_4"
-        hotbar_right = "button_5"
-        inventory = "button_3"
-        jump = "button_0"
-        left = "axe_0-"
-        right = "axe_0+"
-        sneak = "button_12"
-        sprint = "button_11"
-        start = "button_9"
-        use = "button_6"
-        view_down = "axe_3+"
-        view_left = "axe_2-"
-        view_right = "axe_2+"
-        view_up = "axe_3-"
-        x = "button_2"
-
-# Colors
-[colors]
-normal = "#ffffffff"
-pressed = "#ffa000ff"
-background_normal = "#000000aa"
-background_pressed = "#555555aa"
+    # Inverts the right X axis.
+    invert_right_x_axis = false
+    # Inverts the right Y axis.
+    invert_right_y_axis = false

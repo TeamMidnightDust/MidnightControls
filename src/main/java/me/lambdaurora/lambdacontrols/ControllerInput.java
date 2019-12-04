@@ -18,9 +18,11 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
-import net.minecraft.client.gui.screen.ingame.*;
+import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
+import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
-import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
+import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.container.Slot;
 import net.minecraft.container.SlotActionType;
@@ -31,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
-import org.lwjgl.system.CallbackI;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -40,13 +41,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static me.lambdaurora.lambdacontrols.ButtonBinding.PAUSE_GAME;
+import static me.lambdaurora.lambdacontrols.ButtonBinding.SNEAK;
+import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X;
+import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
+
+/**
+ * Represents the controller input handler.
+ */
 public class ControllerInput
 {
     private static final Map<Integer, Boolean> BUTTON_STATES       = new HashMap<>();
     private static final Map<Integer, Integer> BUTTON_COOLDOWNS    = new HashMap<>();
+    private static final Map<Integer, Boolean> AXIS_STATES         = new HashMap<>();
+    private static final Map<Integer, Integer> AXIS_COOLDOWNS      = new HashMap<>();
     private final        LambdaControlsConfig  config;
     private              int                   action_gui_cooldown = 0;
     private              boolean               continuous_sneak    = false;
+    private              int                   ignore_next_a       = 0;
     private              int                   last_sneak          = 0;
     private              double                prev_target_yaw     = 0.0;
     private              double                prev_target_pitch   = 0.0;
@@ -74,6 +86,7 @@ public class ControllerInput
     public void on_tick(@NotNull MinecraftClient client)
     {
         BUTTON_COOLDOWNS.entrySet().stream().filter(entry -> entry.getValue() > 0).forEach(entry -> BUTTON_COOLDOWNS.put(entry.getKey(), entry.getValue() - 1));
+        AXIS_COOLDOWNS.entrySet().stream().filter(entry -> entry.getValue() > 0).forEach(entry -> AXIS_COOLDOWNS.put(entry.getKey(), entry.getValue() - 1));
         // Decreases the last_sneak counter which allows to double press to sneak continuously.
         if (this.last_sneak > 0)
             --this.last_sneak;
@@ -91,6 +104,9 @@ public class ControllerInput
             this.fetch_button_input(client, state);
             this.fetch_axe_input(client, state);
         }
+
+        if (this.ignore_next_a > 0)
+            this.ignore_next_a--;
     }
 
     public void on_pre_render_screen(@NotNull MinecraftClient client, @NotNull Screen screen)
@@ -130,22 +146,24 @@ public class ControllerInput
     private void fetch_button_input(@NotNull MinecraftClient client, @NotNull GLFWGamepadState gamepad_state)
     {
         ByteBuffer buffer = gamepad_state.buttons();
-        for (int i = 0; i < buffer.limit(); i++) {
+        for (int btn = 0; btn < buffer.limit(); btn++) {
             boolean btn_state = buffer.get() == (byte) 1;
-            boolean previous_state = BUTTON_STATES.getOrDefault(i, false);
+            boolean previous_state = BUTTON_STATES.getOrDefault(btn, false);
+
+            ButtonBinding.set_button_state(btn, btn_state);
 
             if (btn_state != previous_state) {
-                this.handle_button(client, i, btn_state ? 0 : 1, btn_state);
+                this.handle_button(client, btn, btn_state ? 0 : 1, btn_state);
                 if (btn_state)
-                    BUTTON_COOLDOWNS.put(i, 5);
+                    BUTTON_COOLDOWNS.put(btn, 5);
             } else if (btn_state) {
-                if (BUTTON_COOLDOWNS.getOrDefault(i, 0) == 0) {
-                    BUTTON_COOLDOWNS.put(i, 5);
-                    this.handle_button(client, i, 2, true);
+                if (BUTTON_COOLDOWNS.getOrDefault(btn, 0) == 0) {
+                    BUTTON_COOLDOWNS.put(btn, 5);
+                    this.handle_button(client, btn, 2, true);
                 }
             }
 
-            BUTTON_STATES.put(i, btn_state);
+            BUTTON_STATES.put(btn, btn_state);
         }
     }
 
@@ -163,15 +181,17 @@ public class ControllerInput
 
     private void handle_button(@NotNull MinecraftClient client, int button, int action, boolean state)
     {
-        if (action == 0) {
+        if (action == 0 || action == 2) {
             // Handles RB and LB buttons.
             if (button == GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER || button == GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER) {
                 this.handle_rb_lb(client, button == GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER);
                 return;
             }
+        }
 
+        if (action == 0) {
             // Handles when the player presses the Start button.
-            if (button == GLFW.GLFW_GAMEPAD_BUTTON_START) {
+            if (PAUSE_GAME.is_button(button)) {
                 // If in game, then pause the game.
                 if (client.currentScreen == null)
                     client.openPauseMenu(false);
@@ -185,10 +205,12 @@ public class ControllerInput
             if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null) {
                 if (this.action_gui_cooldown == 0) {
                     Element focused = client.currentScreen.getFocused();
-                    if (focused != null && this.is_screen_interactive(client.currentScreen))
-                        this.handle_a_button(focused);
-                    this.action_gui_cooldown = 5; // Prevent to press too quickly the focused element, so we have to skip 5 ticks.
-                    return;
+                    if (focused != null && this.is_screen_interactive(client.currentScreen)) {
+                        if (this.handle_a_button(focused)) {
+                            this.action_gui_cooldown = 5; // Prevent to press too quickly the focused element, so we have to skip 5 ticks.
+                            return;
+                        }
+                    }
                 }
             }
 
@@ -198,6 +220,7 @@ public class ControllerInput
                 Slot slot = ((AbstractContainerScreenAccessor) client.currentScreen).get_slot_at(pos_x, pos_y);
                 if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && slot != null) {
                     client.interactionManager.method_2906(((AbstractContainerScreen) client.currentScreen).getContainer().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_1, SlotActionType.PICKUP, client.player);
+                    this.action_gui_cooldown = 5;
                     return;
                 } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
                     client.player.closeContainer();
@@ -218,7 +241,7 @@ public class ControllerInput
         }
 
         // Handles sneak button and continuous sneak.
-        if (button == GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB && client.player != null) {
+        if (SNEAK.is_button(button) && client.player != null) {
             if (action == 0) {
                 if (this.continuous_sneak) {
                     this.set_sneaking(client, this.continuous_sneak = false);
@@ -236,74 +259,91 @@ public class ControllerInput
             return;
         }
 
-        if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null && !this.is_screen_interactive(client.currentScreen)) {
+        if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null && !this.is_screen_interactive(client.currentScreen) && this.action_gui_cooldown == 0 && this.ignore_next_a == 0) {
             double mouse_x = client.mouse.getX() * (double) client.window.getScaledWidth() / (double) client.window.getWidth();
             double mouse_y = client.mouse.getY() * (double) client.window.getScaledHeight() / (double) client.window.getHeight();
-            if (client.currentScreen instanceof AbstractContainerScreen) {
-                Slot slot = ((AbstractContainerScreenAccessor) client.currentScreen).get_slot_at(mouse_x, mouse_y);
-                if (slot != null)
-                    return;
-            }
             if (action == 0) {
                 client.currentScreen.mouseClicked(mouse_x, mouse_y, GLFW.GLFW_MOUSE_BUTTON_1);
             } else if (action == 1) {
                 client.currentScreen.mouseReleased(mouse_x, mouse_y, GLFW.GLFW_MOUSE_BUTTON_1);
             }
+            this.action_gui_cooldown = 5;
             return;
         }
 
         if (client.currentScreen == null && action != 2) {
-            Optional<KeyBinding> key_binding = this.config.get_keybind("button_" + button);
-            key_binding.ifPresent(keyBinding -> ((LambdaKeyBinding) keyBinding).handle_press_state(action != 1));
+            ButtonBinding.handle_button(button, state);
+            //Optional<KeyBinding> key_binding = this.config.get_keybind("button_" + button);
+            //key_binding.ifPresent(keyBinding -> ((LambdaKeyBinding) keyBinding).handle_press_state(action != 1));
         }
     }
 
-    private void handle_axe(@NotNull MinecraftClient client, int axe, float value, float abs_value, int state)
+    private void handle_axe(@NotNull MinecraftClient client, int axis, float value, float abs_value, int state)
     {
         int as_button_state = value > 0.5F ? 1 : (value < -0.5F ? 2 : 0);
         double dead_zone = this.config.get_dead_zone();
         if (client.currentScreen == null) {
-            this.config.get_keybind("axe_" + axe + "+").ifPresent(key_binding -> ((LambdaKeyBinding) key_binding).handle_press_state(as_button_state == 1));
-            this.config.get_keybind("axe_" + axe + "-").ifPresent(key_binding -> ((LambdaKeyBinding) key_binding).handle_press_state(as_button_state == 2));
+            {
+                int axis_minus = axis + 10;
+                boolean current_plus_state = as_button_state == 1;
+                boolean current_minus_state = as_button_state == 2;
+                boolean previous_plus_state = AXIS_STATES.getOrDefault(axis, false);
+                boolean previous_minus_state = AXIS_STATES.getOrDefault(axis_minus, false);
+
+                if (current_plus_state != previous_plus_state) {
+                    this.config.get_keybind("axis_" + axis + "+").ifPresent(key_binding -> ((LambdaKeyBinding) key_binding).handle_press_state(current_plus_state));
+                    if (current_plus_state)
+                        AXIS_COOLDOWNS.put(axis, 5);
+                } else if (current_plus_state) {
+                    if (AXIS_COOLDOWNS.getOrDefault(axis, 0) == 0) {
+                        AXIS_COOLDOWNS.put(axis, 5);
+                    }
+                }
+
+                if (current_minus_state != previous_minus_state) {
+                    this.config.get_keybind("axis_" + axis + "-").ifPresent(key_binding -> ((LambdaKeyBinding) key_binding).handle_press_state(current_minus_state));
+                    if (current_minus_state)
+                        AXIS_COOLDOWNS.put(axis_minus, 5);
+                } else if (current_minus_state) {
+                    if (AXIS_COOLDOWNS.getOrDefault(axis_minus, 0) == 0) {
+                        AXIS_COOLDOWNS.put(axis_minus, 5);
+                    }
+                }
+
+                AXIS_STATES.put(axis, current_plus_state);
+                AXIS_STATES.put(axis_minus, current_minus_state);
+            }
 
             // Handles the look direction.
-            if (this.config.is_look_axis(axe) && client.player != null) {
-                if (this.config.is_view_down_control(axe, state)) {
-                    if (this.config.get_view_down_control().endsWith("+"))
-                        this.target_pitch = client.player.pitch + (this.config.get_rotation_speed() * (abs_value - dead_zone) / (1.0 - dead_zone)) * 0.33D;
-                    else
-                        this.target_pitch = client.player.pitch - (this.config.get_rotation_speed() * (abs_value + dead_zone) / (1.0 - dead_zone)) * 0.33D;
-                    this.target_pitch = MathHelper.clamp(this.target_pitch, -90.0D, 90.0D);
-                } else if (this.config.is_view_up_control(axe, state)) {
-                    if (this.config.get_view_up_control().endsWith("+"))
-                        this.target_pitch = client.player.pitch + (this.config.get_rotation_speed() * (abs_value - dead_zone) / (1.0 - dead_zone)) * 0.33D;
-                    else
-                        this.target_pitch = client.player.pitch - (this.config.get_rotation_speed() * (abs_value + dead_zone) / (1.0 - dead_zone)) * 0.33D;
-                    this.target_pitch = MathHelper.clamp(this.target_pitch, -90.0D, 90.0D);
+            if (client.player != null) {
+                if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
+                    if (state == 2) {
+                        this.target_pitch = client.player.pitch - this.config.get_right_y_axis_sign() * (this.config.get_rotation_speed() * (abs_value + dead_zone) / (1.0 - dead_zone)) * 0.33D;
+                        this.target_pitch = MathHelper.clamp(this.target_pitch, -90.0D, 90.0D);
+                    } else if (state == 1) {
+                        this.target_pitch = client.player.pitch + this.config.get_right_y_axis_sign() * (this.config.get_rotation_speed() * (abs_value - dead_zone) / (1.0 - dead_zone)) * 0.33D;
+                        this.target_pitch = MathHelper.clamp(this.target_pitch, -90.0D, 90.0D);
+                    }
                 }
-                if (this.config.is_view_left_control(axe, state)) {
-                    if (this.config.get_view_left_control().endsWith("+"))
-                        this.target_yaw = client.player.yaw + (this.config.get_rotation_speed() * (abs_value - dead_zone) / (1.0 - dead_zone)) * 0.33D;
-                    else
-                        this.target_yaw = client.player.yaw - (this.config.get_rotation_speed() * (abs_value + dead_zone) / (1.0 - dead_zone)) * 0.33D;
-                } else if (this.config.is_view_right_control(axe, state)) {
-                    if (this.config.get_view_right_control().endsWith("+"))
-                        this.target_yaw = client.player.yaw + (this.config.get_rotation_speed() * (abs_value - dead_zone) / (1.0 - dead_zone)) * 0.33D;
-                    else
-                        this.target_yaw = client.player.yaw - (this.config.get_rotation_speed() * (abs_value + dead_zone) / (1.0 - dead_zone)) * 0.33D;
+                if (axis == GLFW_GAMEPAD_AXIS_RIGHT_X) {
+                    if (state == 2) {
+                        this.target_yaw = client.player.yaw - this.config.get_right_x_axis_sign() * (this.config.get_rotation_speed() * (abs_value + dead_zone) / (1.0 - dead_zone)) * 0.33D;
+                    } else if (state == 1) {
+                        this.target_yaw = client.player.yaw + this.config.get_right_x_axis_sign() * (this.config.get_rotation_speed() * (abs_value + dead_zone) / (1.0 - dead_zone)) * 0.33D;
+                    }
                 }
             }
         } else {
             boolean allow_mouse_control = true;
 
-            if (this.action_gui_cooldown == 0 && this.config.is_movement_axis(axe) && this.is_screen_interactive(client.currentScreen)) {
-                if (this.config.is_forward_button(axe, false, as_button_state)) {
+            if (this.action_gui_cooldown == 0 && this.config.is_movement_axis(axis) && this.is_screen_interactive(client.currentScreen)) {
+                if (this.config.is_forward_button(axis, false, as_button_state)) {
                     allow_mouse_control = this.change_focus(client.currentScreen, false);
-                } else if (this.config.is_back_button(axe, false, as_button_state)) {
+                } else if (this.config.is_back_button(axis, false, as_button_state)) {
                     allow_mouse_control = this.change_focus(client.currentScreen, true);
-                } else if (this.config.is_left_button(axe, false, as_button_state)) {
+                } else if (this.config.is_left_button(axis, false, as_button_state)) {
                     allow_mouse_control = this.handle_left_right(client.currentScreen, false);
-                } else if (this.config.is_right_button(axe, false, as_button_state)) {
+                } else if (this.config.is_right_button(axis, false, as_button_state)) {
                     allow_mouse_control = this.handle_left_right(client.currentScreen, true);
                 }
             }
@@ -311,13 +351,13 @@ public class ControllerInput
             float movement_x = 0.0F;
             float movement_y = 0.0F;
 
-            if (this.config.is_back_button(axe, false, (value > 0 ? 1 : 2))) {
+            if (this.config.is_back_button(axis, false, (value > 0 ? 1 : 2))) {
                 movement_y = abs_value;
-            } else if (this.config.is_forward_button(axe, false, (value > 0 ? 1 : 2))) {
+            } else if (this.config.is_forward_button(axis, false, (value > 0 ? 1 : 2))) {
                 movement_y = -abs_value;
-            } else if (this.config.is_left_button(axe, false, (value > 0 ? 1 : 2))) {
+            } else if (this.config.is_left_button(axis, false, (value > 0 ? 1 : 2))) {
                 movement_x = -abs_value;
-            } else if (this.config.is_right_button(axe, false, (value > 0 ? 1 : 2))) {
+            } else if (this.config.is_right_button(axis, false, (value > 0 ? 1 : 2))) {
                 movement_x = abs_value;
             }
 
@@ -390,20 +430,23 @@ public class ControllerInput
         }
     }
 
-    private void handle_a_button(@NotNull Element focused)
+    private boolean handle_a_button(@NotNull Element focused)
     {
         if (focused instanceof AbstractPressableButtonWidget) {
             AbstractPressableButtonWidget button_widget = (AbstractPressableButtonWidget) focused;
             button_widget.playDownSound(MinecraftClient.getInstance().getSoundManager());
             button_widget.onPress();
+            return true;
         } else if (focused instanceof WorldListWidget) {
             WorldListWidget list = (WorldListWidget) focused;
             list.method_20159().ifPresent(WorldListWidget.LevelItem::play);
+            return true;
         } else if (focused instanceof ParentElement) {
             Element child_focused = ((ParentElement) focused).getFocused();
             if (child_focused != null)
-                this.handle_a_button(child_focused);
+                return this.handle_a_button(child_focused);
         }
+        return false;
     }
 
     /**
