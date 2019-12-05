@@ -23,6 +23,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Injects the new controls settings button.
+ */
 @Mixin(SettingsScreen.class)
 public class SettingsScreenMixin extends Screen
 {

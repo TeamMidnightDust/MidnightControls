@@ -10,9 +10,6 @@
 package me.lambdaurora.lambdacontrols.util;
 
 import net.minecraft.container.Slot;
-import net.minecraft.item.ItemGroup;
-import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.mixin.gen.Accessor;
 
 /**
  * Represents an accessor to AbstractContainerScreen.

@@ -9,7 +9,7 @@
 
 package me.lambdaurora.lambdacontrols.mixin;
 
-import me.lambdaurora.lambdacontrols.util.LambdaKeyBinding;
+import me.lambdaurora.lambdacontrols.util.KeyBindingAccessor;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(KeyBinding.class)
-public class KeyBindingMixin implements LambdaKeyBinding
+public class KeyBindingMixin implements KeyBindingAccessor
 {
     @Shadow
     private InputUtil.KeyCode keyCode;

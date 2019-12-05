@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a Minecraft keybinding with extra access.
  */
-public interface LambdaKeyBinding
+public interface KeyBindingAccessor
 {
     @NotNull InputUtil.KeyCode get_key_code();
 

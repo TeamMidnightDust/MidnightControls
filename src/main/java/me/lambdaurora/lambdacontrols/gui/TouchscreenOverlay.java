@@ -11,7 +11,7 @@ package me.lambdaurora.lambdacontrols.gui;
 
 import me.lambdaurora.lambdacontrols.HudSide;
 import me.lambdaurora.lambdacontrols.LambdaControls;
-import me.lambdaurora.lambdacontrols.util.LambdaKeyBinding;
+import me.lambdaurora.lambdacontrols.util.KeyBindingAccessor;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -122,7 +122,7 @@ public class TouchscreenOverlay extends Screen
      */
     private void handle_jump(boolean state)
     {
-        ((LambdaKeyBinding) this.minecraft.options.keyJump).handle_press_state(state);
+        ((KeyBindingAccessor) this.minecraft.options.keyJump).handle_press_state(state);
     }
 
     @Override
@@ -187,7 +187,7 @@ public class TouchscreenOverlay extends Screen
                 }));
         // Drop
         this.addButton(new TouchscreenButtonWidget(swap_hands_x, sneak_button_y + 5 + 20, 20, 20, 20, 160, 20, WIDGETS_LOCATION,
-                state -> ((LambdaKeyBinding) this.minecraft.options.keyDrop).handle_press_state(state)));
+                state -> ((KeyBindingAccessor) this.minecraft.options.keyDrop).handle_press_state(state)));
         // Jump keys
         this.addButton(this.jump_button = new TouchscreenButtonWidget(jump_button_x, sneak_button_y, 20, 20, 0, 40, 20, WIDGETS_LOCATION,
                 this::handle_jump));
@@ -198,13 +198,13 @@ public class TouchscreenOverlay extends Screen
         this.addButton(this.fly_up_button = new TouchscreenButtonWidget(jump_button_x, sneak_button_y - 5 - 20, 20, 20, 40, 40, 20, WIDGETS_LOCATION,
                 this::handle_jump));
         this.addButton(this.fly_down_button = new TouchscreenButtonWidget(jump_button_x, sneak_button_y + 20 + 5, 20, 20, 60, 40, 20, WIDGETS_LOCATION,
-                state -> ((LambdaKeyBinding) this.minecraft.options.keySneak).handle_press_state(state)));
+                state -> ((KeyBindingAccessor) this.minecraft.options.keySneak).handle_press_state(state)));
         this.update_jump_buttons();
         // Movements keys
         this.addButton((this.start_sneak_button = new TouchscreenButtonWidget(sneak_button_x, sneak_button_y, 20, 20, 0, 120, 20, WIDGETS_LOCATION,
                 state -> {
                     if (state) {
-                        ((LambdaKeyBinding) this.minecraft.options.keySneak).handle_press_state(true);
+                        ((KeyBindingAccessor) this.minecraft.options.keySneak).handle_press_state(true);
                         this.start_sneak_button.visible = false;
                         this.end_sneak_button.visible = true;
                     }
@@ -212,7 +212,7 @@ public class TouchscreenOverlay extends Screen
         this.addButton((this.end_sneak_button = new TouchscreenButtonWidget(sneak_button_x, sneak_button_y, 20, 20, 20, 120, 20, WIDGETS_LOCATION,
                 state -> {
                     if (state) {
-                        ((LambdaKeyBinding) this.minecraft.options.keySneak).handle_press_state(false);
+                        ((KeyBindingAccessor) this.minecraft.options.keySneak).handle_press_state(false);
                         this.end_sneak_button.visible = false;
                         this.start_sneak_button.visible = true;
                     }
@@ -220,31 +220,31 @@ public class TouchscreenOverlay extends Screen
         this.end_sneak_button.visible = false;
         this.addButton(this.forward_left_button = new TouchscreenButtonWidget(sneak_button_x - 20 - 5, sneak_button_y - 5 - 20, 20, 20, 80, 80, 20, WIDGETS_LOCATION,
                 state -> {
-                    ((LambdaKeyBinding) this.minecraft.options.keyForward).handle_press_state(state);
-                    ((LambdaKeyBinding) this.minecraft.options.keyLeft).handle_press_state(state);
+                    ((KeyBindingAccessor) this.minecraft.options.keyForward).handle_press_state(state);
+                    ((KeyBindingAccessor) this.minecraft.options.keyLeft).handle_press_state(state);
                     this.update_forward_buttons_state(state);
                 }));
         this.forward_left_button.visible = false;
         this.addButton(new TouchscreenButtonWidget(sneak_button_x, sneak_button_y - 5 - 20, 20, 20, 0, 80, 20, WIDGETS_LOCATION,
                 state -> {
-                    ((LambdaKeyBinding) this.minecraft.options.keyForward).handle_press_state(state);
+                    ((KeyBindingAccessor) this.minecraft.options.keyForward).handle_press_state(state);
                     this.update_forward_buttons_state(state);
                     this.forward_left_button.visible = true;
                     this.forward_right_button.visible = true;
                 }));
         this.addButton(this.forward_right_button = new TouchscreenButtonWidget(sneak_button_x + 20 + 5, sneak_button_y - 5 - 20, 20, 20, 100, 80, 20, WIDGETS_LOCATION,
                 state -> {
-                    ((LambdaKeyBinding) this.minecraft.options.keyForward).handle_press_state(state);
-                    ((LambdaKeyBinding) this.minecraft.options.keyRight).handle_press_state(state);
+                    ((KeyBindingAccessor) this.minecraft.options.keyForward).handle_press_state(state);
+                    ((KeyBindingAccessor) this.minecraft.options.keyRight).handle_press_state(state);
                     this.update_forward_buttons_state(state);
                 }));
         this.forward_right_button.visible = true;
         this.addButton(new TouchscreenButtonWidget(sneak_button_x + 20 + 5, sneak_button_y, 20, 20, 20, 80, 20, WIDGETS_LOCATION,
-                state -> ((LambdaKeyBinding) this.minecraft.options.keyRight).handle_press_state(state)));
+                state -> ((KeyBindingAccessor) this.minecraft.options.keyRight).handle_press_state(state)));
         this.addButton(new TouchscreenButtonWidget(sneak_button_x, sneak_button_y + 20 + 5, 20, 20, 40, 80, 20, WIDGETS_LOCATION,
-                state -> ((LambdaKeyBinding) this.minecraft.options.keyBack).handle_press_state(state)));
+                state -> ((KeyBindingAccessor) this.minecraft.options.keyBack).handle_press_state(state)));
         this.addButton(new TouchscreenButtonWidget(sneak_button_x - 20 - 5, sneak_button_y, 20, 20, 60, 80, 20, WIDGETS_LOCATION,
-                state -> ((LambdaKeyBinding) this.minecraft.options.keyLeft).handle_press_state(state)));
+                state -> ((KeyBindingAccessor) this.minecraft.options.keyLeft).handle_press_state(state)));
     }
 
     @Override

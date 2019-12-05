@@ -9,45 +9,57 @@
 
 package me.lambdaurora.lambdacontrols.gui;
 
+import me.lambdaurora.lambdacontrols.ButtonBinding;
 import me.lambdaurora.lambdacontrols.ControlsMode;
 import me.lambdaurora.lambdacontrols.LambdaControls;
-import me.lambdaurora.lambdacontrols.util.LambdaKeyBinding;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.util.hit.HitResult;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
 
 /**
  * Represents the LambdaControls HUD.
  */
-public class LambdaControlsHud
+public class LambdaControlsHud extends DrawableHelper
 {
     private final MinecraftClient client;
     private final LambdaControls  mod;
-    private       ButtonWidget    jump_button;
 
     public LambdaControlsHud(@NotNull MinecraftClient client, @NotNull LambdaControls mod)
     {
         this.client = client;
         this.mod = mod;
-        this.jump_button = new ButtonWidget(50, 50, 20, 20, "J", button-> {});
     }
 
-    public void render(float delta)
+    /**
+     * Renders the LambdaControls' HUD.
+     */
+    public void render()
     {
-        if (this.mod.config.get_controls_mode() == ControlsMode.TOUCHSCREEN)
-            this.render_touchscreen(delta);
-    }
-
-    public void render_touchscreen(float delta)
-    {
-        //this.jump_button.render((int) this.client.mouse.getX(), (int) this.client.mouse.getY(), delta);
-    }
-
-    public void on_input(double x, double y, int button, int action)
-    {
-        if (this.jump_button.mouseClicked(x, y, button)) {
-            ((LambdaKeyBinding) this.client.options.keyJump).handle_press_state(action != GLFW.GLFW_RELEASE);
+        if (this.mod.config.get_controls_mode() == ControlsMode.CONTROLLER && this.mod.config.is_hud_enabled() && this.client.currentScreen == null) {
+            int x = 10, y = bottom(10);
+            x += this.draw_button_tip(x, y, ButtonBinding.INVENTORY, true) + 10;
+            this.draw_button_tip(x, y, ButtonBinding.SWAP_HANDS, true);
+            x = 10;
+            x += this.draw_button_tip(x, (y -= 20), ButtonBinding.DROP_ITEM, !client.player.getMainHandStack().isEmpty()) + 10;
+            this.draw_button_tip(x, y, ButtonBinding.ATTACK.get_button(),
+                    client.hitResult.getType() == HitResult.Type.BLOCK ? "lambdacontrols.action.hit" : ButtonBinding.ATTACK.get_translation_key(),
+                    client.hitResult.getType() != HitResult.Type.MISS);
         }
+    }
+
+    private int bottom(int y)
+    {
+        return this.client.window.getScaledHeight() - y - 15;
+    }
+
+    private int draw_button_tip(int x, int y, @NotNull ButtonBinding button, boolean display)
+    {
+        return LambdaControls.draw_button_tip(x, y, button, display, this.client);
+    }
+
+    private int draw_button_tip(int x, int y, int button, @NotNull String action, boolean display)
+    {
+        return LambdaControls.draw_button_tip(x, y, button, action, display, this.client);
     }
 }

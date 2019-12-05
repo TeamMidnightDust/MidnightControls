@@ -9,9 +9,10 @@
 
 package me.lambdaurora.lambdacontrols;
 
-import me.lambdaurora.lambdacontrols.util.LambdaKeyBinding;
+import me.lambdaurora.lambdacontrols.util.KeyBindingAccessor;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
+import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -25,9 +26,10 @@ import java.util.Optional;
  *
  * @author LambdAurora
  */
-public class ButtonBinding
+public class ButtonBinding implements Nameable
 {
     private static final List<ButtonBinding> BINDINGS   = new ArrayList<>();
+    public static final  ButtonBinding       ATTACK     = new ButtonBinding(axis_as_button(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true), "attack");
     public static final  ButtonBinding       BACK       = new ButtonBinding(axis_as_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y, false), "back");
     public static final  ButtonBinding       DROP_ITEM  = new ButtonBinding(GLFW.GLFW_GAMEPAD_BUTTON_B, "drop_item");
     public static final  ButtonBinding       FORWARD    = new ButtonBinding(axis_as_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y, true), "forward");
@@ -86,6 +88,22 @@ public class ButtonBinding
         return this.pressed;
     }
 
+    @Override
+    public @NotNull String get_name()
+    {
+        return this.key;
+    }
+
+    /**
+     * Returns the translation key of this button binding.
+     *
+     * @return The translation key.
+     */
+    public @NotNull String get_translation_key()
+    {
+        return "lambdacontrols.action." + this.get_name();
+    }
+
     /**
      * Returns the key binding equivalent of this button binding.
      *
@@ -105,7 +123,18 @@ public class ButtonBinding
      */
     public static int axis_as_button(int axis, boolean positive)
     {
-        return positive ? GLFW.GLFW_GAMEPAD_BUTTON_LAST + GLFW.GLFW_GAMEPAD_AXIS_LAST + axis : GLFW.GLFW_GAMEPAD_BUTTON_LAST + GLFW.GLFW_GAMEPAD_AXIS_LAST * 2 + axis;
+        return positive ? 100 + axis : 200 + axis;
+    }
+
+    /**
+     * Returns the second Joycon's specified button code.
+     *
+     * @param button The raw button code.
+     * @return The second Joycon's button code.
+     */
+    public static int joycon2_button(int button)
+    {
+        return 300 + button;
     }
 
     public static void init(@NotNull GameOptions options)
@@ -129,6 +158,6 @@ public class ButtonBinding
     {
         BINDINGS.parallelStream().filter(binding -> binding.button == button)
                 .map(ButtonBinding::as_key_binding)
-                .forEach(binding -> binding.ifPresent(key_binding -> ((LambdaKeyBinding) key_binding).handle_press_state(state)));
+                .forEach(binding -> binding.ifPresent(key_binding -> ((KeyBindingAccessor) key_binding).handle_press_state(state)));
     }
 }

@@ -11,7 +11,6 @@ package me.lambdaurora.lambdacontrols;
 
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
 
@@ -129,14 +128,6 @@ public class Controller implements Nameable
         return CONTROLLERS.values().stream().filter(Controller::is_connected)
                 .filter(controller -> controller.get_guid().equals(guid))
                 .max(Comparator.comparingInt(Controller::get_id));
-    }
-
-    private static ByteBuffer resizeBuffer(ByteBuffer buffer, int new_capacity)
-    {
-        ByteBuffer newBuffer = BufferUtils.createByteBuffer(new_capacity);
-        buffer.flip();
-        newBuffer.put(buffer);
-        return newBuffer;
     }
 
     /**

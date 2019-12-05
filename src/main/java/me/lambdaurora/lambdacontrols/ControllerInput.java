@@ -11,7 +11,7 @@ package me.lambdaurora.lambdacontrols;
 
 import me.lambdaurora.lambdacontrols.util.AbstractContainerScreenAccessor;
 import me.lambdaurora.lambdacontrols.util.CreativeInventoryScreenAccessor;
-import me.lambdaurora.lambdacontrols.util.LambdaKeyBinding;
+import me.lambdaurora.lambdacontrols.util.KeyBindingAccessor;
 import me.lambdaurora.lambdacontrols.util.MouseAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
@@ -23,7 +23,6 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.client.options.KeyBinding;
 import net.minecraft.container.Slot;
 import net.minecraft.container.SlotActionType;
 import net.minecraft.item.ItemGroup;
@@ -57,7 +56,6 @@ public class ControllerInput
     private static final Map<Integer, Integer> AXIS_COOLDOWNS      = new HashMap<>();
     private final        LambdaControlsConfig  config;
     private              int                   action_gui_cooldown = 0;
-    private              boolean               continuous_sneak    = false;
     private              int                   ignore_next_a       = 0;
     private              int                   last_sneak          = 0;
     private              double                prev_target_yaw     = 0.0;
@@ -238,25 +236,11 @@ public class ControllerInput
                     return;
                 }
             }
-        }
 
-        // Handles sneak button and continuous sneak.
-        if (SNEAK.is_button(button) && client.player != null) {
-            if (action == 0) {
-                if (this.continuous_sneak) {
-                    this.set_sneaking(client, this.continuous_sneak = false);
-                } else if (this.last_sneak > 3) {
-                    this.set_sneaking(client, this.continuous_sneak = true);
-                } else {
-                    this.set_sneaking(client, true);
-                    this.last_sneak = 15;
-                }
-            } else if (action == 1) {
-                if (this.continuous_sneak)
-                    return;
-                this.set_sneaking(client, false);
+            // Handles sneak button.
+            if (SNEAK.is_button(button) && client.player != null) {
+                this.toggle_sneaking(client);
             }
-            return;
         }
 
         if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null && !this.is_screen_interactive(client.currentScreen) && this.action_gui_cooldown == 0 && this.ignore_next_a == 0) {
@@ -273,8 +257,6 @@ public class ControllerInput
 
         if (client.currentScreen == null && action != 2) {
             ButtonBinding.handle_button(button, state);
-            //Optional<KeyBinding> key_binding = this.config.get_keybind("button_" + button);
-            //key_binding.ifPresent(keyBinding -> ((LambdaKeyBinding) keyBinding).handle_press_state(action != 1));
         }
     }
 
@@ -291,7 +273,7 @@ public class ControllerInput
                 boolean previous_minus_state = AXIS_STATES.getOrDefault(axis_minus, false);
 
                 if (current_plus_state != previous_plus_state) {
-                    this.config.get_keybind("axis_" + axis + "+").ifPresent(key_binding -> ((LambdaKeyBinding) key_binding).handle_press_state(current_plus_state));
+                    this.config.get_keybind("axis_" + axis + "+").ifPresent(key_binding -> ((KeyBindingAccessor) key_binding).handle_press_state(current_plus_state));
                     if (current_plus_state)
                         AXIS_COOLDOWNS.put(axis, 5);
                 } else if (current_plus_state) {
@@ -301,7 +283,7 @@ public class ControllerInput
                 }
 
                 if (current_minus_state != previous_minus_state) {
-                    this.config.get_keybind("axis_" + axis + "-").ifPresent(key_binding -> ((LambdaKeyBinding) key_binding).handle_press_state(current_minus_state));
+                    this.config.get_keybind("axis_" + axis + "-").ifPresent(key_binding -> ((KeyBindingAccessor) key_binding).handle_press_state(current_minus_state));
                     if (current_minus_state)
                         AXIS_COOLDOWNS.put(axis_minus, 5);
                 } else if (current_minus_state) {
@@ -481,14 +463,13 @@ public class ControllerInput
     }
 
     /**
-     * Sets if the player is sneaking.
+     * Toggles whether the player is sneaking.
      *
-     * @param client   The client's instance.
-     * @param sneaking True if the player is sneaking, else false.
+     * @param client The client's instance.
      */
-    private void set_sneaking(@NotNull MinecraftClient client, boolean sneaking)
+    private void toggle_sneaking(@NotNull MinecraftClient client)
     {
-        ((LambdaKeyBinding) client.options.keySneak).handle_press_state(sneaking);
+        ((KeyBindingAccessor) client.options.keySneak).handle_press_state(!client.options.keySneak.isPressed());
     }
 
     private boolean change_focus(@NotNull Screen screen, boolean down)

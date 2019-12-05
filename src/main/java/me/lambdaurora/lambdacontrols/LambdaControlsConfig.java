@@ -30,6 +30,9 @@ public class LambdaControlsConfig
     private final Map<String, KeyBinding> keybinding_mappings = new HashMap<>();
     private final LambdaControls          mod;
     private       ControlsMode            controls_mode;
+    private       ControllerType          controller_type;
+    // HUD settings.
+    private       boolean                 hud_enable;
     private       HudSide                 hud_side;
     // Controller settings
     private       double                  dead_zone;
@@ -52,12 +55,15 @@ public class LambdaControlsConfig
         this.config.load();
         this.mod.log("Configuration loaded.");
         this.controls_mode = ControlsMode.by_id(this.config.getOrElse("controls", "default")).orElse(ControlsMode.DEFAULT);
+        // HUD settings.
+        this.hud_enable = this.config.getOrElse("hud.enable", true);
         this.hud_side = HudSide.by_id(this.config.getOrElse("hud.side", "left")).orElse(HudSide.LEFT);
-        // Controller settings
+        // Controller settings.
+        this.controller_type = ControllerType.by_id(this.config.getOrElse("controller.type", "default")).orElse(ControllerType.DEFAULT);
         this.dead_zone = this.config.getOrElse("controller.dead_zone", 0.25);
         this.rotation_speed = this.config.getOrElse("controller.rotation_speed", 40.0);
         this.mouse_speed = this.config.getOrElse("controller.mouse_speed", 25.0);
-        // Controller controls
+        // Controller controls.
         this.back_button = this.config.getOrElse("controller.controls.back", "none").toLowerCase();
         this.forward_button = this.config.getOrElse("controller.controls.forward", "none").toLowerCase();
         this.left_button = this.config.getOrElse("controller.controls.left", "none").toLowerCase();
@@ -114,6 +120,27 @@ public class LambdaControlsConfig
     }
 
     /**
+     * Returns whether the HUD is enabled.
+     *
+     * @return True if the HUD is enabled, else false.
+     */
+    public boolean is_hud_enabled()
+    {
+        return this.hud_enable;
+    }
+
+    /**
+     * Sets whether the HUD is enabled.
+     *
+     * @param enable True if the HUD is enabled, else false.
+     */
+    public void set_hud_enabled(boolean enable)
+    {
+        this.hud_enable = enable;
+        this.config.set("hud.enable", this.hud_enable);
+    }
+
+    /**
      * Gets the HUD side from the configuration.
      *
      * @return The HUD side.
@@ -158,6 +185,27 @@ public class LambdaControlsConfig
     public void set_controller(@NotNull Controller controller)
     {
         this.config.set("controller.id", controller.get_id());
+    }
+
+    /**
+     * Gets the controller's type.
+     *
+     * @return The controller's type.
+     */
+    public @NotNull ControllerType get_controller_type()
+    {
+        return this.controller_type;
+    }
+
+    /**
+     * Sets the controller's type.
+     *
+     * @param controller_type The controller's type.
+     */
+    public void set_controller_type(@NotNull ControllerType controller_type)
+    {
+        this.controller_type = controller_type;
+        this.config.set("controller.type", controller_type.get_name());
     }
 
     /**

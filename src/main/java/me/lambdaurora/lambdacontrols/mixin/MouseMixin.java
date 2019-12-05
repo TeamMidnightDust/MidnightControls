@@ -12,15 +12,16 @@ package me.lambdaurora.lambdacontrols.mixin;
 import me.lambdaurora.lambdacontrols.ControlsMode;
 import me.lambdaurora.lambdacontrols.LambdaControls;
 import me.lambdaurora.lambdacontrols.util.MouseAccessor;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Adds extra access to the mouse.
+ */
 @Mixin(Mouse.class)
 public abstract class MouseMixin implements MouseAccessor
 {

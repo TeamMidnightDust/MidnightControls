@@ -11,10 +11,10 @@ package me.lambdaurora.lambdacontrols.gui;
 
 import me.lambdaurora.lambdacontrols.Controller;
 import me.lambdaurora.lambdacontrols.ControlsMode;
-import me.lambdaurora.lambdacontrols.HudSide;
 import me.lambdaurora.lambdacontrols.LambdaControls;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.controls.ControlsOptionsScreen;
+import net.minecraft.client.gui.widget.ButtonListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.options.*;
 import net.minecraft.client.resource.language.I18n;
@@ -27,16 +27,19 @@ import org.lwjgl.glfw.GLFW;
  */
 public class LambdaControlsSettingsScreen extends Screen
 {
-    private final LambdaControls mod;
-    private final Screen         parent;
-    private final GameOptions    options;
-    private final Option         controller_option;
-    private final Option         dead_zone_option;
-    private final Option         rotation_speed_option;
-    private final Option         mouse_speed_option;
-    private final Option         inverts_right_x_axis;
-    private final Option         inverts_right_y_axis;
-    private       int            buttons_y = 18;
+    private final LambdaControls   mod;
+    private final Screen           parent;
+    private final GameOptions      options;
+    private final Option           controller_option;
+    private final Option           controller_type_option;
+    private final Option           hud_enable_option;
+    private final Option           hud_side_option;
+    private final Option           dead_zone_option;
+    private final Option           rotation_speed_option;
+    private final Option           mouse_speed_option;
+    private final Option           inverts_right_x_axis;
+    private final Option           inverts_right_y_axis;
+    private       ButtonListWidget list;
 
     public LambdaControlsSettingsScreen(Screen parent, @NotNull GameOptions options)
     {
@@ -51,6 +54,14 @@ public class LambdaControlsSettingsScreen extends Screen
                 current_id = GLFW.GLFW_JOYSTICK_1;
             this.mod.config.set_controller(Controller.by_id(current_id));
         }, (game_options, option) -> option.getDisplayPrefix() + this.mod.config.get_controller().get_name());
+        this.controller_type_option = new CyclingOption("lambdacontrols.menu.controller_type",
+                (game_options, amount) -> this.mod.config.set_controller_type(this.mod.config.get_controller_type().next()),
+                (game_options, option) -> option.getDisplayPrefix() + this.mod.config.get_controller_type().get_translated_name());
+        this.hud_enable_option = new BooleanOption("lambdacontrols.menu.hud_enable", (game_options) -> this.mod.config.is_hud_enabled(),
+                (game_options, new_value) -> this.mod.config.set_hud_enabled(new_value));
+        this.hud_side_option = new CyclingOption("lambdacontrols.menu.hud_side",
+                (game_options, amount) -> this.mod.config.set_hud_side(this.mod.config.get_hud_side().next()),
+                (game_options, option) -> option.getDisplayPrefix() + this.mod.config.get_hud_side().get_translated_name());
         this.dead_zone_option = new DoubleOption("lambdacontrols.menu.dead_zone", 0.05, 1.0, 0.05F, game_options -> this.mod.config.get_dead_zone(),
                 (game_options, new_value) -> {
                     synchronized (this.mod.config) {
@@ -100,46 +111,47 @@ public class LambdaControlsSettingsScreen extends Screen
         super.onClose();
     }
 
+    private int get_text_height()
+    {
+        return (5 + this.font.fontHeight) * 3 + 5;
+    }
+
     @Override
     protected void init()
     {
         super.init();
-        int button_height = 20, spacing = 5;
-        this.addButton(new ButtonWidget(this.width / 2 - 155, this.buttons_y, 150, button_height, I18n.translate("lambdacontrols.menu.controls_mode") + ": " + this.mod.config.get_controls_mode().get_translated_name(),
+        int button_height = 20;
+        this.addButton(new ButtonWidget(this.width / 2 - 155, 18, 150, button_height, I18n.translate("lambdacontrols.menu.controls_mode") + ": " + this.mod.config.get_controls_mode().get_translated_name(),
                 btn -> {
                     ControlsMode next = this.mod.config.get_controls_mode().next();
                     btn.setMessage(I18n.translate("lambdacontrols.menu.controls_mode") + ": " + next.get_translated_name());
                     this.mod.config.set_controls_mode(next);
                     this.mod.config.save();
                 }));
-        this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.buttons_y, 150, button_height, I18n.translate("options.controls"),
+        this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, 18, 150, button_height, I18n.translate("options.controls"),
                 btn -> this.minecraft.openScreen(new ControlsOptionsScreen(this, this.options))));
-        this.addButton(new ButtonWidget(this.width / 2 - 155, (this.buttons_y += spacing + button_height), 150, button_height, I18n.translate("lambdacontrols.menu.hud_side") + ": " + this.mod.config.get_hud_side().get_translated_name(),
-                btn -> {
-                    HudSide next = this.mod.config.get_hud_side().next();
-                    btn.setMessage(I18n.translate("lambdacontrols.menu.hud_side") + ": " + next.get_translated_name());
-                    this.mod.config.set_hud_side(next);
-                    this.mod.config.save();
-                }));
-        this.addButton(this.controller_option.createButton(this.options, this.width / 2 - 155, (this.buttons_y += spacing + button_height), 150));
-        this.addButton(this.dead_zone_option.createButton(this.options, this.width / 2 - 155 + 160, this.buttons_y, 150));
-        this.addButton(this.rotation_speed_option.createButton(this.options, this.width / 2 - 155, (this.buttons_y += spacing + button_height), 150));
-        this.addButton(this.mouse_speed_option.createButton(this.options, this.width / 2 - 155 + 160, this.buttons_y, 150));
-        this.addButton(this.inverts_right_x_axis.createButton(this.options, this.width / 2 - 155, (this.buttons_y += spacing + button_height), 150));
-        this.addButton(this.inverts_right_y_axis.createButton(this.options, this.width / 2 - 155 + 160, this.buttons_y, 150));
+
+        this.list = new ButtonListWidget(this.minecraft, this.width, this.height, 43, this.height - 29 - this.get_text_height(), 25);
+        this.list.addSingleOptionEntry(this.controller_option);
+        this.list.addOptionEntry(this.controller_type_option, this.dead_zone_option);
+        this.list.addOptionEntry(this.hud_enable_option, this.hud_side_option);
+        this.list.addOptionEntry(this.rotation_speed_option, this.mouse_speed_option);
+        this.list.addOptionEntry(this.inverts_right_x_axis, this.inverts_right_y_axis);
+        this.children.add(this.list);
+
         this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 29, 300, button_height, I18n.translate("gui.done"),
                 (buttonWidget) -> this.minecraft.openScreen(this.parent)));
-
-        this.buttons_y += spacing + button_height;
     }
 
     @Override
     public void render(int mouseX, int mouseY, float delta)
     {
         this.renderBackground();
+        this.list.render(mouseX, mouseY, delta);
         super.render(mouseX, mouseY, delta);
-        this.drawCenteredString(this.font, I18n.translate("lambdacontrols.controller.mappings.1"), this.width / 2, this.buttons_y + (20 - 8) / 2, 10526880);
-        this.drawCenteredString(this.font, I18n.translate("lambdacontrols.controller.mappings.2"), this.width / 2, this.buttons_y + (20 - 8) / 2 + font.fontHeight + 5, 10526880);
-        this.drawCenteredString(this.font, I18n.translate("lambdacontrols.controller.mappings.3"), this.width / 2, this.buttons_y + (20 - 8) / 2 + font.fontHeight * 2 + 10, 10526880);
+        this.drawCenteredString(this.font, I18n.translate("lambdacontrols.menu.title"), this.width / 2, 8, 16777215);
+        this.drawCenteredString(this.font, I18n.translate("lambdacontrols.controller.mappings.1"), this.width / 2, this.height - 29 - (5 + this.font.fontHeight) * 3, 10526880);
+        this.drawCenteredString(this.font, I18n.translate("lambdacontrols.controller.mappings.2"), this.width / 2, this.height - 29 - (5 + this.font.fontHeight) * 2, 10526880);
+        this.drawCenteredString(this.font, I18n.translate("lambdacontrols.controller.mappings.3"), this.width / 2, this.height - 29 - (5 + this.font.fontHeight), 10526880);
     }
 }
