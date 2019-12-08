@@ -25,3 +25,39 @@ controls = "default"
     invert_right_x_axis = false
     # Inverts the right Y axis.
     invert_right_y_axis = false
+    # Controller controls.
+    [controller.controls]
+        # Attack control.
+        attack = 105
+        # Back control.
+        back = 201
+        # Open chat control.
+        chat = 12
+        # Drop item control.
+        drop_item = 1
+        # Forward control.
+        forward = 101
+        # Inventory control.
+        inventory = 3
+        # Jump control.
+        jump = 0
+        # Pause game control.
+        pause_game = 7
+        # Pick block control.
+        pick_block = 14
+        # Show player list control.
+        player_list = 6
+        # Take screenshot control.
+        screenshot = 13
+        # Sneak control.
+        sneak = 10
+        # Sprint control.
+        sprint = 9
+        # Swap hands control.
+        swap_hands = 2
+        # Toggle perspective control.
+        toggle_perspective = 11
+        # Toggle smooth camera control.
+        toggle_smooth_camera = -1
+        # Use control.
+        use = 104

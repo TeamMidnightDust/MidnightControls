@@ -6,6 +6,7 @@
     "AbstractButtonWidgetAccessor",
     "AbstractContainerScreenMixin",
     "CreativeInventoryScreenMixin",
+    "EntryListWidgetAccessor",
     "GameRendererMixin",
     "InGameHudMixin",
     "KeyBindingMixin",

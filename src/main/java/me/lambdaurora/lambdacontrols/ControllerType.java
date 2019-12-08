@@ -22,7 +22,7 @@ import java.util.Optional;
 public enum ControllerType implements Nameable
 {
     DEFAULT(0),
-    PLAYSTATION(1),
+    DUALSHOCK(1),
     SWITCH(2),
     XBOX(3),
     STEAM(4),

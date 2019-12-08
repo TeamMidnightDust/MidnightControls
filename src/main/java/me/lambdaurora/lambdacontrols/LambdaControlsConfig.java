@@ -10,7 +10,6 @@
 package me.lambdaurora.lambdacontrols;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
-import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -18,8 +17,6 @@ import org.lwjgl.glfw.GLFW;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Represents LambdaControls configuration.
@@ -38,11 +35,6 @@ public class LambdaControlsConfig
     private       double                  dead_zone;
     private       double                  rotation_speed;
     private       double                  mouse_speed;
-    // Controller controls
-    private       String                  back_button;
-    private       String                  forward_button;
-    private       String                  left_button;
-    private       String                  right_button;
 
     public LambdaControlsConfig(@NotNull LambdaControls mod)
     {
@@ -64,29 +56,7 @@ public class LambdaControlsConfig
         this.rotation_speed = this.config.getOrElse("controller.rotation_speed", 40.0);
         this.mouse_speed = this.config.getOrElse("controller.mouse_speed", 25.0);
         // Controller controls.
-        this.back_button = this.config.getOrElse("controller.controls.back", "none").toLowerCase();
-        this.forward_button = this.config.getOrElse("controller.controls.forward", "none").toLowerCase();
-        this.left_button = this.config.getOrElse("controller.controls.left", "none").toLowerCase();
-        this.right_button = this.config.getOrElse("controller.controls.right", "none").toLowerCase();
-    }
-
-    public void init_keybindings(GameOptions options)
-    {
-        this.keybinding_mappings.put("axis_" + GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER + "+", options.keyAttack);
-        this.keybinding_mappings.put("axis_" + GLFW_GAMEPAD_AXIS_LEFT_TRIGGER + "+", options.keyUse);
-        this.keybinding_mappings.put("axis_" + GLFW_GAMEPAD_AXIS_LEFT_X + "+", options.keyRight);
-        this.keybinding_mappings.put("axis_" + GLFW_GAMEPAD_AXIS_LEFT_X + "-", options.keyLeft);
-        this.keybinding_mappings.put("axis_" + GLFW_GAMEPAD_AXIS_LEFT_Y + "+", options.keyBack);
-        this.keybinding_mappings.put("axis_" + GLFW_GAMEPAD_AXIS_LEFT_Y + "-", options.keyForward);
-        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_A, options.keyJump);
-        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_B, options.keyDrop);
-        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_X, options.keySwapHands);
-        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_Y, options.keyInventory);
-        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_BACK, options.keyPlayerList);
-        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_GUIDE, options.keyScreenshot);
-        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_RIGHT_THUMB, options.keySneak);
-        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_LEFT_THUMB, options.keySprint);
-        this.keybinding_mappings.put("button_" + GLFW_GAMEPAD_BUTTON_DPAD_UP, options.keyTogglePerspective);
+        ButtonBinding.load_from_config(this);
     }
 
     public void save()
@@ -343,52 +313,54 @@ public class LambdaControlsConfig
         return Optional.ofNullable(this.keybinding_mappings.get(id));
     }
 
-    public String get_back_button()
+    /**
+     * Loads the button binding from configuration.
+     *
+     * @param button The button binding.
+     */
+    public void load_button_binding(@NotNull ButtonBinding button)
     {
-        return this.back_button;
+        button.set_button(this.config.getOrElse("controller.controls." + button.get_name(), button.get_button()));
     }
 
-    public String get_forward_button()
+    /**
+     * Sets the button binding in configuration.
+     *
+     * @param binding The button binding.
+     * @param button  The button.
+     */
+    public void set_button_binding(@NotNull ButtonBinding binding, int button)
     {
-        return this.forward_button;
-    }
-
-    public String get_left_button()
-    {
-        return this.left_button;
-    }
-
-    public String get_right_button()
-    {
-        return this.right_button;
+        binding.set_button(button);
+        this.config.set("controller.controls." + binding.get_name(), button);
     }
 
     public boolean is_back_button(int btn, boolean is_btn, int state)
     {
         if (!is_btn && state == 0)
             return false;
-        return this.get_back_button().equals((is_btn ? "button_" : "axe_") + btn + (is_btn ? "" : (state == 1 ? "+" : "-")));
+        return ButtonBinding.BACK.is_button(ButtonBinding.axis_as_button(btn, state == 1));
     }
 
     public boolean is_forward_button(int btn, boolean is_btn, int state)
     {
         if (!is_btn && state == 0)
             return false;
-        return this.get_forward_button().equals((is_btn ? "button_" : "axe_") + btn + (is_btn ? "" : (state == 1 ? "+" : "-")));
+        return ButtonBinding.FORWARD.is_button(ButtonBinding.axis_as_button(btn, state == 1));
     }
 
     public boolean is_left_button(int btn, boolean is_btn, int state)
     {
         if (!is_btn && state == 0)
             return false;
-        return this.get_left_button().equals((is_btn ? "button_" : "axe_") + btn + (is_btn ? "" : (state == 1 ? "+" : "-")));
+        return ButtonBinding.LEFT.is_button(ButtonBinding.axis_as_button(btn, state == 1));
     }
 
     public boolean is_right_button(int btn, boolean is_btn, int state)
     {
         if (!is_btn && state == 0)
             return false;
-        return this.get_right_button().equals((is_btn ? "button_" : "axe_") + btn + (is_btn ? "" : (state == 1 ? "+" : "-")));
+        return ButtonBinding.RIGHT.is_button(ButtonBinding.axis_as_button(btn, state == 1));
     }
 
     /**
@@ -399,7 +371,9 @@ public class LambdaControlsConfig
      */
     public boolean is_movement_axis(int i)
     {
-        return this.get_forward_button().startsWith("axe_" + i) || this.get_back_button().startsWith("axe_" + i) || this.get_left_button().startsWith("axe_" + i)
-                || this.get_right_button().startsWith("axe_" + i);
+        return ButtonBinding.FORWARD.is_button(ButtonBinding.axis_as_button(i, true)) || ButtonBinding.FORWARD.is_button(ButtonBinding.axis_as_button(i, false))
+                || ButtonBinding.BACK.is_button(ButtonBinding.axis_as_button(i, true)) || ButtonBinding.BACK.is_button(ButtonBinding.axis_as_button(i, false))
+                || ButtonBinding.LEFT.is_button(ButtonBinding.axis_as_button(i, true)) || ButtonBinding.LEFT.is_button(ButtonBinding.axis_as_button(i, false))
+                || ButtonBinding.RIGHT.is_button(ButtonBinding.axis_as_button(i, true)) || ButtonBinding.RIGHT.is_button(ButtonBinding.axis_as_button(i, false));
     }
 }

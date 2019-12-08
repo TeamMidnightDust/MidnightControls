@@ -147,7 +147,6 @@ public class Controller implements Nameable
             try (SeekableByteChannel fc = Files.newByteChannel(path)) {
                 buffer = createByteBuffer((int) fc.size() + 2);
                 while (fc.read(buffer) != -1) {
-                    ;
                 }
                 buffer.put((byte) 0);
             }

@@ -50,7 +50,6 @@ public class LambdaControls implements ClientModInitializer
     {
         Controller.update_mappings();
         ButtonBinding.init(client.options);
-        this.config.init_keybindings(client.options);
         GLFW.glfwSetJoystickCallback((jid, event) -> {
             if (event == GLFW.GLFW_CONNECTED) {
                 Controller controller = Controller.by_id(jid);
