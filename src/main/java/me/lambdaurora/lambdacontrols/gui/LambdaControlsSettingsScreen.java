@@ -13,7 +13,7 @@ import me.lambdaurora.lambdacontrols.Controller;
 import me.lambdaurora.lambdacontrols.ControlsMode;
 import me.lambdaurora.lambdacontrols.LambdaControls;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.controls.ControlsOptionsScreen;
+import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.options.*;

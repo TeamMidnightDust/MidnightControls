@@ -28,25 +28,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(AbstractContainerScreen.class)
 public abstract class AbstractContainerScreenMixin implements AbstractContainerScreenAccessor
 {
-    @Shadow
-    protected int left;
+    protected int x;
 
-    @Shadow
-    protected int top;
+    protected int y;
 
     @Shadow
     protected abstract Slot getSlotAt(double xPosition, double yPosition);
 
     @Override
-    public int get_left()
+    public int get_x()
     {
-        return this.left;
+        return this.x;
     }
 
     @Override
-    public int get_top()
+    public int get_y()
     {
-        return this.top;
+        return this.y;
     }
 
     @Override
@@ -60,7 +58,7 @@ public abstract class AbstractContainerScreenMixin implements AbstractContainerS
     {
         if (LambdaControls.get().config.get_controls_mode() == ControlsMode.CONTROLLER) {
             MinecraftClient client = MinecraftClient.getInstance();
-            int x = 10, y = client.window.getScaledHeight() - 10 - 15;
+            int x = 10, y = client.getWindow().getScaledHeight() - 10 - 15;
 
             x += LambdaControls.draw_button_tip(x, y, GLFW.GLFW_GAMEPAD_BUTTON_A, "lambdacontrols.action.pickup_all", true, client) + 10;
             x += LambdaControls.draw_button_tip(x, y, GLFW.GLFW_GAMEPAD_BUTTON_B, "lambdacontrols.action.exit", true, client) + 10;

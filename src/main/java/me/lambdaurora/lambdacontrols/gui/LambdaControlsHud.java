@@ -43,14 +43,14 @@ public class LambdaControlsHud extends DrawableHelper
             x = 10;
             x += this.draw_button_tip(x, (y -= 20), ButtonBinding.DROP_ITEM, !client.player.getMainHandStack().isEmpty()) + 10;
             this.draw_button_tip(x, y, ButtonBinding.ATTACK.get_button(),
-                    client.hitResult.getType() == HitResult.Type.BLOCK ? "lambdacontrols.action.hit" : ButtonBinding.ATTACK.get_translation_key(),
-                    client.hitResult.getType() != HitResult.Type.MISS);
+                    client.crosshairTarget.getType() == HitResult.Type.BLOCK ? "lambdacontrols.action.hit" : ButtonBinding.ATTACK.get_translation_key(),
+                    client.crosshairTarget.getType() != HitResult.Type.MISS);
         }
     }
 
     private int bottom(int y)
     {
-        return this.client.window.getScaledHeight() - y - 15;
+        return this.client.getWindow().getScaledHeight() - y - 15;
     }
 
     private int draw_button_tip(int x, int y, @NotNull ButtonBinding button, boolean display)

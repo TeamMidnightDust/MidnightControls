@@ -34,7 +34,7 @@ public abstract class MinecraftClientMixin
     @Shadow
     public Screen currentScreen;
 
-    @Inject(method = "init", at = @At("RETURN"))
+    @Inject(method = "<init>", at = @At("RETURN"))
     private void on_init(CallbackInfo ci)
     {
         LambdaControls.get().on_mc_init((MinecraftClient) (Object) this);

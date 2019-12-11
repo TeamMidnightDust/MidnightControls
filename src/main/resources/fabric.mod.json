@@ -3,7 +3,7 @@
   "id": "lambdacontrols",
   "name": "LambdaControls",
   "version": "${version}",
-  "description": "Add better controls: controller and touchscreen support.",
+  "description": "Adds better controls: controller and touchscreen support.",
   "authors": [
     "LambdAurora"
   ],
@@ -26,8 +26,7 @@
   "depends": {
     "fabricloader": ">=0.4.0",
     "fabric": "*",
-    "minecraft": "1.14.x",
-    "cotton-client-commands": ">=0.4.2+1.14.3-SNAPSHOT"
+    "minecraft": "1.15.x"
   },
   "suggests": {
     "flamingo": "*"

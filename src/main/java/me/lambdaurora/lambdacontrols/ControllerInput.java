@@ -117,8 +117,8 @@ public class ControllerInput
             if (this.prev_target_mouse_x != this.target_mouse_x || this.prev_target_mouse_y != this.target_mouse_y) {
                 double mouse_x = this.prev_target_mouse_x + (this.target_mouse_x - this.prev_target_mouse_x) * client.getTickDelta() + 0.5;
                 double mouse_y = this.prev_target_mouse_y + (this.target_mouse_y - this.prev_target_mouse_y) * client.getTickDelta() + 0.5;
-                GLFW.glfwSetCursorPos(client.window.getHandle(), mouse_x, mouse_y);
-                ((MouseAccessor) client.mouse).on_cursor_pos(client.window.getHandle(), mouse_x, mouse_y);
+                GLFW.glfwSetCursorPos(client.getWindow().getHandle(), mouse_x, mouse_y);
+                ((MouseAccessor) client.mouse).on_cursor_pos(client.getWindow().getHandle(), mouse_x, mouse_y);
             }
         }
     }
@@ -248,22 +248,22 @@ public class ControllerInput
                 }
             }
 
-            if (client.currentScreen instanceof AbstractContainerScreen) {
-                double pos_x = client.mouse.getX() * (double) client.window.getScaledWidth() / (double) client.window.getWidth();
-                double pos_y = client.mouse.getY() * (double) client.window.getScaledHeight() / (double) client.window.getHeight();
+            if (client.currentScreen instanceof AbstractContainerScreen && client.interactionManager != null && client.player != null) {
+                double pos_x = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
+                double pos_y = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
                 Slot slot = ((AbstractContainerScreenAccessor) client.currentScreen).get_slot_at(pos_x, pos_y);
                 if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && slot != null) {
-                    client.interactionManager.method_2906(((AbstractContainerScreen) client.currentScreen).getContainer().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_1, SlotActionType.PICKUP, client.player);
+                    client.interactionManager.clickSlot(((AbstractContainerScreen) client.currentScreen).getContainer().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_1, SlotActionType.PICKUP, client.player);
                     this.action_gui_cooldown = 5;
                     return;
                 } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
                     client.player.closeContainer();
                     return;
                 } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_X && slot != null) {
-                    client.interactionManager.method_2906(((AbstractContainerScreen) client.currentScreen).getContainer().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_2, SlotActionType.PICKUP, client.player);
+                    client.interactionManager.clickSlot(((AbstractContainerScreen) client.currentScreen).getContainer().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_2, SlotActionType.PICKUP, client.player);
                     return;
                 } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_Y && slot != null) {
-                    client.interactionManager.method_2906(((AbstractContainerScreen) client.currentScreen).getContainer().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_1, SlotActionType.QUICK_MOVE, client.player);
+                    client.interactionManager.clickSlot(((AbstractContainerScreen) client.currentScreen).getContainer().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_1, SlotActionType.QUICK_MOVE, client.player);
                     return;
                 }
             } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
@@ -280,8 +280,8 @@ public class ControllerInput
         }
 
         if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null && !is_screen_interactive(client.currentScreen) && this.action_gui_cooldown == 0 && this.ignore_next_a == 0) {
-            double mouse_x = client.mouse.getX() * (double) client.window.getScaledWidth() / (double) client.window.getWidth();
-            double mouse_y = client.mouse.getY() * (double) client.window.getScaledHeight() / (double) client.window.getHeight();
+            double mouse_x = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
+            double mouse_y = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
             if (action == 0) {
                 client.currentScreen.mouseClicked(mouse_x, mouse_y, GLFW.GLFW_MOUSE_BUTTON_1);
             } else if (action == 1) {
@@ -421,9 +421,9 @@ public class ControllerInput
 
                 if (Math.abs(this.mouse_speed_x) > .05F || Math.abs(this.mouse_speed_y) > .05F) {
                     this.target_mouse_x += this.mouse_speed_x * this.config.get_mouse_speed();
-                    this.target_mouse_x = MathHelper.clamp(this.target_mouse_x, 0, client.window.getWidth());
+                    this.target_mouse_x = MathHelper.clamp(this.target_mouse_x, 0, client.getWindow().getWidth());
                     this.target_mouse_y += this.mouse_speed_y * this.config.get_mouse_speed();
-                    this.target_mouse_y = MathHelper.clamp(this.target_mouse_y, 0, client.window.getHeight());
+                    this.target_mouse_y = MathHelper.clamp(this.target_mouse_y, 0, client.getWindow().getHeight());
                 }
 
                 this.move_mouse_to_closest_slot(client, client.currentScreen);
@@ -469,13 +469,13 @@ public class ControllerInput
             return true;
         } else if (focused instanceof WorldListWidget) {
             WorldListWidget list = (WorldListWidget) focused;
-            list.method_20159().ifPresent(WorldListWidget.LevelItem::play);
+            list.method_20159().ifPresent(WorldListWidget.Entry::play);
             return true;
         } else if (focused instanceof MultiplayerServerListWidget) {
             MultiplayerServerListWidget list = (MultiplayerServerListWidget) focused;
             MultiplayerServerListWidget.Entry entry = list.getSelected();
-            if (entry instanceof MultiplayerServerListWidget.LanServerListEntry || entry instanceof MultiplayerServerListWidget.ServerItem) {
-                ((MultiplayerScreen) screen).selectEntry(entry);
+            if (entry instanceof MultiplayerServerListWidget.LanServerEntry || entry instanceof MultiplayerServerListWidget.ServerEntry) {
+                ((MultiplayerScreen) screen).select(entry);
                 ((MultiplayerScreen) screen).connect();
             }
         } else if (focused instanceof ParentElement) {
@@ -556,10 +556,10 @@ public class ControllerInput
         if (screen instanceof AbstractContainerScreen) {
             AbstractContainerScreen inventory_screen = (AbstractContainerScreen) screen;
             AbstractContainerScreenAccessor accessor = (AbstractContainerScreenAccessor) inventory_screen;
-            int gui_left = accessor.get_left();
-            int gui_top = accessor.get_top();
-            int mouse_x = (int) (target_mouse_x * (double) client.window.getScaledWidth() / (double) client.window.getWidth());
-            int mouse_y = (int) (target_mouse_y * (double) client.window.getScaledHeight() / (double) client.window.getHeight());
+            int gui_left = accessor.get_x();
+            int gui_top = accessor.get_y();
+            int mouse_x = (int) (target_mouse_x * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth());
+            int mouse_y = (int) (target_mouse_y * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight());
 
             // Finds the closest slot in the GUI within 14 pixels.
             Optional<Pair<Slot, Double>> closest_slot = inventory_screen.getContainer().slotList.parallelStream()
@@ -578,8 +578,8 @@ public class ControllerInput
                 if (slot.hasStack() || !client.player.inventory.getMainHandStack().isEmpty()) {
                     int slot_center_x_scaled = gui_left + slot.xPosition + 8;
                     int slot_center_y_scaled = gui_top + slot.yPosition + 8;
-                    int slot_center_x = (int) (slot_center_x_scaled / ((double) client.window.getScaledWidth() / (double) client.window.getWidth()));
-                    int slot_center_y = (int) (slot_center_y_scaled / ((double) client.window.getScaledHeight() / (double) client.window.getHeight()));
+                    int slot_center_x = (int) (slot_center_x_scaled / ((double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth()));
+                    int slot_center_y = (int) (slot_center_y_scaled / ((double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight()));
                     double delta_x = slot_center_x - target_mouse_x;
                     double delta_y = slot_center_y - target_mouse_y;
 

@@ -21,14 +21,14 @@ public interface AbstractContainerScreenAccessor
      *
      * @return The left coordinate of the GUI.
      */
-    int get_left();
+    int get_x();
 
     /**
      * Gets the top coordinate of the GUI.
      *
      * @return The top coordinate of the GUI.
      */
-    int get_top();
+    int get_y();
 
     /**
      * Gets the slot at position.

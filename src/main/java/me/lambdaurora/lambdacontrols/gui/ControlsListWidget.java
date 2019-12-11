@@ -19,7 +19,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.Formatting;
-import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -41,12 +40,11 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
         this.gui = gui;
 
         ButtonBinding.stream_categories()
-                .sorted(Comparator.comparingInt(e -> e.getKey().get_value()))
-                .map(category -> Pair.of(category.getKey().get_key(), category.getValue()))
+                .sorted(Comparator.comparingInt(ButtonBinding.Category::get_priority))
                 .forEach(category -> {
-                    this.addEntry(new CategoryEntry(category.get_key()));
+                    this.addEntry(new CategoryEntry(category));
 
-                    category.get_value().forEach(binding -> {
+                    category.get_bindings().forEach(binding -> {
                         int i = client.textRenderer.getStringWidth(I18n.translate(binding.get_translation_key()));
                         if (i > this.field_2733) {
                             this.field_2733 = i;
@@ -150,9 +148,9 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
         private final String name;
         private final int    name_width;
 
-        public CategoryEntry(String string)
+        public CategoryEntry(@NotNull ButtonBinding.Category category)
         {
-            this.name = I18n.translate(string);
+            this.name = category.get_translated_name();
             this.name_width = ControlsListWidget.this.minecraft.textRenderer.getStringWidth(this.name);
         }
 
