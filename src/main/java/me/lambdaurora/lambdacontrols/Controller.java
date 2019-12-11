@@ -16,6 +16,7 @@ import org.lwjgl.glfw.GLFWGamepadState;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
@@ -146,13 +147,12 @@ public class Controller implements Nameable
         if (Files.isReadable(path)) {
             try (SeekableByteChannel fc = Files.newByteChannel(path)) {
                 buffer = createByteBuffer((int) fc.size() + 2);
-                while (fc.read(buffer) != -1) {
-                }
+                while (fc.read(buffer) != -1);
                 buffer.put((byte) 0);
             }
         }
 
-        buffer.flip();
+        ((Buffer) buffer).flip(); // Force Java 8 >.<
         return buffer;
     }
 
