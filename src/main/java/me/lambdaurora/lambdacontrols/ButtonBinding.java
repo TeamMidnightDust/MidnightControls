@@ -53,8 +53,9 @@ public class ButtonBinding implements Nameable
     public static final  ButtonBinding       RIGHT              = new ButtonBinding("right", axis_as_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X, true));
     public static final  ButtonBinding       SCREENSHOT         = new ButtonBinding("screenshot", GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN,
             Collections.singletonList((client, action) -> {
-                ScreenshotUtils.saveScreenshot(client.runDirectory, client.getWindow().getFramebufferWidth(), client.getWindow().getFramebufferHeight(), client.getFramebuffer(),
-                        text -> client.execute(() -> client.inGameHud.getChatHud().addMessage(text)));
+                if (action == 0)
+                    ScreenshotUtils.saveScreenshot(client.runDirectory, client.getWindow().getFramebufferWidth(), client.getWindow().getFramebufferHeight(), client.getFramebuffer(),
+                            text -> client.execute(() -> client.inGameHud.getChatHud().addMessage(text)));
                 return true;
             }));
     public static final  ButtonBinding       SMOOTH_CAMERA      = new ButtonBinding("toggle_smooth_camera", -1);

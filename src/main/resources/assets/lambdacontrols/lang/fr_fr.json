@@ -1,4 +1,8 @@
 {
+  "key.lambdacontrols.look_down": "Regarder en bas",
+  "key.lambdacontrols.look_left": "Regarder à gauche",
+  "key.lambdacontrols.look_right": "Regarder à droite",
+  "key.lambdacontrols.look_up": "Regarder en haut",
   "lambdacontrols.action.attack": "Attaquer",
   "lambdacontrols.action.back": "Reculer",
   "lambdacontrols.action.chat": "Ouvrir le tchat",

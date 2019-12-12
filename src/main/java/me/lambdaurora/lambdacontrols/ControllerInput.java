@@ -80,12 +80,27 @@ public class ControllerInput
         this.config = mod.config;
     }
 
+    public void on_tick(@NotNull MinecraftClient client)
+    {
+        if (LambdaControls.BINDING_LOOK_UP.isPressed()) {
+            this.handle_look(client, GLFW_GAMEPAD_AXIS_RIGHT_Y, 0.8F, 2);
+        } else if (LambdaControls.BINDING_LOOK_DOWN.isPressed()) {
+            this.handle_look(client, GLFW_GAMEPAD_AXIS_RIGHT_Y, 0.8F, 1);
+        }
+
+        if (LambdaControls.BINDING_LOOK_RIGHT.isPressed()) {
+            this.handle_look(client, GLFW_GAMEPAD_AXIS_RIGHT_X, 0.8F, 2);
+        } else if (LambdaControls.BINDING_LOOK_LEFT.isPressed()) {
+            this.handle_look(client, GLFW_GAMEPAD_AXIS_RIGHT_X, 0.8F, 1);
+        }
+    }
+
     /**
      * This method is called every Minecraft tick.
      *
      * @param client The client instance.
      */
-    public void on_tick(@NotNull MinecraftClient client)
+    public void on_controller_tick(@NotNull MinecraftClient client)
     {
         BUTTON_COOLDOWNS.entrySet().stream().filter(entry -> entry.getValue() > 0).forEach(entry -> BUTTON_COOLDOWNS.put(entry.getKey(), entry.getValue() - 1));
         AXIS_COOLDOWNS.entrySet().stream().filter(entry -> entry.getValue() > 0).forEach(entry -> AXIS_COOLDOWNS.put(entry.getKey(), entry.getValue() - 1));
@@ -344,25 +359,7 @@ public class ControllerInput
             }
 
             // Handles the look direction.
-            if (client.player != null) {
-                double pow_value = Math.pow(abs_value, 2.0);
-                if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
-                    if (state == 2) {
-                        this.target_pitch = client.player.pitch - this.config.get_right_y_axis_sign() * (this.config.get_rotation_speed() * pow_value) * 0.33D;
-                        this.target_pitch = MathHelper.clamp(this.target_pitch, -90.0D, 90.0D);
-                    } else if (state == 1) {
-                        this.target_pitch = client.player.pitch + this.config.get_right_y_axis_sign() * (this.config.get_rotation_speed() * pow_value) * 0.33D;
-                        this.target_pitch = MathHelper.clamp(this.target_pitch, -90.0D, 90.0D);
-                    }
-                }
-                if (axis == GLFW_GAMEPAD_AXIS_RIGHT_X) {
-                    if (state == 2) {
-                        this.target_yaw = client.player.yaw - this.config.get_right_x_axis_sign() * (this.config.get_rotation_speed() * pow_value) * 0.33D;
-                    } else if (state == 1) {
-                        this.target_yaw = client.player.yaw + this.config.get_right_x_axis_sign() * (this.config.get_rotation_speed() * pow_value) * 0.33D;
-                    }
-                }
-            }
+            this.handle_look(client, axis, abs_value, state);
         } else {
             boolean allow_mouse_control = true;
 
@@ -530,6 +527,38 @@ public class ControllerInput
         ((KeyBindingAccessor) client.options.keySneak).handle_press_state(!client.options.keySneak.isPressed());
     }
 
+    /**
+     * Handles the look direction input.
+     *
+     * @param client The client isntance.
+     * @param axis   The axis to change.
+     * @param value  The value of the look.
+     * @param state  The state.
+     */
+    private void handle_look(@NotNull MinecraftClient client, int axis, float value, int state)
+    {
+        // Handles the look direction.
+        if (client.player != null) {
+            double pow_value = Math.pow(value, 2.0);
+            if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
+                if (state == 2) {
+                    this.target_pitch = client.player.pitch - this.config.get_right_y_axis_sign() * (this.config.get_rotation_speed() * pow_value) * 0.33D;
+                    this.target_pitch = MathHelper.clamp(this.target_pitch, -90.0D, 90.0D);
+                } else if (state == 1) {
+                    this.target_pitch = client.player.pitch + this.config.get_right_y_axis_sign() * (this.config.get_rotation_speed() * pow_value) * 0.33D;
+                    this.target_pitch = MathHelper.clamp(this.target_pitch, -90.0D, 90.0D);
+                }
+            }
+            if (axis == GLFW_GAMEPAD_AXIS_RIGHT_X) {
+                if (state == 2) {
+                    this.target_yaw = client.player.yaw - this.config.get_right_x_axis_sign() * (this.config.get_rotation_speed() * pow_value) * 0.33D;
+                } else if (state == 1) {
+                    this.target_yaw = client.player.yaw + this.config.get_right_x_axis_sign() * (this.config.get_rotation_speed() * pow_value) * 0.33D;
+                }
+            }
+        }
+    }
+
     private boolean change_focus(@NotNull Screen screen, boolean down)
     {
         if (!screen.changeFocus(down)) {
@@ -544,7 +573,7 @@ public class ControllerInput
         }
     }
 
-    static boolean is_screen_interactive(@NotNull Screen screen)
+    private static boolean is_screen_interactive(@NotNull Screen screen)
     {
         return !(screen instanceof AdvancementsScreen || screen instanceof AbstractContainerScreen);
     }

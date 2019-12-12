@@ -11,11 +11,14 @@ package me.lambdaurora.lambdacontrols;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
+import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.toast.SystemToast;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
@@ -29,12 +32,20 @@ import org.lwjgl.glfw.GLFW;
  */
 public class LambdaControls implements ClientModInitializer
 {
-    private static      LambdaControls       INSTANCE;
+    private static      LambdaControls   INSTANCE;
+    public static final FabricKeyBinding BINDING_LOOK_UP    = FabricKeyBinding.Builder.create(new Identifier("lambdacontrols", "look_up"),
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.movement").build();
+    public static final FabricKeyBinding     BINDING_LOOK_RIGHT = FabricKeyBinding.Builder.create(new Identifier("lambdacontrols", "look_right"),
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, "key.categories.movement").build();
+    public static final FabricKeyBinding     BINDING_LOOK_DOWN  = FabricKeyBinding.Builder.create(new Identifier("lambdacontrols", "look_down"),
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.movement").build();
+    public static final FabricKeyBinding     BINDING_LOOK_LEFT  = FabricKeyBinding.Builder.create(new Identifier("lambdacontrols", "look_left"),
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement").build();
     public static final Identifier           CONTROLLER_BUTTONS = new Identifier("lambdacontrols", "textures/gui/controller_buttons.png");
     public final        Logger               logger             = LogManager.getLogger("LambdaControls");
     public final        LambdaControlsConfig config             = new LambdaControlsConfig(this);
-    public final        ControllerInput      controller_input   = new ControllerInput(this);
-    private             ControlsMode         previous_controls_mode;
+    public final        ControllerInput  controller_input   = new ControllerInput(this);
+    private             ControlsMode     previous_controls_mode;
 
     @Override
     public void onInitializeClient()
@@ -42,6 +53,11 @@ public class LambdaControls implements ClientModInitializer
         INSTANCE = this;
         this.log("Initializing LambdaControls...");
         this.config.load();
+
+        KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_UP);
+        KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_RIGHT);
+        KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_DOWN);
+        KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_LEFT);
     }
 
     /**
@@ -72,8 +88,9 @@ public class LambdaControls implements ClientModInitializer
      */
     public void on_tick(@NotNull MinecraftClient client)
     {
+        this.controller_input.on_tick(client);
         if (this.config.get_controls_mode() == ControlsMode.CONTROLLER)
-            this.controller_input.on_tick(client);
+            this.controller_input.on_controller_tick(client);
     }
 
     public void on_render(MinecraftClient client)

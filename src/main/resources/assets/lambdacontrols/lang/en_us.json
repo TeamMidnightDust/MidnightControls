@@ -1,4 +1,8 @@
 {
+  "key.lambdacontrols.look_down": "Look down",
+  "key.lambdacontrols.look_left": "Look left",
+  "key.lambdacontrols.look_right": "Look right",
+  "key.lambdacontrols.look_up": "Look up",
   "lambdacontrols.action.attack": "Attack",
   "lambdacontrols.action.back": "Back",
   "lambdacontrols.action.chat": "Open Chat",
