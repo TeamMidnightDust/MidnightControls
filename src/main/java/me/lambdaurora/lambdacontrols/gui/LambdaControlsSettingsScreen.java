@@ -147,6 +147,7 @@ public class LambdaControlsSettingsScreen extends Screen
 
         this.gamepad_tool_url_label = new LabelWidget(this.width / 2, this.height - 29 - (5 + this.font.fontHeight) * 2, this.controller_mappings_url_text, this.width,
                 label -> Util.getOperatingSystem().open(GAMEPAD_TOOL_URL), true);
+        this.gamepad_tool_url_label.set_tooltip_text(I18n.translate("chat.link.open"));
         this.children.add(this.gamepad_tool_url_label);
 
         this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 29, 300, button_height, I18n.translate("gui.done"),

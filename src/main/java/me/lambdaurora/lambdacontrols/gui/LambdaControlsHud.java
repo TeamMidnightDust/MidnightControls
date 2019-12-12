@@ -36,7 +36,7 @@ public class LambdaControlsHud extends DrawableHelper
      */
     public void render()
     {
-        if (this.mod.config.get_controls_mode() == ControlsMode.CONTROLLER && this.mod.config.is_hud_enabled() && this.client.currentScreen == null) {
+        if (this.mod.config.get_controls_mode() == ControlsMode.CONTROLLER && this.mod.config.is_hud_enabled() && this.client.currentScreen == null && !this.client.options.hudHidden) {
             int x = 10, y = bottom(10);
             x += this.draw_button_tip(x, y, ButtonBinding.INVENTORY, true) + 10;
             this.draw_button_tip(x, y, ButtonBinding.SWAP_HANDS, true);

@@ -253,4 +253,10 @@ public class TouchscreenOverlay extends Screen
     {
         super.render(mouseX, mouseY, delta);
     }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    {
+        return false;
+    }
 }

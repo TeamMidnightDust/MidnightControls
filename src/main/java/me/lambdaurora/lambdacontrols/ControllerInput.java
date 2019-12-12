@@ -9,6 +9,7 @@
 
 package me.lambdaurora.lambdacontrols;
 
+import me.lambdaurora.lambdacontrols.gui.LabelWidget;
 import me.lambdaurora.lambdacontrols.gui.LambdaControlsControlsScreen;
 import me.lambdaurora.lambdacontrols.mixin.EntryListWidgetAccessor;
 import me.lambdaurora.lambdacontrols.util.AbstractContainerScreenAccessor;
@@ -82,15 +83,18 @@ public class ControllerInput
 
     public void on_tick(@NotNull MinecraftClient client)
     {
+        this.prev_target_yaw = this.target_yaw;
+        this.prev_target_pitch = this.target_pitch;
+
+        // Handles the key bindings.
         if (LambdaControls.BINDING_LOOK_UP.isPressed()) {
             this.handle_look(client, GLFW_GAMEPAD_AXIS_RIGHT_Y, 0.8F, 2);
         } else if (LambdaControls.BINDING_LOOK_DOWN.isPressed()) {
             this.handle_look(client, GLFW_GAMEPAD_AXIS_RIGHT_Y, 0.8F, 1);
         }
-
-        if (LambdaControls.BINDING_LOOK_RIGHT.isPressed()) {
+        if (LambdaControls.BINDING_LOOK_LEFT.isPressed()) {
             this.handle_look(client, GLFW_GAMEPAD_AXIS_RIGHT_X, 0.8F, 2);
-        } else if (LambdaControls.BINDING_LOOK_LEFT.isPressed()) {
+        } else if (LambdaControls.BINDING_LOOK_RIGHT.isPressed()) {
             this.handle_look(client, GLFW_GAMEPAD_AXIS_RIGHT_X, 0.8F, 1);
         }
     }
@@ -110,8 +114,6 @@ public class ControllerInput
         // Decreases the cooldown for GUI actions.
         if (this.action_gui_cooldown > 0)
             --this.action_gui_cooldown;
-        this.prev_target_yaw = this.target_yaw;
-        this.prev_target_pitch = this.target_pitch;
         this.prev_target_mouse_x = this.target_mouse_x;
         this.prev_target_mouse_y = this.target_mouse_y;
 
@@ -463,6 +465,9 @@ public class ControllerInput
             AbstractPressableButtonWidget button_widget = (AbstractPressableButtonWidget) focused;
             button_widget.playDownSound(MinecraftClient.getInstance().getSoundManager());
             button_widget.onPress();
+            return true;
+        } else if (focused instanceof LabelWidget) {
+            ((LabelWidget) focused).on_press();
             return true;
         } else if (focused instanceof WorldListWidget) {
             WorldListWidget list = (WorldListWidget) focused;
