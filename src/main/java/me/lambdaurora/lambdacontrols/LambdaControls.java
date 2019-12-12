@@ -34,6 +34,7 @@ public class LambdaControls implements ClientModInitializer
     public final        Logger               logger             = LogManager.getLogger("LambdaControls");
     public final        LambdaControlsConfig config             = new LambdaControlsConfig(this);
     public final        ControllerInput      controller_input   = new ControllerInput(this);
+    private             ControlsMode         previous_controls_mode;
 
     @Override
     public void onInitializeClient()
@@ -59,6 +60,8 @@ public class LambdaControls implements ClientModInitializer
                 client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, new TranslatableText("lambdacontrols.controller.disconnected", jid),
                         null));
             }
+
+            this.switch_controls_mode();
         });
     }
 
@@ -76,6 +79,25 @@ public class LambdaControls implements ClientModInitializer
     public void on_render(MinecraftClient client)
     {
         this.controller_input.on_render(client);
+    }
+
+    /**
+     * Switches the controls mode if the auto switch is enabled.
+     */
+    public void switch_controls_mode()
+    {
+        if (this.config.has_auto_switch_mode()) {
+            if (this.config.get_controller().is_gamepad()) {
+                this.previous_controls_mode = this.config.get_controls_mode();
+                this.config.set_controls_mode(ControlsMode.CONTROLLER);
+            } else {
+                if (this.previous_controls_mode == null) {
+                    this.previous_controls_mode = ControlsMode.DEFAULT;
+                }
+
+                this.config.set_controls_mode(this.previous_controls_mode);
+            }
+        }
     }
 
     /**

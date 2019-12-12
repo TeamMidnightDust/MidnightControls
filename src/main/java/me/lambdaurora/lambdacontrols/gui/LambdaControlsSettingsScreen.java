@@ -20,6 +20,7 @@ import net.minecraft.client.options.*;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -28,17 +29,21 @@ import org.lwjgl.glfw.GLFW;
  */
 public class LambdaControlsSettingsScreen extends Screen
 {
-    final         LambdaControls   mod;
-    private final Screen           parent;
-    private final GameOptions      options;
-    private final Option           controller_option;
-    private final Option           controller_type_option;
-    private final Option           hud_enable_option;
-    private final Option           hud_side_option;
-    private final Option           dead_zone_option;
-    private final Option           rotation_speed_option;
-    private final Option           mouse_speed_option;
-    private       ButtonListWidget list;
+    public static final String           GAMEPAD_TOOL_URL             = "http://generalarcade.com/gamepadtool/";
+    final               LambdaControls   mod;
+    private final       Screen           parent;
+    private final       GameOptions      options;
+    private final       Option           auto_switch_mode_option;
+    private final       Option           controller_option;
+    private final       Option           controller_type_option;
+    private final       Option           dead_zone_option;
+    private final       Option           hud_enable_option;
+    private final       Option           hud_side_option;
+    private final       Option           mouse_speed_option;
+    private final       Option           rotation_speed_option;
+    private final       String           controller_mappings_url_text = I18n.translate("lambdacontrols.controller.mappings.2", Formatting.GOLD.toString(), GAMEPAD_TOOL_URL, Formatting.RESET.toString());
+    private             ButtonListWidget list;
+    private             LabelWidget      gamepad_tool_url_label;
 
     public LambdaControlsSettingsScreen(Screen parent, @NotNull GameOptions options)
     {
@@ -46,6 +51,8 @@ public class LambdaControlsSettingsScreen extends Screen
         this.mod = LambdaControls.get();
         this.parent = parent;
         this.options = options;
+        this.auto_switch_mode_option = new BooleanOption("lambdacontrols.menu.auto_switch_mode", game_options -> this.mod.config.has_auto_switch_mode(),
+                (game_options, new_value) -> this.mod.config.set_auto_switch_mode(new_value));
         this.controller_option = new CyclingOption("lambdacontrols.menu.controller", (game_options, amount) -> {
             int current_id = this.mod.config.get_controller().get_id();
             current_id += amount;
@@ -134,7 +141,13 @@ public class LambdaControlsSettingsScreen extends Screen
         this.list.addOptionEntry(this.controller_type_option, this.dead_zone_option);
         this.list.addOptionEntry(this.hud_enable_option, this.hud_side_option);
         this.list.addOptionEntry(this.rotation_speed_option, this.mouse_speed_option);
+        this.list.addSingleOptionEntry(this.auto_switch_mode_option);
+        this.list.addSingleOptionEntry(new ReloadControllerMappingsOption());
         this.children.add(this.list);
+
+        this.gamepad_tool_url_label = new LabelWidget(this.width / 2, this.height - 29 - (5 + this.font.fontHeight) * 2, this.controller_mappings_url_text, this.width,
+                label -> Util.getOperatingSystem().open(GAMEPAD_TOOL_URL), true);
+        this.children.add(this.gamepad_tool_url_label);
 
         this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 29, 300, button_height, I18n.translate("gui.done"),
                 (buttonWidget) -> this.minecraft.openScreen(this.parent)));
@@ -148,7 +161,7 @@ public class LambdaControlsSettingsScreen extends Screen
         super.render(mouse_x, mouse_y, delta);
         this.drawCenteredString(this.font, I18n.translate("lambdacontrols.menu.title"), this.width / 2, 8, 16777215);
         this.drawCenteredString(this.font, I18n.translate("lambdacontrols.controller.mappings.1", Formatting.GREEN.toString(), Formatting.RESET.toString()), this.width / 2, this.height - 29 - (5 + this.font.fontHeight) * 3, 10526880);
-        this.drawCenteredString(this.font, I18n.translate("lambdacontrols.controller.mappings.2", Formatting.GOLD.toString(), Formatting.RESET.toString()), this.width / 2, this.height - 29 - (5 + this.font.fontHeight) * 2, 10526880);
+        this.gamepad_tool_url_label.render(mouse_x, mouse_y, delta);
         this.drawCenteredString(this.font, I18n.translate("lambdacontrols.controller.mappings.3", Formatting.GREEN.toString(), Formatting.RESET.toString()), this.width / 2, this.height - 29 - (5 + this.font.fontHeight), 10526880);
     }
 }

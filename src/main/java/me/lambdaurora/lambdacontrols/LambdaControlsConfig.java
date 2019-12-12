@@ -90,6 +90,26 @@ public class LambdaControlsConfig
     }
 
     /**
+     * Returns whether the auto switch mode is enabled or not.
+     *
+     * @return True if the auto switch mode is enabled, else false.
+     */
+    public boolean has_auto_switch_mode()
+    {
+        return this.config.getOrElse("auto_switch_mode", false);
+    }
+
+    /**
+     * Sets whether the auto switch mode is enabled or not.
+     *
+     * @param auto_switch_mode True if the auto switch mode is enabled, else false.
+     */
+    public void set_auto_switch_mode(boolean auto_switch_mode)
+    {
+        this.config.set("auto_switch_mode", auto_switch_mode);
+    }
+
+    /**
      * Returns whether the HUD is enabled.
      *
      * @return True if the HUD is enabled, else false.

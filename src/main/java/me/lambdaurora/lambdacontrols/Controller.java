@@ -80,7 +80,7 @@ public class Controller implements Nameable
      */
     public boolean is_gamepad()
     {
-        return GLFW.glfwJoystickIsGamepad(this.id);
+        return this.is_connected() && GLFW.glfwJoystickIsGamepad(this.id);
     }
 
     /**
@@ -147,7 +147,7 @@ public class Controller implements Nameable
         if (Files.isReadable(path)) {
             try (SeekableByteChannel fc = Files.newByteChannel(path)) {
                 buffer = createByteBuffer((int) fc.size() + 2);
-                while (fc.read(buffer) != -1);
+                while (fc.read(buffer) != -1) ;
                 buffer.put((byte) 0);
             }
         }
@@ -165,6 +165,7 @@ public class Controller implements Nameable
             File mappings_file = new File("config/gamecontrollerdb.txt");
             if (!mappings_file.exists())
                 return;
+            LambdaControls.get().log("Updating controller mappings...");
             ByteBuffer buffer = io_resource_to_buffer(mappings_file.getPath(), 1024);
             GLFW.glfwUpdateGamepadMappings(buffer);
         } catch (IOException e) {

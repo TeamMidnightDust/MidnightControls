@@ -468,7 +468,6 @@ public class ButtonBinding implements Nameable
          */
         public @NotNull String get_translated_name()
         {
-            System.out.println(id.toString());
             if (this.id.get_namespace().equals("minecraft"))
                 return I18n.translate(this.id.get_name());
             else

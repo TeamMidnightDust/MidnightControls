@@ -2,6 +2,8 @@
 
 # The controls mode. Available modes: default, controller, touchscreen
 controls = "default"
+# Auto switch mode.
+auto_switch_mode = false
 
 [hud]
     # Enables the HUD.
