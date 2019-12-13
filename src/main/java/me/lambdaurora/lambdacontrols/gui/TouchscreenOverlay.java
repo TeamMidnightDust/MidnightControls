@@ -255,8 +255,20 @@ public class TouchscreenOverlay extends Screen
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    public boolean mouseClicked(double mouse_x, double mouse_y, int button)
     {
-        return false;
+        if (mouse_y >= (double) (this.height - 22) && this.minecraft != null && this.minecraft.player != null) {
+            int center_x = this.width / 2;
+            if (mouse_x >= (double) (center_x - 90) && mouse_x <= (double) (center_x + 90)) {
+                for (int slot = 0; slot < 9; ++slot) {
+                    int slot_x = center_x - 90 + slot * 20 + 2;
+                    if (mouse_x >= (double) slot_x && mouse_x <= (double) (slot_x + 20)) {
+                        this.minecraft.player.inventory.selectedSlot = slot;
+                        return true;
+                    }
+                }
+            }
+        }
+        return super.mouseClicked(mouse_x, mouse_y, button);
     }
 }
