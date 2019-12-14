@@ -62,7 +62,7 @@ public abstract class MinecraftClientMixin
             this.skipGameRender = false;
             this.currentScreen = screen;
         } else if (screen != null) {
-            mod.controller_input.on_screen_open(((MinecraftClient) (Object) this), this.window.getWidth(), this.window.getHeight());
+            mod.input.on_screen_open(((MinecraftClient) (Object) this), this.window.getWidth(), this.window.getHeight());
         }
     }
 }

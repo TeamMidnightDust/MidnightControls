@@ -25,6 +25,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
+
+import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X;
+import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
 
 /**
  * Represents the touchscreen overlay
@@ -270,5 +274,22 @@ public class TouchscreenOverlay extends Screen
             }
         }
         return super.mouseClicked(mouse_x, mouse_y, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouse_x, double mouse_y, int button, double delta_x, double delta_y)
+    {
+        if (button == GLFW.GLFW_MOUSE_BUTTON_1 && this.minecraft != null) {
+            if (delta_y > 0.01)
+                this.mod.input.handle_look(this.minecraft, GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) Math.abs(delta_y / 5.0), 2);
+            else if (delta_y < 0.01)
+                this.mod.input.handle_look(this.minecraft, GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) Math.abs(delta_y / 5.0), 1);
+
+            if (delta_x > 0.01)
+                this.mod.input.handle_look(this.minecraft, GLFW_GAMEPAD_AXIS_RIGHT_X, (float) Math.abs(delta_x / 5.0), 2);
+            else if (delta_x < 0.01)
+                this.mod.input.handle_look(this.minecraft, GLFW_GAMEPAD_AXIS_RIGHT_X, (float) Math.abs(delta_x / 5.0), 1);
+        }
+        return super.mouseDragged(mouse_x, mouse_y, button, delta_x, delta_y);
     }
 }

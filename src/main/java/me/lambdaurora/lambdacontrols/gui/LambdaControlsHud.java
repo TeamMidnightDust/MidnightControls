@@ -41,10 +41,10 @@ public class LambdaControlsHud extends DrawableHelper
             x += this.draw_button_tip(x, y, ButtonBinding.INVENTORY, true) + 10;
             this.draw_button_tip(x, y, ButtonBinding.SWAP_HANDS, true);
             x = 10;
-            x += this.draw_button_tip(x, (y -= 20), ButtonBinding.DROP_ITEM, !client.player.getMainHandStack().isEmpty()) + 10;
+            x += this.draw_button_tip(x, (y -= 20), ButtonBinding.DROP_ITEM, !this.client.player.getMainHandStack().isEmpty()) + 10;
             this.draw_button_tip(x, y, ButtonBinding.ATTACK.get_button(),
-                    client.crosshairTarget.getType() == HitResult.Type.BLOCK ? "lambdacontrols.action.hit" : ButtonBinding.ATTACK.get_translation_key(),
-                    client.crosshairTarget.getType() != HitResult.Type.MISS);
+                    this.client.crosshairTarget.getType() == HitResult.Type.BLOCK ? "lambdacontrols.action.hit" : ButtonBinding.ATTACK.get_translation_key(),
+                    this.client.crosshairTarget.getType() != HitResult.Type.MISS);
         }
     }
 

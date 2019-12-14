@@ -43,9 +43,9 @@ public class LambdaControls implements ClientModInitializer
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement").build();
     public static final Identifier           CONTROLLER_BUTTONS = new Identifier("lambdacontrols", "textures/gui/controller_buttons.png");
     public final        Logger               logger             = LogManager.getLogger("LambdaControls");
-    public final        LambdaControlsConfig config             = new LambdaControlsConfig(this);
-    public final        ControllerInput  controller_input   = new ControllerInput(this);
-    private             ControlsMode     previous_controls_mode;
+    public final LambdaControlsConfig config = new LambdaControlsConfig(this);
+    public final LambdaInput          input  = new LambdaInput(this);
+    private      ControlsMode         previous_controls_mode;
 
     @Override
     public void onInitializeClient()
@@ -88,14 +88,14 @@ public class LambdaControls implements ClientModInitializer
      */
     public void on_tick(@NotNull MinecraftClient client)
     {
-        this.controller_input.on_tick(client);
+        this.input.on_tick(client);
         if (this.config.get_controls_mode() == ControlsMode.CONTROLLER)
-            this.controller_input.on_controller_tick(client);
+            this.input.on_controller_tick(client);
     }
 
     public void on_render(MinecraftClient client)
     {
-        this.controller_input.on_render(client);
+        this.input.on_render(client);
     }
 
     /**

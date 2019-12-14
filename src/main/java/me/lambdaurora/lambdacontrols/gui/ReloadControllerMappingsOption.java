@@ -37,8 +37,11 @@ public class ReloadControllerMappingsOption extends Option implements Nameable
     public AbstractButtonWidget createButton(GameOptions options, int x, int y, int width)
     {
         return new ButtonWidget(x, y, width, 20, this.get_name(), btn -> {
+            MinecraftClient client = MinecraftClient.getInstance();
             Controller.update_mappings();
-            MinecraftClient.getInstance().getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, new TranslatableText("lambdacontrols.controller.mappings.updated"), null));
+            if (client.currentScreen != null)
+                client.currentScreen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
+            client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, new TranslatableText("lambdacontrols.controller.mappings.updated"), null));
         });
     }
 

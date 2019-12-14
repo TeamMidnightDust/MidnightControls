@@ -211,10 +211,10 @@ public class LabelWidget extends DrawableHelper implements Element, Drawable
             this.fillGradient(k + i + 2, l - 3 + 1, k + i + 3, l + n + 3 - 1, 1347420415, 1344798847);
             this.fillGradient(k - 3, l - 3, k + i + 3, l - 3 + 1, 1347420415, 1347420415);
             this.fillGradient(k - 3, l + n + 2, k + i + 3, l + n + 3, 1344798847, 1344798847);
-            MatrixStack matrixStack = new MatrixStack();
+            MatrixStack matrix_stack = new MatrixStack();
             VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-            matrixStack.translate(0.0D, 0.0D, this.client.getItemRenderer().zOffset);
-            Matrix4f matrix4f = matrixStack.peek().getModel();
+            matrix_stack.translate(0.0D, 0.0D, this.client.getItemRenderer().zOffset);
+            Matrix4f matrix4f = matrix_stack.peek().getModel();
 
             for (int r = 0; r < text.size(); ++r) {
                 String string2 = text.get(r);

@@ -11,6 +11,7 @@ package me.lambdaurora.lambdacontrols;
 
 import me.lambdaurora.lambdacontrols.gui.LabelWidget;
 import me.lambdaurora.lambdacontrols.gui.LambdaControlsControlsScreen;
+import me.lambdaurora.lambdacontrols.gui.TouchscreenOverlay;
 import me.lambdaurora.lambdacontrols.mixin.EntryListWidgetAccessor;
 import me.lambdaurora.lambdacontrols.util.AbstractContainerScreenAccessor;
 import me.lambdaurora.lambdacontrols.util.CreativeInventoryScreenAccessor;
@@ -51,9 +52,9 @@ import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X;
 import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
 
 /**
- * Represents the controller input handler.
+ * Represents the LambdaControls' input handler.
  */
-public class ControllerInput
+public class LambdaInput
 {
     private static final Map<Integer, Boolean> BUTTON_STATES       = new HashMap<>();
     private static final Map<Integer, Integer> BUTTON_COOLDOWNS    = new HashMap<>();
@@ -76,11 +77,16 @@ public class ControllerInput
     private              float                 mouse_speed_x       = 0.F;
     private              float                 mouse_speed_y       = 0.F;
 
-    public ControllerInput(@NotNull LambdaControls mod)
+    public LambdaInput(@NotNull LambdaControls mod)
     {
         this.config = mod.config;
     }
 
+    /**
+     * This method is called every Minecraft tick.
+     *
+     * @param client The client instance.
+     */
     public void on_tick(@NotNull MinecraftClient client)
     {
         this.prev_target_yaw = this.target_yaw;
@@ -100,7 +106,7 @@ public class ControllerInput
     }
 
     /**
-     * This method is called every Minecraft tick.
+     * This method is called every Minecraft tick for controller input update.
      *
      * @param client The client instance.
      */
@@ -128,6 +134,12 @@ public class ControllerInput
             this.ignore_next_a--;
     }
 
+    /**
+     * This method is called before the screen is rendered.
+     *
+     * @param client The client instance.
+     * @param screen The screen to render.
+     */
     public void on_pre_render_screen(@NotNull MinecraftClient client, @NotNull Screen screen)
     {
         if (!is_screen_interactive(screen)) {
@@ -140,9 +152,15 @@ public class ControllerInput
         }
     }
 
+    /**
+     * This method is called when Minecraft renders.
+     *
+     * @param client The client instance.
+     */
     public void on_render(@NotNull MinecraftClient client)
     {
-        if (client.currentScreen == null && (this.prev_target_yaw != this.target_yaw || this.prev_target_pitch != this.target_pitch)) {
+        if ((client.currentScreen == null || client.currentScreen instanceof TouchscreenOverlay) &&
+                (this.prev_target_yaw != this.target_yaw || this.prev_target_pitch != this.target_pitch)) {
             float rotation_yaw = (float) (client.player.prevYaw + (this.target_yaw - client.player.prevYaw) * client.getTickDelta());
             float rotation_pitch = (float) (client.player.prevPitch + (this.target_pitch - client.player.prevPitch) * client.getTickDelta());
             client.player.yaw = rotation_yaw;
@@ -153,6 +171,13 @@ public class ControllerInput
         }
     }
 
+    /**
+     * This method is called when a Screen is opened.
+     *
+     * @param client        The client instance.
+     * @param window_width  The window width.
+     * @param window_height The window height.
+     */
     public void on_screen_open(@NotNull MinecraftClient client, int window_width, int window_height)
     {
         if (client.currentScreen == null) {
@@ -540,7 +565,7 @@ public class ControllerInput
      * @param value  The value of the look.
      * @param state  The state.
      */
-    private void handle_look(@NotNull MinecraftClient client, int axis, float value, int state)
+    public void handle_look(@NotNull MinecraftClient client, int axis, float value, int state)
     {
         // Handles the look direction.
         if (client.player != null) {

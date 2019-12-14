@@ -61,8 +61,10 @@ public class LambdaControlsSettingsScreen extends Screen
             this.mod.config.set_controller(Controller.by_id(current_id));
         }, (game_options, option) -> {
             String controller_name = this.mod.config.get_controller().get_name();
-            if (controller_name.equals(String.valueOf(this.mod.config.get_controller().get_id())))
+            if (!this.mod.config.get_controller().is_connected())
                 return option.getDisplayPrefix() + Formatting.RED + controller_name;
+            else if (!this.mod.config.get_controller().is_gamepad())
+                return option.getDisplayPrefix() + Formatting.GOLD + controller_name;
             else
                 return option.getDisplayPrefix() + controller_name;
         });
@@ -81,7 +83,7 @@ public class LambdaControlsSettingsScreen extends Screen
                     }
                 }, (game_options, option) -> {
             String value = String.valueOf(option.get(options));
-            return option.getDisplayPrefix() + value.substring(0, value.length() > 5 ? 5 : value.length());
+            return option.getDisplayPrefix() + value.substring(0, Math.min(value.length(), 5));
         });
         this.rotation_speed_option = new DoubleOption("lambdacontrols.menu.rotation_speed", 0.0, 50.0, 0.5F, game_options -> this.mod.config.get_rotation_speed(),
                 (game_options, new_value) -> {

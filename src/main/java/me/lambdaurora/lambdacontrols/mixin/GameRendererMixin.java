@@ -31,6 +31,6 @@ public class GameRendererMixin
     private void on_render(float tick_delta, long start_time, boolean full_render, CallbackInfo ci)
     {
         if (this.client.currentScreen != null && LambdaControls.get().config.get_controls_mode() == ControlsMode.CONTROLLER)
-            LambdaControls.get().controller_input.on_pre_render_screen(this.client, this.client.currentScreen);
+            LambdaControls.get().input.on_pre_render_screen(this.client, this.client.currentScreen);
     }
 }
