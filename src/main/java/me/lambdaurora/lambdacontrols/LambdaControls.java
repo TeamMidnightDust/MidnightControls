@@ -32,8 +32,8 @@ import org.lwjgl.glfw.GLFW;
  */
 public class LambdaControls implements ClientModInitializer
 {
-    private static      LambdaControls   INSTANCE;
-    public static final FabricKeyBinding BINDING_LOOK_UP    = FabricKeyBinding.Builder.create(new Identifier("lambdacontrols", "look_up"),
+    private static      LambdaControls       INSTANCE;
+    public static final FabricKeyBinding     BINDING_LOOK_UP    = FabricKeyBinding.Builder.create(new Identifier("lambdacontrols", "look_up"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.movement").build();
     public static final FabricKeyBinding     BINDING_LOOK_RIGHT = FabricKeyBinding.Builder.create(new Identifier("lambdacontrols", "look_right"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, "key.categories.movement").build();
@@ -42,10 +42,11 @@ public class LambdaControls implements ClientModInitializer
     public static final FabricKeyBinding     BINDING_LOOK_LEFT  = FabricKeyBinding.Builder.create(new Identifier("lambdacontrols", "look_left"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement").build();
     public static final Identifier           CONTROLLER_BUTTONS = new Identifier("lambdacontrols", "textures/gui/controller_buttons.png");
+    public static final Identifier           CONTROLLER_AXIS    = new Identifier("lambdacontrols", "textures/gui/controller_axis.png");
     public final        Logger               logger             = LogManager.getLogger("LambdaControls");
-    public final LambdaControlsConfig config = new LambdaControlsConfig(this);
-    public final LambdaInput          input  = new LambdaInput(this);
-    private      ControlsMode         previous_controls_mode;
+    public final        LambdaControlsConfig config             = new LambdaControlsConfig(this);
+    public final        LambdaInput          input              = new LambdaInput(this);
+    private             ControlsMode         previous_controls_mode;
 
     @Override
     public void onInitializeClient()
@@ -137,6 +138,93 @@ public class LambdaControls implements ClientModInitializer
         return INSTANCE;
     }
 
+    public static int draw_button(int x, int y, @NotNull ButtonBinding button, @NotNull MinecraftClient client)
+    {
+        return draw_button(x, y, button.get_button(), client);
+    }
+
+    public static int draw_button(int x, int y, int button, @NotNull MinecraftClient client)
+    {
+        if (button == -1)
+            return 0;
+
+        int controller_type = get().config.get_controller_type().get_id();
+        boolean axis = false;
+        int button_offset = button * 15;
+        switch (button) {
+            case GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER:
+                button_offset = 7 * 15;
+                break;
+            case GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER:
+                button_offset = 8 * 15;
+                break;
+            case GLFW.GLFW_GAMEPAD_BUTTON_BACK:
+                button_offset = 4 * 15;
+                break;
+            case GLFW.GLFW_GAMEPAD_BUTTON_START:
+                button_offset = 6 * 15;
+                break;
+            case GLFW.GLFW_GAMEPAD_BUTTON_GUIDE:
+                button_offset = 5 * 15;
+                break;
+            case GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB:
+                button_offset = 15 * 15;
+                break;
+            case GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB:
+                button_offset = 16 * 15;
+                break;
+            case GLFW.GLFW_GAMEPAD_AXIS_LEFT_X + 100:
+                button_offset = 0;
+                axis = true;
+                break;
+            case GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y + 100:
+                button_offset = 18;
+                axis = true;
+                break;
+            case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X + 100:
+                button_offset = 2 * 18;
+                axis = true;
+                break;
+            case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y + 100:
+                button_offset = 3 * 18;
+                axis = true;
+                break;
+            case GLFW.GLFW_GAMEPAD_AXIS_LEFT_X + 200:
+                button_offset = 4 * 18;
+                axis = true;
+                break;
+            case GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y + 200:
+                button_offset = 5 * 18;
+                axis = true;
+                break;
+            case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X + 200:
+                button_offset = 6 * 18;
+                axis = true;
+                break;
+            case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y + 200:
+                button_offset = 7 * 18;
+                axis = true;
+                break;
+            case GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER + 100:
+            case GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER + 200:
+                button_offset = 9 * 15;
+                break;
+            case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER + 100:
+            case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER + 200:
+                button_offset = 10 * 15;
+                break;
+        }
+
+        client.getTextureManager().bindTexture(axis ? LambdaControls.CONTROLLER_AXIS : LambdaControls.CONTROLLER_BUTTONS);
+        GlStateManager.disableDepthTest();
+
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        DrawableHelper.blit(x, y, (float) button_offset, (float) (controller_type * (axis ? 18 : 15)), axis ? 18 : 15, axis ? 18 : 15, 256, 256);
+        GlStateManager.enableDepthTest();
+
+        return axis ? 18 : 15;
+    }
+
     public static int draw_button_tip(int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull MinecraftClient client)
     {
         return draw_button_tip(x, y, button.get_button(), button.get_translation_key(), display, client);
@@ -144,37 +232,13 @@ public class LambdaControls implements ClientModInitializer
 
     public static int draw_button_tip(int x, int y, int button, @NotNull String action, boolean display, @NotNull MinecraftClient client)
     {
-        int controller_type = get().config.get_controller_type().get_id();
         String translated_action = I18n.translate(action);
 
         if (display) {
-            int button_offset = button * 15;
-            switch (button) {
-                case GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB:
-                    button_offset = 15 * 15;
-                    break;
-                case GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB:
-                    button_offset = 16 * 15;
-                    break;
-                case GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER + 100:
-                case GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER + 200:
-                    button_offset = 9 * 15;
-                    break;
-                case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER + 100:
-                case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER + 200:
-                    button_offset = 10 * 15;
-                    break;
-            }
-
-            client.getTextureManager().bindTexture(LambdaControls.CONTROLLER_BUTTONS);
-            GlStateManager.disableDepthTest();
-
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            DrawableHelper.blit(x, y, (float) button_offset, (float) (controller_type * 15), 15, 15, 256, 256);
-            GlStateManager.enableDepthTest();
+            int button_width = draw_button(x, y, button, client);
 
             int text_y = (15 - client.textRenderer.fontHeight) / 2;
-            client.textRenderer.drawWithShadow(translated_action, (float) (x + 15 + 5), (float) (y + text_y), 14737632);
+            client.textRenderer.drawWithShadow(translated_action, (float) (x + button_width + 5), (float) (y + text_y), 14737632);
         }
 
         return display ? get_button_tip_width(translated_action, client.textRenderer) : -10;

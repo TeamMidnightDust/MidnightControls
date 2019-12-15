@@ -1,7 +1,7 @@
 #
 # LambdAurora's ignore file
 #
-# v0.11
+# v0.12
 
 # JetBrains
 .idea/
@@ -58,6 +58,7 @@ desktop.ini
 *.dylib
 *.lib
 lib*.a
+*.png~
 
 # Common
 bin/

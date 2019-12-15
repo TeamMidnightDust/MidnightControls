@@ -36,7 +36,7 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
 
     public ControlsListWidget(@NotNull LambdaControlsControlsScreen gui, @NotNull MinecraftClient client)
     {
-        super(client, gui.width + 45, gui.height, 43, gui.height - 32, 20);
+        super(client, gui.width + 45, gui.height, 43, gui.height - 32, 24);
         this.gui = gui;
 
         ButtonBinding.stream_categories()
@@ -69,16 +69,16 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
 
     public class ButtonBindingEntry extends Entry
     {
-        private final ButtonBinding binding;
-        private final String        binding_name;
-        private final ButtonWidget  edit_button;
-        private final ButtonWidget  reset_button;
+        private final ButtonBinding          binding;
+        private final String                 binding_name;
+        private final ControllerButtonWidget edit_button;
+        private final ButtonWidget           reset_button;
 
         ButtonBindingEntry(@NotNull ButtonBinding binding)
         {
             this.binding = binding;
             this.binding_name = I18n.translate(this.binding.get_translation_key());
-            this.edit_button = new ButtonWidget(0, 0, 75, 20, this.binding_name, btn -> gui.focused_binding = binding)
+            this.edit_button = new ControllerButtonWidget(0, 0, 90, this.binding, btn -> gui.focused_binding = binding)
             {
                 protected String getNarrationMessage()
                 {
@@ -107,16 +107,16 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
             boolean focused = gui.focused_binding == this.binding;
             TextRenderer text_renderer = ControlsListWidget.this.minecraft.textRenderer;
             String binding_name = this.binding_name;
-            float var10002 = (float) (x + 90 - ControlsListWidget.this.field_2733);
+            float var10002 = (float) (x + 70 - ControlsListWidget.this.field_2733);
             int var10003 = y + height / 2;
             text_renderer.draw(binding_name, var10002, (float) (var10003 - 9 / 2), 16777215);
             this.reset_button.x = x + 190;
             this.reset_button.y = y;
             this.reset_button.active = !this.binding.is_default();
             this.reset_button.render(mouse_x, mouse_y, delta);
-            this.edit_button.x = x + 105;
+            this.edit_button.x = x + 85;
             this.edit_button.y = y;
-            this.edit_button.setMessage(ButtonBinding.get_localized_button_name(binding.get_button()));
+            this.edit_button.update();
 
             if (focused) {
                 this.edit_button.setMessage(Formatting.WHITE + "> " + Formatting.YELLOW + this.edit_button.getMessage() + Formatting.WHITE + " <");
