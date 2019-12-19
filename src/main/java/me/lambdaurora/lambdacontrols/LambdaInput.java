@@ -161,13 +161,16 @@ public class LambdaInput
     {
         if ((client.currentScreen == null || client.currentScreen instanceof TouchscreenOverlay) &&
                 (this.prev_target_yaw != this.target_yaw || this.prev_target_pitch != this.target_pitch)) {
-            float rotation_yaw = (float) (client.player.prevYaw + (this.target_yaw - client.player.prevYaw) * client.getTickDelta());
-            float rotation_pitch = (float) (client.player.prevPitch + (this.target_pitch - client.player.prevPitch) * client.getTickDelta());
+            float delta_yaw = (float) ((this.target_yaw - client.player.prevYaw) * client.getTickDelta());
+            float delta_pitch = (float) ((this.target_pitch - client.player.prevPitch) * client.getTickDelta());
+            float rotation_yaw = client.player.prevYaw + delta_yaw;
+            float rotation_pitch = client.player.prevPitch + delta_pitch;
             client.player.yaw = rotation_yaw;
             client.player.pitch = MathHelper.clamp(rotation_pitch, -90.F, 90.F);
             if (client.player.isRiding()) {
                 client.player.getVehicle().copyPositionAndRotation(client.player);
             }
+            client.getTutorialManager().onUpdateMouse(delta_pitch, delta_yaw);
         }
     }
 
