@@ -21,6 +21,9 @@ repositories {
 		name = 'CottonMC'
 		url = 'http://server.bbkr.space:8081/artifactory/libs-snapshot'
 	}
+	repositories {
+		maven { url = "https://jitpack.io" }
+	}
 }
 
 dependencies {
@@ -30,7 +33,9 @@ dependencies {
 	modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	modCompile "io.github.prospector:modmenu:1.8.0+build.16"
 	//modCompile "io.github.cottonmc:cotton-client-commands:0.4.2+1.14.3-SNAPSHOT"
 
 	implementation "org.jetbrains:annotations:17.0.0"

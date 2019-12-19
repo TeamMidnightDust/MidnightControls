@@ -467,7 +467,7 @@ public class LambdaInput
     private void handle_rb_lb(@NotNull MinecraftClient client, boolean right)
     {
         // When ingame
-        if (client.currentScreen == null) {
+        if (client.currentScreen == null && client.player != null) {
             if (right)
                 client.player.inventory.selectedSlot = client.player.inventory.selectedSlot == 8 ? 0 : client.player.inventory.selectedSlot + 1;
             else
@@ -523,7 +523,8 @@ public class LambdaInput
     {
         Element focused = screen.getFocused();
         if (focused != null)
-            return this.handle_right_left_element(focused, right);
+            if (this.handle_right_left_element(focused, right))
+                return this.change_focus(screen, right);
         return true;
     }
 
