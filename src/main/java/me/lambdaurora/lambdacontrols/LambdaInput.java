@@ -61,9 +61,11 @@ public class LambdaInput
     private static final Map<Integer, Boolean> AXIS_STATES         = new HashMap<>();
     private static final Map<Integer, Integer> AXIS_COOLDOWNS      = new HashMap<>();
     private final        LambdaControlsConfig  config;
+    // Cooldowns
     private              int                   action_gui_cooldown = 0;
     private              int                   ignore_next_a       = 0;
-    private              int                   last_sneak          = 0;
+    // Sneak state.
+    private              boolean               sneak               = false;
     private              double                prev_target_yaw     = 0.0;
     private              double                prev_target_pitch   = 0.0;
     private              double                target_yaw          = 0.0;
@@ -114,9 +116,6 @@ public class LambdaInput
     {
         BUTTON_COOLDOWNS.entrySet().stream().filter(entry -> entry.getValue() > 0).forEach(entry -> BUTTON_COOLDOWNS.put(entry.getKey(), entry.getValue() - 1));
         AXIS_COOLDOWNS.entrySet().stream().filter(entry -> entry.getValue() > 0).forEach(entry -> AXIS_COOLDOWNS.put(entry.getKey(), entry.getValue() - 1));
-        // Decreases the last_sneak counter which allows to double press to sneak continuously.
-        if (this.last_sneak > 0)
-            --this.last_sneak;
         // Decreases the cooldown for GUI actions.
         if (this.action_gui_cooldown > 0)
             --this.action_gui_cooldown;
@@ -317,11 +316,6 @@ public class LambdaInput
                     return;
                 }
             }
-
-            // Handles sneak button.
-            if (SNEAK.is_button(button) && client.player != null) {
-                this.toggle_sneaking(client);
-            }
         }
 
         if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null && !is_screen_interactive(client.currentScreen) && this.action_gui_cooldown == 0 && this.ignore_next_a == 0) {
@@ -336,7 +330,7 @@ public class LambdaInput
             return;
         }
 
-        if (client.currentScreen == null && action != 2) {
+        if (client.currentScreen == null) {
             ButtonBinding.handle_button(client, button, action);
         }
     }
@@ -549,16 +543,6 @@ public class LambdaInput
             return this.handle_right_left_element(focused, right);
         }
         return true;
-    }
-
-    /**
-     * Toggles whether the player is sneaking.
-     *
-     * @param client The client's instance.
-     */
-    private void toggle_sneaking(@NotNull MinecraftClient client)
-    {
-        ((KeyBindingAccessor) client.options.keySneak).handle_press_state(!client.options.keySneak.isPressed());
     }
 
     /**

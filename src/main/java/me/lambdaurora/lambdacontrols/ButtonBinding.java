@@ -34,6 +34,12 @@ public class ButtonBinding implements Nameable
 {
     private static final List<ButtonBinding> BINDINGS           = new ArrayList<>();
     private static final List<Category>      CATEGORIES         = new ArrayList<>();
+    public static final  PressAction         DEFAULT_ACTION     = (client, button, action) -> {
+        if (action == 2)
+            return false;
+        button.as_key_binding().ifPresent(key_binding -> ((KeyBindingAccessor) key_binding).handle_press_state(button.is_button_down()));
+        return true;
+    };
     public static final  Category            MOVEMENT_CATEGORY;
     public static final  Category            GAMEPLAY_CATEGORY;
     public static final  Category            INVENTORY_CATEGORY;
@@ -52,14 +58,21 @@ public class ButtonBinding implements Nameable
     public static final  ButtonBinding       PLAYER_LIST        = new ButtonBinding("player_list", GLFW.GLFW_GAMEPAD_BUTTON_BACK);
     public static final  ButtonBinding       RIGHT              = new ButtonBinding("right", axis_as_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X, true));
     public static final  ButtonBinding       SCREENSHOT         = new ButtonBinding("screenshot", GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN,
-            Collections.singletonList((client, action) -> {
+            Collections.singletonList((client, button, action) -> {
                 if (action == 0)
                     ScreenshotUtils.saveScreenshot(client.runDirectory, client.getWindow().getFramebufferWidth(), client.getWindow().getFramebufferHeight(), client.getFramebuffer(),
                             text -> client.execute(() -> client.inGameHud.getChatHud().addMessage(text)));
                 return true;
             }));
     public static final  ButtonBinding       SMOOTH_CAMERA      = new ButtonBinding("toggle_smooth_camera", -1);
-    public static final  ButtonBinding       SNEAK              = new ButtonBinding("sneak", GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB);
+    public static final  ButtonBinding       SNEAK              = new ButtonBinding("sneak", GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB,
+            Arrays.asList(DEFAULT_ACTION, (client, button, action) -> {
+                if (client.player != null && !client.player.abilities.flying) {
+                    button.as_key_binding().filter(binding -> action == 0).ifPresent(binding -> ((KeyBindingAccessor) binding).handle_press_state(!binding.isPressed()));
+                    return true;
+                }
+                return false;
+            }));
     public static final  ButtonBinding       SPRINT             = new ButtonBinding("sprint", GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB);
     public static final  ButtonBinding       SWAP_HANDS         = new ButtonBinding("swap_hands", GLFW.GLFW_GAMEPAD_BUTTON_X);
     public static final  ButtonBinding       TOGGLE_PERSPECTIVE = new ButtonBinding("toggle_perspective", GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP);
@@ -69,10 +82,7 @@ public class ButtonBinding implements Nameable
     private int               default_button;
     private String            key;
     private KeyBinding        minecraft_key_binding = null;
-    private List<PressAction> actions               = new ArrayList<>(Collections.singletonList((client, action) -> {
-        this.as_key_binding().ifPresent(key_binding -> ((KeyBindingAccessor) key_binding).handle_press_state(this.is_button_down()));
-        return true;
-    }));
+    private List<PressAction> actions               = new ArrayList<>(Collections.singletonList(DEFAULT_ACTION));
     private boolean           pressed               = false;
 
     protected ButtonBinding(@NotNull String key, int default_button, @NotNull List<PressAction> actions)
@@ -246,7 +256,7 @@ public class ButtonBinding implements Nameable
         BINDINGS.parallelStream().filter(binding -> binding.button == button)
                 .forEach(binding -> {
                     for (int i = binding.actions.size() - 1; i >= 0; i--) {
-                        if (binding.actions.get(i).press(client, action))
+                        if (binding.actions.get(i).press(client, binding, action))
                             break;
                     }
                 });
@@ -502,6 +512,6 @@ public class ButtonBinding implements Nameable
          * @param client The client instance.
          * @param action The action done.
          */
-        boolean press(@NotNull MinecraftClient client, int action);
+        boolean press(@NotNull MinecraftClient client, @NotNull ButtonBinding button, int action);
     }
 }

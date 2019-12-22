@@ -12,7 +12,6 @@
     "KeyBindingMixin",
     "MinecraftClientMixin",
     "MouseMixin",
-    "ScreenMixin",
     "SettingsScreenMixin"
   ],
   "injectors": {

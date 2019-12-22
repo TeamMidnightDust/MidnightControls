@@ -232,16 +232,17 @@ public class LambdaControls implements ClientModInitializer
 
     public static int draw_button_tip(int x, int y, int button, @NotNull String action, boolean display, @NotNull MinecraftClient client)
     {
-        String translated_action = I18n.translate(action);
-
         if (display) {
             int button_width = draw_button(x, y, button, client);
 
+            String translated_action = I18n.translate(action);
             int text_y = (15 - client.textRenderer.fontHeight) / 2;
             client.textRenderer.drawWithShadow(translated_action, (float) (x + button_width + 5), (float) (y + text_y), 14737632);
+
+            return get_button_tip_width(translated_action, client.textRenderer);
         }
 
-        return display ? get_button_tip_width(translated_action, client.textRenderer) : -10;
+        return -10;
     }
 
     private static int get_button_tip_width(@NotNull String action, @NotNull TextRenderer text_renderer)
