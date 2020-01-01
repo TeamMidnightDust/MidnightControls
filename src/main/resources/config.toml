@@ -15,6 +15,8 @@ auto_switch_mode = false
 [controller]
     # Controller to use.
     id = 0
+    # Second controller to use.
+    id2 = -1
     # Controller's type.
     type = "default"
     # Controller's dead zone.
@@ -30,36 +32,42 @@ auto_switch_mode = false
     # Controller controls.
     [controller.controls]
         # Attack control.
-        attack = 105
+        attack = "105"
         # Back control.
-        back = 201
+        back = "201"
         # Open chat control.
-        chat = 12
+        chat = "12"
         # Drop item control.
-        drop_item = 1
+        drop_item = "1"
         # Forward control.
-        forward = 101
+        forward = "101"
+        # Hot-bar left control.
+        hotbar_left = "4"
+        # Hot-bar right control.
+        hotbar_right = "5"
         # Inventory control.
-        inventory = 3
+        inventory = "3"
         # Jump control.
-        jump = 0
+        jump = "0"
         # Pause game control.
-        pause_game = 7
+        pause_game = "7"
         # Pick block control.
-        pick_block = 14
+        pick_block = "14"
         # Show player list control.
-        player_list = 6
+        player_list = "6"
         # Take screenshot control.
-        screenshot = 13
+        screenshot = "11+0"
         # Sneak control.
-        sneak = 10
+        sneak = "10"
         # Sprint control.
-        sprint = 9
+        sprint = "9"
         # Swap hands control.
-        swap_hands = 2
+        swap_hands = "2"
         # Toggle perspective control.
-        toggle_perspective = 11
+        toggle_perspective = "11+3"
         # Toggle smooth camera control.
-        toggle_smooth_camera = -1
+        toggle_smooth_camera = "-1"
         # Use control.
-        use = 104
+        use = "104"
+        # Zoom control.
+        zoom = "11+2"

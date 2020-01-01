@@ -36,6 +36,8 @@ dependencies {
 	modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modCompile "io.github.prospector:modmenu:1.8.0+build.16"
+	modCompile "me.lambdaurora:spruceui:${project.spruceui_version}"
+	include "me.lambdaurora:spruceui:${project.spruceui_version}"
 	//modCompile "io.github.cottonmc:cotton-client-commands:0.4.2+1.14.3-SNAPSHOT"
 
 	implementation "org.jetbrains:annotations:17.0.0"

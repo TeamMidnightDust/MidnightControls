@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 LambdAurora <aurora42lambda@gmail.com>
+ * Copyright © 2020 LambdAurora <aurora42lambda@gmail.com>
  *
  * This file is part of LambdaControls.
  *
@@ -10,55 +10,78 @@
 package me.lambdaurora.lambdacontrols;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
-import net.minecraft.client.options.KeyBinding;
+import me.lambdaurora.lambdacontrols.controller.ButtonBinding;
+import me.lambdaurora.lambdacontrols.controller.Controller;
+import me.lambdaurora.lambdacontrols.controller.InputManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_X;
+import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
 
 /**
  * Represents LambdaControls configuration.
  */
 public class LambdaControlsConfig
 {
-    private final FileConfig              config              = FileConfig.builder("config/lambdacontrols.toml").concurrent().defaultResource("/config.toml").build();
-    private final Map<String, KeyBinding> keybinding_mappings = new HashMap<>();
-    private final LambdaControls          mod;
-    private       ControlsMode            controls_mode;
-    private       ControllerType          controller_type;
+    private static final ControlsMode   DEFAULT_CONTROLS_MODE    = ControlsMode.DEFAULT;
+    private static final boolean        DEFAULT_AUTO_SWITCH_MODE = false;
+    private static final boolean        DEFAULT_HUD_ENABLE       = true;
+    private static final HudSide        DEFAULT_HUD_SIDE         = HudSide.LEFT;
+    private static final ControllerType DEFAULT_CONTROLLER_TYPE  = ControllerType.DEFAULT;
+    private static final double         DEFAULT_DEAD_ZONE        = 0.25;
+    private static final double         DEFAULT_ROTATION_SPEED   = 40.0;
+    private static final double         DEFAULT_MOUSE_SPEED      = 25.0;
+
+    private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
+
+    private final FileConfig     config = FileConfig.builder("config/lambdacontrols.toml").concurrent().defaultResource("/config.toml").build();
+    private final LambdaControls mod;
+    private       ControlsMode   controls_mode;
+    private       ControllerType controller_type;
     // HUD settings.
-    private       boolean                 hud_enable;
-    private       HudSide                 hud_side;
+    private       boolean        hud_enable;
+    private       HudSide        hud_side;
     // Controller settings
-    private       double                  dead_zone;
-    private       double                  rotation_speed;
-    private       double                  mouse_speed;
+    private       double         dead_zone;
+    private       double         rotation_speed;
+    private       double         mouse_speed;
 
     public LambdaControlsConfig(@NotNull LambdaControls mod)
     {
         this.mod = mod;
     }
 
+    /**
+     * Loads the configuration
+     */
     public void load()
     {
-        this.keybinding_mappings.clear();
         this.config.load();
+        this.check_and_fix();
         this.mod.log("Configuration loaded.");
-        this.controls_mode = ControlsMode.by_id(this.config.getOrElse("controls", "default")).orElse(ControlsMode.DEFAULT);
+        this.controls_mode = ControlsMode.by_id(this.config.getOrElse("controls", DEFAULT_CONTROLS_MODE.get_name())).orElse(DEFAULT_CONTROLS_MODE);
         // HUD settings.
-        this.hud_enable = this.config.getOrElse("hud.enable", true);
-        this.hud_side = HudSide.by_id(this.config.getOrElse("hud.side", "left")).orElse(HudSide.LEFT);
+        this.hud_enable = this.config.getOrElse("hud.enable", DEFAULT_HUD_ENABLE);
+        this.hud_side = HudSide.by_id(this.config.getOrElse("hud.side", DEFAULT_HUD_SIDE.get_name())).orElse(DEFAULT_HUD_SIDE);
         // Controller settings.
-        this.controller_type = ControllerType.by_id(this.config.getOrElse("controller.type", "default")).orElse(ControllerType.DEFAULT);
-        this.dead_zone = this.config.getOrElse("controller.dead_zone", 0.25);
-        this.rotation_speed = this.config.getOrElse("controller.rotation_speed", 40.0);
-        this.mouse_speed = this.config.getOrElse("controller.mouse_speed", 25.0);
+        this.controller_type = ControllerType.by_id(this.config.getOrElse("controller.type", DEFAULT_CONTROLLER_TYPE.get_name())).orElse(DEFAULT_CONTROLLER_TYPE);
+        this.dead_zone = this.config.getOrElse("controller.dead_zone", DEFAULT_DEAD_ZONE);
+        this.rotation_speed = this.config.getOrElse("controller.rotation_speed", DEFAULT_ROTATION_SPEED);
+        this.mouse_speed = this.config.getOrElse("controller.mouse_speed", DEFAULT_MOUSE_SPEED);
         // Controller controls.
-        ButtonBinding.load_from_config(this);
+        InputManager.load_button_bindings(this);
     }
 
+    /**
+     * Saves the configuration.
+     */
     public void save()
     {
         this.config.set("controller.dead_zone", this.dead_zone);
@@ -66,6 +89,35 @@ public class LambdaControlsConfig
         this.config.set("controller.mouse_speed", this.mouse_speed);
         this.config.save();
         this.mod.log("Configuration saved.");
+    }
+
+    public void check_and_fix()
+    {
+        InputManager.stream_bindings().forEach(binding -> {
+            String path = "controller.controls." + binding.get_name();
+            Object raw = this.config.getRaw(path);
+            if (raw instanceof Number) {
+                this.mod.warn("Invalid data at \"" + path + "\", fixing...");
+                this.config.set(path, "0;" + raw);
+            }
+        });
+    }
+
+    /**
+     * Resets the configuration to default values.
+     */
+    public void reset()
+    {
+        this.set_controls_mode(DEFAULT_CONTROLS_MODE);
+        this.set_auto_switch_mode(DEFAULT_AUTO_SWITCH_MODE);
+        this.set_hud_enabled(DEFAULT_HUD_ENABLE);
+        this.set_hud_side(DEFAULT_HUD_SIDE);
+        this.set_controller_type(DEFAULT_CONTROLLER_TYPE);
+        this.set_dead_zone(DEFAULT_DEAD_ZONE);
+        this.set_rotation_speed(DEFAULT_ROTATION_SPEED);
+        this.set_mouse_speed(DEFAULT_MOUSE_SPEED);
+
+        InputManager.stream_bindings().forEach(binding -> this.set_button_binding(binding, binding.get_default_button()));
     }
 
     /**
@@ -96,7 +148,7 @@ public class LambdaControlsConfig
      */
     public boolean has_auto_switch_mode()
     {
-        return this.config.getOrElse("auto_switch_mode", false);
+        return this.config.getOrElse("auto_switch_mode", DEFAULT_AUTO_SWITCH_MODE);
     }
 
     /**
@@ -175,6 +227,34 @@ public class LambdaControlsConfig
     public void set_controller(@NotNull Controller controller)
     {
         this.config.set("controller.id", controller.get_id());
+    }
+
+    /**
+     * Gets the second controller (for Joy-Con supports).
+     *
+     * @return The second controller.
+     */
+    public @NotNull Optional<Controller> get_second_controller()
+    {
+        Object raw = this.config.getRaw("controller.id2");
+        if (raw instanceof Number) {
+            if ((int) raw == -1)
+                return Optional.empty();
+            return Optional.of(Controller.by_id((Integer) raw));
+        } else if (raw instanceof String) {
+            return Optional.of(Controller.by_guid((String) raw).orElse(Controller.by_id(GLFW.GLFW_JOYSTICK_1)));
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Sets the second controller.
+     *
+     * @param controller The second controller.
+     */
+    public void set_second_controller(@Nullable Controller controller)
+    {
+        this.config.set("controller.id2", controller == null ? -1 : controller.get_id());
     }
 
     /**
@@ -319,28 +399,49 @@ public class LambdaControlsConfig
     }
 
     /**
-     * Returns the keybindings.
-     *
-     * @return The keybindings.
-     */
-    public @NotNull Map<String, KeyBinding> get_keybindings()
-    {
-        return this.keybinding_mappings;
-    }
-
-    public Optional<KeyBinding> get_keybind(@NotNull String id)
-    {
-        return Optional.ofNullable(this.keybinding_mappings.get(id));
-    }
-
-    /**
      * Loads the button binding from configuration.
      *
      * @param button The button binding.
      */
     public void load_button_binding(@NotNull ButtonBinding button)
     {
-        button.set_button(this.config.getOrElse("controller.controls." + button.get_name(), button.get_button()));
+        button.set_button(button.get_default_button());
+        String button_code = this.config.getOrElse("controller.controls." + button.get_name(), button.get_button_code());
+
+        Matcher matcher = BUTTON_BINDING_PATTERN.matcher(button_code);
+
+        try {
+            int[] buttons = new int[1];
+            int count = 0;
+            while (matcher.find()) {
+                count++;
+                if (count > buttons.length)
+                    buttons = Arrays.copyOf(buttons, count);
+                String current;
+                if (!this.check_validity(button, button_code, current = matcher.group(1)))
+                    return;
+                buttons[count - 1] = Integer.parseInt(current);
+            }
+            if (count == 0) {
+                this.mod.warn("Malformed config value \"" + button_code + "\" for binding \"" + button.get_name() + "\".");
+                this.set_button_binding(button, new int[]{-1});
+            }
+
+            button.set_button(buttons);
+        } catch (Exception e) {
+            this.mod.warn("Malformed config value \"" + button_code + "\" for binding \"" + button.get_name() + "\".");
+            this.config.set("controller.controls." + button.get_name(), button.get_button_code());
+        }
+    }
+
+    private boolean check_validity(@NotNull ButtonBinding binding, @NotNull String input, String group)
+    {
+        if (group == null) {
+            this.mod.warn("Malformed config value \"" + input + "\" for binding \"" + binding.get_name() + "\".");
+            this.config.set("controller.controls." + binding.get_name(), binding.get_button_code());
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -349,51 +450,48 @@ public class LambdaControlsConfig
      * @param binding The button binding.
      * @param button  The button.
      */
-    public void set_button_binding(@NotNull ButtonBinding binding, int button)
+    public void set_button_binding(@NotNull ButtonBinding binding, int[] button)
     {
         binding.set_button(button);
-        this.config.set("controller.controls." + binding.get_name(), button);
+        this.config.set("controller.controls." + binding.get_name(), binding.get_button_code());
     }
 
     public boolean is_back_button(int btn, boolean is_btn, int state)
     {
         if (!is_btn && state == 0)
             return false;
-        return ButtonBinding.BACK.is_button(ButtonBinding.axis_as_button(btn, state == 1));
+        return ButtonBinding.axis_as_button(GLFW_GAMEPAD_AXIS_LEFT_Y, false) == ButtonBinding.axis_as_button(btn, state == 1);
     }
 
     public boolean is_forward_button(int btn, boolean is_btn, int state)
     {
         if (!is_btn && state == 0)
             return false;
-        return ButtonBinding.FORWARD.is_button(ButtonBinding.axis_as_button(btn, state == 1));
+        return ButtonBinding.axis_as_button(GLFW_GAMEPAD_AXIS_LEFT_Y, true) == ButtonBinding.axis_as_button(btn, state == 1);
     }
 
     public boolean is_left_button(int btn, boolean is_btn, int state)
     {
         if (!is_btn && state == 0)
             return false;
-        return ButtonBinding.LEFT.is_button(ButtonBinding.axis_as_button(btn, state == 1));
+        return ButtonBinding.axis_as_button(GLFW_GAMEPAD_AXIS_LEFT_X, false) == ButtonBinding.axis_as_button(btn, state == 1);
     }
 
     public boolean is_right_button(int btn, boolean is_btn, int state)
     {
         if (!is_btn && state == 0)
             return false;
-        return ButtonBinding.RIGHT.is_button(ButtonBinding.axis_as_button(btn, state == 1));
+        return ButtonBinding.axis_as_button(GLFW_GAMEPAD_AXIS_LEFT_X, true) == ButtonBinding.axis_as_button(btn, state == 1);
     }
 
     /**
      * Returns whether the specified axis is an axis used for movements.
      *
-     * @param i The axis index.
+     * @param axis The axis index.
      * @return True if the axis is used for movements, else false.
      */
-    public boolean is_movement_axis(int i)
+    public boolean is_movement_axis(int axis)
     {
-        return ButtonBinding.FORWARD.is_button(ButtonBinding.axis_as_button(i, true)) || ButtonBinding.FORWARD.is_button(ButtonBinding.axis_as_button(i, false))
-                || ButtonBinding.BACK.is_button(ButtonBinding.axis_as_button(i, true)) || ButtonBinding.BACK.is_button(ButtonBinding.axis_as_button(i, false))
-                || ButtonBinding.LEFT.is_button(ButtonBinding.axis_as_button(i, true)) || ButtonBinding.LEFT.is_button(ButtonBinding.axis_as_button(i, false))
-                || ButtonBinding.RIGHT.is_button(ButtonBinding.axis_as_button(i, true)) || ButtonBinding.RIGHT.is_button(ButtonBinding.axis_as_button(i, false));
+        return axis == GLFW_GAMEPAD_AXIS_LEFT_Y || axis == GLFW_GAMEPAD_AXIS_LEFT_X;
     }
 }

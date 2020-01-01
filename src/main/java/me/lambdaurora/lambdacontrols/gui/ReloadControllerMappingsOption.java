@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 LambdAurora <aurora42lambda@gmail.com>
+ * Copyright © 2020 LambdAurora <aurora42lambda@gmail.com>
  *
  * This file is part of LambdaControls.
  *
@@ -9,10 +9,10 @@
 
 package me.lambdaurora.lambdacontrols.gui;
 
-import me.lambdaurora.lambdacontrols.Controller;
+import me.lambdaurora.lambdacontrols.controller.Controller;
+import me.lambdaurora.spruceui.SpruceButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.Option;
 import net.minecraft.client.resource.language.I18n;
@@ -36,13 +36,15 @@ public class ReloadControllerMappingsOption extends Option implements Nameable
     @Override
     public AbstractButtonWidget createButton(GameOptions options, int x, int y, int width)
     {
-        return new ButtonWidget(x, y, width, 20, this.get_name(), btn -> {
+        SpruceButtonWidget button = new SpruceButtonWidget(x, y, width, 20, this.get_name(), btn -> {
             MinecraftClient client = MinecraftClient.getInstance();
             Controller.update_mappings();
             if (client.currentScreen != null)
                 client.currentScreen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
             client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, new TranslatableText("lambdacontrols.controller.mappings.updated"), null));
         });
+        button.set_tooltip(new TranslatableText("lambdacontrols.tooltip.reload_controller_mappings"));
+        return button;
     }
 
     @Override

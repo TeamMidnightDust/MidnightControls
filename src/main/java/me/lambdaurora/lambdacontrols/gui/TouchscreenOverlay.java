@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 LambdAurora <aurora42lambda@gmail.com>
+ * Copyright © 2020 LambdAurora <aurora42lambda@gmail.com>
  *
  * This file is part of LambdaControls.
  *
@@ -12,6 +12,7 @@ package me.lambdaurora.lambdacontrols.gui;
 import me.lambdaurora.lambdacontrols.HudSide;
 import me.lambdaurora.lambdacontrols.LambdaControls;
 import me.lambdaurora.lambdacontrols.util.KeyBindingAccessor;
+import me.lambdaurora.spruceui.SpruceTexturedButtonWidget;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -35,18 +36,18 @@ import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
  */
 public class TouchscreenOverlay extends Screen
 {
-    public static final Identifier              WIDGETS_LOCATION        = new Identifier("lambdacontrols", "textures/gui/widgets.png");
-    private             LambdaControls          mod;
-    private             TouchscreenButtonWidget jump_button;
-    private             TouchscreenButtonWidget fly_button;
-    private             TouchscreenButtonWidget fly_up_button;
-    private             TouchscreenButtonWidget fly_down_button;
-    private             int                     fly_button_enable_ticks = 0;
-    private             int                     forward_button_tick     = 0;
-    private             TouchscreenButtonWidget forward_left_button;
-    private             TouchscreenButtonWidget forward_right_button;
-    private             TouchscreenButtonWidget start_sneak_button;
-    private             TouchscreenButtonWidget end_sneak_button;
+    public static final Identifier                 WIDGETS_LOCATION        = new Identifier("lambdacontrols", "textures/gui/widgets.png");
+    private             LambdaControls             mod;
+    private             SpruceTexturedButtonWidget jump_button;
+    private             SpruceTexturedButtonWidget fly_button;
+    private             SpruceTexturedButtonWidget fly_up_button;
+    private             SpruceTexturedButtonWidget fly_down_button;
+    private             int                        fly_button_enable_ticks = 0;
+    private             int                        forward_button_tick     = 0;
+    private             SpruceTexturedButtonWidget forward_left_button;
+    private             SpruceTexturedButtonWidget forward_right_button;
+    private             SpruceTexturedButtonWidget start_sneak_button;
+    private             SpruceTexturedButtonWidget end_sneak_button;
 
     public TouchscreenOverlay(@NotNull LambdaControls mod)
     {
@@ -108,7 +109,7 @@ public class TouchscreenOverlay extends Screen
             this.fly_down_button.visible = true;
             if (old_state_fly != this.fly_button.visible) {
                 this.fly_button_enable_ticks = 5;
-                this.handle_jump(false);
+                this.handle_jump(null, false);
             } else if (this.fly_button_enable_ticks > 0)
                 this.fly_button_enable_ticks--;
         } else {
@@ -122,9 +123,10 @@ public class TouchscreenOverlay extends Screen
     /**
      * Handles the jump button.
      *
+     * @param btn   The pressed button.
      * @param state The state of the jump button.
      */
-    private void handle_jump(boolean state)
+    private void handle_jump(ButtonWidget btn, boolean state)
     {
         ((KeyBindingAccessor) this.minecraft.options.keyJump).handle_press_state(state);
     }
@@ -182,8 +184,8 @@ public class TouchscreenOverlay extends Screen
             sneak_button_x = scaled_width - 10 - 40 - 5;
         }
         // Swap items hand.
-        this.addButton(new TouchscreenButtonWidget(swap_hands_x, sneak_button_y, 20, 20, 0, 160, 20, WIDGETS_LOCATION,
-                state -> {
+        this.addButton(new SpruceTexturedButtonWidget(swap_hands_x, sneak_button_y, 20, 20, 0, 160, 20, WIDGETS_LOCATION,
+                (btn, state) -> {
                     if (state) {
                         if (!this.minecraft.player.isSpectator()) {
                             this.minecraft.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_HELD_ITEMS, BlockPos.ORIGIN, Direction.DOWN));
@@ -191,31 +193,31 @@ public class TouchscreenOverlay extends Screen
                     }
                 }));
         // Drop
-        this.addButton(new TouchscreenButtonWidget(swap_hands_x, sneak_button_y + 5 + 20, 20, 20, 20, 160, 20, WIDGETS_LOCATION,
-                state -> ((KeyBindingAccessor) this.minecraft.options.keyDrop).handle_press_state(state)));
+        this.addButton(new SpruceTexturedButtonWidget(swap_hands_x, sneak_button_y + 5 + 20, 20, 20, 20, 160, 20, WIDGETS_LOCATION,
+                (btn, state) -> ((KeyBindingAccessor) this.minecraft.options.keyDrop).handle_press_state(state)));
         // Jump keys
-        this.addButton(this.jump_button = new TouchscreenButtonWidget(jump_button_x, sneak_button_y, 20, 20, 0, 40, 20, WIDGETS_LOCATION,
+        this.addButton(this.jump_button = new SpruceTexturedButtonWidget(jump_button_x, sneak_button_y, 20, 20, 0, 40, 20, WIDGETS_LOCATION,
                 this::handle_jump));
-        this.addButton(this.fly_button = new TouchscreenButtonWidget(jump_button_x, sneak_button_y, 20, 20, 20, 40, 20, WIDGETS_LOCATION,
-                state -> {
+        this.addButton(this.fly_button = new SpruceTexturedButtonWidget(jump_button_x, sneak_button_y, 20, 20, 20, 40, 20, WIDGETS_LOCATION,
+                (btn, state) -> {
                     if (this.fly_button_enable_ticks == 0) this.minecraft.player.abilities.flying = false;
                 }));
-        this.addButton(this.fly_up_button = new TouchscreenButtonWidget(jump_button_x, sneak_button_y - 5 - 20, 20, 20, 40, 40, 20, WIDGETS_LOCATION,
+        this.addButton(this.fly_up_button = new SpruceTexturedButtonWidget(jump_button_x, sneak_button_y - 5 - 20, 20, 20, 40, 40, 20, WIDGETS_LOCATION,
                 this::handle_jump));
-        this.addButton(this.fly_down_button = new TouchscreenButtonWidget(jump_button_x, sneak_button_y + 20 + 5, 20, 20, 60, 40, 20, WIDGETS_LOCATION,
-                state -> ((KeyBindingAccessor) this.minecraft.options.keySneak).handle_press_state(state)));
+        this.addButton(this.fly_down_button = new SpruceTexturedButtonWidget(jump_button_x, sneak_button_y + 20 + 5, 20, 20, 60, 40, 20, WIDGETS_LOCATION,
+                (btn, state) -> ((KeyBindingAccessor) this.minecraft.options.keySneak).handle_press_state(state)));
         this.update_jump_buttons();
         // Movements keys
-        this.addButton((this.start_sneak_button = new TouchscreenButtonWidget(sneak_button_x, sneak_button_y, 20, 20, 0, 120, 20, WIDGETS_LOCATION,
-                state -> {
+        this.addButton((this.start_sneak_button = new SpruceTexturedButtonWidget(sneak_button_x, sneak_button_y, 20, 20, 0, 120, 20, WIDGETS_LOCATION,
+                (btn, state) -> {
                     if (state) {
                         ((KeyBindingAccessor) this.minecraft.options.keySneak).handle_press_state(true);
                         this.start_sneak_button.visible = false;
                         this.end_sneak_button.visible = true;
                     }
                 })));
-        this.addButton((this.end_sneak_button = new TouchscreenButtonWidget(sneak_button_x, sneak_button_y, 20, 20, 20, 120, 20, WIDGETS_LOCATION,
-                state -> {
+        this.addButton((this.end_sneak_button = new SpruceTexturedButtonWidget(sneak_button_x, sneak_button_y, 20, 20, 20, 120, 20, WIDGETS_LOCATION,
+                (btn, state) -> {
                     if (state) {
                         ((KeyBindingAccessor) this.minecraft.options.keySneak).handle_press_state(false);
                         this.end_sneak_button.visible = false;
@@ -223,33 +225,33 @@ public class TouchscreenOverlay extends Screen
                     }
                 })));
         this.end_sneak_button.visible = false;
-        this.addButton(this.forward_left_button = new TouchscreenButtonWidget(sneak_button_x - 20 - 5, sneak_button_y - 5 - 20, 20, 20, 80, 80, 20, WIDGETS_LOCATION,
-                state -> {
+        this.addButton(this.forward_left_button = new SpruceTexturedButtonWidget(sneak_button_x - 20 - 5, sneak_button_y - 5 - 20, 20, 20, 80, 80, 20, WIDGETS_LOCATION,
+                (btn, state) -> {
                     ((KeyBindingAccessor) this.minecraft.options.keyForward).handle_press_state(state);
                     ((KeyBindingAccessor) this.minecraft.options.keyLeft).handle_press_state(state);
                     this.update_forward_buttons_state(state);
                 }));
         this.forward_left_button.visible = false;
-        this.addButton(new TouchscreenButtonWidget(sneak_button_x, sneak_button_y - 5 - 20, 20, 20, 0, 80, 20, WIDGETS_LOCATION,
-                state -> {
+        this.addButton(new SpruceTexturedButtonWidget(sneak_button_x, sneak_button_y - 5 - 20, 20, 20, 0, 80, 20, WIDGETS_LOCATION,
+                (btn, state) -> {
                     ((KeyBindingAccessor) this.minecraft.options.keyForward).handle_press_state(state);
                     this.update_forward_buttons_state(state);
                     this.forward_left_button.visible = true;
                     this.forward_right_button.visible = true;
                 }));
-        this.addButton(this.forward_right_button = new TouchscreenButtonWidget(sneak_button_x + 20 + 5, sneak_button_y - 5 - 20, 20, 20, 100, 80, 20, WIDGETS_LOCATION,
-                state -> {
+        this.addButton(this.forward_right_button = new SpruceTexturedButtonWidget(sneak_button_x + 20 + 5, sneak_button_y - 5 - 20, 20, 20, 100, 80, 20, WIDGETS_LOCATION,
+                (btn, state) -> {
                     ((KeyBindingAccessor) this.minecraft.options.keyForward).handle_press_state(state);
                     ((KeyBindingAccessor) this.minecraft.options.keyRight).handle_press_state(state);
                     this.update_forward_buttons_state(state);
                 }));
         this.forward_right_button.visible = true;
-        this.addButton(new TouchscreenButtonWidget(sneak_button_x + 20 + 5, sneak_button_y, 20, 20, 20, 80, 20, WIDGETS_LOCATION,
-                state -> ((KeyBindingAccessor) this.minecraft.options.keyRight).handle_press_state(state)));
-        this.addButton(new TouchscreenButtonWidget(sneak_button_x, sneak_button_y + 20 + 5, 20, 20, 40, 80, 20, WIDGETS_LOCATION,
-                state -> ((KeyBindingAccessor) this.minecraft.options.keyBack).handle_press_state(state)));
-        this.addButton(new TouchscreenButtonWidget(sneak_button_x - 20 - 5, sneak_button_y, 20, 20, 60, 80, 20, WIDGETS_LOCATION,
-                state -> ((KeyBindingAccessor) this.minecraft.options.keyLeft).handle_press_state(state)));
+        this.addButton(new SpruceTexturedButtonWidget(sneak_button_x + 20 + 5, sneak_button_y, 20, 20, 20, 80, 20, WIDGETS_LOCATION,
+                (btn, state) -> ((KeyBindingAccessor) this.minecraft.options.keyRight).handle_press_state(state)));
+        this.addButton(new SpruceTexturedButtonWidget(sneak_button_x, sneak_button_y + 20 + 5, 20, 20, 40, 80, 20, WIDGETS_LOCATION,
+                (btn, state) -> ((KeyBindingAccessor) this.minecraft.options.keyBack).handle_press_state(state)));
+        this.addButton(new SpruceTexturedButtonWidget(sneak_button_x - 20 - 5, sneak_button_y, 20, 20, 60, 80, 20, WIDGETS_LOCATION,
+                (btn, state) -> ((KeyBindingAccessor) this.minecraft.options.keyLeft).handle_press_state(state)));
     }
 
     @Override

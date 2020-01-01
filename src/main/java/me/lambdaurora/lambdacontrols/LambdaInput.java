@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 LambdAurora <aurora42lambda@gmail.com>
+ * Copyright © 2020 LambdAurora <aurora42lambda@gmail.com>
  *
  * This file is part of LambdaControls.
  *
@@ -9,21 +9,21 @@
 
 package me.lambdaurora.lambdacontrols;
 
-import me.lambdaurora.lambdacontrols.gui.LabelWidget;
+import me.lambdaurora.lambdacontrols.controller.ButtonBinding;
+import me.lambdaurora.lambdacontrols.controller.Controller;
+import me.lambdaurora.lambdacontrols.controller.InputManager;
 import me.lambdaurora.lambdacontrols.gui.LambdaControlsControlsScreen;
 import me.lambdaurora.lambdacontrols.gui.TouchscreenOverlay;
 import me.lambdaurora.lambdacontrols.mixin.EntryListWidgetAccessor;
 import me.lambdaurora.lambdacontrols.util.AbstractContainerScreenAccessor;
-import me.lambdaurora.lambdacontrols.util.CreativeInventoryScreenAccessor;
-import me.lambdaurora.lambdacontrols.util.KeyBindingAccessor;
 import me.lambdaurora.lambdacontrols.util.MouseAccessor;
+import me.lambdaurora.spruceui.SpruceLabelWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
@@ -32,7 +32,6 @@ import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.container.Slot;
 import net.minecraft.container.SlotActionType;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -47,25 +46,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static me.lambdaurora.lambdacontrols.ButtonBinding.*;
+import static me.lambdaurora.lambdacontrols.controller.ButtonBinding.axis_as_button;
 import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X;
 import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
 
 /**
  * Represents the LambdaControls' input handler.
+ *
+ * @author LambdAurora
+ * @version 1.1.0
+ * @since 1.0.0
  */
 public class LambdaInput
 {
     private static final Map<Integer, Boolean> BUTTON_STATES       = new HashMap<>();
     private static final Map<Integer, Integer> BUTTON_COOLDOWNS    = new HashMap<>();
-    private static final Map<Integer, Boolean> AXIS_STATES         = new HashMap<>();
-    private static final Map<Integer, Integer> AXIS_COOLDOWNS      = new HashMap<>();
     private final        LambdaControlsConfig  config;
     // Cooldowns
     private              int                   action_gui_cooldown = 0;
     private              int                   ignore_next_a       = 0;
     // Sneak state.
-    private              boolean               sneak               = false;
     private              double                prev_target_yaw     = 0.0;
     private              double                prev_target_pitch   = 0.0;
     private              double                target_yaw          = 0.0;
@@ -115,19 +115,29 @@ public class LambdaInput
     public void on_controller_tick(@NotNull MinecraftClient client)
     {
         BUTTON_COOLDOWNS.entrySet().stream().filter(entry -> entry.getValue() > 0).forEach(entry -> BUTTON_COOLDOWNS.put(entry.getKey(), entry.getValue() - 1));
-        AXIS_COOLDOWNS.entrySet().stream().filter(entry -> entry.getValue() > 0).forEach(entry -> AXIS_COOLDOWNS.put(entry.getKey(), entry.getValue() - 1));
         // Decreases the cooldown for GUI actions.
         if (this.action_gui_cooldown > 0)
             --this.action_gui_cooldown;
         this.prev_target_mouse_x = this.target_mouse_x;
         this.prev_target_mouse_y = this.target_mouse_y;
 
+        InputManager.update_states();
+
         Controller controller = this.config.get_controller();
         if (controller.is_connected()) {
             GLFWGamepadState state = controller.get_state();
-            this.fetch_button_input(client, state);
-            this.fetch_axe_input(client, state);
+            this.fetch_button_input(client, state, false);
+            this.fetch_axe_input(client, state, false);
         }
+        this.config.get_second_controller().filter(Controller::is_connected)
+                .ifPresent(joycon -> {
+                    GLFWGamepadState state = joycon.get_state();
+                    this.fetch_button_input(client, state, true);
+                    this.fetch_axe_input(client, state, true);
+                });
+
+        InputManager.update_bindings();
+        InputManager.stream_active_bindings().forEach(binding -> binding.handle(client, InputManager.get_binding_state(binding)));
 
         if (this.ignore_next_a > 0)
             this.ignore_next_a--;
@@ -189,46 +199,59 @@ public class LambdaInput
         }
     }
 
-    private void fetch_button_input(@NotNull MinecraftClient client, @NotNull GLFWGamepadState gamepad_state)
+    private void fetch_button_input(@NotNull MinecraftClient client, @NotNull GLFWGamepadState gamepad_state, boolean left_joycon)
     {
         ByteBuffer buffer = gamepad_state.buttons();
-        for (int btn = 0; btn < buffer.limit(); btn++) {
+        for (int i = 0; i < buffer.limit(); i++) {
+            int btn = left_joycon ? ButtonBinding.controller2_button(i) : i;
             boolean btn_state = buffer.get() == (byte) 1;
-            boolean previous_state = BUTTON_STATES.getOrDefault(btn, false);
+            ButtonState current_state = ButtonState.NONE;
+            ButtonState previous_state = InputManager.STATES.getOrDefault(btn, ButtonState.NONE);
 
-            ButtonBinding.set_button_state(btn, btn_state);
-
-            if (btn_state != previous_state) {
+            if (btn_state != previous_state.is_pressed()) {
+                current_state = btn_state ? ButtonState.PRESS : ButtonState.RELEASE;
                 this.handle_button(client, btn, btn_state ? 0 : 1, btn_state);
                 if (btn_state)
                     BUTTON_COOLDOWNS.put(btn, 5);
             } else if (btn_state) {
+                current_state = ButtonState.REPEAT;
                 if (BUTTON_COOLDOWNS.getOrDefault(btn, 0) == 0) {
                     BUTTON_COOLDOWNS.put(btn, 5);
                     this.handle_button(client, btn, 2, true);
                 }
             }
 
-            BUTTON_STATES.put(btn, btn_state);
+            InputManager.STATES.put(btn, current_state);
         }
     }
 
-    private void fetch_axe_input(@NotNull MinecraftClient client, @NotNull GLFWGamepadState gamepad_state)
+    private void fetch_axe_input(@NotNull MinecraftClient client, @NotNull GLFWGamepadState gamepad_state, boolean left_joycon)
     {
         FloatBuffer buffer = gamepad_state.axes();
         for (int i = 0; i < buffer.limit(); i++) {
+            int axis = left_joycon ? ButtonBinding.controller2_button(i) : i;
             float value = buffer.get();
             float abs_value = Math.abs(value);
 
             if (i == GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y)
                 value *= -1.0F;
 
-            ButtonBinding.set_button_state(axis_as_button(i, true), value > 0.5F);
-            ButtonBinding.set_button_state(axis_as_button(i, false), value < -0.5F);
+            //InputManager.(axis_as_button(axis, true), value > 0.5F);
+            //ButtonBinding.set_button_state(axis_as_button(axis, false), value < -0.5F);
 
             int state = value > this.config.get_dead_zone() ? 1 : (value < -this.config.get_dead_zone() ? 2 : 0);
-            this.handle_axe(client, i, value, abs_value, state);
+            this.handle_axe(client, axis, value, abs_value, state);
         }
+    }
+
+    public boolean are_buttons_pressed(int[] buttons)
+    {
+        int i = 0;
+        for (int btn : buttons) {
+            if (BUTTON_STATES.containsKey(btn) && BUTTON_STATES.get(btn))
+                i++;
+        }
+        return i == buttons.length;
     }
 
     private void handle_button(@NotNull MinecraftClient client, int button, int action, boolean state)
@@ -236,19 +259,13 @@ public class LambdaInput
         if (client.currentScreen instanceof LambdaControlsControlsScreen && action == 0) {
             LambdaControlsControlsScreen controls_screen = (LambdaControlsControlsScreen) client.currentScreen;
             if (controls_screen.focused_binding != null) {
-                this.config.set_button_binding(controls_screen.focused_binding, button);
+                this.config.set_button_binding(controls_screen.focused_binding, new int[]{button});
                 controls_screen.focused_binding = null;
                 return;
             }
         }
 
         if (action == 0 || action == 2) {
-            // Handles RB and LB buttons.
-            if (button == GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER || button == GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER) {
-                this.handle_rb_lb(client, button == GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER);
-                return;
-            }
-
             if (client.currentScreen != null && is_screen_interactive(client.currentScreen)
                     && (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP || button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN
                     || button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT || button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT)) {
@@ -267,19 +284,7 @@ public class LambdaInput
             }
         }
 
-        if (action == 0) {
-            // Handles when the player presses the Start button.
-            if (PAUSE_GAME.is_button(button)) {
-                // If in game, then pause the game.
-                if (client.currentScreen == null)
-                    client.openPauseMenu(false);
-                else if (client.currentScreen instanceof AbstractContainerScreen) // If the current screen is a container then close it.
-                    client.player.closeContainer();
-                else// Else just close the current screen.
-                    client.currentScreen.onClose();
-                return;
-            }
-
+        if (action == 1) {
             if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null) {
                 if (this.action_gui_cooldown == 0) {
                     Element focused = client.currentScreen.getFocused();
@@ -327,11 +332,6 @@ public class LambdaInput
                 client.currentScreen.mouseReleased(mouse_x, mouse_y, GLFW.GLFW_MOUSE_BUTTON_1);
             }
             this.action_gui_cooldown = 5;
-            return;
-        }
-
-        if (client.currentScreen == null) {
-            ButtonBinding.handle_button(client, button, action);
         }
     }
 
@@ -340,10 +340,11 @@ public class LambdaInput
         int as_button_state = value > 0.5F ? 1 : (value < -0.5F ? 2 : 0);
 
         if (client.currentScreen instanceof LambdaControlsControlsScreen && as_button_state != 0
-                && !(as_button_state == 2 && (axis == GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || axis == GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER))) {
+                && !(as_button_state == 2 && (axis == GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || axis == GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER ||
+                axis == ButtonBinding.controller2_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) || axis == ButtonBinding.controller2_button(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER)))) {
             LambdaControlsControlsScreen controls_screen = (LambdaControlsControlsScreen) client.currentScreen;
             if (controls_screen.focused_binding != null) {
-                this.config.set_button_binding(controls_screen.focused_binding, axis_as_button(axis, as_button_state == 1));
+                this.config.set_button_binding(controls_screen.focused_binding, new int[]{axis_as_button(axis, as_button_state == 1)});
                 controls_screen.focused_binding = null;
                 return;
             }
@@ -352,38 +353,36 @@ public class LambdaInput
         double dead_zone = this.config.get_dead_zone();
         if (client.currentScreen == null) {
             {
-                int axis_minus = axis + 100;
                 boolean current_plus_state = as_button_state == 1;
                 boolean current_minus_state = as_button_state == 2;
-                boolean previous_plus_state = AXIS_STATES.getOrDefault(axis, false);
-                boolean previous_minus_state = AXIS_STATES.getOrDefault(axis_minus, false);
+                ButtonState previous_plus_state = InputManager.STATES.getOrDefault(axis_as_button(axis, true), ButtonState.NONE);
+                ButtonState previous_minus_state = InputManager.STATES.getOrDefault(axis_as_button(axis, false), ButtonState.NONE);
 
-                if (current_plus_state != previous_plus_state) {
-                    ButtonBinding.handle_button(client, ButtonBinding.axis_as_button(axis, true), 0);
+                if (current_plus_state != previous_plus_state.is_pressed()) {
+                    InputManager.STATES.put(axis_as_button(axis, true), current_plus_state ? ButtonState.PRESS : ButtonState.RELEASE);
                     if (current_plus_state)
-                        AXIS_COOLDOWNS.put(axis, 5);
+                        BUTTON_COOLDOWNS.put(axis_as_button(axis, true), 5);
                 } else if (current_plus_state) {
-                    if (AXIS_COOLDOWNS.getOrDefault(axis, 0) == 0) {
-                        AXIS_COOLDOWNS.put(axis, 5);
+                    InputManager.STATES.put(axis_as_button(axis, true), ButtonState.REPEAT);
+                    if (BUTTON_COOLDOWNS.getOrDefault(axis_as_button(axis, true), 0) == 0) {
+                        BUTTON_COOLDOWNS.put(axis_as_button(axis, true), 5);
                     }
                 }
 
-                if (current_minus_state != previous_minus_state) {
-                    ButtonBinding.handle_button(client, ButtonBinding.axis_as_button(axis, false), 0);
+                if (current_minus_state != previous_minus_state.is_pressed()) {
+                    InputManager.STATES.put(axis_as_button(axis, false), current_minus_state ? ButtonState.PRESS : ButtonState.RELEASE);
                     if (current_minus_state)
-                        AXIS_COOLDOWNS.put(axis_minus, 5);
+                        BUTTON_COOLDOWNS.put(axis_as_button(axis, false), 5);
                 } else if (current_minus_state) {
-                    if (AXIS_COOLDOWNS.getOrDefault(axis_minus, 0) == 0) {
-                        AXIS_COOLDOWNS.put(axis_minus, 5);
+                    InputManager.STATES.put(axis_as_button(axis, false), ButtonState.REPEAT);
+                    if (BUTTON_COOLDOWNS.getOrDefault(axis_as_button(axis, false), 0) == 0) {
+                        BUTTON_COOLDOWNS.put(axis_as_button(axis, false), 5);
                     }
                 }
-
-                AXIS_STATES.put(axis, current_plus_state);
-                AXIS_STATES.put(axis_minus, current_minus_state);
             }
 
             // Handles the look direction.
-            this.handle_look(client, axis, abs_value, state);
+            this.handle_look(client, axis, (float) (abs_value / (1.0 - this.config.get_dead_zone())), state);
         } else {
             boolean allow_mouse_control = true;
 
@@ -422,8 +421,8 @@ public class LambdaInput
                     if (Math.abs(prev_x_axis) < dead_zone && Math.abs(prev_y_axis) < dead_zone) {
                         double mouse_x = client.mouse.getX();
                         double mouse_y = client.mouse.getY();
-                        prev_target_mouse_x = target_mouse_x = (int) mouse_x;
-                        prev_target_mouse_y = target_mouse_y = (int) mouse_y;
+                        this.prev_target_mouse_x = this.target_mouse_x = (int) mouse_x;
+                        this.prev_target_mouse_y = this.target_mouse_y = (int) mouse_y;
                     }
 
                     if (Math.abs(movement_x) >= dead_zone)
@@ -440,7 +439,7 @@ public class LambdaInput
                     this.mouse_speed_y = 0.F;
                 }
 
-                if (Math.abs(this.mouse_speed_x) > .05F || Math.abs(this.mouse_speed_y) > .05F) {
+                if (Math.abs(this.mouse_speed_x) >= .05F || Math.abs(this.mouse_speed_y) >= .05F) {
                     this.target_mouse_x += this.mouse_speed_x * this.config.get_mouse_speed();
                     this.target_mouse_x = MathHelper.clamp(this.target_mouse_x, 0, client.getWindow().getWidth());
                     this.target_mouse_y += this.mouse_speed_y * this.config.get_mouse_speed();
@@ -455,32 +454,6 @@ public class LambdaInput
         }
     }
 
-    /**
-     * Handles the press on RB on LB.
-     *
-     * @param client The client's instance.
-     * @param right  True if RB is pressed, else false.
-     */
-    private void handle_rb_lb(@NotNull MinecraftClient client, boolean right)
-    {
-        // When ingame
-        if (client.currentScreen == null && client.player != null) {
-            if (right)
-                client.player.inventory.selectedSlot = client.player.inventory.selectedSlot == 8 ? 0 : client.player.inventory.selectedSlot + 1;
-            else
-                client.player.inventory.selectedSlot = client.player.inventory.selectedSlot == 0 ? 8 : client.player.inventory.selectedSlot - 1;
-        } else if (client.currentScreen instanceof CreativeInventoryScreen) {
-            CreativeInventoryScreenAccessor creative_inventory = (CreativeInventoryScreenAccessor) client.currentScreen;
-            int current_selected_tab = creative_inventory.get_selected_tab();
-            int next_tab = current_selected_tab + (right ? 1 : -1);
-            if (next_tab < 0)
-                next_tab = ItemGroup.GROUPS.length - 1;
-            else if (next_tab >= ItemGroup.GROUPS.length)
-                next_tab = 0;
-            creative_inventory.set_selected_tab(ItemGroup.GROUPS[next_tab]);
-        }
-    }
-
     private boolean handle_a_button(@NotNull Screen screen, @NotNull Element focused)
     {
         if (focused instanceof AbstractPressableButtonWidget) {
@@ -488,8 +461,8 @@ public class LambdaInput
             button_widget.playDownSound(MinecraftClient.getInstance().getSoundManager());
             button_widget.onPress();
             return true;
-        } else if (focused instanceof LabelWidget) {
-            ((LabelWidget) focused).on_press();
+        } else if (focused instanceof SpruceLabelWidget) {
+            ((SpruceLabelWidget) focused).on_press();
             return true;
         } else if (focused instanceof WorldListWidget) {
             WorldListWidget list = (WorldListWidget) focused;
@@ -557,7 +530,7 @@ public class LambdaInput
     {
         // Handles the look direction.
         if (client.player != null) {
-            double pow_value = Math.pow(value, 2.0);
+            double pow_value = Math.pow(value, 4.0);
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
                 if (state == 2) {
                     this.target_pitch = client.player.pitch - this.config.get_right_y_axis_sign() * (this.config.get_rotation_speed() * pow_value) * 0.33D;

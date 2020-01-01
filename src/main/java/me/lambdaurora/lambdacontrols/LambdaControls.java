@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 LambdAurora <aurora42lambda@gmail.com>
+ * Copyright © 2020 LambdAurora <aurora42lambda@gmail.com>
  *
  * This file is part of LambdaControls.
  *
@@ -10,9 +10,14 @@
 package me.lambdaurora.lambdacontrols;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import me.lambdaurora.lambdacontrols.compat.LambdaControlsCompat;
+import me.lambdaurora.lambdacontrols.controller.ButtonBinding;
+import me.lambdaurora.lambdacontrols.controller.Controller;
+import me.lambdaurora.lambdacontrols.gui.LambdaControlsHud;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
@@ -24,28 +29,35 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 /**
  * Represents the LambdaControls mod.
+ *
+ * @author LambdAurora
+ * @version 1.1.0
+ * @since 1.0.0
  */
 public class LambdaControls implements ClientModInitializer
 {
     private static      LambdaControls       INSTANCE;
-    public static final FabricKeyBinding     BINDING_LOOK_UP    = FabricKeyBinding.Builder.create(new Identifier("lambdacontrols", "look_up"),
+    public static final String               MODID              = "lambdacontrols";
+    public static final FabricKeyBinding     BINDING_LOOK_UP    = FabricKeyBinding.Builder.create(new Identifier(MODID, "look_up"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.movement").build();
-    public static final FabricKeyBinding     BINDING_LOOK_RIGHT = FabricKeyBinding.Builder.create(new Identifier("lambdacontrols", "look_right"),
+    public static final FabricKeyBinding     BINDING_LOOK_RIGHT = FabricKeyBinding.Builder.create(new Identifier(MODID, "look_right"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, "key.categories.movement").build();
-    public static final FabricKeyBinding     BINDING_LOOK_DOWN  = FabricKeyBinding.Builder.create(new Identifier("lambdacontrols", "look_down"),
+    public static final FabricKeyBinding     BINDING_LOOK_DOWN  = FabricKeyBinding.Builder.create(new Identifier(MODID, "look_down"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.movement").build();
-    public static final FabricKeyBinding     BINDING_LOOK_LEFT  = FabricKeyBinding.Builder.create(new Identifier("lambdacontrols", "look_left"),
+    public static final FabricKeyBinding     BINDING_LOOK_LEFT  = FabricKeyBinding.Builder.create(new Identifier(MODID, "look_left"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement").build();
-    public static final Identifier           CONTROLLER_BUTTONS = new Identifier("lambdacontrols", "textures/gui/controller_buttons.png");
-    public static final Identifier           CONTROLLER_AXIS    = new Identifier("lambdacontrols", "textures/gui/controller_axis.png");
+    public static final Identifier           CONTROLLER_BUTTONS = new Identifier(MODID, "textures/gui/controller_buttons.png");
+    public static final Identifier           CONTROLLER_AXIS    = new Identifier(MODID, "textures/gui/controller_axis.png");
     public final        Logger               logger             = LogManager.getLogger("LambdaControls");
     public final        LambdaControlsConfig config             = new LambdaControlsConfig(this);
     public final        LambdaInput          input              = new LambdaInput(this);
+    private             LambdaControlsHud    hud;
     private             ControlsMode         previous_controls_mode;
 
     @Override
@@ -53,12 +65,13 @@ public class LambdaControls implements ClientModInitializer
     {
         INSTANCE = this;
         this.log("Initializing LambdaControls...");
-        this.config.load();
 
         KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_UP);
         KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_RIGHT);
         KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_DOWN);
         KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_LEFT);
+
+        HudRenderCallback.EVENT.register(delta -> this.hud.render());
     }
 
     /**
@@ -66,8 +79,9 @@ public class LambdaControls implements ClientModInitializer
      */
     public void on_mc_init(@NotNull MinecraftClient client)
     {
-        Controller.update_mappings();
         ButtonBinding.init(client.options);
+        this.config.load();
+        Controller.update_mappings();
         GLFW.glfwSetJoystickCallback((jid, event) -> {
             if (event == GLFW.GLFW_CONNECTED) {
                 Controller controller = Controller.by_id(jid);
@@ -80,6 +94,10 @@ public class LambdaControls implements ClientModInitializer
 
             this.switch_controls_mode();
         });
+
+        this.hud = new LambdaControlsHud(client, this);
+
+        LambdaControlsCompat.init();
     }
 
     /**
@@ -129,6 +147,16 @@ public class LambdaControls implements ClientModInitializer
     }
 
     /**
+     * Prints a warning to the terminal.
+     *
+     * @param warning The warning to print.
+     */
+    public void warn(String warning)
+    {
+        this.logger.info("[LambdaControls] " + warning);
+    }
+
+    /**
      * Gets the LambdaControls instance.
      *
      * @return The LambdaControls instance.
@@ -138,15 +166,39 @@ public class LambdaControls implements ClientModInitializer
         return INSTANCE;
     }
 
-    public static int draw_button(int x, int y, @NotNull ButtonBinding button, @NotNull MinecraftClient client)
+    public static Pair<Integer, Integer> draw_button(int x, int y, @NotNull ButtonBinding button, @NotNull MinecraftClient client)
     {
         return draw_button(x, y, button.get_button(), client);
     }
 
-    public static int draw_button(int x, int y, int button, @NotNull MinecraftClient client)
+    public static Pair<Integer, Integer> draw_button(int x, int y, int[] buttons, @NotNull MinecraftClient client)
     {
+        int height = 0;
+        int length = 0;
+        int current_x = x;
+        for (int i = 0; i < buttons.length; i++) {
+            int btn = buttons[i];
+            Pair<Integer, Integer> size = draw_button(current_x, y, btn, client);
+            if (size.get_key() > height)
+                height = size.get_value();
+            length += size.get_key();
+            if (i + 1 < buttons.length) {
+                length += 2;
+                current_x = x + length;
+            }
+        }
+        return Pair.of(length, height);
+    }
+
+    public static Pair<Integer, Integer> draw_button(int x, int y, int button, @NotNull MinecraftClient client)
+    {
+        boolean second = false;
         if (button == -1)
-            return 0;
+            return Pair.of(0, 0);
+        else if (button >= 500) {
+            button -= 1000;
+            second = true;
+        }
 
         int controller_type = get().config.get_controller_type().get_id();
         boolean axis = false;
@@ -218,11 +270,11 @@ public class LambdaControls implements ClientModInitializer
         client.getTextureManager().bindTexture(axis ? LambdaControls.CONTROLLER_AXIS : LambdaControls.CONTROLLER_BUTTONS);
         GlStateManager.disableDepthTest();
 
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, second ? 0.0F : 1.0F, 1.0F, 1.0F);
         DrawableHelper.blit(x, y, (float) button_offset, (float) (controller_type * (axis ? 18 : 15)), axis ? 18 : 15, axis ? 18 : 15, 256, 256);
         GlStateManager.enableDepthTest();
 
-        return axis ? 18 : 15;
+        return axis ? Pair.of(18, 18) : Pair.of(15, 15);
     }
 
     public static int draw_button_tip(int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull MinecraftClient client)
@@ -230,10 +282,10 @@ public class LambdaControls implements ClientModInitializer
         return draw_button_tip(x, y, button.get_button(), button.get_translation_key(), display, client);
     }
 
-    public static int draw_button_tip(int x, int y, int button, @NotNull String action, boolean display, @NotNull MinecraftClient client)
+    public static int draw_button_tip(int x, int y, int[] button, @NotNull String action, boolean display, @NotNull MinecraftClient client)
     {
         if (display) {
-            int button_width = draw_button(x, y, button, client);
+            int button_width = draw_button(x, y, button, client).get_key();
 
             String translated_action = I18n.translate(action);
             int text_y = (15 - client.textRenderer.fontHeight) / 2;

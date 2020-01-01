@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 LambdAurora <aurora42lambda@gmail.com>
+ * Copyright © 2020 LambdAurora <aurora42lambda@gmail.com>
  *
  * This file is part of LambdaControls.
  *
@@ -60,10 +60,10 @@ public abstract class AbstractContainerScreenMixin implements AbstractContainerS
             MinecraftClient client = MinecraftClient.getInstance();
             int x = 10, y = client.getWindow().getScaledHeight() - 10 - 15;
 
-            x += LambdaControls.draw_button_tip(x, y, GLFW.GLFW_GAMEPAD_BUTTON_A, "lambdacontrols.action.pickup_all", true, client) + 10;
-            x += LambdaControls.draw_button_tip(x, y, GLFW.GLFW_GAMEPAD_BUTTON_B, "lambdacontrols.action.exit", true, client) + 10;
-            x += LambdaControls.draw_button_tip(x, y, GLFW.GLFW_GAMEPAD_BUTTON_X, "lambdacontrols.action.pickup", true, client) + 10;
-            LambdaControls.draw_button_tip(x, y, GLFW.GLFW_GAMEPAD_BUTTON_Y, "lambdacontrols.action.quick_move", true, client);
+            x += LambdaControls.draw_button_tip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_A}, "lambdacontrols.action.pickup_all", true, client) + 10;
+            x += LambdaControls.draw_button_tip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_B}, "lambdacontrols.action.exit", true, client) + 10;
+            x += LambdaControls.draw_button_tip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_X}, "lambdacontrols.action.pickup", true, client) + 10;
+            LambdaControls.draw_button_tip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_Y}, "lambdacontrols.action.quick_move", true, client);
         }
     }
 }

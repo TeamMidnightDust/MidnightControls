@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 LambdAurora <aurora42lambda@gmail.com>
+ * Copyright © 2020 LambdAurora <aurora42lambda@gmail.com>
  *
  * This file is part of LambdaControls.
  *
@@ -7,8 +7,9 @@
  * see the LICENSE file.
  */
 
-package me.lambdaurora.lambdacontrols;
+package me.lambdaurora.lambdacontrols.controller;
 
+import me.lambdaurora.lambdacontrols.LambdaControls;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -31,6 +32,10 @@ import static org.lwjgl.BufferUtils.createByteBuffer;
 
 /**
  * Represents a controller.
+ *
+ * @author LambdAurora
+ * @version 1.0.0
+ * @since 1.0.0
  */
 public class Controller implements Nameable
 {

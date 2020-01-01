@@ -5,10 +5,10 @@
   "client": [
     "AbstractButtonWidgetAccessor",
     "AbstractContainerScreenMixin",
+    "ControlsOptionsScreenMixin",
     "CreativeInventoryScreenMixin",
     "EntryListWidgetAccessor",
     "GameRendererMixin",
-    "InGameHudMixin",
     "KeyBindingMixin",
     "MinecraftClientMixin",
     "MouseMixin",

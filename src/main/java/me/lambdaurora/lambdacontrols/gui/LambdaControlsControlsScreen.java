@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 LambdAurora <aurora42lambda@gmail.com>
+ * Copyright © 2020 LambdAurora <aurora42lambda@gmail.com>
  *
  * This file is part of LambdaControls.
  *
@@ -9,9 +9,12 @@
 
 package me.lambdaurora.lambdacontrols.gui;
 
-import me.lambdaurora.lambdacontrols.ButtonBinding;
+import me.lambdaurora.lambdacontrols.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.LambdaControls;
+import me.lambdaurora.lambdacontrols.controller.InputManager;
+import me.lambdaurora.spruceui.SpruceButtonWidget;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.options.BooleanOption;
 import net.minecraft.client.options.Option;
@@ -27,19 +30,21 @@ import java.util.function.Predicate;
  */
 public class LambdaControlsControlsScreen extends Screen
 {
-    private final LambdaControlsSettingsScreen parent;
-    final         LambdaControls               mod;
-    private final Option                       inverts_right_x_axis;
-    private final Option                       inverts_right_y_axis;
-    private       ControlsListWidget           bindings_list_widget;
-    private       ButtonWidget                 reset_button;
-    public        ButtonBinding                focused_binding;
+    private final Screen             parent;
+    final         LambdaControls     mod;
+    private final Option             inverts_right_x_axis;
+    private final Option             inverts_right_y_axis;
+    private final boolean            hide_settings;
+    private       ControlsListWidget bindings_list_widget;
+    private       ButtonWidget       reset_button;
+    public        ButtonBinding      focused_binding;
 
-    protected LambdaControlsControlsScreen(@NotNull LambdaControlsSettingsScreen parent)
+    public LambdaControlsControlsScreen(@NotNull Screen parent, boolean hide_settings)
     {
         super(new TranslatableText("lambdacontrols.menu.title.controller_controls"));
         this.parent = parent;
-        this.mod = parent.mod;
+        this.mod = LambdaControls.get();
+        this.hide_settings = hide_settings;
         this.inverts_right_x_axis = new BooleanOption("lambdacontrols.menu.invert_right_x_axis", game_options -> this.mod.config.does_invert_right_x_axis(),
                 (game_options, new_value) -> {
                     synchronized (this.mod.config) {
@@ -64,12 +69,17 @@ public class LambdaControlsControlsScreen extends Screen
     @Override
     protected void init()
     {
-        this.addButton(this.inverts_right_x_axis.createButton(this.minecraft.options, this.width / 2 - 155, 18, 150));
-        this.addButton(this.inverts_right_y_axis.createButton(this.minecraft.options, this.width / 2 - 155 + 160, 18, 150));
+        //this.addButton(this.inverts_right_x_axis.createButton(this.minecraft.options, this.width / 2 - 155, 18, 150));
+        //this.addButton(this.inverts_right_y_axis.createButton(this.minecraft.options, this.width / 2 - 155 + 160, 18, 150));
+        this.addButton(new SpruceButtonWidget(this.width / 2 - 155, 18, this.hide_settings ? 310 : 150, 20, I18n.translate("lambdacontrols.menu.keyboard_controls"),
+                btn -> this.minecraft.openScreen(new ControlsOptionsScreen(this, this.minecraft.options))));
+        if (!this.hide_settings)
+            this.addButton(new SpruceButtonWidget(this.width / 2 - 155 + 160, 18, 150, 20, I18n.translate("menu.options"),
+                    btn -> this.minecraft.openScreen(new LambdaControlsSettingsScreen(this, this.minecraft.options, true))));
         this.bindings_list_widget = new ControlsListWidget(this, this.minecraft);
         this.children.add(this.bindings_list_widget);
         this.reset_button = this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 29, 150, 20, I18n.translate("controls.resetAll"),
-                btn -> ButtonBinding.stream().forEach(binding -> this.mod.config.set_button_binding(binding, binding.get_default_button()))));
+                btn -> InputManager.stream_bindings().forEach(binding -> this.mod.config.set_button_binding(binding, binding.get_default_button()))));
         this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, I18n.translate("gui.done"),
                 btn -> this.minecraft.openScreen(this.parent)));
     }
@@ -87,7 +97,7 @@ public class LambdaControlsControlsScreen extends Screen
         this.renderBackground();
         this.bindings_list_widget.render(mouse_x, mouse_y, delta);
         this.drawCenteredString(this.font, this.title.asFormattedString(), this.width / 2, 8, 16777215);
-        this.reset_button.active = ButtonBinding.stream().anyMatch(this.not(ButtonBinding::is_default));
+        this.reset_button.active = InputManager.stream_bindings().anyMatch(this.not(ButtonBinding::is_default));
         super.render(mouse_x, mouse_y, delta);
     }
 }

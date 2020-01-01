@@ -18,6 +18,9 @@
   "entrypoints": {
     "client": [
       "me.lambdaurora.lambdacontrols.LambdaControls"
+    ],
+    "modmenu": [
+      "me.lambdaurora.lambdacontrols.LambdaControlsModMenu"
     ]
   },
   "mixins": [
@@ -26,7 +29,11 @@
   "depends": {
     "fabricloader": ">=0.4.0",
     "fabric": "*",
-    "minecraft": "1.15.x"
+    "minecraft": "1.15.x",
+    "spruceui": ">=1.0.1"
+  },
+  "recommends": {
+    "modmenu": ">=1.8.0+build.16"
   },
   "suggests": {
     "flamingo": "*"

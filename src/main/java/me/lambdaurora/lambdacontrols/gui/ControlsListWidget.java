@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 LambdAurora <aurora42lambda@gmail.com>
+ * Copyright © 2020 LambdAurora <aurora42lambda@gmail.com>
  *
  * This file is part of LambdaControls.
  *
@@ -9,7 +9,9 @@
 
 package me.lambdaurora.lambdacontrols.gui;
 
-import me.lambdaurora.lambdacontrols.ButtonBinding;
+import me.lambdaurora.lambdacontrols.controller.ButtonBinding;
+import me.lambdaurora.lambdacontrols.controller.ButtonCategory;
+import me.lambdaurora.lambdacontrols.controller.InputManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -39,8 +41,8 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
         super(client, gui.width + 45, gui.height, 43, gui.height - 32, 24);
         this.gui = gui;
 
-        ButtonBinding.stream_categories()
-                .sorted(Comparator.comparingInt(ButtonBinding.Category::get_priority))
+        InputManager.stream_categories()
+                .sorted(Comparator.comparingInt(ButtonCategory::get_priority))
                 .forEach(category -> {
                     this.addEntry(new CategoryEntry(category));
 
@@ -78,7 +80,7 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
         {
             this.binding = binding;
             this.binding_name = I18n.translate(this.binding.get_translation_key());
-            this.edit_button = new ControllerButtonWidget(0, 0, 90, this.binding, btn -> gui.focused_binding = binding)
+            this.edit_button = new ControllerButtonWidget(0, 0, 110, this.binding, btn -> gui.focused_binding = binding)
             {
                 protected String getNarrationMessage()
                 {
@@ -114,16 +116,16 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
             this.reset_button.y = y;
             this.reset_button.active = !this.binding.is_default();
             this.reset_button.render(mouse_x, mouse_y, delta);
-            this.edit_button.x = x + 85;
+            this.edit_button.x = x + 75;
             this.edit_button.y = y;
             this.edit_button.update();
 
             if (focused) {
                 this.edit_button.setMessage(Formatting.WHITE + "> " + Formatting.YELLOW + this.edit_button.getMessage() + Formatting.WHITE + " <");
-            } else if (!this.binding.is_not_bound() && ButtonBinding.has_duplicates(this.binding.get_button())) {
+            } else if (!this.binding.is_not_bound() && InputManager.has_duplicated_bindings(this.binding.get_button())) {
                 this.edit_button.setMessage(Formatting.RED + this.edit_button.getMessage());
             } else if (this.binding.is_not_bound()) {
-                this.edit_button.setMessage(Formatting.GOLD + edit_button.getMessage());
+                this.edit_button.setMessage(Formatting.GOLD + this.edit_button.getMessage());
             }
 
             this.edit_button.render(mouse_x, mouse_y, delta);
@@ -148,7 +150,7 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
         private final String name;
         private final int    name_width;
 
-        public CategoryEntry(@NotNull ButtonBinding.Category category)
+        public CategoryEntry(@NotNull ButtonCategory category)
         {
             this.name = category.get_translated_name();
             this.name_width = ControlsListWidget.this.minecraft.textRenderer.getStringWidth(this.name);
