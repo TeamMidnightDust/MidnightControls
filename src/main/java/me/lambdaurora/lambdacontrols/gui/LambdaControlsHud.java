@@ -9,10 +9,10 @@
 
 package me.lambdaurora.lambdacontrols.gui;
 
-import me.lambdaurora.lambdacontrols.HudSide;
-import me.lambdaurora.lambdacontrols.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.ControlsMode;
+import me.lambdaurora.lambdacontrols.HudSide;
 import me.lambdaurora.lambdacontrols.LambdaControls;
+import me.lambdaurora.lambdacontrols.controller.ButtonBinding;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.util.hit.HitResult;
@@ -29,8 +29,8 @@ public class LambdaControlsHud extends DrawableHelper
 {
     private final MinecraftClient client;
     private final LambdaControls  mod;
-    private int width_bottom = 0;
-    private int width_top = 0;
+    private       int             width_bottom = 0;
+    private       int             width_top    = 0;
 
     public LambdaControlsHud(@NotNull MinecraftClient client, @NotNull LambdaControls mod)
     {

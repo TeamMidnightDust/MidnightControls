@@ -33,8 +33,9 @@ import java.util.List;
  */
 public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Entry>
 {
-    private final LambdaControlsControlsScreen gui;
-    private       int                          field_2733;
+    private static final int[]                        UNBOUND = new int[0];
+    private final        LambdaControlsControlsScreen gui;
+    private              int                          field_2733;
 
     public ControlsListWidget(@NotNull LambdaControlsControlsScreen gui, @NotNull MinecraftClient client)
     {
@@ -75,6 +76,7 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
         private final String                 binding_name;
         private final ControllerButtonWidget edit_button;
         private final ButtonWidget           reset_button;
+        private final ButtonWidget           unbound_button;
 
         ButtonBindingEntry(@NotNull ButtonBinding binding)
         {
@@ -83,6 +85,7 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
             this.edit_button = new ControllerButtonWidget(0, 0, 110, this.binding, btn -> {
                 gui.focused_binding = binding;
                 gui.current_buttons.clear();
+                gui.waiting = true;
             })
             {
                 protected String getNarrationMessage()
@@ -96,6 +99,17 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
                 protected String getNarrationMessage()
                 {
                     return I18n.translate("narrator.controls.reset", binding_name);
+                }
+            };
+            this.unbound_button = new ButtonWidget(0, 0, 50, 20, I18n.translate("lambdacontrols.menu.unbound"),
+                    btn -> {
+                        gui.mod.config.set_button_binding(binding, UNBOUND);
+                        gui.focused_binding = null;
+                    })
+            {
+                protected String getNarrationMessage()
+                {
+                    return I18n.translate("lambdacontrols.narrator.unbound", binding_name);
                 }
             };
         }
@@ -115,10 +129,13 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
             float var10002 = (float) (x + 70 - ControlsListWidget.this.field_2733);
             int var10003 = y + height / 2;
             text_renderer.draw(binding_name, var10002, (float) (var10003 - 9 / 2), 16777215);
-            this.reset_button.x = x + 190;
-            this.reset_button.y = y;
+            this.reset_button.x = this.unbound_button.x = x + 190;
+            this.reset_button.y = this.unbound_button.y = y;
             this.reset_button.active = !this.binding.is_default();
-            this.reset_button.render(mouse_x, mouse_y, delta);
+            if (focused)
+                this.unbound_button.render(mouse_x, mouse_y, delta);
+            else
+                this.reset_button.render(mouse_x, mouse_y, delta);
             this.edit_button.x = x + 75;
             this.edit_button.y = y;
             this.edit_button.update();
@@ -134,17 +151,19 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
             this.edit_button.render(mouse_x, mouse_y, delta);
         }
 
-        public boolean mouseClicked(double mouseX, double mouseY, int button)
+        public boolean mouseClicked(double mouse_x, double mouse_y, int button)
         {
-            if (this.edit_button.mouseClicked(mouseX, mouseY, button))
+            boolean focused = gui.focused_binding == this.binding;
+            if (this.edit_button.mouseClicked(mouse_x, mouse_y, button))
                 return true;
             else
-                return this.reset_button.mouseClicked(mouseX, mouseY, button);
+                return focused ? this.unbound_button.mouseClicked(mouse_x, mouse_y, button) : this.reset_button.mouseClicked(mouse_x, mouse_y, button);
         }
 
-        public boolean mouseReleased(double mouseX, double mouseY, int button)
+        public boolean mouseReleased(double mouse_x, double mouse_y, int button)
         {
-            return this.edit_button.mouseReleased(mouseX, mouseY, button) || this.reset_button.mouseReleased(mouseX, mouseY, button);
+            return this.edit_button.mouseReleased(mouse_x, mouse_y, button) || this.reset_button.mouseReleased(mouse_x, mouse_y, button)
+                    || this.unbound_button.mouseReleased(mouse_x, mouse_y, button);
         }
     }
 

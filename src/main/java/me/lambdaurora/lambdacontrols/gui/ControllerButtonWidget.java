@@ -9,10 +9,12 @@
 
 package me.lambdaurora.lambdacontrols.gui;
 
-import me.lambdaurora.lambdacontrols.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.LambdaControls;
+import me.lambdaurora.lambdacontrols.controller.ButtonBinding;
 import me.lambdaurora.spruceui.AbstractIconButtonWidget;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.resource.language.I18n;
+import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 public class ControllerButtonWidget extends AbstractIconButtonWidget
 {
     private ButtonBinding binding;
+    private int           icon_width;
 
     public ControllerButtonWidget(int x, int y, int width, @NotNull ButtonBinding button_binding, @NotNull PressAction on_press)
     {
@@ -30,12 +33,27 @@ public class ControllerButtonWidget extends AbstractIconButtonWidget
 
     public void update()
     {
-        this.setMessage(ButtonBinding.get_localized_button_name(binding.get_button()[0]));
+        int length = binding.get_button().length;
+        this.setMessage(this.binding.is_not_bound() ? I18n.translate("lambdacontrols.not_bound") :
+                (length > 0 ? ButtonBinding.get_localized_button_name(binding.get_button()[0]) : "<>"));
+    }
+
+    @Override
+    public String getMessage()
+    {
+        if (this.binding.get_button().length > 1)
+            return "";
+        return super.getMessage();
     }
 
     @Override
     protected int render_icon(int mouse_x, int mouse_y, float delta, int x, int y)
     {
-        return LambdaControls.draw_button(x, y, this.binding, MinecraftClient.getInstance()).get_value();
+        if (this.binding.get_button().length > 1) {
+            x += (this.width / 2 - this.icon_width / 2) - 4;
+        }
+        Pair<Integer, Integer> size = LambdaControls.draw_button(x, y, this.binding, MinecraftClient.getInstance());
+        this.icon_width = size.get_key();
+        return size.get_value();
     }
 }

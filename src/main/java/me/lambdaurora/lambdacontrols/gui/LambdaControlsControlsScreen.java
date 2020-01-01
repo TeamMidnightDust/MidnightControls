@@ -36,6 +36,7 @@ public class LambdaControlsControlsScreen extends Screen
     private       ControlsListWidget bindings_list_widget;
     private       ButtonWidget       reset_button;
     public        ButtonBinding      focused_binding;
+    public        boolean            waiting         = false;
     public        List<Integer>      current_buttons = new ArrayList<>();
 
     public LambdaControlsControlsScreen(@NotNull Screen parent, boolean hide_settings)

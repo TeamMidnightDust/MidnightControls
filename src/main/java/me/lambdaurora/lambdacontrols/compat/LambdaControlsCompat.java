@@ -24,8 +24,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class LambdaControlsCompat
 {
-    private static final String OKZOOMER_CLASS_PATH = "io.github.joaoh1.okzoomer.OkZoomer";
-
     /**
      * Initializes compatibility with other mods if needed.
      *
@@ -33,7 +31,7 @@ public class LambdaControlsCompat
      */
     public static void init(@NotNull LambdaControls mod)
     {
-        if (FabricLoader.getInstance().isModLoaded("okzoomer") && LambdaReflection.does_class_exist(OKZOOMER_CLASS_PATH)) {
+        if (FabricLoader.getInstance().isModLoaded("okzoomer") && LambdaReflection.does_class_exist(OkZoomerCompat.OKZOOMER_CLASS_PATH)) {
             mod.log("Adding okzoomer compatibility...");
             new OkZoomerCompat().handle(mod);
         }

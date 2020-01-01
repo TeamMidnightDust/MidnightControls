@@ -140,7 +140,7 @@ public class ButtonBinding implements Nameable
      */
     public boolean is_not_bound()
     {
-        return this.button[0] == -1;
+        return this.button.length == 0 || this.button[0] == -1;
     }
 
     /**

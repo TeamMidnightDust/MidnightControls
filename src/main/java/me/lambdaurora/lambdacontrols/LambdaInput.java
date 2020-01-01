@@ -47,8 +47,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static me.lambdaurora.lambdacontrols.controller.ButtonBinding.axis_as_button;
-import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X;
-import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Represents the LambdaControls' input handler.
@@ -135,15 +134,20 @@ public class LambdaInput
                     this.fetch_axe_input(client, state, true);
                 });
 
-        InputManager.update_bindings(client);
+        boolean allow_input = true;
+
+        if (client.currentScreen instanceof LambdaControlsControlsScreen && ((LambdaControlsControlsScreen) client.currentScreen).focused_binding != null)
+            allow_input = false;
+
+        if (allow_input)
+            InputManager.update_bindings(client);
 
         if (this.ignore_next_a > 0)
             this.ignore_next_a--;
 
-        if (client.currentScreen instanceof  LambdaControlsControlsScreen && InputManager.STATES.entrySet().parallelStream().map(Map.Entry::getValue).allMatch(ButtonState::is_unpressed))
-        {
+        if (client.currentScreen instanceof LambdaControlsControlsScreen && InputManager.STATES.entrySet().parallelStream().map(Map.Entry::getValue).allMatch(ButtonState::is_unpressed)) {
             LambdaControlsControlsScreen controls_screen = (LambdaControlsControlsScreen) client.currentScreen;
-            if (controls_screen.focused_binding != null) {
+            if (controls_screen.focused_binding != null && !controls_screen.waiting) {
                 int[] buttons = new int[controls_screen.current_buttons.size()];
                 for (int i = 0; i < controls_screen.current_buttons.size(); i++)
                     buttons[i] = controls_screen.current_buttons.get(i);
@@ -253,10 +257,19 @@ public class LambdaInput
 
     private void handle_button(@NotNull MinecraftClient client, int button, int action, boolean state)
     {
-        if (client.currentScreen instanceof LambdaControlsControlsScreen && action == 0) {
+        if (client.currentScreen instanceof LambdaControlsControlsScreen) {
             LambdaControlsControlsScreen controls_screen = (LambdaControlsControlsScreen) client.currentScreen;
             if (controls_screen.focused_binding != null) {
-                controls_screen.current_buttons.add(button);
+                if (action == 0 && !controls_screen.current_buttons.contains(button)) {
+                    controls_screen.current_buttons.add(button);
+
+                    int[] buttons = new int[controls_screen.current_buttons.size()];
+                    for (int i = 0; i < controls_screen.current_buttons.size(); i++)
+                        buttons[i] = controls_screen.current_buttons.get(i);
+                    controls_screen.focused_binding.set_button(buttons);
+
+                    controls_screen.waiting = false;
+                }
                 return;
             }
         }
@@ -335,47 +348,60 @@ public class LambdaInput
     {
         int as_button_state = value > 0.5F ? 1 : (value < -0.5F ? 2 : 0);
 
-        if (client.currentScreen instanceof LambdaControlsControlsScreen && as_button_state != 0
-                && !(as_button_state == 2 && (axis == GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || axis == GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER ||
-                axis == ButtonBinding.controller2_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) || axis == ButtonBinding.controller2_button(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER)))) {
+        if (axis == GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || axis == GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER || axis == ButtonBinding.controller2_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) ||
+                axis == ButtonBinding.controller2_button(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER))
+            if (as_button_state == 2)
+                as_button_state = 0;
+
+        {
+            boolean current_plus_state = as_button_state == 1;
+            boolean current_minus_state = as_button_state == 2;
+            ButtonState previous_plus_state = InputManager.STATES.getOrDefault(axis_as_button(axis, true), ButtonState.NONE);
+            ButtonState previous_minus_state = InputManager.STATES.getOrDefault(axis_as_button(axis, false), ButtonState.NONE);
+
+            if (current_plus_state != previous_plus_state.is_pressed()) {
+                InputManager.STATES.put(axis_as_button(axis, true), current_plus_state ? ButtonState.PRESS : ButtonState.RELEASE);
+                if (current_plus_state)
+                    BUTTON_COOLDOWNS.put(axis_as_button(axis, true), 5);
+            } else if (current_plus_state) {
+                InputManager.STATES.put(axis_as_button(axis, true), ButtonState.REPEAT);
+                if (BUTTON_COOLDOWNS.getOrDefault(axis_as_button(axis, true), 0) == 0) {
+                    BUTTON_COOLDOWNS.put(axis_as_button(axis, true), 5);
+                }
+            }
+
+            if (current_minus_state != previous_minus_state.is_pressed()) {
+                InputManager.STATES.put(axis_as_button(axis, false), current_minus_state ? ButtonState.PRESS : ButtonState.RELEASE);
+                if (current_minus_state)
+                    BUTTON_COOLDOWNS.put(axis_as_button(axis, false), 5);
+            } else if (current_minus_state) {
+                InputManager.STATES.put(axis_as_button(axis, false), ButtonState.REPEAT);
+                if (BUTTON_COOLDOWNS.getOrDefault(axis_as_button(axis, false), 0) == 0) {
+                    BUTTON_COOLDOWNS.put(axis_as_button(axis, false), 5);
+                }
+            }
+        }
+
+        if (client.currentScreen instanceof LambdaControlsControlsScreen) {
             LambdaControlsControlsScreen controls_screen = (LambdaControlsControlsScreen) client.currentScreen;
             if (controls_screen.focused_binding != null) {
-                controls_screen.current_buttons.add(axis_as_button(axis, as_button_state == 1));
+                if (as_button_state != 0 && !controls_screen.current_buttons.contains(axis_as_button(axis, as_button_state == 1))) {
+
+                    controls_screen.current_buttons.add(axis_as_button(axis, as_button_state == 1));
+
+                    int[] buttons = new int[controls_screen.current_buttons.size()];
+                    for (int i = 0; i < controls_screen.current_buttons.size(); i++)
+                        buttons[i] = controls_screen.current_buttons.get(i);
+                    controls_screen.focused_binding.set_button(buttons);
+
+                    controls_screen.waiting = false;
+                }
                 return;
             }
         }
 
         double dead_zone = this.config.get_dead_zone();
         if (client.currentScreen == null) {
-            {
-                boolean current_plus_state = as_button_state == 1;
-                boolean current_minus_state = as_button_state == 2;
-                ButtonState previous_plus_state = InputManager.STATES.getOrDefault(axis_as_button(axis, true), ButtonState.NONE);
-                ButtonState previous_minus_state = InputManager.STATES.getOrDefault(axis_as_button(axis, false), ButtonState.NONE);
-
-                if (current_plus_state != previous_plus_state.is_pressed()) {
-                    InputManager.STATES.put(axis_as_button(axis, true), current_plus_state ? ButtonState.PRESS : ButtonState.RELEASE);
-                    if (current_plus_state)
-                        BUTTON_COOLDOWNS.put(axis_as_button(axis, true), 5);
-                } else if (current_plus_state) {
-                    InputManager.STATES.put(axis_as_button(axis, true), ButtonState.REPEAT);
-                    if (BUTTON_COOLDOWNS.getOrDefault(axis_as_button(axis, true), 0) == 0) {
-                        BUTTON_COOLDOWNS.put(axis_as_button(axis, true), 5);
-                    }
-                }
-
-                if (current_minus_state != previous_minus_state.is_pressed()) {
-                    InputManager.STATES.put(axis_as_button(axis, false), current_minus_state ? ButtonState.PRESS : ButtonState.RELEASE);
-                    if (current_minus_state)
-                        BUTTON_COOLDOWNS.put(axis_as_button(axis, false), 5);
-                } else if (current_minus_state) {
-                    InputManager.STATES.put(axis_as_button(axis, false), ButtonState.REPEAT);
-                    if (BUTTON_COOLDOWNS.getOrDefault(axis_as_button(axis, false), 0) == 0) {
-                        BUTTON_COOLDOWNS.put(axis_as_button(axis, false), 5);
-                    }
-                }
-            }
-
             // Handles the look direction.
             this.handle_look(client, axis, (float) (abs_value / (1.0 - this.config.get_dead_zone())), state);
         } else {

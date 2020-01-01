@@ -26,6 +26,8 @@ import org.lwjgl.glfw.GLFW;
  */
 public class OkZoomerCompat implements CompatHandler
 {
+    public static final String OKZOOMER_CLASS_PATH = "io.github.joaoh1.okzoomer.OkZoomer";
+
     @Override
     public void handle(@NotNull LambdaControls mod)
     {
