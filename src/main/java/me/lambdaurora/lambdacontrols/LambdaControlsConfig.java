@@ -98,7 +98,7 @@ public class LambdaControlsConfig
             Object raw = this.config.getRaw(path);
             if (raw instanceof Number) {
                 this.mod.warn("Invalid data at \"" + path + "\", fixing...");
-                this.config.set(path, "0;" + raw);
+                this.config.set(path, String.valueOf(raw));
             }
         });
     }
