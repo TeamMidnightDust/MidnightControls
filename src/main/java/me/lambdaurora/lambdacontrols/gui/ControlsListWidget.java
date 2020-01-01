@@ -80,7 +80,10 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
         {
             this.binding = binding;
             this.binding_name = I18n.translate(this.binding.get_translation_key());
-            this.edit_button = new ControllerButtonWidget(0, 0, 110, this.binding, btn -> gui.focused_binding = binding)
+            this.edit_button = new ControllerButtonWidget(0, 0, 110, this.binding, btn -> {
+                gui.focused_binding = binding;
+                gui.current_buttons.clear();
+            })
             {
                 protected String getNarrationMessage()
                 {

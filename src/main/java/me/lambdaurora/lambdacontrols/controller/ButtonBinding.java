@@ -10,12 +10,10 @@
 package me.lambdaurora.lambdacontrols.controller;
 
 import me.lambdaurora.lambdacontrols.ButtonState;
-import me.lambdaurora.lambdacontrols.util.KeyBindingAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.ScreenshotUtils;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,21 +58,10 @@ public class ButtonBinding implements Nameable
     public static final ButtonBinding PLAYER_LIST        = register_binding(new ButtonBinding("player_list", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_BACK}, false));
     public static final ButtonBinding RIGHT              = register_binding(new ButtonBinding("right", new int[]{axis_as_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X, true)}, false));
     public static final ButtonBinding SCREENSHOT         = register_binding(new ButtonBinding("screenshot", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW.GLFW_GAMEPAD_BUTTON_A},
-            Collections.singletonList((client, button, action) -> {
-                if (action == ButtonState.PRESS)
-                    ScreenshotUtils.saveScreenshot(client.runDirectory, client.getWindow().getFramebufferWidth(), client.getWindow().getFramebufferHeight(), client.getFramebuffer(),
-                            text -> client.execute(() -> client.inGameHud.getChatHud().addMessage(text)));
-                return true;
-            }), true));
+            Collections.singletonList(InputHandlers::handle_screenshot), true));
     public static final ButtonBinding SMOOTH_CAMERA      = register_binding(new ButtonBinding("toggle_smooth_camera", new int[]{-1}, true));
     public static final ButtonBinding SNEAK              = register_binding(new ButtonBinding("sneak", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB},
-            Arrays.asList(PressAction.DEFAULT_ACTION, (client, button, action) -> {
-                if (client.player != null && !client.player.abilities.flying) {
-                    button.as_key_binding().filter(binding -> action == ButtonState.PRESS).ifPresent(binding -> ((KeyBindingAccessor) binding).handle_press_state(!binding.isPressed()));
-                    return true;
-                }
-                return false;
-            }), true));
+            Arrays.asList(PressAction.DEFAULT_ACTION, InputHandlers::handle_toggle_sneak), true));
     public static final ButtonBinding SPRINT             = register_binding(new ButtonBinding("sprint", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB}, false));
     public static final ButtonBinding SWAP_HANDS         = register_binding(new ButtonBinding("swap_hands", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_X}, true));
     public static final ButtonBinding TOGGLE_PERSPECTIVE = register_binding(new ButtonBinding("toggle_perspective", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW.GLFW_GAMEPAD_BUTTON_Y}, true));
@@ -91,7 +78,7 @@ public class ButtonBinding implements Nameable
 
     public ButtonBinding(@NotNull String key, int[] default_button, @NotNull List<PressAction> actions, boolean has_cooldown)
     {
-        this.button = this.default_button = default_button;
+        this.set_button(this.default_button = default_button);
         this.key = key;
         this.actions.addAll(actions);
         this.has_cooldown = has_cooldown;
@@ -120,6 +107,9 @@ public class ButtonBinding implements Nameable
     public void set_button(int[] button)
     {
         this.button = button;
+
+        if (InputManager.has_binding(this))
+            InputManager.sort_bindings();
     }
 
     /**
@@ -214,8 +204,10 @@ public class ButtonBinding implements Nameable
     {
         if (state == ButtonState.REPEAT && this.has_cooldown && this.cooldown != 0)
             return;
-        if (this.has_cooldown && state.is_pressed())
+        if (this.has_cooldown && state.is_pressed()) {
             this.cooldown = 5;
+
+        }
         for (int i = this.actions.size() - 1; i >= 0; i--) {
             if (this.actions.get(i).press(client, this, state))
                 break;

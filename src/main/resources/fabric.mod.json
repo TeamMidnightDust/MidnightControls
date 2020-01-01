@@ -33,7 +33,8 @@
     "spruceui": ">=1.0.1"
   },
   "recommends": {
-    "modmenu": ">=1.8.0+build.16"
+    "modmenu": ">=1.8.0+build.16",
+    "okzoomer": ">=1.0.3"
   },
   "suggests": {
     "flamingo": "*"

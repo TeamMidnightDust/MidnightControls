@@ -11,11 +11,13 @@ package me.lambdaurora.lambdacontrols.controller;
 
 import me.lambdaurora.lambdacontrols.ButtonState;
 import me.lambdaurora.lambdacontrols.LambdaControlsConfig;
+import net.minecraft.client.MinecraftClient;
 import org.aperlambda.lambdacommon.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -31,32 +33,84 @@ public class InputManager
     private static final List<ButtonCategory>      CATEGORIES = new ArrayList<>();
     public static final  Map<Integer, ButtonState> STATES     = new HashMap<>();
 
+    /**
+     * Returns whether the specified binding is registered or not.
+     *
+     * @param binding The binding to check.
+     * @return True if the binding is registered, else false.
+     */
+    public static boolean has_binding(@NotNull ButtonBinding binding)
+    {
+        return BINDINGS.contains(binding);
+    }
+
+    /**
+     * Returns whether the specified binding is registered or not.
+     *
+     * @param name The name of the binding to check.
+     * @return True if the binding is registered, else false.
+     */
+    public static boolean has_binding(@NotNull String name)
+    {
+        return BINDINGS.parallelStream().map(ButtonBinding::get_name).anyMatch(binding -> binding.equalsIgnoreCase(name));
+    }
+
+    /**
+     * Returns whether the specified binding is registered or not.
+     *
+     * @param identifier The identifier of the binding to check.
+     * @return True if the binding is registered, else false.
+     */
+    public static boolean has_binding(@NotNull Identifier identifier)
+    {
+        return has_binding(identifier.get_namespace() + "." + identifier.get_name());
+    }
+
+    /**
+     * Registers a button binding.
+     *
+     * @param binding The binding to register.
+     * @return The registered binding.
+     */
     public static @NotNull ButtonBinding register_binding(@NotNull ButtonBinding binding)
     {
-        if (BINDINGS.contains(binding))
+        if (has_binding(binding))
             throw new IllegalStateException("Cannot register twice a button binding in the registry.");
         BINDINGS.add(binding);
         return binding;
     }
 
-    public static ButtonBinding register_binding(@NotNull Identifier binding_id, int[] default_button, @NotNull List<PressAction> actions, boolean has_cooldown)
+    public static @NotNull ButtonBinding register_binding(@NotNull Identifier binding_id, int[] default_button, @NotNull List<PressAction> actions, boolean has_cooldown)
     {
         return register_binding(new ButtonBinding(binding_id.get_namespace() + "." + binding_id.get_name(), default_button, actions, has_cooldown));
     }
 
-    public static ButtonBinding register_binding(@NotNull Identifier binding_id, int[] default_button, boolean has_cooldown)
+    public static @NotNull ButtonBinding register_binding(@NotNull Identifier binding_id, int[] default_button, boolean has_cooldown)
     {
         return register_binding(binding_id, default_button, Collections.emptyList(), has_cooldown);
     }
 
-    public static ButtonBinding register_binding(@NotNull net.minecraft.util.Identifier binding_id, int[] default_button, @NotNull List<PressAction> actions, boolean has_cooldown)
+    public static @NotNull ButtonBinding register_binding(@NotNull net.minecraft.util.Identifier binding_id, int[] default_button, @NotNull List<PressAction> actions, boolean has_cooldown)
     {
         return register_binding(new Identifier(binding_id.getNamespace(), binding_id.getPath()), default_button, actions, has_cooldown);
     }
 
-    public static ButtonBinding register_binding(@NotNull net.minecraft.util.Identifier binding_id, int[] default_button, boolean has_cooldown)
+    public static @NotNull ButtonBinding register_binding(@NotNull net.minecraft.util.Identifier binding_id, int[] default_button, boolean has_cooldown)
     {
         return register_binding(binding_id, default_button, Collections.emptyList(), has_cooldown);
+    }
+
+    /**
+     * Sorts bindings to get bindings with the higher button counts first.
+     */
+    public static void sort_bindings()
+    {
+        synchronized (BINDINGS) {
+            List<ButtonBinding> sorted_bindings = BINDINGS.stream().sorted(Collections.reverseOrder(Comparator.comparingInt(binding -> binding.get_button().length)))
+                    .collect(Collectors.toList());
+            BINDINGS.clear();
+            BINDINGS.addAll(sorted_bindings);
+        }
     }
 
     /**
@@ -95,7 +149,8 @@ public class InputManager
      */
     public static void load_button_bindings(@NotNull LambdaControlsConfig config)
     {
-        BINDINGS.forEach(config::load_button_binding);
+        List<ButtonBinding> load_queue = new ArrayList<>(BINDINGS);
+        load_queue.forEach(config::load_button_binding);
     }
 
     /**
@@ -157,6 +212,18 @@ public class InputManager
     }
 
     /**
+     * Returns whether the button set contains the specified button or not.
+     *
+     * @param buttons The button set.
+     * @param button  The button to check.
+     * @return True if the button set contains the specified button, else false.
+     */
+    public static boolean contains_button(int[] buttons, int button)
+    {
+        return Arrays.stream(buttons).anyMatch(btn -> btn == button);
+    }
+
+    /**
      * Updates the button states.
      */
     public static void update_states()
@@ -169,25 +236,34 @@ public class InputManager
         });
     }
 
-    public static void update_bindings() {
-        BINDINGS.forEach(binding -> binding.pressed = get_binding_state(binding).is_pressed());
-        BINDINGS.forEach(ButtonBinding::update);
+    public static void update_bindings(@NotNull MinecraftClient client)
+    {
+        List<Integer> skip_buttons = new ArrayList<>();
+        Map<ButtonBinding, ButtonState> states = new HashMap<>();
+        for (ButtonBinding binding : BINDINGS) {
+            ButtonState binding_state = get_binding_state(binding);
+            if (skip_buttons.stream().anyMatch(btn -> contains_button(binding.get_button(), btn))) {
+                if (binding.pressed)
+                    binding_state = ButtonState.RELEASE;
+                else
+                    binding_state = ButtonState.NONE;
+            }
+            binding.pressed = binding_state.is_pressed();
+            binding.update();
+            if (binding.pressed)
+                Arrays.stream(binding.get_button()).forEach(skip_buttons::add);
+            states.put(binding, binding_state);
+        }
+
+        states.forEach((binding, state) -> {
+            if (state != ButtonState.NONE)
+                binding.handle(client, state);
+        });
     }
 
     public static @NotNull Stream<ButtonBinding> stream_bindings()
     {
         return BINDINGS.stream();
-    }
-
-    public static @NotNull Stream<ButtonBinding> stream_active_bindings()
-    {
-        return BINDINGS.stream().filter(binding -> {
-            for (int btn : binding.get_button()) {
-                if (InputManager.STATES.getOrDefault(btn, ButtonState.NONE) == ButtonState.NONE)
-                    return false;
-            }
-            return true;
-        });
     }
 
     public static @NotNull Stream<ButtonCategory> stream_categories()

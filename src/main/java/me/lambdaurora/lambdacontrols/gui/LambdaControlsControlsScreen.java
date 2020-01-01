@@ -9,19 +9,19 @@
 
 package me.lambdaurora.lambdacontrols.gui;
 
-import me.lambdaurora.lambdacontrols.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.LambdaControls;
+import me.lambdaurora.lambdacontrols.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.controller.InputManager;
 import me.lambdaurora.spruceui.SpruceButtonWidget;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.options.BooleanOption;
-import net.minecraft.client.options.Option;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -32,12 +32,11 @@ public class LambdaControlsControlsScreen extends Screen
 {
     private final Screen             parent;
     final         LambdaControls     mod;
-    private final Option             inverts_right_x_axis;
-    private final Option             inverts_right_y_axis;
     private final boolean            hide_settings;
     private       ControlsListWidget bindings_list_widget;
     private       ButtonWidget       reset_button;
     public        ButtonBinding      focused_binding;
+    public        List<Integer>      current_buttons = new ArrayList<>();
 
     public LambdaControlsControlsScreen(@NotNull Screen parent, boolean hide_settings)
     {
@@ -45,18 +44,6 @@ public class LambdaControlsControlsScreen extends Screen
         this.parent = parent;
         this.mod = LambdaControls.get();
         this.hide_settings = hide_settings;
-        this.inverts_right_x_axis = new BooleanOption("lambdacontrols.menu.invert_right_x_axis", game_options -> this.mod.config.does_invert_right_x_axis(),
-                (game_options, new_value) -> {
-                    synchronized (this.mod.config) {
-                        this.mod.config.set_invert_right_x_axis(new_value);
-                    }
-                });
-        this.inverts_right_y_axis = new BooleanOption("lambdacontrols.menu.invert_right_y_axis", game_options -> this.mod.config.does_invert_right_y_axis(),
-                (game_options, new_value) -> {
-                    synchronized (this.mod.config) {
-                        this.mod.config.set_invert_right_y_axis(new_value);
-                    }
-                });
     }
 
     @Override
@@ -69,8 +56,6 @@ public class LambdaControlsControlsScreen extends Screen
     @Override
     protected void init()
     {
-        //this.addButton(this.inverts_right_x_axis.createButton(this.minecraft.options, this.width / 2 - 155, 18, 150));
-        //this.addButton(this.inverts_right_y_axis.createButton(this.minecraft.options, this.width / 2 - 155 + 160, 18, 150));
         this.addButton(new SpruceButtonWidget(this.width / 2 - 155, 18, this.hide_settings ? 310 : 150, 20, I18n.translate("lambdacontrols.menu.keyboard_controls"),
                 btn -> this.minecraft.openScreen(new ControlsOptionsScreen(this, this.minecraft.options))));
         if (!this.hide_settings)

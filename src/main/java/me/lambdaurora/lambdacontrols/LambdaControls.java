@@ -97,7 +97,7 @@ public class LambdaControls implements ClientModInitializer
 
         this.hud = new LambdaControlsHud(client, this);
 
-        LambdaControlsCompat.init();
+        LambdaControlsCompat.init(this);
     }
 
     /**

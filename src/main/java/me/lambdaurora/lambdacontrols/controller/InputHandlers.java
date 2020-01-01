@@ -11,9 +11,11 @@ package me.lambdaurora.lambdacontrols.controller;
 
 import me.lambdaurora.lambdacontrols.ButtonState;
 import me.lambdaurora.lambdacontrols.util.CreativeInventoryScreenAccessor;
+import me.lambdaurora.lambdacontrols.util.KeyBindingAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.client.util.ScreenshotUtils;
 import net.minecraft.item.ItemGroup;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,9 +28,14 @@ import org.jetbrains.annotations.NotNull;
  */
 public class InputHandlers
 {
-    private InputHandlers() {}
+    private static int hotbar_cooldown = 0;
 
-    public static PressAction handle_hotbar(boolean right) {
+    private InputHandlers()
+    {
+    }
+
+    public static PressAction handle_hotbar(boolean right)
+    {
         return (client, button, action) -> {
             if (action == ButtonState.RELEASE)
                 return false;
@@ -55,7 +62,8 @@ public class InputHandlers
         };
     }
 
-    public static boolean handle_pause_game(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, @NotNull ButtonState action) {
+    public static boolean handle_pause_game(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, @NotNull ButtonState action)
+    {
         if (action == ButtonState.PRESS) {
             // If in game, then pause the game.
             if (client.currentScreen == null)
@@ -66,5 +74,30 @@ public class InputHandlers
                 client.currentScreen.onClose();
         }
         return true;
+    }
+
+    /**
+     * Handles the screenshot action.
+     *
+     * @param client  The client instance.
+     * @param binding The binding which fired the action.
+     * @param action  The action done on the binding.
+     * @return True if handled, else false.
+     */
+    public static boolean handle_screenshot(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, @NotNull ButtonState action)
+    {
+        if (action == ButtonState.PRESS)
+            ScreenshotUtils.saveScreenshot(client.runDirectory, client.getWindow().getFramebufferWidth(), client.getWindow().getFramebufferHeight(), client.getFramebuffer(),
+                    text -> client.execute(() -> client.inGameHud.getChatHud().addMessage(text)));
+        return true;
+    }
+
+    public static boolean handle_toggle_sneak(@NotNull MinecraftClient client, @NotNull ButtonBinding button, @NotNull ButtonState action)
+    {
+        if (client.player != null && !client.player.abilities.flying) {
+            button.as_key_binding().filter(binding -> action == ButtonState.PRESS).ifPresent(binding -> ((KeyBindingAccessor) binding).handle_press_state(!binding.isPressed()));
+            return true;
+        }
+        return false;
     }
 }

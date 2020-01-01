@@ -59,7 +59,6 @@ import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
  */
 public class LambdaInput
 {
-    private static final Map<Integer, Boolean> BUTTON_STATES       = new HashMap<>();
     private static final Map<Integer, Integer> BUTTON_COOLDOWNS    = new HashMap<>();
     private final        LambdaControlsConfig  config;
     // Cooldowns
@@ -136,11 +135,22 @@ public class LambdaInput
                     this.fetch_axe_input(client, state, true);
                 });
 
-        InputManager.update_bindings();
-        InputManager.stream_active_bindings().forEach(binding -> binding.handle(client, InputManager.get_binding_state(binding)));
+        InputManager.update_bindings(client);
 
         if (this.ignore_next_a > 0)
             this.ignore_next_a--;
+
+        if (client.currentScreen instanceof  LambdaControlsControlsScreen && InputManager.STATES.entrySet().parallelStream().map(Map.Entry::getValue).allMatch(ButtonState::is_unpressed))
+        {
+            LambdaControlsControlsScreen controls_screen = (LambdaControlsControlsScreen) client.currentScreen;
+            if (controls_screen.focused_binding != null) {
+                int[] buttons = new int[controls_screen.current_buttons.size()];
+                for (int i = 0; i < controls_screen.current_buttons.size(); i++)
+                    buttons[i] = controls_screen.current_buttons.get(i);
+                controls_screen.focused_binding.set_button(buttons);
+                controls_screen.focused_binding = null;
+            }
+        }
     }
 
     /**
@@ -236,22 +246,9 @@ public class LambdaInput
             if (i == GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y)
                 value *= -1.0F;
 
-            //InputManager.(axis_as_button(axis, true), value > 0.5F);
-            //ButtonBinding.set_button_state(axis_as_button(axis, false), value < -0.5F);
-
             int state = value > this.config.get_dead_zone() ? 1 : (value < -this.config.get_dead_zone() ? 2 : 0);
             this.handle_axe(client, axis, value, abs_value, state);
         }
-    }
-
-    public boolean are_buttons_pressed(int[] buttons)
-    {
-        int i = 0;
-        for (int btn : buttons) {
-            if (BUTTON_STATES.containsKey(btn) && BUTTON_STATES.get(btn))
-                i++;
-        }
-        return i == buttons.length;
     }
 
     private void handle_button(@NotNull MinecraftClient client, int button, int action, boolean state)
@@ -259,8 +256,7 @@ public class LambdaInput
         if (client.currentScreen instanceof LambdaControlsControlsScreen && action == 0) {
             LambdaControlsControlsScreen controls_screen = (LambdaControlsControlsScreen) client.currentScreen;
             if (controls_screen.focused_binding != null) {
-                this.config.set_button_binding(controls_screen.focused_binding, new int[]{button});
-                controls_screen.focused_binding = null;
+                controls_screen.current_buttons.add(button);
                 return;
             }
         }
@@ -344,8 +340,7 @@ public class LambdaInput
                 axis == ButtonBinding.controller2_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) || axis == ButtonBinding.controller2_button(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER)))) {
             LambdaControlsControlsScreen controls_screen = (LambdaControlsControlsScreen) client.currentScreen;
             if (controls_screen.focused_binding != null) {
-                this.config.set_button_binding(controls_screen.focused_binding, new int[]{axis_as_button(axis, as_button_state == 1)});
-                controls_screen.focused_binding = null;
+                controls_screen.current_buttons.add(axis_as_button(axis, as_button_state == 1));
                 return;
             }
         }

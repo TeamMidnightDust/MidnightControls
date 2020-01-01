@@ -21,6 +21,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.options.BooleanOption;
 import net.minecraft.client.options.CyclingOption;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.Option;
@@ -36,23 +37,28 @@ import org.lwjgl.glfw.GLFW;
  */
 public class LambdaControlsSettingsScreen extends Screen
 {
-    public static final String                GAMEPAD_TOOL_URL             = "http://generalarcade.com/gamepadtool/";
-    final               LambdaControls        mod;
-    private final       Screen                parent;
-    private final       boolean               hide_controls;
-    private final       Option                auto_switch_mode_option;
-    private final       Option                controller_option;
-    private final       Option                second_controller_option;
-    private final       Option                controller_type_option;
-    private final       Option                dead_zone_option;
-    private final       Option                hud_enable_option;
-    private final       Option                hud_side_option;
-    private final       Option                mouse_speed_option;
-    private final       Option                rotation_speed_option;
-    private final       Option                reset_option;
-    private final       String                controller_mappings_url_text = I18n.translate("lambdacontrols.controller.mappings.2", Formatting.GOLD.toString(), GAMEPAD_TOOL_URL, Formatting.RESET.toString());
-    private             ButtonListWidget      list;
-    private             SpruceLabelWidget     gamepad_tool_url_label;
+    public static final String            GAMEPAD_TOOL_URL             = "http://generalarcade.com/gamepadtool/";
+    final               LambdaControls    mod;
+    private final       Screen            parent;
+    private final       boolean           hide_controls;
+    // General options
+    private final       Option            auto_switch_mode_option;
+    private final       Option            rotation_speed_option;
+    private final       Option            mouse_speed_option;
+    private final       Option            reset_option;
+    // Controller options
+    private final       Option            controller_option;
+    private final       Option            second_controller_option;
+    private final       Option            controller_type_option;
+    private final       Option            dead_zone_option;
+    private final       Option            inverts_right_x_axis;
+    private final       Option            inverts_right_y_axis;
+    // Hud options
+    private final       Option            hud_enable_option;
+    private final       Option            hud_side_option;
+    private final       String            controller_mappings_url_text = I18n.translate("lambdacontrols.controller.mappings.2", Formatting.GOLD.toString(), GAMEPAD_TOOL_URL, Formatting.RESET.toString());
+    private             ButtonListWidget  list;
+    private             SpruceLabelWidget gamepad_tool_url_label;
 
     public LambdaControlsSettingsScreen(Screen parent, @NotNull GameOptions options, boolean hide_controls)
     {
@@ -60,8 +66,29 @@ public class LambdaControlsSettingsScreen extends Screen
         this.mod = LambdaControls.get();
         this.parent = parent;
         this.hide_controls = hide_controls;
+        // General options
         this.auto_switch_mode_option = new SpruceBooleanOption("lambdacontrols.menu.auto_switch_mode", game_options -> this.mod.config.has_auto_switch_mode(),
                 (game_options, new_value) -> this.mod.config.set_auto_switch_mode(new_value), new TranslatableText("lambdacontrols.tooltip.auto_switch_mode"));
+        this.rotation_speed_option = new SpruceDoubleOption("lambdacontrols.menu.rotation_speed", 0.0, 50.0, 0.5F, game_options -> this.mod.config.get_rotation_speed(),
+                (game_options, new_value) -> {
+                    synchronized (this.mod.config) {
+                        this.mod.config.set_rotation_speed(new_value);
+                    }
+                }, (game_options, option) -> option.getDisplayPrefix() + option.get(options),
+                new TranslatableText("lambdacontrols.tooltip.rotation_speed"));
+        this.mouse_speed_option = new SpruceDoubleOption("lambdacontrols.menu.mouse_speed", 0.0, 50.0, 0.5F, game_options -> this.mod.config.get_mouse_speed(),
+                (game_options, new_value) -> {
+                    synchronized (this.mod.config) {
+                        this.mod.config.set_mouse_speed(new_value);
+                    }
+                }, (game_options, option) -> option.getDisplayPrefix() + option.get(options),
+                new TranslatableText("lambdacontrols.tooltip.mouse_speed"));
+        this.reset_option = new SpruceResetOption(btn -> {
+            this.mod.config.reset();
+            MinecraftClient client = MinecraftClient.getInstance();
+            this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
+        });
+        // Controller options
         this.controller_option = new CyclingOption("lambdacontrols.menu.controller", (game_options, amount) -> {
             int current_id = this.mod.config.get_controller().get_id();
             current_id += amount;
@@ -98,12 +125,6 @@ public class LambdaControlsSettingsScreen extends Screen
                 (game_options, amount) -> this.mod.config.set_controller_type(this.mod.config.get_controller_type().next()),
                 (game_options, option) -> option.getDisplayPrefix() + this.mod.config.get_controller_type().get_translated_name(),
                 new TranslatableText("lambdacontrols.tooltip.controller_type"));
-        this.hud_enable_option = new SpruceBooleanOption("lambdacontrols.menu.hud_enable", (game_options) -> this.mod.config.is_hud_enabled(),
-                (game_options, new_value) -> this.mod.config.set_hud_enabled(new_value), new TranslatableText("lambdacontrols.tooltip.hud_enable"));
-        this.hud_side_option = new SpruceCyclingOption("lambdacontrols.menu.hud_side",
-                (game_options, amount) -> this.mod.config.set_hud_side(this.mod.config.get_hud_side().next()),
-                (game_options, option) -> option.getDisplayPrefix() + this.mod.config.get_hud_side().get_translated_name(),
-                new TranslatableText("lambdacontrols.tooltip.hud_side"));
         this.dead_zone_option = new SpruceDoubleOption("lambdacontrols.menu.dead_zone", 0.05, 1.0, 0.05F, game_options -> this.mod.config.get_dead_zone(),
                 (game_options, new_value) -> {
                     synchronized (this.mod.config) {
@@ -113,25 +134,25 @@ public class LambdaControlsSettingsScreen extends Screen
             String value = String.valueOf(option.get(options));
             return option.getDisplayPrefix() + value.substring(0, Math.min(value.length(), 5));
         }, new TranslatableText("lambdacontrols.tooltip.dead_zone"));
-        this.rotation_speed_option = new SpruceDoubleOption("lambdacontrols.menu.rotation_speed", 0.0, 50.0, 0.5F, game_options -> this.mod.config.get_rotation_speed(),
+        this.inverts_right_x_axis = new SpruceBooleanOption("lambdacontrols.menu.invert_right_x_axis", game_options -> this.mod.config.does_invert_right_x_axis(),
                 (game_options, new_value) -> {
                     synchronized (this.mod.config) {
-                        this.mod.config.set_rotation_speed(new_value);
+                        this.mod.config.set_invert_right_x_axis(new_value);
                     }
-                }, (game_options, option) -> option.getDisplayPrefix() + option.get(options),
-                new TranslatableText("lambdacontrols.tooltip.rotation_speed"));
-        this.mouse_speed_option = new SpruceDoubleOption("lambdacontrols.menu.mouse_speed", 0.0, 50.0, 0.5F, game_options -> this.mod.config.get_mouse_speed(),
+                }, null);
+        this.inverts_right_y_axis = new SpruceBooleanOption("lambdacontrols.menu.invert_right_y_axis", game_options -> this.mod.config.does_invert_right_y_axis(),
                 (game_options, new_value) -> {
                     synchronized (this.mod.config) {
-                        this.mod.config.set_mouse_speed(new_value);
+                        this.mod.config.set_invert_right_y_axis(new_value);
                     }
-                }, (game_options, option) -> option.getDisplayPrefix() + option.get(options),
-                new TranslatableText("lambdacontrols.tooltip.mouse_speed"));
-        this.reset_option = new SpruceResetOption(btn -> {
-            this.mod.config.reset();
-            MinecraftClient client = MinecraftClient.getInstance();
-            this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
-        });
+                }, null);
+        // HUD options
+        this.hud_enable_option = new SpruceBooleanOption("lambdacontrols.menu.hud_enable", (game_options) -> this.mod.config.is_hud_enabled(),
+                (game_options, new_value) -> this.mod.config.set_hud_enabled(new_value), new TranslatableText("lambdacontrols.tooltip.hud_enable"));
+        this.hud_side_option = new SpruceCyclingOption("lambdacontrols.menu.hud_side",
+                (game_options, amount) -> this.mod.config.set_hud_side(this.mod.config.get_hud_side().next()),
+                (game_options, option) -> option.getDisplayPrefix() + this.mod.config.get_hud_side().get_translated_name(),
+                new TranslatableText("lambdacontrols.tooltip.hud_side"));
     }
 
     @Override
@@ -178,14 +199,18 @@ public class LambdaControlsSettingsScreen extends Screen
                     }));
 
         this.list = new ButtonListWidget(this.minecraft, this.width, this.height, 43, this.height - 29 - this.get_text_height(), 25);
+        // General options
         this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.general", true, null));
         this.list.addOptionEntry(this.rotation_speed_option, this.mouse_speed_option);
         this.list.addSingleOptionEntry(this.auto_switch_mode_option);
+        // Controller options
         this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.controller", true, null));
         this.list.addSingleOptionEntry(this.controller_option);
         this.list.addSingleOptionEntry(this.second_controller_option);
         this.list.addOptionEntry(this.controller_type_option, this.dead_zone_option);
+        this.list.addOptionEntry(this.inverts_right_x_axis, this.inverts_right_y_axis);
         this.list.addSingleOptionEntry(new ReloadControllerMappingsOption());
+        // HUD options
         this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.hud", true, null));
         this.list.addOptionEntry(this.hud_enable_option, this.hud_side_option);
         this.children.add(this.list);

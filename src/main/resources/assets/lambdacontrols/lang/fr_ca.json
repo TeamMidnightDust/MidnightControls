@@ -29,6 +29,7 @@
   "lambdacontrols.action.toggle_perspective": "Changer de point de vue",
   "lambdacontrols.action.toggle_smooth_camera": "Basculer en mode cinématique",
   "lambdacontrols.action.use": "Utiliser",
+  "lambdacontrols.action.zoom": "Zoom",
   "lambdacontrols.button.a": "A",
   "lambdacontrols.button.b": "B",
   "lambdacontrols.button.x": "X",
