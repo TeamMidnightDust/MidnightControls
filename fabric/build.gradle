@@ -1,0 +1,87 @@
+plugins {
+    id 'fabric-loom' version '0.2.6-SNAPSHOT'
+    id 'java-library'
+    id 'maven-publish'
+}
+
+archivesBaseName = project.archives_base_name + "-fabric"
+
+minecraft {
+}
+
+repositories {
+    maven {
+        name = 'CottonMC'
+        url = 'http://server.bbkr.space:8081/artifactory/libs-snapshot'
+    }
+    repositories {
+        maven { url = "https://jitpack.io" }
+    }
+    // SpruceUI
+    ivy {
+        url 'https://github.com/LambdAurora/SpruceUI/releases/download/'
+        patternLayout {
+            artifact '[revision]/[module]-[version].[ext]'
+        }
+        metadataSources() {
+            artifact()
+        }
+    }
+    // OkZoomer
+    ivy {
+        url 'https://github.com/joaoh1/OkZoomer/releases/download/'
+        patternLayout {
+            artifact '[revision]/[module]-[version].[ext]'
+        }
+        metadataSources() {
+            artifact()
+        }
+    }
+}
+
+dependencies {
+    //to change the versions see the gradle.properties file
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}"
+    modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    modCompile "io.github.prospector:modmenu:1.8.0+build.16"
+    modCompile "me.lambdaurora:spruceui:${project.spruceui_version}"
+    include "me.lambdaurora:spruceui:${project.spruceui_version}"
+    //modCompile "io.github.cottonmc:cotton-client-commands:0.4.2+1.14.3-SNAPSHOT"
+
+    // Compatibility mods
+    modCompile "io.github.joaoh1:okzoomer:1.0.3"
+
+    api project(":common")
+    include project(":common")
+    include "org.jetbrains:annotations:17.0.0"
+    include "org.aperlambda:lambdajcommon:1.7.2"
+    include "com.electronwill.night-config:core:3.5.3"
+    include "com.electronwill.night-config:toml:3.5.3"
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include "fabric.mod.json"
+        expand "version": project.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "fabric.mod.json"
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+jar {
+    from "../LICENSE"
+}

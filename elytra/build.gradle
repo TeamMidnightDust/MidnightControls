@@ -1,0 +1,21 @@
+plugins {
+    id 'java-library'
+}
+
+archivesBaseName = project.archives_base_name + "-elytra"
+
+repositories {
+    maven { url = 'https://hub.spigotmc.org/nexus/content/groups/public/' }
+    maven { url = 'https://mcelytra.github.io/maven/' }
+    maven { url = 'https://libraries.minecraft.net/' }
+}
+
+dependencies {
+    api project(":common")
+    implementation "org.mcelytra:elytra-core:1.0.0-SNAPSHOT"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}

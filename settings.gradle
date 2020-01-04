@@ -8,3 +8,6 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+rootProject.name = 'lambdacontrols'
+include 'common', 'fabric', 'elytra'

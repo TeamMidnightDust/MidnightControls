@@ -1,110 +1,35 @@
 plugins {
-	id 'fabric-loom' version '0.2.6-SNAPSHOT'
+	id 'java-library'
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+allprojects {
+	group = project.maven_group
+	version = project.mod_version
 
-archivesBaseName = project.archives_base_name
-version = project.mod_version
-group = project.maven_group
-
-minecraft {
-}
-
-repositories {
-	mavenLocal()
-    mavenCentral()
-	maven { url = 'https://aperlambda.github.io/maven' }
-	maven {
-		name = 'CottonMC'
-		url = 'http://server.bbkr.space:8081/artifactory/libs-snapshot'
-	}
 	repositories {
-		maven { url = "https://jitpack.io" }
+		mavenLocal()
+		mavenCentral()
+		maven { url = 'https://aperlambda.github.io/maven' }
 	}
-	// SpruceUI
-	ivy {
-		url 'https://github.com/LambdAurora/SpruceUI/releases/download/'
-		patternLayout {
-			artifact '[revision]/[module]-[version].[ext]'
-		}
-		metadataSources() {
-			artifact()
-		}
+
+	dependencies {
 	}
-	// OkZoomer
-	ivy {
-		url 'https://github.com/joaoh1/OkZoomer/releases/download/'
-		patternLayout {
-			artifact '[revision]/[module]-[version].[ext]'
-		}
-		metadataSources() {
-			artifact()
-		}
+
+	tasks.withType(JavaCompile) {
+		options.encoding = "UTF-8"
+	}
+
+	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+	// if it is present.
+	// If you remove this task, sources will not be generated.
+	task sourcesJar(type: Jar, dependsOn: classes) {
+		classifier = "sources"
+		from sourceSets.main.allSource
 	}
 }
 
-dependencies {
-	//to change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}"
-	modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-	modCompile "io.github.prospector:modmenu:1.8.0+build.16"
-	modCompile "me.lambdaurora:spruceui:${project.spruceui_version}"
-	include "me.lambdaurora:spruceui:${project.spruceui_version}"
-	//modCompile "io.github.cottonmc:cotton-client-commands:0.4.2+1.14.3-SNAPSHOT"
-
-	// Compatibility mods
-	modCompile "io.github.joaoh1:okzoomer:1.0.3"
-
-	implementation "org.jetbrains:annotations:17.0.0"
-	implementation "org.aperlambda:lambdajcommon:1.7.2"
-	implementation "com.electronwill.night-config:core:3.5.3"
-	implementation "com.electronwill.night-config:toml:3.5.3"
-	include "org.jetbrains:annotations:17.0.0"
-	include "org.aperlambda:lambdajcommon:1.7.2"
-	include "com.electronwill.night-config:core:3.5.3"
-	include "com.electronwill.night-config:toml:3.5.3"
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	from(sourceSets.main.resources.srcDirs) {
-		include "fabric.mod.json"
-		expand "version": project.version
-	}
-
-	from(sourceSets.main.resources.srcDirs) {
-		exclude "fabric.mod.json"
-	}
-}
-
-// ensure that the encoding is set to UTF-8, no matter what the system default is
-// this fixes some edge cases with special characters not displaying correctly
-// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-tasks.withType(JavaCompile) {
-	options.encoding = "UTF-8"
-}
-
-// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-// if it is present.
-// If you remove this task, sources will not be generated.
-task sourcesJar(type: Jar, dependsOn: classes) {
-	classifier = "sources"
-	from sourceSets.main.allSource
-}
-
-jar {
-	from "LICENSE"
-}
-
+/*
 // configure the maven publication
 publishing {
 	publications {
@@ -123,4 +48,4 @@ publishing {
 	repositories {
 		mavenLocal()
 	}
-}
+}*/
