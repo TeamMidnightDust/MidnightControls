@@ -10,7 +10,7 @@
 package me.lambdaurora.lambdacontrols.client.controller;
 
 import me.lambdaurora.lambdacontrols.client.ButtonState;
-import me.lambdaurora.lambdacontrols.client.util.CreativeInventoryScreenAccessor;
+import me.lambdaurora.lambdacontrols.client.mixin.CreativeInventoryScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.util.KeyBindingAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
@@ -49,13 +49,13 @@ public class InputHandlers
                 return true;
             } else if (client.currentScreen instanceof CreativeInventoryScreen) {
                 CreativeInventoryScreenAccessor creative_inventory = (CreativeInventoryScreenAccessor) client.currentScreen;
-                int current_selected_tab = creative_inventory.get_selected_tab();
+                int current_selected_tab = creative_inventory.lambdacontrols_get_selected_tab();
                 int next_tab = current_selected_tab + (right ? 1 : -1);
                 if (next_tab < 0)
                     next_tab = ItemGroup.GROUPS.length - 1;
                 else if (next_tab >= ItemGroup.GROUPS.length)
                     next_tab = 0;
-                creative_inventory.set_selected_tab(ItemGroup.GROUPS[next_tab]);
+                creative_inventory.lambdacontrols_set_selected_tab(ItemGroup.GROUPS[next_tab]);
                 return true;
             }
             return false;

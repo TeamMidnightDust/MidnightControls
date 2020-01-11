@@ -21,14 +21,14 @@ public interface AbstractContainerScreenAccessor
      *
      * @return The left coordinate of the GUI.
      */
-    int get_x();
+    int lambdacontrols_get_x();
 
     /**
      * Gets the top coordinate of the GUI.
      *
      * @return The top coordinate of the GUI.
      */
-    int get_y();
+    int lambdacontrols_get_y();
 
     /**
      * Gets the slot at position.
@@ -37,5 +37,5 @@ public interface AbstractContainerScreenAccessor
      * @param pos_y The Y position to check.
      * @return The slot at the specified position.
      */
-    Slot get_slot_at(double pos_x, double pos_y);
+    Slot lambdacontrols_get_slot_at(double pos_x, double pos_y);
 }

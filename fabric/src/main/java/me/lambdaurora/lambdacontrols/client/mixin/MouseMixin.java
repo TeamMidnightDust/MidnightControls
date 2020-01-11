@@ -39,13 +39,7 @@ public abstract class MouseMixin implements MouseAccessor
     }
 
     @Override
-    public void on_mouse_button(long window, int button, int action, int mods)
-    {
-        this.onMouseButton(window, button, action, mods);
-    }
-
-    @Override
-    public void on_cursor_pos(long window, double x, double y)
+    public void lambdacontrols_on_cursor_pos(long window, double x, double y)
     {
         this.onCursorPos(window, x, y);
     }

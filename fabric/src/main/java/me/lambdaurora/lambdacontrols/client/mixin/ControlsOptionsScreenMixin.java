@@ -40,7 +40,7 @@ public class ControlsOptionsScreenMixin extends GameOptionsScreen
         if (this.parent instanceof LambdaControlsControlsScreen)
             return this.addButton(btn);
         else
-            return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).get_height(), I18n.translate("menu.options"),
+            return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).lambdacontrols_get_height(), I18n.translate("menu.options"),
                     b -> this.minecraft.openScreen(new LambdaControlsSettingsScreen(this, this.gameOptions, true))));
     }
 }

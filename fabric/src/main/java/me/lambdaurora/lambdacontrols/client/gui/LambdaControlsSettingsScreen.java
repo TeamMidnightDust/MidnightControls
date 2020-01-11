@@ -39,25 +39,27 @@ public class LambdaControlsSettingsScreen extends Screen
     public static final String               GAMEPAD_TOOL_URL             = "http://generalarcade.com/gamepadtool/";
     final               LambdaControlsClient mod;
     private final       Screen               parent;
-    private final       boolean           hide_controls;
+    private final       boolean              hide_controls;
     // General options
-    private final       Option            auto_switch_mode_option;
-    private final       Option            rotation_speed_option;
-    private final       Option            mouse_speed_option;
-    private final       Option            reset_option;
+    private final       Option               auto_switch_mode_option;
+    private final       Option               rotation_speed_option;
+    private final       Option               mouse_speed_option;
+    private final       Option               reset_option;
+    // Gameplay options
+    private final       Option               front_block_placing_option;
     // Controller options
-    private final       Option            controller_option;
-    private final       Option            second_controller_option;
-    private final       Option            controller_type_option;
-    private final       Option            dead_zone_option;
-    private final       Option            inverts_right_x_axis;
-    private final       Option            inverts_right_y_axis;
+    private final       Option               controller_option;
+    private final       Option               second_controller_option;
+    private final       Option               controller_type_option;
+    private final       Option               dead_zone_option;
+    private final       Option               inverts_right_x_axis;
+    private final       Option               inverts_right_y_axis;
     // Hud options
-    private final       Option            hud_enable_option;
-    private final       Option            hud_side_option;
-    private final       String            controller_mappings_url_text = I18n.translate("lambdacontrols.controller.mappings.2", Formatting.GOLD.toString(), GAMEPAD_TOOL_URL, Formatting.RESET.toString());
-    private             ButtonListWidget  list;
-    private             SpruceLabelWidget gamepad_tool_url_label;
+    private final       Option               hud_enable_option;
+    private final       Option               hud_side_option;
+    private final       String               controller_mappings_url_text = I18n.translate("lambdacontrols.controller.mappings.2", Formatting.GOLD.toString(), GAMEPAD_TOOL_URL, Formatting.RESET.toString());
+    private             ButtonListWidget     list;
+    private             SpruceLabelWidget    gamepad_tool_url_label;
 
     public LambdaControlsSettingsScreen(Screen parent, @NotNull GameOptions options, boolean hide_controls)
     {
@@ -87,6 +89,9 @@ public class LambdaControlsSettingsScreen extends Screen
             MinecraftClient client = MinecraftClient.getInstance();
             this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
         });
+        // Gameplay options
+        this.front_block_placing_option = new SpruceBooleanOption("lambdacontrols.menu.front_block_placing", game_options -> this.mod.config.has_front_block_placing(),
+                (game_options, new_value) -> this.mod.config.set_front_block_placing(new_value), new TranslatableText("lambdacontrols.tooltip.front_block_placing"));
         // Controller options
         this.controller_option = new CyclingOption("lambdacontrols.menu.controller", (game_options, amount) -> {
             int current_id = this.mod.config.get_controller().get_id();
@@ -202,6 +207,9 @@ public class LambdaControlsSettingsScreen extends Screen
         this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.general", true, null));
         this.list.addOptionEntry(this.rotation_speed_option, this.mouse_speed_option);
         this.list.addSingleOptionEntry(this.auto_switch_mode_option);
+        // Gameplay options
+        this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.gameplay", true, null));
+        this.list.addSingleOptionEntry(this.front_block_placing_option);
         // Controller options
         this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.controller", true, null));
         this.list.addSingleOptionEntry(this.controller_option);

@@ -14,7 +14,5 @@ package me.lambdaurora.lambdacontrols.client.util;
  */
 public interface MouseAccessor
 {
-    void on_mouse_button(long window, int button, int action, int mods);
-
-    void on_cursor_pos(long window, double x, double y);
+    void lambdacontrols_on_cursor_pos(long window, double x, double y);
 }

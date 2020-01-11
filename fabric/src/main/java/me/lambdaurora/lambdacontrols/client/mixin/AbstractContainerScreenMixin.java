@@ -18,6 +18,7 @@ import net.minecraft.container.Slot;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -29,29 +30,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class AbstractContainerScreenMixin implements AbstractContainerScreenAccessor
 {
     protected int x;
-
     protected int y;
 
-    @Shadow
-    protected abstract Slot getSlotAt(double xPosition, double yPosition);
-
     @Override
-    public int get_x()
+    public int lambdacontrols_get_x()
     {
         return this.x;
     }
 
     @Override
-    public int get_y()
+    public int lambdacontrols_get_y()
     {
         return this.y;
     }
 
-    @Override
-    public Slot get_slot_at(double pos_x, double pos_y)
-    {
-        return this.getSlotAt(pos_x, pos_y);
-    }
+    @Invoker("getSlotAt")
+    public abstract Slot lambdacontrols_get_slot_at(double pos_x, double pos_y);
 
     @Inject(method = "render", at = @At("RETURN"))
     public void render(int mouseX, int mouseY, float delta, CallbackInfo ci)

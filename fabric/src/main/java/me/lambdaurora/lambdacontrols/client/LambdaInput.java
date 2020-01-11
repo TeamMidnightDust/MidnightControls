@@ -170,7 +170,7 @@ public class LambdaInput
                 double mouse_x = this.prev_target_mouse_x + (this.target_mouse_x - this.prev_target_mouse_x) * client.getTickDelta() + 0.5;
                 double mouse_y = this.prev_target_mouse_y + (this.target_mouse_y - this.prev_target_mouse_y) * client.getTickDelta() + 0.5;
                 GLFW.glfwSetCursorPos(client.getWindow().getHandle(), mouse_x, mouse_y);
-                ((MouseAccessor) client.mouse).on_cursor_pos(client.getWindow().getHandle(), mouse_x, mouse_y);
+                ((MouseAccessor) client.mouse).lambdacontrols_on_cursor_pos(client.getWindow().getHandle(), mouse_x, mouse_y);
             }
         }
     }
@@ -309,7 +309,7 @@ public class LambdaInput
             if (client.currentScreen instanceof AbstractContainerScreen && client.interactionManager != null && client.player != null) {
                 double pos_x = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
                 double pos_y = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
-                Slot slot = ((AbstractContainerScreenAccessor) client.currentScreen).get_slot_at(pos_x, pos_y);
+                Slot slot = ((AbstractContainerScreenAccessor) client.currentScreen).lambdacontrols_get_slot_at(pos_x, pos_y);
                 if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && slot != null) {
                     client.interactionManager.clickSlot(((AbstractContainerScreen) client.currentScreen).getContainer().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_1, SlotActionType.PICKUP, client.player);
                     this.action_gui_cooldown = 5;
@@ -527,7 +527,7 @@ public class LambdaInput
             this.action_gui_cooldown = 2; // Prevent to press too quickly the focused element, so we have to skip 5 ticks.
             return false;
         } else if (element instanceof AlwaysSelectedEntryListWidget) {
-            ((EntryListWidgetAccessor) element).move_selection(right ? 1 : -1);
+            ((EntryListWidgetAccessor) element).lambdacontrols_move_selection(right ? 1 : -1);
             return false;
         } else if (element instanceof ParentElement) {
             ParentElement entry_list = (ParentElement) element;
@@ -597,8 +597,8 @@ public class LambdaInput
         if (screen instanceof AbstractContainerScreen) {
             AbstractContainerScreen inventory_screen = (AbstractContainerScreen) screen;
             AbstractContainerScreenAccessor accessor = (AbstractContainerScreenAccessor) inventory_screen;
-            int gui_left = accessor.get_x();
-            int gui_top = accessor.get_y();
+            int gui_left = accessor.lambdacontrols_get_x();
+            int gui_top = accessor.lambdacontrols_get_y();
             int mouse_x = (int) (target_mouse_x * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth());
             int mouse_y = (int) (target_mouse_y * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight());
 

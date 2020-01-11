@@ -9,26 +9,32 @@
 
 package me.lambdaurora.lambdacontrols.client.mixin;
 
-import me.lambdaurora.lambdacontrols.client.util.CreativeInventoryScreenAccessor;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.item.ItemGroup;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
+/**
+ * Represents an accessor to CreativeInventoryScreen.
+ */
 @Mixin(CreativeInventoryScreen.class)
-public abstract class CreativeInventoryScreenMixin implements CreativeInventoryScreenAccessor
+public interface CreativeInventoryScreenAccessor
 {
-    @Shadow
-    protected abstract void setSelectedTab(ItemGroup itemGroup);
-
+    /**
+     * Gets the selected tab.
+     *
+     * @return The selected tab index.
+     */
     @Accessor("selectedTab")
-    public abstract int get_selected_tab();
+    int lambdacontrols_get_selected_tab();
 
-    @Override
-    public void set_selected_tab(@NotNull ItemGroup group)
-    {
-        this.setSelectedTab(group);
-    }
+    /**
+     * Sets the selected tab.
+     *
+     * @param group The tab's item group.
+     */
+    @Invoker("setSelectedTab")
+    void lambdacontrols_set_selected_tab(@NotNull ItemGroup group);
 }

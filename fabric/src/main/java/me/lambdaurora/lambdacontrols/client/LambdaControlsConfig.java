@@ -32,14 +32,19 @@ import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
  */
 public class LambdaControlsConfig
 {
-    private static final ControlsMode DEFAULT_CONTROLS_MODE    = ControlsMode.DEFAULT;
-    private static final boolean      DEFAULT_AUTO_SWITCH_MODE = false;
-    private static final boolean        DEFAULT_HUD_ENABLE       = true;
-    private static final HudSide        DEFAULT_HUD_SIDE         = HudSide.LEFT;
-    private static final ControllerType DEFAULT_CONTROLLER_TYPE  = ControllerType.DEFAULT;
-    private static final double         DEFAULT_DEAD_ZONE        = 0.25;
-    private static final double         DEFAULT_ROTATION_SPEED   = 40.0;
-    private static final double         DEFAULT_MOUSE_SPEED      = 25.0;
+    // General
+    private static final ControlsMode   DEFAULT_CONTROLS_MODE       = ControlsMode.DEFAULT;
+    private static final boolean        DEFAULT_AUTO_SWITCH_MODE    = false;
+    // HUD
+    private static final boolean        DEFAULT_HUD_ENABLE          = true;
+    private static final HudSide        DEFAULT_HUD_SIDE            = HudSide.LEFT;
+    // Gameplay
+    private static final boolean        DEFAULT_FRONT_BLOCK_PLACING = false;
+    // Controller
+    private static final ControllerType DEFAULT_CONTROLLER_TYPE     = ControllerType.DEFAULT;
+    private static final double         DEFAULT_DEAD_ZONE           = 0.25;
+    private static final double         DEFAULT_ROTATION_SPEED      = 40.0;
+    private static final double         DEFAULT_MOUSE_SPEED         = 25.0;
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
 
@@ -110,10 +115,15 @@ public class LambdaControlsConfig
      */
     public void reset()
     {
+        // General
         this.set_controls_mode(DEFAULT_CONTROLS_MODE);
         this.set_auto_switch_mode(DEFAULT_AUTO_SWITCH_MODE);
+        // HUD
         this.set_hud_enabled(DEFAULT_HUD_ENABLE);
         this.set_hud_side(DEFAULT_HUD_SIDE);
+        // Gameplay
+        this.set_front_block_placing(DEFAULT_FRONT_BLOCK_PLACING);
+        // Controller
         this.set_controller_type(DEFAULT_CONTROLLER_TYPE);
         this.set_dead_zone(DEFAULT_DEAD_ZONE);
         this.set_rotation_speed(DEFAULT_ROTATION_SPEED);
@@ -164,6 +174,10 @@ public class LambdaControlsConfig
         this.config.set("auto_switch_mode", auto_switch_mode);
     }
 
+    /*
+            HUD settings
+     */
+
     /**
      * Returns whether the HUD is enabled.
      *
@@ -205,6 +219,34 @@ public class LambdaControlsConfig
         this.hud_side = hud_side;
         this.config.set("hud.side", hud_side.get_name());
     }
+
+    /*
+            Gameplay settings
+     */
+
+    /**
+     * Returns whether front block placing is enabled or not.
+     *
+     * @return True if front block placing is enabled, else false.
+     */
+    public boolean has_front_block_placing()
+    {
+        return this.config.getOrElse("gameplay.front_block_placing", DEFAULT_FRONT_BLOCK_PLACING);
+    }
+
+    /**
+     * Sets whether front block placing is enabled or not.
+     *
+     * @param enable True if front block placing is enabled, else false.
+     */
+    public void set_front_block_placing(boolean enable)
+    {
+        this.config.set("gameplay.front_block_placing", enable);
+    }
+
+    /*
+            Controller settings
+     */
 
     /**
      * Gets the used controller.

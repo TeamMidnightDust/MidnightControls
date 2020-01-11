@@ -37,7 +37,7 @@
   },
   "recommends": {
     "modmenu": ">=1.8.0+build.16",
-    "okzoomer": ">=1.0.3"
+    "okzoomer": ">=1.0.4"
   },
   "suggests": {
     "flamingo": "*"

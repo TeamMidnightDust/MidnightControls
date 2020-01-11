@@ -6,7 +6,7 @@
     "AbstractButtonWidgetAccessor",
     "AbstractContainerScreenMixin",
     "ControlsOptionsScreenMixin",
-    "CreativeInventoryScreenMixin",
+    "CreativeInventoryScreenAccessor",
     "EntryListWidgetAccessor",
     "GameRendererMixin",
     "KeyBindingMixin",

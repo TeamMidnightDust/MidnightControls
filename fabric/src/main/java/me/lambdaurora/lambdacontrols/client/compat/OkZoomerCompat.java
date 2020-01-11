@@ -9,6 +9,7 @@
 
 package me.lambdaurora.lambdacontrols.client.compat;
 
+import io.github.joaoh1.okzoomer.OkZoomer;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.InputManager;
@@ -31,12 +32,8 @@ public class OkZoomerCompat implements CompatHandler
     @Override
     public void handle(@NotNull LambdaControlsClient mod)
     {
-        LambdaReflection.get_first_field_of_type(io.github.joaoh1.okzoomer.OkZoomer.class, FabricKeyBinding.class)
-                .map(field -> (FabricKeyBinding) LambdaReflection.get_field_value(null, field))
-                .ifPresent(zoom_key_binding -> {
-                    ButtonBinding binding = InputManager.register_binding(new ButtonBinding("zoom", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW.GLFW_GAMEPAD_BUTTON_X}, true));
-                    binding.set_key_binding(zoom_key_binding);
-                    ButtonBinding.MISC_CATEGORY.register_binding(binding);
-                });
+        ButtonBinding binding = InputManager.register_binding(new ButtonBinding("zoom", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW.GLFW_GAMEPAD_BUTTON_X}, true));
+        binding.set_key_binding(OkZoomer.zoomKeyBinding);
+        ButtonBinding.MISC_CATEGORY.register_binding(binding);
     }
 }
