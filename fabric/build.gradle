@@ -21,7 +21,7 @@ repositories {
     ivy {
         url 'https://github.com/LambdAurora/SpruceUI/releases/download/'
         patternLayout {
-            artifact '[revision]/[module]-[revision]-fabric1.15.[ext]'
+            artifact 'v[revision]/[module]-[revision]-fabric1.15.[ext]'
         }
         metadataSources() {
             artifact()
