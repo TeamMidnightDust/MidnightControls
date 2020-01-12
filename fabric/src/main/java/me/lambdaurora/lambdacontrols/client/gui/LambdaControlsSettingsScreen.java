@@ -47,6 +47,7 @@ public class LambdaControlsSettingsScreen extends Screen
     private final       Option               reset_option;
     // Gameplay options
     private final       Option               front_block_placing_option;
+    private final       Option               fly_drifting_option;
     // Controller options
     private final       Option               controller_option;
     private final       Option               second_controller_option;
@@ -92,6 +93,8 @@ public class LambdaControlsSettingsScreen extends Screen
         // Gameplay options
         this.front_block_placing_option = new SpruceBooleanOption("lambdacontrols.menu.front_block_placing", game_options -> this.mod.config.has_front_block_placing(),
                 (game_options, new_value) -> this.mod.config.set_front_block_placing(new_value), new TranslatableText("lambdacontrols.tooltip.front_block_placing"));
+        this.fly_drifting_option = new SpruceBooleanOption("lambdacontrols.menu.fly_drifting", game_options -> this.mod.config.has_fly_drifting(),
+                (game_options, new_value) -> this.mod.config.set_fly_drifting(new_value), new TranslatableText("lambdacontrols.tooltip.fly_drifting"));
         // Controller options
         this.controller_option = new CyclingOption("lambdacontrols.menu.controller", (game_options, amount) -> {
             int current_id = this.mod.config.get_controller().get_id();
@@ -210,6 +213,7 @@ public class LambdaControlsSettingsScreen extends Screen
         // Gameplay options
         this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.gameplay", true, null));
         this.list.addSingleOptionEntry(this.front_block_placing_option);
+        this.list.addSingleOptionEntry(this.fly_drifting_option);
         // Controller options
         this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.controller", true, null));
         this.list.addSingleOptionEntry(this.controller_option);

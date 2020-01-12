@@ -13,7 +13,10 @@ auto_switch_mode = false
 
 # Gameplay settings
 [gameplay]
+    # Enables front block placing like in Bedrock Edition.
     front_block_placing = false
+    # Enables fly drifting.
+    fly_drifting = false
 
 # Controller settings
 [controller]

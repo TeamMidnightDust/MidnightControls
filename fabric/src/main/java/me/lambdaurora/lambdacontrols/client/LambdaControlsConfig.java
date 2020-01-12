@@ -40,6 +40,7 @@ public class LambdaControlsConfig
     private static final HudSide        DEFAULT_HUD_SIDE            = HudSide.LEFT;
     // Gameplay
     private static final boolean        DEFAULT_FRONT_BLOCK_PLACING = false;
+    private static final boolean        DEFAULT_FLY_DRIFTING        = false;
     // Controller
     private static final ControllerType DEFAULT_CONTROLLER_TYPE     = ControllerType.DEFAULT;
     private static final double         DEFAULT_DEAD_ZONE           = 0.25;
@@ -123,6 +124,7 @@ public class LambdaControlsConfig
         this.set_hud_side(DEFAULT_HUD_SIDE);
         // Gameplay
         this.set_front_block_placing(DEFAULT_FRONT_BLOCK_PLACING);
+        this.set_fly_drifting(DEFAULT_FLY_DRIFTING);
         // Controller
         this.set_controller_type(DEFAULT_CONTROLLER_TYPE);
         this.set_dead_zone(DEFAULT_DEAD_ZONE);
@@ -242,6 +244,26 @@ public class LambdaControlsConfig
     public void set_front_block_placing(boolean enable)
     {
         this.config.set("gameplay.front_block_placing", enable);
+    }
+
+    /**
+     * Returns whether fly drifting is enabled or not.
+     *
+     * @return True if fly drifting is enabled, else false.
+     */
+    public boolean has_fly_drifting()
+    {
+        return this.config.getOrElse("gameplay.fly_drifting", DEFAULT_FLY_DRIFTING);
+    }
+
+    /**
+     * Sets whether fly drifting is enabled or not.
+     *
+     * @param fly_drifting True if fly drifting is enabled, else false.
+     */
+    public void set_fly_drifting(boolean fly_drifting)
+    {
+        this.config.set("gameplay.fly_drifting", fly_drifting);
     }
 
     /*

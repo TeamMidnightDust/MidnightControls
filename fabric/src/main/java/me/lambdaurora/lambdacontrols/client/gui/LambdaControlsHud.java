@@ -30,7 +30,7 @@ public class LambdaControlsHud extends DrawableHelper
     private final MinecraftClient      client;
     private final LambdaControlsClient mod;
     private       int                  width_bottom = 0;
-    private       int             width_top    = 0;
+    private       int                  width_top    = 0;
 
     public LambdaControlsHud(@NotNull MinecraftClient client, @NotNull LambdaControlsClient mod)
     {

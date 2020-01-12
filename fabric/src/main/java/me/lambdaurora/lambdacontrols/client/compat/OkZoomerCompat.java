@@ -13,8 +13,6 @@ import io.github.joaoh1.okzoomer.OkZoomer;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.InputManager;
-import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
-import org.aperlambda.lambdacommon.utils.LambdaReflection;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 

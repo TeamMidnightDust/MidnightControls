@@ -5,6 +5,7 @@
   "client": [
     "AbstractButtonWidgetAccessor",
     "AbstractContainerScreenMixin",
+    "ClientPlayerEntityMixin",
     "ControlsOptionsScreenMixin",
     "CreativeInventoryScreenAccessor",
     "EntryListWidgetAccessor",
