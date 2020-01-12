@@ -17,16 +17,6 @@ repositories {
     repositories {
         maven { url = "https://jitpack.io" }
     }
-    // SpruceUI
-    ivy {
-        url 'https://github.com/LambdAurora/SpruceUI/releases/download/'
-        patternLayout {
-            artifact 'v[revision]/[module]-[revision]-fabric1.15.[ext]'
-        }
-        metadataSources() {
-            artifact()
-        }
-    }
     // OkZoomer
     ivy {
         url 'https://github.com/joaoh1/OkZoomer/releases/download/'
@@ -49,8 +39,8 @@ dependencies {
     modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     modCompile "io.github.prospector:modmenu:1.8.0+build.16"
-    modCompile "me.lambdaurora:spruceui:${project.spruceui_version}"
-    include "me.lambdaurora:spruceui:${project.spruceui_version}"
+    modCompile "com.github.lambdaurora:spruceui:${project.spruceui_version}"
+    include "com.github.lambdaurora:spruceui:${project.spruceui_version}"
     //modCompile "io.github.cottonmc:cotton-client-commands:0.4.2+1.14.3-SNAPSHOT"
 
     // Compatibility mods
