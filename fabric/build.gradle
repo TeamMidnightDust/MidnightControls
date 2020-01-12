@@ -21,7 +21,7 @@ repositories {
     ivy {
         url 'https://github.com/LambdAurora/SpruceUI/releases/download/'
         patternLayout {
-            artifact '[revision]/[module]-[version]-fabric1.15.[ext]'
+            artifact '[revision]/[module]-[revision]-fabric1.15.[ext]'
         }
         metadataSources() {
             artifact()
@@ -31,7 +31,7 @@ repositories {
     ivy {
         url 'https://github.com/joaoh1/OkZoomer/releases/download/'
         patternLayout {
-            artifact '[revision]/[module]-[version].[ext]'
+            artifact '[revision]/[module]-[revision].[ext]'
         }
         metadataSources() {
             artifact()
