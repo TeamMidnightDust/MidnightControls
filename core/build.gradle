@@ -2,6 +2,8 @@ plugins {
     id 'java-library'
 }
 
+archivesBaseName = project.archives_base_name + "-core"
+
 dependencies {
     api "org.jetbrains:annotations:17.0.0"
     api "org.aperlambda:lambdajcommon:1.7.2"

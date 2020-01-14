@@ -30,9 +30,8 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 {
     private boolean lambdacontrols_drifting_prevented = false;
 
-    // Can be mapped as `hasMovementInput` for example.
     @Shadow
-    protected abstract boolean method_22120();
+    protected abstract boolean hasMovementInput();
 
     public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile)
     {
@@ -45,7 +44,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         LambdaControlsClient mod = LambdaControlsClient.get();
         if (type == MovementType.SELF) {
             if (this.abilities.flying && !mod.config.has_fly_drifting()) {
-                if (!this.method_22120()) {
+                if (!this.hasMovementInput()) {
                     if (!this.lambdacontrols_drifting_prevented) {
                         this.setVelocity(this.getVelocity().multiply(0, 1.0, 0));
                     }

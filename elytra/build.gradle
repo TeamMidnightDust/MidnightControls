@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    api project(":common")
+    api project(":core")
     implementation "org.mcelytra:elytra-core:1.0.0-SNAPSHOT"
 }
 

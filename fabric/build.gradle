@@ -29,6 +29,10 @@ repositories {
     }
 }
 
+configurations {
+    shadow
+}
+
 dependencies {
     //to change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -46,8 +50,8 @@ dependencies {
     // Compatibility mods
     modCompile "io.github.joaoh1:okzoomer:2.0.1"
 
-    api project(":common")
-    include project(":common")
+    api project(":core")
+    shadow project(":core")
     include "org.jetbrains:annotations:17.0.0"
     include "org.aperlambda:lambdajcommon:1.7.2"
     include "com.electronwill.night-config:core:3.5.3"
@@ -74,4 +78,12 @@ java {
 
 jar {
     from "../LICENSE"
+
+    from {
+        configurations.shadow.filter {
+            it.getName().contains("lambdacontrols")
+        }.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
 }
