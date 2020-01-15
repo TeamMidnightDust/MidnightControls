@@ -45,7 +45,6 @@ dependencies {
     modCompile "io.github.prospector:modmenu:1.8.0+build.16"
     modCompile "com.github.lambdaurora:spruceui:${project.spruceui_version}"
     include "com.github.lambdaurora:spruceui:${project.spruceui_version}"
-    //modCompile "io.github.cottonmc:cotton-client-commands:0.4.2+1.14.3-SNAPSHOT"
 
     // Compatibility mods
     modCompile "io.github.joaoh1:okzoomer:2.0.1"
