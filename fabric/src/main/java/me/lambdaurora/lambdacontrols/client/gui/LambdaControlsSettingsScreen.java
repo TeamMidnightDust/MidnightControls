@@ -55,6 +55,7 @@ public class LambdaControlsSettingsScreen extends Screen
     private final       Option               dead_zone_option;
     private final       Option               inverts_right_x_axis;
     private final       Option               inverts_right_y_axis;
+    private final       Option               unfocused_input_option;
     // Hud options
     private final       Option               hud_enable_option;
     private final       Option               hud_side_option;
@@ -70,7 +71,7 @@ public class LambdaControlsSettingsScreen extends Screen
         this.hide_controls = hide_controls;
         // General options
         this.auto_switch_mode_option = new SpruceBooleanOption("lambdacontrols.menu.auto_switch_mode", game_options -> this.mod.config.has_auto_switch_mode(),
-                (game_options, new_value) -> this.mod.config.set_auto_switch_mode(new_value), new TranslatableText("lambdacontrols.tooltip.auto_switch_mode"));
+                (game_options, new_value) -> this.mod.config.set_auto_switch_mode(new_value), new TranslatableText("lambdacontrols.tooltip.auto_switch_mode"), true);
         this.rotation_speed_option = new SpruceDoubleOption("lambdacontrols.menu.rotation_speed", 0.0, 150.0, 0.5F, game_options -> this.mod.config.get_rotation_speed(),
                 (game_options, new_value) -> {
                     synchronized (this.mod.config) {
@@ -92,9 +93,9 @@ public class LambdaControlsSettingsScreen extends Screen
         });
         // Gameplay options
         this.front_block_placing_option = new SpruceBooleanOption("lambdacontrols.menu.front_block_placing", game_options -> this.mod.config.has_front_block_placing(),
-                (game_options, new_value) -> this.mod.config.set_front_block_placing(new_value), new TranslatableText("lambdacontrols.tooltip.front_block_placing"));
+                (game_options, new_value) -> this.mod.config.set_front_block_placing(new_value), new TranslatableText("lambdacontrols.tooltip.front_block_placing"), true);
         this.fly_drifting_option = new SpruceBooleanOption("lambdacontrols.menu.fly_drifting", game_options -> this.mod.config.has_fly_drifting(),
-                (game_options, new_value) -> this.mod.config.set_fly_drifting(new_value), new TranslatableText("lambdacontrols.tooltip.fly_drifting"));
+                (game_options, new_value) -> this.mod.config.set_fly_drifting(new_value), new TranslatableText("lambdacontrols.tooltip.fly_drifting"), true);
         // Controller options
         this.controller_option = new CyclingOption("lambdacontrols.menu.controller", (game_options, amount) -> {
             int current_id = this.mod.config.get_controller().get_id();
@@ -146,16 +147,18 @@ public class LambdaControlsSettingsScreen extends Screen
                     synchronized (this.mod.config) {
                         this.mod.config.set_invert_right_x_axis(new_value);
                     }
-                }, null);
+                }, null, true);
         this.inverts_right_y_axis = new SpruceBooleanOption("lambdacontrols.menu.invert_right_y_axis", game_options -> this.mod.config.does_invert_right_y_axis(),
                 (game_options, new_value) -> {
                     synchronized (this.mod.config) {
                         this.mod.config.set_invert_right_y_axis(new_value);
                     }
-                }, null);
+                }, null, true);
+        this.unfocused_input_option = new SpruceBooleanOption("lambdacontrols.menu.unfocused_input", (game_options) -> this.mod.config.has_unfocused_input(),
+                (game_options, new_value) -> this.mod.config.set_unfocused_input(new_value), new TranslatableText("lambdacontrols.tooltip.unfocused_input"), true);
         // HUD options
         this.hud_enable_option = new SpruceBooleanOption("lambdacontrols.menu.hud_enable", (game_options) -> this.mod.config.is_hud_enabled(),
-                (game_options, new_value) -> this.mod.config.set_hud_enabled(new_value), new TranslatableText("lambdacontrols.tooltip.hud_enable"));
+                (game_options, new_value) -> this.mod.config.set_hud_enabled(new_value), new TranslatableText("lambdacontrols.tooltip.hud_enable"), true);
         this.hud_side_option = new SpruceCyclingOption("lambdacontrols.menu.hud_side",
                 (game_options, amount) -> this.mod.config.set_hud_side(this.mod.config.get_hud_side().next()),
                 (game_options, option) -> option.getDisplayPrefix() + this.mod.config.get_hud_side().get_translated_name(),
@@ -220,6 +223,7 @@ public class LambdaControlsSettingsScreen extends Screen
         this.list.addSingleOptionEntry(this.second_controller_option);
         this.list.addOptionEntry(this.controller_type_option, this.dead_zone_option);
         this.list.addOptionEntry(this.inverts_right_x_axis, this.inverts_right_y_axis);
+        this.list.addSingleOptionEntry(this.unfocused_input_option);
         this.list.addSingleOptionEntry(new ReloadControllerMappingsOption());
         // HUD options
         this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.hud", true, null));

@@ -36,6 +36,8 @@ auto_switch_mode = false
     invert_right_x_axis = false
     # Inverts the right Y axis.
     invert_right_y_axis = false
+    # Allow unfocused input.
+    unfocused_input = false
     # Controller controls.
     [controller.controls]
         # Attack control.

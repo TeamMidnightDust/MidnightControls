@@ -105,7 +105,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
     public void on_tick(@NotNull MinecraftClient client)
     {
         this.input.on_tick(client);
-        if (this.config.get_controls_mode() == ControlsMode.CONTROLLER)
+        if (this.config.get_controls_mode() == ControlsMode.CONTROLLER && (client.isWindowFocused() || this.config.has_unfocused_input()))
             this.input.on_controller_tick(client);
     }
 

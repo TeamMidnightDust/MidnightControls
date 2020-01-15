@@ -96,6 +96,7 @@
   "lambdacontrols.menu.title.general": "General Options",
   "lambdacontrols.menu.title.hud": "HUD Options",
   "lambdacontrols.menu.unbound": "Unbound",
+  "lambdacontrols.menu.unfocused_input": "Unfocused Input",
   "lambdacontrols.narrator.unbound": "Unbound %s",
   "lambdacontrols.not_bound": "Not bound",
   "lambdacontrols.tooltip.auto_switch_mode": "If the controls mode should be switched to Controller automatically if one is connected.",
@@ -109,5 +110,6 @@
   "lambdacontrols.tooltip.hud_side": "The position of the HUD.",
   "lambdacontrols.tooltip.mouse_speed": "The controller's emulated mouse speed.",
   "lambdacontrols.tooltip.rotation_speed": "The camera rotation speed in controller mode.",
-  "lambdacontrols.tooltip.reload_controller_mappings": "Reloads the controller mappings file."
+  "lambdacontrols.tooltip.reload_controller_mappings": "Reloads the controller mappings file.",
+  "lambdacontrols.tooltip.unfocused_input": "Allow controller input when the window is not focused."
 }

@@ -108,7 +108,7 @@ public abstract class MinecraftClientMixin
     private void lambdacontrols_on_item_use(CallbackInfo ci, Hand[] hands, int hand_count, int hand_index, Hand hand, ItemStack stack_in_hand)
     {
         LambdaControlsClient mod = LambdaControlsClient.get();
-        if (!stack_in_hand.isEmpty() && this.player.pitch > 0.0F && mod.config.has_front_block_placing()) {
+        if (!stack_in_hand.isEmpty() && this.player.pitch > 35.0F && mod.config.has_front_block_placing()) {
             if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.MISS && this.player.onGround) {
                 if (!stack_in_hand.isEmpty() && stack_in_hand.getItem() instanceof BlockItem) {
                     BlockPos player_pos = this.player.getBlockPos().down();
@@ -119,12 +119,8 @@ public abstract class MinecraftClientMixin
                     Direction direction = player.getHorizontalFacing();
 
                     BlockState adjacent_block_state = this.world.getBlockState(block_pos.offset(direction.getOpposite()));
-                    if (adjacent_block_state.isAir() || adjacent_block_state.getBlock() instanceof FluidBlock) {
-                        adjacent_block_state = this.world.getBlockState(player_pos.offset(direction.getOpposite()));
-                        if (adjacent_block_state.isAir() || adjacent_block_state.getBlock() instanceof FluidBlock)
-                            return;
-                        else
-                            block_pos = player_pos;
+                    if (adjacent_block_state.isAir() || adjacent_block_state.getBlock() instanceof FluidBlock || (vector.getX() == 0 && vector.getZ() == 0)) {
+                        return;
                     }
 
                     BlockHitResult hit_result = new BlockHitResult(this.crosshairTarget.getPos(), direction.getOpposite(), block_pos, false);

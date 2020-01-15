@@ -33,7 +33,7 @@
     "fabricloader": ">=0.4.0",
     "fabric": "*",
     "minecraft": "1.15.x",
-    "spruceui": ">=1.0.3"
+    "spruceui": ">=1.1.0"
   },
   "recommends": {
     "modmenu": ">=1.8.0+build.16",

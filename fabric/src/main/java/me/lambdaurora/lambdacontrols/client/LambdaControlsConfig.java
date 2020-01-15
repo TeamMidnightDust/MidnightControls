@@ -46,6 +46,7 @@ public class LambdaControlsConfig
     private static final double         DEFAULT_DEAD_ZONE           = 0.25;
     private static final double         DEFAULT_ROTATION_SPEED      = 40.0;
     private static final double         DEFAULT_MOUSE_SPEED         = 25.0;
+    private static final boolean        DEFAULT_UNFOCUSED_INPUT     = false;
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
 
@@ -60,6 +61,7 @@ public class LambdaControlsConfig
     private         double               dead_zone;
     private         double               rotation_speed;
     private         double               mouse_speed;
+    private         boolean              unfocused_input;
 
     public LambdaControlsConfig(@NotNull LambdaControlsClient mod)
     {
@@ -83,6 +85,7 @@ public class LambdaControlsConfig
         this.dead_zone = this.config.getOrElse("controller.dead_zone", DEFAULT_DEAD_ZONE);
         this.rotation_speed = this.config.getOrElse("controller.rotation_speed", DEFAULT_ROTATION_SPEED);
         this.mouse_speed = this.config.getOrElse("controller.mouse_speed", DEFAULT_MOUSE_SPEED);
+        this.unfocused_input = this.config.getOrElse("controller.unfocused_input", DEFAULT_UNFOCUSED_INPUT);
         // Controller controls.
         InputManager.load_button_bindings(this);
     }
@@ -95,6 +98,7 @@ public class LambdaControlsConfig
         this.config.set("controller.dead_zone", this.dead_zone);
         this.config.set("controller.rotation_speed", this.rotation_speed);
         this.config.set("controller.mouse_speed", this.mouse_speed);
+        this.config.set("controller.unfocused_input", this.unfocused_input);
         this.config.save();
         this.mod.log("Configuration saved.");
     }
@@ -130,6 +134,7 @@ public class LambdaControlsConfig
         this.set_dead_zone(DEFAULT_DEAD_ZONE);
         this.set_rotation_speed(DEFAULT_ROTATION_SPEED);
         this.set_mouse_speed(DEFAULT_MOUSE_SPEED);
+        this.set_unfocused_input(DEFAULT_UNFOCUSED_INPUT);
 
         // Collect prevents concurrent modification.
         InputManager.stream_bindings().collect(Collectors.toList()).forEach(binding -> this.set_button_binding(binding, binding.get_default_button()));
@@ -443,6 +448,26 @@ public class LambdaControlsConfig
     public void set_invert_right_y_axis(boolean invert)
     {
         this.config.set("controller.invert_right_y_axis", invert);
+    }
+
+    /**
+     * Returns whether unfocused controller input is allowed or not.
+     *
+     * @return True if unfocused controller input is allowed, else false.
+     */
+    public boolean has_unfocused_input()
+    {
+        return this.unfocused_input;
+    }
+
+    /**
+     * Sets whether unfocused controller input is allowed or not.
+     *
+     * @param unfocused_input True if unfocused controller input is allowed, else false.
+     */
+    public void set_unfocused_input(boolean unfocused_input)
+    {
+        this.unfocused_input = unfocused_input;
     }
 
     /**
