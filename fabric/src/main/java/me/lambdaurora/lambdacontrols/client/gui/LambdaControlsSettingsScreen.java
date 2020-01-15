@@ -71,14 +71,14 @@ public class LambdaControlsSettingsScreen extends Screen
         // General options
         this.auto_switch_mode_option = new SpruceBooleanOption("lambdacontrols.menu.auto_switch_mode", game_options -> this.mod.config.has_auto_switch_mode(),
                 (game_options, new_value) -> this.mod.config.set_auto_switch_mode(new_value), new TranslatableText("lambdacontrols.tooltip.auto_switch_mode"));
-        this.rotation_speed_option = new SpruceDoubleOption("lambdacontrols.menu.rotation_speed", 0.0, 50.0, 0.5F, game_options -> this.mod.config.get_rotation_speed(),
+        this.rotation_speed_option = new SpruceDoubleOption("lambdacontrols.menu.rotation_speed", 0.0, 150.0, 0.5F, game_options -> this.mod.config.get_rotation_speed(),
                 (game_options, new_value) -> {
                     synchronized (this.mod.config) {
                         this.mod.config.set_rotation_speed(new_value);
                     }
                 }, (game_options, option) -> option.getDisplayPrefix() + option.get(options),
                 new TranslatableText("lambdacontrols.tooltip.rotation_speed"));
-        this.mouse_speed_option = new SpruceDoubleOption("lambdacontrols.menu.mouse_speed", 0.0, 50.0, 0.5F, game_options -> this.mod.config.get_mouse_speed(),
+        this.mouse_speed_option = new SpruceDoubleOption("lambdacontrols.menu.mouse_speed", 0.0, 150.0, 0.5F, game_options -> this.mod.config.get_mouse_speed(),
                 (game_options, new_value) -> {
                     synchronized (this.mod.config) {
                         this.mod.config.set_mouse_speed(new_value);
