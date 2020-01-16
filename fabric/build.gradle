@@ -86,3 +86,5 @@ jar {
         }
     }
 }
+
+build.dependsOn(":core:build")
