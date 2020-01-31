@@ -47,13 +47,13 @@ public enum ControlsMode implements Nameable
      * @return The translated key of this controls mode.
      * @since 1.1.0
      */
-    public String get_translation_key()
+    public String getTranslationKey()
     {
-        return "lambdacontrols.controls_mode." + this.get_name();
+        return "lambdacontrols.controls_mode." + this.getName();
     }
 
     @Override
-    public @NotNull String get_name()
+    public @NotNull String getName()
     {
         return this.name().toLowerCase();
     }
@@ -64,8 +64,8 @@ public enum ControlsMode implements Nameable
      * @param id The identifier of the controls mode.
      * @return The controls mode if found, else empty.
      */
-    public static Optional<ControlsMode> by_id(@NotNull String id)
+    public static Optional<ControlsMode> byId(@NotNull String id)
     {
-        return Arrays.stream(values()).filter(mode -> mode.get_name().equalsIgnoreCase(id)).findFirst();
+        return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();
     }
 }

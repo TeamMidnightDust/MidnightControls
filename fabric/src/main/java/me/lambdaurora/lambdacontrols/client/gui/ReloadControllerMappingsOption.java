@@ -36,19 +36,19 @@ public class ReloadControllerMappingsOption extends Option implements Nameable
     @Override
     public AbstractButtonWidget createButton(GameOptions options, int x, int y, int width)
     {
-        SpruceButtonWidget button = new SpruceButtonWidget(x, y, width, 20, this.get_name(), btn -> {
+        SpruceButtonWidget button = new SpruceButtonWidget(x, y, width, 20, this.getName(), btn -> {
             MinecraftClient client = MinecraftClient.getInstance();
-            Controller.update_mappings();
+            Controller.updateMappings();
             if (client.currentScreen != null)
                 client.currentScreen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
             client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, new TranslatableText("lambdacontrols.controller.mappings.updated"), null));
         });
-        button.set_tooltip(new TranslatableText("lambdacontrols.tooltip.reload_controller_mappings"));
+        button.setTooltip(new TranslatableText("lambdacontrols.tooltip.reload_controller_mappings"));
         return button;
     }
 
     @Override
-    public @NotNull String get_name()
+    public @NotNull String getName()
     {
         return I18n.translate(KEY);
     }

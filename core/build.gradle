@@ -6,7 +6,7 @@ archivesBaseName = project.archives_base_name + "-core"
 
 dependencies {
     api "org.jetbrains:annotations:17.0.0"
-    api "org.aperlambda:lambdajcommon:1.7.2"
+    api "org.aperlambda:lambdajcommon:1.8.0"
     api "com.electronwill.night-config:core:3.5.3"
     api "com.electronwill.night-config:toml:3.5.3"
 }

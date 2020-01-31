@@ -43,21 +43,21 @@ public class ButtonCategory implements Identifiable
         this(id, 100);
     }
 
-    public void register_binding(@NotNull ButtonBinding binding)
+    public void registerBinding(@NotNull ButtonBinding binding)
     {
         if (this.bindings.contains(binding))
             throw new IllegalStateException("Cannot register twice a button binding in the same category.");
         this.bindings.add(binding);
     }
 
-    public void register_all_bindings(@NotNull ButtonBinding... bindings)
+    public void registerAllBindings(@NotNull ButtonBinding... bindings)
     {
-        this.register_all_bindings(Arrays.asList(bindings));
+        this.registerAllBindings(Arrays.asList(bindings));
     }
 
-    public void register_all_bindings(@NotNull List<ButtonBinding> bindings)
+    public void registerAllBindings(@NotNull List<ButtonBinding> bindings)
     {
-        bindings.forEach(this::register_binding);
+        bindings.forEach(this::registerBinding);
     }
 
     /**
@@ -65,7 +65,7 @@ public class ButtonCategory implements Identifiable
      *
      * @return The bindings assigned to this category.
      */
-    public @NotNull List<ButtonBinding> get_bindings()
+    public @NotNull List<ButtonBinding> getBindings()
     {
         return Collections.unmodifiableList(this.bindings);
     }
@@ -77,12 +77,12 @@ public class ButtonCategory implements Identifiable
      *
      * @return The translated name.
      */
-    public @NotNull String get_translated_name()
+    public @NotNull String getTranslatedName()
     {
-        if (this.id.get_namespace().equals("minecraft"))
-            return I18n.translate(this.id.get_name());
+        if (this.id.getNamespace().equals("minecraft"))
+            return I18n.translate(this.id.getName());
         else
-            return I18n.translate(this.id.get_namespace() + "." + this.id.get_name());
+            return I18n.translate(this.id.getNamespace() + "." + this.id.getName());
     }
 
     /**
@@ -91,13 +91,13 @@ public class ButtonCategory implements Identifiable
      *
      * @return The priority of this category.
      */
-    public int get_priority()
+    public int getPriority()
     {
         return this.priority;
     }
 
     @Override
-    public @NotNull Identifier get_identifier()
+    public @NotNull Identifier getIdentifier()
     {
         return this.id;
     }

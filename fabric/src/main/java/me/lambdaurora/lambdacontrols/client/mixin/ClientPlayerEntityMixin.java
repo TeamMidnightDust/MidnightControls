@@ -11,11 +11,14 @@ package me.lambdaurora.lambdacontrols.client.mixin;
 
 import com.mojang.authlib.GameProfile;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.input.Input;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Vec3d;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,10 +31,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientPlayerEntity.class)
 public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 {
-    private boolean lambdacontrols_drifting_prevented = false;
+    private boolean lambdacontrols_driftingPrevented = false;
 
     @Shadow
     protected abstract boolean hasMovementInput();
+
+    @Shadow
+    @Final
+    protected MinecraftClient client;
+
+    @Shadow
+    public Input input;
+
+    @Shadow
+    protected abstract boolean isCamera();
 
     public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile)
     {
@@ -43,14 +56,36 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     {
         LambdaControlsClient mod = LambdaControlsClient.get();
         if (type == MovementType.SELF) {
-            if (this.abilities.flying && !mod.config.has_fly_drifting()) {
+            if (this.abilities.flying && (!mod.config.hasFlyDrifting() || !mod.config.hasFlyVerticalDrifting())) {
                 if (!this.hasMovementInput()) {
-                    if (!this.lambdacontrols_drifting_prevented) {
-                        this.setVelocity(this.getVelocity().multiply(0, 1.0, 0));
+                    if (!this.lambdacontrols_driftingPrevented) {
+                        if (!mod.config.hasFlyDrifting())
+                            this.setVelocity(this.getVelocity().multiply(0, 1.0, 0));
                     }
-                    this.lambdacontrols_drifting_prevented = true;
+                    this.lambdacontrols_driftingPrevented = true;
                 } else
-                    this.lambdacontrols_drifting_prevented = false;
+                    this.lambdacontrols_driftingPrevented = false;
+            }
+        }
+    }
+
+    @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isCamera()Z"))
+    public void lambdacontrols_tickMovement(CallbackInfo ci)
+    {
+        if (this.abilities.flying && this.isCamera()) {
+            if (LambdaControlsClient.get().config.hasFlyVerticalDrifting())
+                return;
+            int moving = 0;
+            if (this.input.sneaking) {
+                --moving;
+            }
+
+            if (this.input.jumping) {
+                ++moving;
+            }
+
+            if (moving == 0) {
+                this.setVelocity(this.getVelocity().multiply(1.0, 0.0, 1.0));
             }
         }
     }

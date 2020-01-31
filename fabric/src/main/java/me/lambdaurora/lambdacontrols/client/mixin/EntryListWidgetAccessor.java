@@ -17,5 +17,5 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface EntryListWidgetAccessor
 {
     @Invoker("moveSelection")
-    void lambdacontrols_move_selection(int amount);
+    void lambdacontrols_moveSelection(int amount);
 }

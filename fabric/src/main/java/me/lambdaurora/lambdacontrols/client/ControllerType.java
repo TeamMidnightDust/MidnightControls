@@ -44,7 +44,7 @@ public enum ControllerType implements Nameable
      *
      * @return The controller type's identifier.
      */
-    public int get_id()
+    public int getId()
     {
         return this.id;
     }
@@ -67,13 +67,13 @@ public enum ControllerType implements Nameable
      *
      * @return The translated name of this controller type.
      */
-    public String get_translated_name()
+    public String getTranslatedName()
     {
-        return I18n.translate("lambdacontrols.controller_type." + this.get_name());
+        return I18n.translate("lambdacontrols.controller_type." + this.getName());
     }
 
     @Override
-    public @NotNull String get_name()
+    public @NotNull String getName()
     {
         return this.name().toLowerCase();
     }
@@ -84,8 +84,8 @@ public enum ControllerType implements Nameable
      * @param id The identifier of the controller type.
      * @return The controller type if found, else empty.
      */
-    public static Optional<ControllerType> by_id(@NotNull String id)
+    public static Optional<ControllerType> byId(@NotNull String id)
     {
-        return Arrays.stream(values()).filter(mode -> mode.get_name().equalsIgnoreCase(id)).findFirst();
+        return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();
     }
 }

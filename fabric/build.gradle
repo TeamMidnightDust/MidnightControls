@@ -42,17 +42,20 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modCompile "io.github.prospector:modmenu:1.8.0+build.16"
+    modCompile "io.github.prospector:modmenu:1.8.5+build.23"
     modCompile "com.github.lambdaurora:spruceui:${project.spruceui_version}"
     include "com.github.lambdaurora:spruceui:${project.spruceui_version}"
 
     // Compatibility mods
-    modCompile "io.github.joaoh1:okzoomer:2.0.1"
+    modCompile "io.github.joaoh1:okzoomer:2.1.0-beta.2"
 
     api project(":core")
     shadow project(":core")
     include "org.jetbrains:annotations:17.0.0"
-    include "org.aperlambda:lambdajcommon:1.7.2"
+    include("org.aperlambda:lambdajcommon:1.8.0")  {
+        exclude group: 'com.google.code.gson'
+        exclude group: 'com.google.guava'
+    }
     include "com.electronwill.night-config:core:3.5.3"
     include "com.electronwill.night-config:toml:3.5.3"
 }

@@ -12,7 +12,6 @@ package me.lambdaurora.lambdacontrols.client.mixin;
 import me.lambdaurora.lambdacontrols.client.util.KeyBindingAccessor;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -29,19 +28,13 @@ public class KeyBindingMixin implements KeyBindingAccessor
     private boolean pressed;
 
     @Override
-    public @NotNull InputUtil.KeyCode get_key_code()
-    {
-        return this.keyCode;
-    }
-
-    @Override
     public boolean lambdacontrols_press()
     {
-        boolean old_pressed = this.pressed;
+        boolean oldPressed = this.pressed;
         if (!this.pressed)
             this.pressed = true;
         ++this.timesPressed;
-        return old_pressed != this.pressed;
+        return oldPressed != this.pressed;
     }
 
     @Override

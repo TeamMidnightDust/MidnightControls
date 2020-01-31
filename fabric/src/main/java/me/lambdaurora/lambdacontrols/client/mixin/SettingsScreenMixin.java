@@ -11,7 +11,7 @@ package me.lambdaurora.lambdacontrols.client.mixin;
 
 import me.lambdaurora.lambdacontrols.ControlsMode;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
-import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsControlsScreen;
+import me.lambdaurora.lambdacontrols.client.gui.ControllerControlsScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.SettingsScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
@@ -33,11 +33,11 @@ public class SettingsScreenMixin extends Screen
     }
 
     @Redirect(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/SettingsScreen;addButton(Lnet/minecraft/client/gui/widget/AbstractButtonWidget;)Lnet/minecraft/client/gui/widget/AbstractButtonWidget;", ordinal = 7))
-    private AbstractButtonWidget on_init(SettingsScreen screen, AbstractButtonWidget btn)
+    private AbstractButtonWidget lambdacontrols_onInit(SettingsScreen screen, AbstractButtonWidget btn)
     {
-        if (LambdaControlsClient.get().config.get_controls_mode() == ControlsMode.CONTROLLER) {
-            return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).lambdacontrols_get_height(), btn.getMessage(),
-                    b -> this.minecraft.openScreen(new LambdaControlsControlsScreen(this, false))));
+        if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER) {
+            return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).lambdacontrols_getHeight(), btn.getMessage(),
+                    b -> this.minecraft.openScreen(new ControllerControlsScreen(this, false))));
         } else {
             return this.addButton(btn);
         }

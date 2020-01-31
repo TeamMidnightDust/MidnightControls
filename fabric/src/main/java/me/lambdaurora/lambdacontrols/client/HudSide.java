@@ -46,13 +46,13 @@ public enum HudSide implements Nameable
      *
      * @return The translated name of this hud side.
      */
-    public String get_translated_name()
+    public String getTranslatedName()
     {
-        return I18n.translate("lambdacontrols.hud_side." + this.get_name());
+        return I18n.translate("lambdacontrols.hud_side." + this.getName());
     }
 
     @Override
-    public @NotNull String get_name()
+    public @NotNull String getName()
     {
         return this.name().toLowerCase();
     }
@@ -63,8 +63,8 @@ public enum HudSide implements Nameable
      * @param id The identifier of the hud side.
      * @return The hud side if found, else empty.
      */
-    public static Optional<HudSide> by_id(@NotNull String id)
+    public static Optional<HudSide> byId(@NotNull String id)
     {
-        return Arrays.stream(values()).filter(mode -> mode.get_name().equalsIgnoreCase(id)).findFirst();
+        return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();
     }
 }

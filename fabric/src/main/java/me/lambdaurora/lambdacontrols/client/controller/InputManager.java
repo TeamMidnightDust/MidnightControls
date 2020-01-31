@@ -9,11 +9,17 @@
 
 package me.lambdaurora.lambdacontrols.client.controller;
 
+import me.lambdaurora.lambdacontrols.ControlsMode;
 import me.lambdaurora.lambdacontrols.client.ButtonState;
+import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsConfig;
+import me.lambdaurora.lambdacontrols.client.util.MouseAccessor;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.Identifier;
+import org.aperlambda.lambdacommon.utils.function.PairPredicate;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -29,9 +35,67 @@ import java.util.stream.Stream;
  */
 public class InputManager
 {
-    private static final List<ButtonBinding>       BINDINGS   = new ArrayList<>();
-    private static final List<ButtonCategory>      CATEGORIES = new ArrayList<>();
-    public static final  Map<Integer, ButtonState> STATES     = new HashMap<>();
+    public static final  InputManager              INPUT_MANAGER    = new InputManager();
+    private static final List<ButtonBinding>       BINDINGS         = new ArrayList<>();
+    private static final List<ButtonCategory>      CATEGORIES       = new ArrayList<>();
+    public static final  Map<Integer, ButtonState> STATES           = new HashMap<>();
+    private              int                       prevTargetMouseX = 0;
+    private              int                       prevTargetMouseY = 0;
+    private              int                       targetMouseX     = 0;
+    private              int                       targetMouseY     = 0;
+
+    protected InputManager()
+    {
+    }
+
+    public void tick(@NotNull MinecraftClient client)
+    {
+        if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER) {
+            this.controllerTick(client);
+        }
+    }
+
+    public void controllerTick(@NotNull MinecraftClient client)
+    {
+        this.prevTargetMouseX = this.targetMouseX;
+        this.prevTargetMouseY = this.targetMouseY;
+    }
+
+    /**
+     * Updates the mouse position. Should only be called on pre render of a screen.
+     *
+     * @param client The client instance.
+     */
+    public void updateMousePosition(@NotNull MinecraftClient client)
+    {
+        Objects.requireNonNull(client, "Client instance cannot be null.");
+        if (this.prevTargetMouseX != this.targetMouseX || this.prevTargetMouseY != this.targetMouseY) {
+            double mouseX = this.prevTargetMouseX + (this.targetMouseX - this.prevTargetMouseX) * client.getTickDelta() + 0.5;
+            double mouseY = this.prevTargetMouseY + (this.targetMouseY - this.prevTargetMouseY) * client.getTickDelta() + 0.5;
+            GLFW.glfwSetCursorPos(client.getWindow().getHandle(), mouseX, mouseY);
+            ((MouseAccessor) client.mouse).lambdacontrols_onCursorPos(client.getWindow().getHandle(), mouseX, mouseY);
+        }
+    }
+
+    /**
+     * Resets the mouse position.
+     *
+     * @param windowWidth  The window width.
+     * @param windowHeight The window height.
+     */
+    public void resetMousePosition(int windowWidth, int windowHeight)
+    {
+        this.targetMouseX = this.prevTargetMouseX = (int) (windowWidth / 2.F);
+        this.targetMouseY = this.prevTargetMouseY = (int) (windowHeight / 2.F);
+    }
+
+    public void resetMouseTarget(@NotNull MinecraftClient client)
+    {
+        double mouseX = client.mouse.getX();
+        double mouseY = client.mouse.getY();
+        this.prevTargetMouseX = this.targetMouseX = (int) mouseX;
+        this.prevTargetMouseY = this.targetMouseY = (int) mouseY;
+    }
 
     /**
      * Returns whether the specified binding is registered or not.
@@ -39,7 +103,7 @@ public class InputManager
      * @param binding The binding to check.
      * @return True if the binding is registered, else false.
      */
-    public static boolean has_binding(@NotNull ButtonBinding binding)
+    public static boolean hasBinding(@NotNull ButtonBinding binding)
     {
         return BINDINGS.contains(binding);
     }
@@ -50,9 +114,9 @@ public class InputManager
      * @param name The name of the binding to check.
      * @return True if the binding is registered, else false.
      */
-    public static boolean has_binding(@NotNull String name)
+    public static boolean hasBinding(@NotNull String name)
     {
-        return BINDINGS.parallelStream().map(ButtonBinding::get_name).anyMatch(binding -> binding.equalsIgnoreCase(name));
+        return BINDINGS.parallelStream().map(ButtonBinding::getName).anyMatch(binding -> binding.equalsIgnoreCase(name));
     }
 
     /**
@@ -61,9 +125,9 @@ public class InputManager
      * @param identifier The identifier of the binding to check.
      * @return True if the binding is registered, else false.
      */
-    public static boolean has_binding(@NotNull Identifier identifier)
+    public static boolean hasBinding(@NotNull Identifier identifier)
     {
-        return has_binding(identifier.get_namespace() + "." + identifier.get_name());
+        return hasBinding(identifier.getNamespace() + "." + identifier.getName());
     }
 
     /**
@@ -72,44 +136,44 @@ public class InputManager
      * @param binding The binding to register.
      * @return The registered binding.
      */
-    public static @NotNull ButtonBinding register_binding(@NotNull ButtonBinding binding)
+    public static @NotNull ButtonBinding registerBinding(@NotNull ButtonBinding binding)
     {
-        if (has_binding(binding))
+        if (hasBinding(binding))
             throw new IllegalStateException("Cannot register twice a button binding in the registry.");
         BINDINGS.add(binding);
         return binding;
     }
 
-    public static @NotNull ButtonBinding register_binding(@NotNull Identifier binding_id, int[] default_button, @NotNull List<PressAction> actions, boolean has_cooldown)
+    public static @NotNull ButtonBinding registerBinding(@NotNull Identifier id, int[] defaultButton, @NotNull List<PressAction> actions, @NotNull PairPredicate<MinecraftClient, ButtonBinding> filter, boolean hasCooldown)
     {
-        return register_binding(new ButtonBinding(binding_id.get_namespace() + "." + binding_id.get_name(), default_button, actions, has_cooldown));
+        return registerBinding(new ButtonBinding(id.getNamespace() + "." + id.getName(), defaultButton, actions, filter, hasCooldown));
     }
 
-    public static @NotNull ButtonBinding register_binding(@NotNull Identifier binding_id, int[] default_button, boolean has_cooldown)
+    public static @NotNull ButtonBinding registerBinding(@NotNull Identifier id, int[] defaultButton, boolean hasCooldown)
     {
-        return register_binding(binding_id, default_button, Collections.emptyList(), has_cooldown);
+        return registerBinding(id, defaultButton, Collections.emptyList(), InputHandlers::always, hasCooldown);
     }
 
-    public static @NotNull ButtonBinding register_binding(@NotNull net.minecraft.util.Identifier binding_id, int[] default_button, @NotNull List<PressAction> actions, boolean has_cooldown)
+    public static @NotNull ButtonBinding registerBinding(@NotNull net.minecraft.util.Identifier id, int[] defaultButton, @NotNull List<PressAction> actions, @NotNull PairPredicate<MinecraftClient, ButtonBinding> filter, boolean hasCooldown)
     {
-        return register_binding(new Identifier(binding_id.getNamespace(), binding_id.getPath()), default_button, actions, has_cooldown);
+        return registerBinding(new Identifier(id.getNamespace(), id.getPath()), defaultButton, actions, filter, hasCooldown);
     }
 
-    public static @NotNull ButtonBinding register_binding(@NotNull net.minecraft.util.Identifier binding_id, int[] default_button, boolean has_cooldown)
+    public static @NotNull ButtonBinding registerBinding(@NotNull net.minecraft.util.Identifier id, int[] defaultButton, boolean hasCooldown)
     {
-        return register_binding(binding_id, default_button, Collections.emptyList(), has_cooldown);
+        return registerBinding(id, defaultButton, Collections.emptyList(), InputHandlers::always, hasCooldown);
     }
 
     /**
      * Sorts bindings to get bindings with the higher button counts first.
      */
-    public static void sort_bindings()
+    public static void sortBindings()
     {
         synchronized (BINDINGS) {
-            List<ButtonBinding> sorted_bindings = BINDINGS.stream().sorted(Collections.reverseOrder(Comparator.comparingInt(binding -> binding.get_button().length)))
+            List<ButtonBinding> sorted = BINDINGS.stream().sorted(Collections.reverseOrder(Comparator.comparingInt(binding -> binding.getButton().length)))
                     .collect(Collectors.toList());
             BINDINGS.clear();
-            BINDINGS.addAll(sorted_bindings);
+            BINDINGS.addAll(sorted);
         }
     }
 
@@ -119,26 +183,26 @@ public class InputManager
      * @param category The category to register.
      * @return The registered category.
      */
-    public static ButtonCategory register_category(@NotNull ButtonCategory category)
+    public static ButtonCategory registerCategory(@NotNull ButtonCategory category)
     {
         CATEGORIES.add(category);
         return category;
     }
 
-    public static ButtonCategory register_category(@NotNull Identifier identifier, int priority)
+    public static ButtonCategory registerCategory(@NotNull Identifier identifier, int priority)
     {
-        return register_category(new ButtonCategory(identifier, priority));
+        return registerCategory(new ButtonCategory(identifier, priority));
     }
 
-    public static ButtonCategory register_category(@NotNull Identifier identifier)
+    public static ButtonCategory registerCategory(@NotNull Identifier identifier)
     {
-        return register_category(new ButtonCategory(identifier));
+        return registerCategory(new ButtonCategory(identifier));
     }
 
-    protected static ButtonCategory register_default_category(@NotNull String key, @NotNull Consumer<ButtonCategory> key_adder)
+    protected static ButtonCategory registerDefaultCategory(@NotNull String key, @NotNull Consumer<ButtonCategory> keyAdder)
     {
-        ButtonCategory category = register_category(new Identifier("minecraft", key), CATEGORIES.size());
-        key_adder.accept(category);
+        ButtonCategory category = registerCategory(new Identifier("minecraft", key), CATEGORIES.size());
+        keyAdder.accept(category);
         return category;
     }
 
@@ -147,10 +211,10 @@ public class InputManager
      *
      * @param config The configuration instance.
      */
-    public static void load_button_bindings(@NotNull LambdaControlsConfig config)
+    public static void loadButtonBindings(@NotNull LambdaControlsConfig config)
     {
-        List<ButtonBinding> load_queue = new ArrayList<>(BINDINGS);
-        load_queue.forEach(config::load_button_binding);
+        List<ButtonBinding> queue = new ArrayList<>(BINDINGS);
+        queue.forEach(config::loadButtonBinding);
     }
 
     /**
@@ -159,17 +223,17 @@ public class InputManager
      * @param binding The binding.
      * @return The current state of the binding.
      */
-    public static @NotNull ButtonState get_binding_state(@NotNull ButtonBinding binding)
+    public static @NotNull ButtonState getBindingState(@NotNull ButtonBinding binding)
     {
         ButtonState state = ButtonState.REPEAT;
-        for (int btn : binding.get_button()) {
-            ButtonState btn_state = InputManager.STATES.getOrDefault(btn, ButtonState.NONE);
-            if (btn_state == ButtonState.PRESS)
+        for (int btn : binding.getButton()) {
+            ButtonState btnState = InputManager.STATES.getOrDefault(btn, ButtonState.NONE);
+            if (btnState == ButtonState.PRESS)
                 state = ButtonState.PRESS;
-            else if (btn_state == ButtonState.RELEASE) {
+            else if (btnState == ButtonState.RELEASE) {
                 state = ButtonState.RELEASE;
                 break;
-            } else if (btn_state == ButtonState.NONE) {
+            } else if (btnState == ButtonState.NONE) {
                 state = ButtonState.NONE;
                 break;
             }
@@ -183,9 +247,20 @@ public class InputManager
      * @param button The button to check.
      * @return True if the button has duplicated bindings, else false.
      */
-    public static boolean has_duplicated_bindings(int[] button)
+    public static boolean hasDuplicatedBindings(int[] button)
     {
-        return BINDINGS.parallelStream().filter(binding -> are_buttons_equivalent(binding.get_button(), button)).count() > 1;
+        return BINDINGS.parallelStream().filter(binding -> areButtonsEquivalent(binding.getButton(), button)).count() > 1;
+    }
+
+    /**
+     * Returns whether the button has duplicated bindings.
+     *
+     * @param binding The binding to check.
+     * @return True if the button has duplicated bindings, else false.
+     */
+    public static boolean hasDuplicatedBindings(ButtonBinding binding)
+    {
+        return BINDINGS.parallelStream().filter(other -> areButtonsEquivalent(other.getButton(), binding.getButton()) && other.filter.equals(binding.filter)).count() > 1;
     }
 
     /**
@@ -195,7 +270,7 @@ public class InputManager
      * @param buttons2 Second set of buttons.
      * @return True if the two sets of buttons are equivalent, else false.
      */
-    public static boolean are_buttons_equivalent(int[] buttons1, int[] buttons2)
+    public static boolean areButtonsEquivalent(int[] buttons1, int[] buttons2)
     {
         if (buttons1.length != buttons2.length)
             return false;
@@ -218,7 +293,7 @@ public class InputManager
      * @param button  The button to check.
      * @return True if the button set contains the specified button, else false.
      */
-    public static boolean contains_button(int[] buttons, int button)
+    public static boolean containsButton(int[] buttons, int button)
     {
         return Arrays.stream(buttons).anyMatch(btn -> btn == button);
     }
@@ -226,7 +301,7 @@ public class InputManager
     /**
      * Updates the button states.
      */
-    public static void update_states()
+    public static void updateStates()
     {
         STATES.forEach((btn, state) -> {
             if (state == ButtonState.PRESS)
@@ -236,37 +311,49 @@ public class InputManager
         });
     }
 
-    public static void update_bindings(@NotNull MinecraftClient client)
+    public static void updateBindings(@NotNull MinecraftClient client)
     {
-        List<Integer> skip_buttons = new ArrayList<>();
+        List<Integer> skipButtons = new ArrayList<>();
         Map<ButtonBinding, ButtonState> states = new HashMap<>();
         for (ButtonBinding binding : BINDINGS) {
-            ButtonState binding_state = get_binding_state(binding);
-            if (skip_buttons.stream().anyMatch(btn -> contains_button(binding.get_button(), btn))) {
+            ButtonState state = binding.isAvailable(client) ? getBindingState(binding) : ButtonState.NONE;
+            if (skipButtons.stream().anyMatch(btn -> containsButton(binding.getButton(), btn))) {
                 if (binding.pressed)
-                    binding_state = ButtonState.RELEASE;
+                    state = ButtonState.RELEASE;
                 else
-                    binding_state = ButtonState.NONE;
+                    state = ButtonState.NONE;
             }
-            binding.pressed = binding_state.is_pressed();
+            binding.pressed = state.isPressed();
             binding.update();
             if (binding.pressed)
-                Arrays.stream(binding.get_button()).forEach(skip_buttons::add);
-            states.put(binding, binding_state);
+                Arrays.stream(binding.getButton()).forEach(skipButtons::add);
+            states.put(binding, state);
         }
 
         states.forEach((binding, state) -> {
-            if (state != ButtonState.NONE)
+            if (state != ButtonState.NONE) {
                 binding.handle(client, state);
+            }
         });
     }
 
-    public static @NotNull Stream<ButtonBinding> stream_bindings()
+    public static void queueMousePosition(double x, double y)
+    {
+        INPUT_MANAGER.targetMouseX = (int) MathHelper.clamp(x, 0, MinecraftClient.getInstance().getWindow().getWidth());
+        INPUT_MANAGER.targetMouseY = (int) MathHelper.clamp(y, 0, MinecraftClient.getInstance().getWindow().getHeight());
+    }
+
+    public static void queueMoveMousePosition(double x, double y)
+    {
+        queueMousePosition(INPUT_MANAGER.targetMouseX + x, INPUT_MANAGER.targetMouseY + y);
+    }
+
+    public static @NotNull Stream<ButtonBinding> streamBindings()
     {
         return BINDINGS.stream();
     }
 
-    public static @NotNull Stream<ButtonCategory> stream_categories()
+    public static @NotNull Stream<ButtonCategory> streamCategories()
     {
         return CATEGORIES.stream();
     }

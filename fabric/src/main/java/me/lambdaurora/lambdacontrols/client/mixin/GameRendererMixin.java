@@ -28,9 +28,9 @@ public class GameRendererMixin
     private MinecraftClient client;
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Mouse;getX()D"))
-    private void on_render(float tick_delta, long start_time, boolean full_render, CallbackInfo ci)
+    private void onRender(float tickDelta, long startTime, boolean fullRender, CallbackInfo ci)
     {
-        if (this.client.currentScreen != null && LambdaControlsClient.get().config.get_controls_mode() == ControlsMode.CONTROLLER)
-            LambdaControlsClient.get().input.on_pre_render_screen(this.client, this.client.currentScreen);
+        if (this.client.currentScreen != null && LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER)
+            LambdaControlsClient.get().input.onPreRenderScreen(this.client, this.client.currentScreen);
     }
 }

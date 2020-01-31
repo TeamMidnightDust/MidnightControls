@@ -9,12 +9,20 @@
 
 package me.lambdaurora.lambdacontrols;
 
+import io.netty.buffer.Unpooled;
 import me.lambdaurora.lambdacontrols.event.PlayerChangeControlsModeCallback;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.PacketByteBuf;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Represents the LambdaControls mod.
@@ -26,7 +34,9 @@ import org.apache.logging.log4j.Logger;
 public class LambdaControls implements ModInitializer
 {
     private static      LambdaControls INSTANCE;
-    public static final Identifier     CONTROLS_MODE_CHANNEL = new Identifier(LambdaControlsConstants.NAMESPACE, "controls_mode");
+    public static final Identifier     CONTROLS_MODE_CHANNEL = new Identifier(LambdaControlsConstants.CONTROLS_MODE_CHANNEL.toString());
+    public static final Identifier     FEATURE_CHANNEL       = new Identifier(LambdaControlsConstants.FEATURE_CHANNEL.toString());
+    public static final Identifier     HELLO_CHANNEL         = new Identifier(LambdaControlsConstants.HELLO_CHANNEL.toString());
 
     public final Logger logger = LogManager.getLogger("LambdaControls");
 
@@ -36,10 +46,19 @@ public class LambdaControls implements ModInitializer
         INSTANCE = this;
         this.log("Initializing LambdaControls...");
 
+        ServerSidePacketRegistry.INSTANCE.register(HELLO_CHANNEL,
+                (context, attachedData) -> {
+                    String version = attachedData.readString(16);
+                    ControlsMode.byId(attachedData.readString(32))
+                            .ifPresent(controlsMode -> context.getTaskQueue()
+                                    .execute(() -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.getPlayer(), controlsMode)));
+                    context.getTaskQueue().execute(() ->
+                            ServerSidePacketRegistry.INSTANCE.sendToPlayer(context.getPlayer(), FEATURE_CHANNEL, this.makeFeatureBuffer(LambdaControlsFeature.FRONT_BLOCK_PLACING)));
+                });
         ServerSidePacketRegistry.INSTANCE.register(CONTROLS_MODE_CHANNEL,
-                (context, attached_data) -> ControlsMode.by_id(attached_data.readString(32))
-                        .ifPresent(controls_mode -> context.getTaskQueue()
-                                .execute(() -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.getPlayer(), controls_mode))));
+                (context, attachedData) -> ControlsMode.byId(attachedData.readString(32))
+                        .ifPresent(controlsMode -> context.getTaskQueue()
+                                .execute(() -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.getPlayer(), controlsMode))));
     }
 
     /**
@@ -60,6 +79,42 @@ public class LambdaControls implements ModInitializer
     public void warn(String warning)
     {
         this.logger.info("[LambdaControls] " + warning);
+    }
+
+    /**
+     * Returns a packet byte buffer made for the lambdacontrols:controls_mode plugin message.
+     *
+     * @param controlsMode The controls mode to send.
+     * @return The packet byte buffer.
+     */
+    public PacketByteBuf makeControlsModeBuffer(@NotNull ControlsMode controlsMode)
+    {
+        Objects.requireNonNull(controlsMode, "Controls mode cannot be null.");
+        return new PacketByteBuf(Unpooled.buffer()).writeString(controlsMode.getName(), 32);
+    }
+
+    /**
+     * Returns a packet byte buffer made for the lambdacontrols:feature plugin message.
+     *
+     * @param feature The feature data to send.
+     * @return The packet byte buffer.
+     */
+    public PacketByteBuf makeFeatureBuffer(@NotNull LambdaControlsFeature feature)
+    {
+        Objects.requireNonNull(feature, "Feature cannot be null.");
+        PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer()).writeString(feature.getName(), 64);
+        buffer.writeBoolean(feature.isAllowed());
+        return buffer;
+    }
+
+    public PacketByteBuf makeHello(@NotNull ControlsMode controlsMode)
+    {
+        String version = "";
+        Optional<ModContainer> container;
+        if ((container = FabricLoader.getInstance().getModContainer(LambdaControlsConstants.NAMESPACE)).isPresent()) {
+            version = container.get().getMetadata().getVersion().getFriendlyString();
+        }
+        return new PacketByteBuf(Unpooled.buffer()).writeString(version, 16).writeString(controlsMode.getName(), 32);
     }
 
     /**

@@ -35,7 +35,7 @@ public enum ButtonState
      *
      * @return True if this state is a pressed state, else false.
      */
-    public boolean is_pressed()
+    public boolean isPressed()
     {
         return this == PRESS || this == REPEAT;
     }
@@ -45,7 +45,7 @@ public enum ButtonState
      *
      * @return True if this state is an unpressed state, else false.
      */
-    public boolean is_unpressed()
+    public boolean isUnpressed()
     {
         return this == RELEASE || this == NONE;
     }

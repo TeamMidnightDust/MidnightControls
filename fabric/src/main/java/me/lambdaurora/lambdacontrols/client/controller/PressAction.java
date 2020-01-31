@@ -27,7 +27,7 @@ public interface PressAction
     PressAction DEFAULT_ACTION = (client, button, action) -> {
         if (action == ButtonState.REPEAT || client.currentScreen != null)
             return false;
-        button.as_key_binding().ifPresent(key_binding -> ((KeyBindingAccessor) key_binding).handle_press_state(button.is_button_down()));
+        button.asKeyBinding().ifPresent(binding -> ((KeyBindingAccessor) binding).lambdacontrols_handlePressState(button.isButtonDown()));
         return true;
     };
 

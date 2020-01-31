@@ -33,22 +33,22 @@ import java.util.List;
  */
 public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Entry>
 {
-    private static final int[]                        UNBOUND = new int[0];
-    private final        LambdaControlsControlsScreen gui;
-    private              int                          field_2733;
+    private static final int[]                    UNBOUND = new int[0];
+    private final        ControllerControlsScreen gui;
+    private              int                      field_2733;
 
-    public ControlsListWidget(@NotNull LambdaControlsControlsScreen gui, @NotNull MinecraftClient client)
+    public ControlsListWidget(@NotNull ControllerControlsScreen gui, @NotNull MinecraftClient client)
     {
         super(client, gui.width + 45, gui.height, 43, gui.height - 32, 24);
         this.gui = gui;
 
-        InputManager.stream_categories()
-                .sorted(Comparator.comparingInt(ButtonCategory::get_priority))
+        InputManager.streamCategories()
+                .sorted(Comparator.comparingInt(ButtonCategory::getPriority))
                 .forEach(category -> {
                     this.addEntry(new CategoryEntry(category));
 
-                    category.get_bindings().forEach(binding -> {
-                        int i = client.textRenderer.getStringWidth(I18n.translate(binding.get_translation_key()));
+                    category.getBindings().forEach(binding -> {
+                        int i = client.textRenderer.getStringWidth(I18n.translate(binding.getTranslationKey()));
                         if (i > this.field_2733) {
                             this.field_2733 = i;
                         }
@@ -73,43 +73,43 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
     public class ButtonBindingEntry extends Entry
     {
         private final ButtonBinding          binding;
-        private final String                 binding_name;
-        private final ControllerButtonWidget edit_button;
-        private final ButtonWidget           reset_button;
-        private final ButtonWidget           unbound_button;
+        private final String                 bindingName;
+        private final ControllerButtonWidget editButton;
+        private final ButtonWidget           resetButton;
+        private final ButtonWidget           unboundButton;
 
         ButtonBindingEntry(@NotNull ButtonBinding binding)
         {
             this.binding = binding;
-            this.binding_name = I18n.translate(this.binding.get_translation_key());
-            this.edit_button = new ControllerButtonWidget(0, 0, 110, this.binding, btn -> {
-                gui.focused_binding = binding;
-                gui.current_buttons.clear();
+            this.bindingName = I18n.translate(this.binding.getTranslationKey());
+            this.editButton = new ControllerButtonWidget(0, 0, 110, this.binding, btn -> {
+                gui.focusedBinding = binding;
+                gui.currentButtons.clear();
                 gui.waiting = true;
             })
             {
                 protected String getNarrationMessage()
                 {
-                    return binding.is_not_bound() ? I18n.translate("narrator.controls.unbound", binding_name) : I18n.translate("narrator.controls.bound", binding_name, super.getNarrationMessage());
+                    return binding.isNotBound() ? I18n.translate("narrator.controls.unbound", bindingName) : I18n.translate("narrator.controls.bound", bindingName, super.getNarrationMessage());
                 }
             };
-            this.reset_button = new ButtonWidget(0, 0, 50, 20, I18n.translate("controls.reset"),
-                    btn -> gui.mod.config.set_button_binding(binding, binding.get_default_button()))
+            this.resetButton = new ButtonWidget(0, 0, 50, 20, I18n.translate("controls.reset"),
+                    btn -> gui.mod.config.setButtonBinding(binding, binding.getDefaultButton()))
             {
                 protected String getNarrationMessage()
                 {
-                    return I18n.translate("narrator.controls.reset", binding_name);
+                    return I18n.translate("narrator.controls.reset", bindingName);
                 }
             };
-            this.unbound_button = new ButtonWidget(0, 0, 50, 20, I18n.translate("lambdacontrols.menu.unbound"),
+            this.unboundButton = new ButtonWidget(0, 0, 50, 20, I18n.translate("lambdacontrols.menu.unbound"),
                     btn -> {
-                        gui.mod.config.set_button_binding(binding, UNBOUND);
-                        gui.focused_binding = null;
+                        gui.mod.config.setButtonBinding(binding, UNBOUND);
+                        gui.focusedBinding = null;
                     })
             {
                 protected String getNarrationMessage()
                 {
-                    return I18n.translate("lambdacontrols.narrator.unbound", binding_name);
+                    return I18n.translate("lambdacontrols.narrator.unbound", bindingName);
                 }
             };
         }
@@ -117,71 +117,71 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
         @Override
         public List<? extends Element> children()
         {
-            return Collections.unmodifiableList(Arrays.asList(this.edit_button, this.reset_button));
+            return Collections.unmodifiableList(Arrays.asList(this.editButton, this.resetButton));
         }
 
         @Override
-        public void render(int index, int y, int x, int width, int height, int mouse_x, int mouse_y, boolean hovering, float delta)
+        public void render(int index, int y, int x, int width, int height, int mouseX, int mouseY, boolean hovering, float delta)
         {
-            boolean focused = gui.focused_binding == this.binding;
-            TextRenderer text_renderer = ControlsListWidget.this.minecraft.textRenderer;
-            String binding_name = this.binding_name;
+            boolean focused = gui.focusedBinding == this.binding;
+            TextRenderer textRenderer = ControlsListWidget.this.minecraft.textRenderer;
+            String bindingName = this.bindingName;
             float var10002 = (float) (x + 70 - ControlsListWidget.this.field_2733);
             int var10003 = y + height / 2;
-            text_renderer.draw(binding_name, var10002, (float) (var10003 - 9 / 2), 16777215);
-            this.reset_button.x = this.unbound_button.x = x + 190;
-            this.reset_button.y = this.unbound_button.y = y;
-            this.reset_button.active = !this.binding.is_default();
+            textRenderer.draw(bindingName, var10002, (float) (var10003 - 9 / 2), 16777215);
+            this.resetButton.x = this.unboundButton.x = x + 190;
+            this.resetButton.y = this.unboundButton.y = y;
+            this.resetButton.active = !this.binding.isDefault();
             if (focused)
-                this.unbound_button.render(mouse_x, mouse_y, delta);
+                this.unboundButton.render(mouseX, mouseY, delta);
             else
-                this.reset_button.render(mouse_x, mouse_y, delta);
-            this.edit_button.x = x + 75;
-            this.edit_button.y = y;
-            this.edit_button.update();
+                this.resetButton.render(mouseX, mouseY, delta);
+            this.editButton.x = x + 75;
+            this.editButton.y = y;
+            this.editButton.update();
 
             if (focused) {
-                this.edit_button.setMessage(Formatting.WHITE + "> " + Formatting.YELLOW + this.edit_button.getMessage() + Formatting.WHITE + " <");
-            } else if (!this.binding.is_not_bound() && InputManager.has_duplicated_bindings(this.binding.get_button())) {
-                this.edit_button.setMessage(Formatting.RED + this.edit_button.getMessage());
-            } else if (this.binding.is_not_bound()) {
-                this.edit_button.setMessage(Formatting.GOLD + this.edit_button.getMessage());
+                this.editButton.setMessage(Formatting.WHITE + "> " + Formatting.YELLOW + this.editButton.getMessage() + Formatting.WHITE + " <");
+            } else if (!this.binding.isNotBound() && InputManager.hasDuplicatedBindings(this.binding)) {
+                this.editButton.setMessage(Formatting.RED + this.editButton.getMessage());
+            } else if (this.binding.isNotBound()) {
+                this.editButton.setMessage(Formatting.GOLD + this.editButton.getMessage());
             }
 
-            this.edit_button.render(mouse_x, mouse_y, delta);
+            this.editButton.render(mouseX, mouseY, delta);
         }
 
-        public boolean mouseClicked(double mouse_x, double mouse_y, int button)
+        public boolean mouseClicked(double mouseX, double mouseY, int button)
         {
-            boolean focused = gui.focused_binding == this.binding;
-            if (this.edit_button.mouseClicked(mouse_x, mouse_y, button))
+            boolean focused = gui.focusedBinding == this.binding;
+            if (this.editButton.mouseClicked(mouseX, mouseY, button))
                 return true;
             else
-                return focused ? this.unbound_button.mouseClicked(mouse_x, mouse_y, button) : this.reset_button.mouseClicked(mouse_x, mouse_y, button);
+                return focused ? this.unboundButton.mouseClicked(mouseX, mouseY, button) : this.resetButton.mouseClicked(mouseX, mouseY, button);
         }
 
-        public boolean mouseReleased(double mouse_x, double mouse_y, int button)
+        public boolean mouseReleased(double mouseX, double mouseY, int button)
         {
-            return this.edit_button.mouseReleased(mouse_x, mouse_y, button) || this.reset_button.mouseReleased(mouse_x, mouse_y, button)
-                    || this.unbound_button.mouseReleased(mouse_x, mouse_y, button);
+            return this.editButton.mouseReleased(mouseX, mouseY, button) || this.resetButton.mouseReleased(mouseX, mouseY, button)
+                    || this.unboundButton.mouseReleased(mouseX, mouseY, button);
         }
     }
 
     public class CategoryEntry extends Entry
     {
         private final String name;
-        private final int    name_width;
+        private final int    nameWidth;
 
         public CategoryEntry(@NotNull ButtonCategory category)
         {
-            this.name = category.get_translated_name();
-            this.name_width = ControlsListWidget.this.minecraft.textRenderer.getStringWidth(this.name);
+            this.name = category.getTranslatedName();
+            this.nameWidth = ControlsListWidget.this.minecraft.textRenderer.getStringWidth(this.name);
         }
 
         @Override
-        public void render(int index, int y, int x, int width, int height, int mouse_x, int mouse_y, boolean hovering, float delta)
+        public void render(int index, int y, int x, int width, int height, int mouseX, int mouseY, boolean hovering, float delta)
         {
-            ControlsListWidget.this.minecraft.textRenderer.draw(this.name, (float) (ControlsListWidget.this.minecraft.currentScreen.width / 2 - this.name_width / 2),
+            ControlsListWidget.this.minecraft.textRenderer.draw(this.name, (float) (ControlsListWidget.this.minecraft.currentScreen.width / 2 - this.nameWidth / 2),
                     (float) ((y + height) - 9 - 1), 16777215);
         }
 

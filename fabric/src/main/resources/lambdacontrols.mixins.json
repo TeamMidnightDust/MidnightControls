@@ -4,8 +4,10 @@
   "compatibilityLevel": "JAVA_8",
   "client": [
     "AbstractButtonWidgetAccessor",
-    "AbstractContainerScreenMixin",
+    "AdvancementsScreenAccessor",
+    "ContainerScreenMixin",
     "ClientPlayerEntityMixin",
+    "ClientPlayNetworkHandlerMixin",
     "ControlsOptionsScreenMixin",
     "CreativeInventoryScreenAccessor",
     "EntryListWidgetAccessor",

@@ -25,11 +25,11 @@ import org.jetbrains.annotations.NotNull;
 @FunctionalInterface
 public interface PlayerChangeControlsModeCallback
 {
-    Event<PlayerChangeControlsModeCallback> EVENT = EventFactory.createArrayBacked(PlayerChangeControlsModeCallback.class, listeners -> (player, controls_mode) -> {
+    Event<PlayerChangeControlsModeCallback> EVENT = EventFactory.createArrayBacked(PlayerChangeControlsModeCallback.class, listeners -> (player, controlsMode) -> {
         for (PlayerChangeControlsModeCallback event : listeners) {
-            event.apply(player, controls_mode);
+            event.apply(player, controlsMode);
         }
     });
 
-    void apply(@NotNull PlayerEntity player, @NotNull ControlsMode controls_mode);
+    void apply(@NotNull PlayerEntity player, @NotNull ControlsMode controlsMode);
 }

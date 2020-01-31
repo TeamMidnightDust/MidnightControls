@@ -11,6 +11,7 @@ package me.lambdaurora.lambdacontrols.client;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 import me.lambdaurora.lambdacontrols.ControlsMode;
+import me.lambdaurora.lambdacontrols.LambdaControlsFeature;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.Controller;
 import me.lambdaurora.lambdacontrols.client.controller.InputManager;
@@ -33,35 +34,36 @@ import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
 public class LambdaControlsConfig
 {
     // General
-    private static final ControlsMode   DEFAULT_CONTROLS_MODE       = ControlsMode.DEFAULT;
-    private static final boolean        DEFAULT_AUTO_SWITCH_MODE    = false;
+    private static final ControlsMode   DEFAULT_CONTROLS_MODE         = ControlsMode.DEFAULT;
+    private static final boolean        DEFAULT_AUTO_SWITCH_MODE      = false;
     // HUD
-    private static final boolean        DEFAULT_HUD_ENABLE          = true;
-    private static final HudSide        DEFAULT_HUD_SIDE            = HudSide.LEFT;
+    private static final boolean        DEFAULT_HUD_ENABLE            = true;
+    private static final HudSide        DEFAULT_HUD_SIDE              = HudSide.LEFT;
     // Gameplay
-    private static final boolean        DEFAULT_FRONT_BLOCK_PLACING = false;
-    private static final boolean        DEFAULT_FLY_DRIFTING        = false;
+    private static final boolean        DEFAULT_FRONT_BLOCK_PLACING   = false;
+    private static final boolean        DEFAULT_FLY_DRIFTING          = false;
+    private static final boolean        DEFAULT_FLY_VERTICAL_DRIFTING = true;
     // Controller
-    private static final ControllerType DEFAULT_CONTROLLER_TYPE     = ControllerType.DEFAULT;
-    private static final double         DEFAULT_DEAD_ZONE           = 0.25;
-    private static final double         DEFAULT_ROTATION_SPEED      = 40.0;
-    private static final double         DEFAULT_MOUSE_SPEED         = 25.0;
-    private static final boolean        DEFAULT_UNFOCUSED_INPUT     = false;
+    private static final ControllerType DEFAULT_CONTROLLER_TYPE       = ControllerType.DEFAULT;
+    private static final double         DEFAULT_DEAD_ZONE             = 0.25;
+    private static final double         DEFAULT_ROTATION_SPEED        = 40.0;
+    private static final double         DEFAULT_MOUSE_SPEED           = 25.0;
+    private static final boolean        DEFAULT_UNFOCUSED_INPUT       = false;
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
 
     protected final FileConfig           config = FileConfig.builder("config/lambdacontrols.toml").concurrent().defaultResource("/config.toml").build();
     private final   LambdaControlsClient mod;
-    private         ControlsMode         controls_mode;
-    private         ControllerType       controller_type;
+    private         ControlsMode         controlsMode;
+    private         ControllerType       controllerType;
     // HUD settings.
-    private         boolean              hud_enable;
-    private         HudSide              hud_side;
+    private         boolean              hudEnable;
+    private         HudSide              hudSide;
     // Controller settings
-    private         double               dead_zone;
-    private         double               rotation_speed;
-    private         double               mouse_speed;
-    private         boolean              unfocused_input;
+    private         double               deadZone;
+    private         double               rotationSpeed;
+    private         double               mouseSpeed;
+    private         boolean              unfocusedInput;
 
     public LambdaControlsConfig(@NotNull LambdaControlsClient mod)
     {
@@ -74,20 +76,22 @@ public class LambdaControlsConfig
     public void load()
     {
         this.config.load();
-        this.check_and_fix();
+        this.checkAndFix();
         this.mod.log("Configuration loaded.");
-        this.controls_mode = ControlsMode.by_id(this.config.getOrElse("controls", DEFAULT_CONTROLS_MODE.get_name())).orElse(DEFAULT_CONTROLS_MODE);
+        this.controlsMode = ControlsMode.byId(this.config.getOrElse("controls", DEFAULT_CONTROLS_MODE.getName())).orElse(DEFAULT_CONTROLS_MODE);
         // HUD settings.
-        this.hud_enable = this.config.getOrElse("hud.enable", DEFAULT_HUD_ENABLE);
-        this.hud_side = HudSide.by_id(this.config.getOrElse("hud.side", DEFAULT_HUD_SIDE.get_name())).orElse(DEFAULT_HUD_SIDE);
+        this.hudEnable = this.config.getOrElse("hud.enable", DEFAULT_HUD_ENABLE);
+        this.hudSide = HudSide.byId(this.config.getOrElse("hud.side", DEFAULT_HUD_SIDE.getName())).orElse(DEFAULT_HUD_SIDE);
+        // Gameplay
+        LambdaControlsFeature.FRONT_BLOCK_PLACING.setEnabled(this.config.getOrElse("gameplay.front_block_placing", DEFAULT_FRONT_BLOCK_PLACING));
         // Controller settings.
-        this.controller_type = ControllerType.by_id(this.config.getOrElse("controller.type", DEFAULT_CONTROLLER_TYPE.get_name())).orElse(DEFAULT_CONTROLLER_TYPE);
-        this.dead_zone = this.config.getOrElse("controller.dead_zone", DEFAULT_DEAD_ZONE);
-        this.rotation_speed = this.config.getOrElse("controller.rotation_speed", DEFAULT_ROTATION_SPEED);
-        this.mouse_speed = this.config.getOrElse("controller.mouse_speed", DEFAULT_MOUSE_SPEED);
-        this.unfocused_input = this.config.getOrElse("controller.unfocused_input", DEFAULT_UNFOCUSED_INPUT);
+        this.controllerType = ControllerType.byId(this.config.getOrElse("controller.type", DEFAULT_CONTROLLER_TYPE.getName())).orElse(DEFAULT_CONTROLLER_TYPE);
+        this.deadZone = this.config.getOrElse("controller.dead_zone", DEFAULT_DEAD_ZONE);
+        this.rotationSpeed = this.config.getOrElse("controller.rotation_speed", DEFAULT_ROTATION_SPEED);
+        this.mouseSpeed = this.config.getOrElse("controller.mouse_speed", DEFAULT_MOUSE_SPEED);
+        this.unfocusedInput = this.config.getOrElse("controller.unfocused_input", DEFAULT_UNFOCUSED_INPUT);
         // Controller controls.
-        InputManager.load_button_bindings(this);
+        InputManager.loadButtonBindings(this);
     }
 
     /**
@@ -95,18 +99,18 @@ public class LambdaControlsConfig
      */
     public void save()
     {
-        this.config.set("controller.dead_zone", this.dead_zone);
-        this.config.set("controller.rotation_speed", this.rotation_speed);
-        this.config.set("controller.mouse_speed", this.mouse_speed);
-        this.config.set("controller.unfocused_input", this.unfocused_input);
+        this.config.set("controller.dead_zone", this.deadZone);
+        this.config.set("controller.rotation_speed", this.rotationSpeed);
+        this.config.set("controller.mouse_speed", this.mouseSpeed);
+        this.config.set("controller.unfocused_input", this.unfocusedInput);
         this.config.save();
         this.mod.log("Configuration saved.");
     }
 
-    public void check_and_fix()
+    public void checkAndFix()
     {
-        InputManager.stream_bindings().forEach(binding -> {
-            String path = "controller.controls." + binding.get_name();
+        InputManager.streamBindings().forEach(binding -> {
+            String path = "controller.controls." + binding.getName();
             Object raw = this.config.getRaw(path);
             if (raw instanceof Number) {
                 this.mod.warn("Invalid data at \"" + path + "\", fixing...");
@@ -121,23 +125,24 @@ public class LambdaControlsConfig
     public void reset()
     {
         // General
-        this.set_controls_mode(DEFAULT_CONTROLS_MODE);
-        this.set_auto_switch_mode(DEFAULT_AUTO_SWITCH_MODE);
+        this.setControlsMode(DEFAULT_CONTROLS_MODE);
+        this.setAutoSwitchMode(DEFAULT_AUTO_SWITCH_MODE);
         // HUD
-        this.set_hud_enabled(DEFAULT_HUD_ENABLE);
-        this.set_hud_side(DEFAULT_HUD_SIDE);
+        this.setHudEnabled(DEFAULT_HUD_ENABLE);
+        this.setHudSide(DEFAULT_HUD_SIDE);
         // Gameplay
-        this.set_front_block_placing(DEFAULT_FRONT_BLOCK_PLACING);
-        this.set_fly_drifting(DEFAULT_FLY_DRIFTING);
+        this.setFrontBlockPlacing(DEFAULT_FRONT_BLOCK_PLACING);
+        this.setFlyDrifting(DEFAULT_FLY_DRIFTING);
+        this.setFlyVerticalDrifting(DEFAULT_FLY_VERTICAL_DRIFTING);
         // Controller
-        this.set_controller_type(DEFAULT_CONTROLLER_TYPE);
-        this.set_dead_zone(DEFAULT_DEAD_ZONE);
-        this.set_rotation_speed(DEFAULT_ROTATION_SPEED);
-        this.set_mouse_speed(DEFAULT_MOUSE_SPEED);
-        this.set_unfocused_input(DEFAULT_UNFOCUSED_INPUT);
+        this.setControllerType(DEFAULT_CONTROLLER_TYPE);
+        this.setDeadZone(DEFAULT_DEAD_ZONE);
+        this.setRotationSpeed(DEFAULT_ROTATION_SPEED);
+        this.setMouseSpeed(DEFAULT_MOUSE_SPEED);
+        this.setUnfocusedInput(DEFAULT_UNFOCUSED_INPUT);
 
         // Collect prevents concurrent modification.
-        InputManager.stream_bindings().collect(Collectors.toList()).forEach(binding -> this.set_button_binding(binding, binding.get_default_button()));
+        InputManager.streamBindings().collect(Collectors.toList()).forEach(binding -> this.setButtonBinding(binding, binding.getDefaultButton()));
     }
 
     /**
@@ -145,20 +150,20 @@ public class LambdaControlsConfig
      *
      * @return The controls mode.
      */
-    public @NotNull ControlsMode get_controls_mode()
+    public @NotNull ControlsMode getControlsMode()
     {
-        return this.controls_mode;
+        return this.controlsMode;
     }
 
     /**
      * Sets the controls mode in the configuration.
      *
-     * @param controls_mode The controls mode.
+     * @param controlsMode The controls mode.
      */
-    public void set_controls_mode(@NotNull ControlsMode controls_mode)
+    public void setControlsMode(@NotNull ControlsMode controlsMode)
     {
-        this.controls_mode = controls_mode;
-        this.config.set("controls", controls_mode.get_name());
+        this.controlsMode = controlsMode;
+        this.config.set("controls", controlsMode.getName());
     }
 
     /**
@@ -166,7 +171,7 @@ public class LambdaControlsConfig
      *
      * @return True if the auto switch mode is enabled, else false.
      */
-    public boolean has_auto_switch_mode()
+    public boolean hasAutoSwitchMode()
     {
         return this.config.getOrElse("auto_switch_mode", DEFAULT_AUTO_SWITCH_MODE);
     }
@@ -174,11 +179,11 @@ public class LambdaControlsConfig
     /**
      * Sets whether the auto switch mode is enabled or not.
      *
-     * @param auto_switch_mode True if the auto switch mode is enabled, else false.
+     * @param autoSwitchMode True if the auto switch mode is enabled, else false.
      */
-    public void set_auto_switch_mode(boolean auto_switch_mode)
+    public void setAutoSwitchMode(boolean autoSwitchMode)
     {
-        this.config.set("auto_switch_mode", auto_switch_mode);
+        this.config.set("auto_switch_mode", autoSwitchMode);
     }
 
     /*
@@ -190,9 +195,9 @@ public class LambdaControlsConfig
      *
      * @return True if the HUD is enabled, else false.
      */
-    public boolean is_hud_enabled()
+    public boolean isHudEnabled()
     {
-        return this.hud_enable;
+        return this.hudEnable;
     }
 
     /**
@@ -200,10 +205,10 @@ public class LambdaControlsConfig
      *
      * @param enable True if the HUD is enabled, else false.
      */
-    public void set_hud_enabled(boolean enable)
+    public void setHudEnabled(boolean enable)
     {
-        this.hud_enable = enable;
-        this.config.set("hud.enable", this.hud_enable);
+        this.hudEnable = enable;
+        this.config.set("hud.enable", this.hudEnable);
     }
 
     /**
@@ -211,20 +216,20 @@ public class LambdaControlsConfig
      *
      * @return The HUD side.
      */
-    public @NotNull HudSide get_hud_side()
+    public @NotNull HudSide getHudSide()
     {
-        return this.hud_side;
+        return this.hudSide;
     }
 
     /**
      * Sets the HUD side in the configuration.
      *
-     * @param hud_side The HUD side.
+     * @param hudSide The HUD side.
      */
-    public void set_hud_side(@NotNull HudSide hud_side)
+    public void setHudSide(@NotNull HudSide hudSide)
     {
-        this.hud_side = hud_side;
-        this.config.set("hud.side", hud_side.get_name());
+        this.hudSide = hudSide;
+        this.config.set("hud.side", hudSide.getName());
     }
 
     /*
@@ -236,9 +241,9 @@ public class LambdaControlsConfig
      *
      * @return True if front block placing is enabled, else false.
      */
-    public boolean has_front_block_placing()
+    public boolean hasFrontBlockPlacing()
     {
-        return this.config.getOrElse("gameplay.front_block_placing", DEFAULT_FRONT_BLOCK_PLACING);
+        return LambdaControlsFeature.FRONT_BLOCK_PLACING.isEnabled();
     }
 
     /**
@@ -246,8 +251,9 @@ public class LambdaControlsConfig
      *
      * @param enable True if front block placing is enabled, else false.
      */
-    public void set_front_block_placing(boolean enable)
+    public void setFrontBlockPlacing(boolean enable)
     {
+        LambdaControlsFeature.FRONT_BLOCK_PLACING.setEnabled(enable);
         this.config.set("gameplay.front_block_placing", enable);
     }
 
@@ -256,19 +262,39 @@ public class LambdaControlsConfig
      *
      * @return True if fly drifting is enabled, else false.
      */
-    public boolean has_fly_drifting()
+    public boolean hasFlyDrifting()
     {
-        return this.config.getOrElse("gameplay.fly_drifting", DEFAULT_FLY_DRIFTING);
+        return this.config.getOrElse("gameplay.fly.drifting", DEFAULT_FLY_DRIFTING);
     }
 
     /**
      * Sets whether fly drifting is enabled or not.
      *
-     * @param fly_drifting True if fly drifting is enabled, else false.
+     * @param flyDrifting True if fly drifting is enabled, else false.
      */
-    public void set_fly_drifting(boolean fly_drifting)
+    public void setFlyDrifting(boolean flyDrifting)
     {
-        this.config.set("gameplay.fly_drifting", fly_drifting);
+        this.config.set("gameplay.fly.drifting", flyDrifting);
+    }
+
+    /**
+     * Returns whether vertical fly drifting is enabled or not.
+     *
+     * @return True if vertical fly drifting is enabled, else false.
+     */
+    public boolean hasFlyVerticalDrifting()
+    {
+        return this.config.getOrElse("gameplay.fly.vertical_drifting", DEFAULT_FLY_VERTICAL_DRIFTING);
+    }
+
+    /**
+     * Sets whether vertical fly drifting is enabled or not.
+     *
+     * @param flyDrifting True if vertical fly drifting is enabled, else false.
+     */
+    public void setFlyVerticalDrifting(boolean flyDrifting)
+    {
+        this.config.set("gameplay.fly.vertical_drifting", flyDrifting);
     }
 
     /*
@@ -280,15 +306,15 @@ public class LambdaControlsConfig
      *
      * @return The used controller.
      */
-    public @NotNull Controller get_controller()
+    public @NotNull Controller getController()
     {
         Object raw = this.config.getRaw("controller.id");
         if (raw instanceof Number) {
-            return Controller.by_id((Integer) raw);
+            return Controller.byId((Integer) raw);
         } else if (raw instanceof String) {
-            return Controller.by_guid((String) raw).orElse(Controller.by_id(GLFW.GLFW_JOYSTICK_1));
+            return Controller.byGuid((String) raw).orElse(Controller.byId(GLFW.GLFW_JOYSTICK_1));
         }
-        return Controller.by_id(GLFW.GLFW_JOYSTICK_1);
+        return Controller.byId(GLFW.GLFW_JOYSTICK_1);
     }
 
     /**
@@ -296,9 +322,9 @@ public class LambdaControlsConfig
      *
      * @param controller The used controller.
      */
-    public void set_controller(@NotNull Controller controller)
+    public void setController(@NotNull Controller controller)
     {
-        this.config.set("controller.id", controller.get_id());
+        this.config.set("controller.id", controller.getId());
     }
 
     /**
@@ -306,15 +332,15 @@ public class LambdaControlsConfig
      *
      * @return The second controller.
      */
-    public @NotNull Optional<Controller> get_second_controller()
+    public @NotNull Optional<Controller> getSecondController()
     {
         Object raw = this.config.getRaw("controller.id2");
         if (raw instanceof Number) {
             if ((int) raw == -1)
                 return Optional.empty();
-            return Optional.of(Controller.by_id((Integer) raw));
+            return Optional.of(Controller.byId((Integer) raw));
         } else if (raw instanceof String) {
-            return Optional.of(Controller.by_guid((String) raw).orElse(Controller.by_id(GLFW.GLFW_JOYSTICK_1)));
+            return Optional.of(Controller.byGuid((String) raw).orElse(Controller.byId(GLFW.GLFW_JOYSTICK_1)));
         }
         return Optional.empty();
     }
@@ -324,9 +350,9 @@ public class LambdaControlsConfig
      *
      * @param controller The second controller.
      */
-    public void set_second_controller(@Nullable Controller controller)
+    public void setSecondController(@Nullable Controller controller)
     {
-        this.config.set("controller.id2", controller == null ? -1 : controller.get_id());
+        this.config.set("controller.id2", controller == null ? -1 : controller.getId());
     }
 
     /**
@@ -334,20 +360,20 @@ public class LambdaControlsConfig
      *
      * @return The controller's type.
      */
-    public @NotNull ControllerType get_controller_type()
+    public @NotNull ControllerType getControllerType()
     {
-        return this.controller_type;
+        return this.controllerType;
     }
 
     /**
      * Sets the controller's type.
      *
-     * @param controller_type The controller's type.
+     * @param controllerType The controller's type.
      */
-    public void set_controller_type(@NotNull ControllerType controller_type)
+    public void setControllerType(@NotNull ControllerType controllerType)
     {
-        this.controller_type = controller_type;
-        this.config.set("controller.type", controller_type.get_name());
+        this.controllerType = controllerType;
+        this.config.set("controller.type", controllerType.getName());
     }
 
     /**
@@ -355,19 +381,19 @@ public class LambdaControlsConfig
      *
      * @return The controller's dead zone value.
      */
-    public double get_dead_zone()
+    public double getDeadZone()
     {
-        return this.dead_zone;
+        return this.deadZone;
     }
 
     /**
      * Sets the controller's dead zone in the configuration.
      *
-     * @param dead_zone The new controller's dead zone value.
+     * @param deadZone The new controller's dead zone value.
      */
-    public void set_dead_zone(double dead_zone)
+    public void setDeadZone(double deadZone)
     {
-        this.dead_zone = dead_zone;
+        this.deadZone = deadZone;
     }
 
     /**
@@ -375,19 +401,19 @@ public class LambdaControlsConfig
      *
      * @return The rotation speed.
      */
-    public double get_rotation_speed()
+    public double getRotationSpeed()
     {
-        return this.rotation_speed;
+        return this.rotationSpeed;
     }
 
     /**
      * Sets the controller's rotation speed.
      *
-     * @param rotation_speed The rotation speed.
+     * @param rotationSpeed The rotation speed.
      */
-    public void set_rotation_speed(double rotation_speed)
+    public void setRotationSpeed(double rotationSpeed)
     {
-        this.rotation_speed = rotation_speed;
+        this.rotationSpeed = rotationSpeed;
     }
 
     /**
@@ -395,19 +421,19 @@ public class LambdaControlsConfig
      *
      * @return The mouse speed.
      */
-    public double get_mouse_speed()
+    public double getMouseSpeed()
     {
-        return this.mouse_speed;
+        return this.mouseSpeed;
     }
 
     /**
      * Sets the controller's mouse speed.
      *
-     * @param mouse_speed The mouse speed.
+     * @param mouseSpeed The mouse speed.
      */
-    public void set_mouse_speed(double mouse_speed)
+    public void setMouseSpeed(double mouseSpeed)
     {
-        this.mouse_speed = mouse_speed;
+        this.mouseSpeed = mouseSpeed;
     }
 
     /**
@@ -415,7 +441,7 @@ public class LambdaControlsConfig
      *
      * @return True if the right X axis is inverted, else false.
      */
-    public boolean does_invert_right_x_axis()
+    public boolean doesInvertRightXAxis()
     {
         return this.config.getOrElse("controller.invert_right_x_axis", false);
     }
@@ -425,7 +451,7 @@ public class LambdaControlsConfig
      *
      * @param invert True if the right X axis is inverted, else false.
      */
-    public void set_invert_right_x_axis(boolean invert)
+    public void setInvertRightXAxis(boolean invert)
     {
         this.config.set("controller.invert_right_x_axis", invert);
     }
@@ -435,7 +461,7 @@ public class LambdaControlsConfig
      *
      * @return True if the right Y axis is inverted, else false.
      */
-    public boolean does_invert_right_y_axis()
+    public boolean doesInvertRightYAxis()
     {
         return this.config.getOrElse("controller.invert_right_y_axis", false);
     }
@@ -445,7 +471,7 @@ public class LambdaControlsConfig
      *
      * @param invert True if the right Y axis is inverted, else false.
      */
-    public void set_invert_right_y_axis(boolean invert)
+    public void setInvertRightYAxis(boolean invert)
     {
         this.config.set("controller.invert_right_y_axis", invert);
     }
@@ -455,19 +481,19 @@ public class LambdaControlsConfig
      *
      * @return True if unfocused controller input is allowed, else false.
      */
-    public boolean has_unfocused_input()
+    public boolean hasUnfocusedInput()
     {
-        return this.unfocused_input;
+        return this.unfocusedInput;
     }
 
     /**
      * Sets whether unfocused controller input is allowed or not.
      *
-     * @param unfocused_input True if unfocused controller input is allowed, else false.
+     * @param unfocusedInput True if unfocused controller input is allowed, else false.
      */
-    public void set_unfocused_input(boolean unfocused_input)
+    public void setUnfocusedInput(boolean unfocusedInput)
     {
-        this.unfocused_input = unfocused_input;
+        this.unfocusedInput = unfocusedInput;
     }
 
     /**
@@ -475,9 +501,9 @@ public class LambdaControlsConfig
      *
      * @return The right X axis sign.
      */
-    public double get_right_x_axis_sign()
+    public double getRightXAxisSign()
     {
-        return this.does_invert_right_x_axis() ? -1.0 : 1.0;
+        return this.doesInvertRightXAxis() ? -1.0 : 1.0;
     }
 
     /**
@@ -485,9 +511,9 @@ public class LambdaControlsConfig
      *
      * @return The right Y axis sign.
      */
-    public double get_right_y_axis_sign()
+    public double getRightYAxisSign()
     {
-        return this.does_invert_right_y_axis() ? -1.0 : 1.0;
+        return this.doesInvertRightYAxis() ? -1.0 : 1.0;
     }
 
     /**
@@ -495,12 +521,12 @@ public class LambdaControlsConfig
      *
      * @param button The button binding.
      */
-    public void load_button_binding(@NotNull ButtonBinding button)
+    public void loadButtonBinding(@NotNull ButtonBinding button)
     {
-        button.set_button(button.get_default_button());
-        String button_code = this.config.getOrElse("controller.controls." + button.get_name(), button.get_button_code());
+        button.setButton(button.getDefaultButton());
+        String code = this.config.getOrElse("controller.controls." + button.getName(), button.getButtonCode());
 
-        Matcher matcher = BUTTON_BINDING_PATTERN.matcher(button_code);
+        Matcher matcher = BUTTON_BINDING_PATTERN.matcher(code);
 
         try {
             int[] buttons = new int[1];
@@ -510,27 +536,27 @@ public class LambdaControlsConfig
                 if (count > buttons.length)
                     buttons = Arrays.copyOf(buttons, count);
                 String current;
-                if (!this.check_validity(button, button_code, current = matcher.group(1)))
+                if (!this.checkValidity(button, code, current = matcher.group(1)))
                     return;
                 buttons[count - 1] = Integer.parseInt(current);
             }
             if (count == 0) {
-                this.mod.warn("Malformed config value \"" + button_code + "\" for binding \"" + button.get_name() + "\".");
-                this.set_button_binding(button, new int[]{-1});
+                this.mod.warn("Malformed config value \"" + code + "\" for binding \"" + button.getName() + "\".");
+                this.setButtonBinding(button, new int[]{-1});
             }
 
-            button.set_button(buttons);
+            button.setButton(buttons);
         } catch (Exception e) {
-            this.mod.warn("Malformed config value \"" + button_code + "\" for binding \"" + button.get_name() + "\".");
-            this.config.set("controller.controls." + button.get_name(), button.get_button_code());
+            this.mod.warn("Malformed config value \"" + code + "\" for binding \"" + button.getName() + "\".");
+            this.config.set("controller.controls." + button.getName(), button.getButtonCode());
         }
     }
 
-    private boolean check_validity(@NotNull ButtonBinding binding, @NotNull String input, String group)
+    private boolean checkValidity(@NotNull ButtonBinding binding, @NotNull String input, String group)
     {
         if (group == null) {
-            this.mod.warn("Malformed config value \"" + input + "\" for binding \"" + binding.get_name() + "\".");
-            this.config.set("controller.controls." + binding.get_name(), binding.get_button_code());
+            this.mod.warn("Malformed config value \"" + input + "\" for binding \"" + binding.getName() + "\".");
+            this.config.set("controller.controls." + binding.getName(), binding.getButtonCode());
             return false;
         }
         return true;
@@ -542,38 +568,38 @@ public class LambdaControlsConfig
      * @param binding The button binding.
      * @param button  The button.
      */
-    public void set_button_binding(@NotNull ButtonBinding binding, int[] button)
+    public void setButtonBinding(@NotNull ButtonBinding binding, int[] button)
     {
-        binding.set_button(button);
-        this.config.set("controller.controls." + binding.get_name(), binding.get_button_code());
+        binding.setButton(button);
+        this.config.set("controller.controls." + binding.getName(), binding.getButtonCode());
     }
 
-    public boolean is_back_button(int btn, boolean is_btn, int state)
+    public boolean isBackButton(int btn, boolean isBtn, int state)
     {
-        if (!is_btn && state == 0)
+        if (!isBtn && state == 0)
             return false;
-        return ButtonBinding.axis_as_button(GLFW_GAMEPAD_AXIS_LEFT_Y, false) == ButtonBinding.axis_as_button(btn, state == 1);
+        return ButtonBinding.axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, false) == ButtonBinding.axisAsButton(btn, state == 1);
     }
 
-    public boolean is_forward_button(int btn, boolean is_btn, int state)
+    public boolean isForwardButton(int btn, boolean isBtn, int state)
     {
-        if (!is_btn && state == 0)
+        if (!isBtn && state == 0)
             return false;
-        return ButtonBinding.axis_as_button(GLFW_GAMEPAD_AXIS_LEFT_Y, true) == ButtonBinding.axis_as_button(btn, state == 1);
+        return ButtonBinding.axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, true) == ButtonBinding.axisAsButton(btn, state == 1);
     }
 
-    public boolean is_left_button(int btn, boolean is_btn, int state)
+    public boolean isLeftButton(int btn, boolean isBtn, int state)
     {
-        if (!is_btn && state == 0)
+        if (!isBtn && state == 0)
             return false;
-        return ButtonBinding.axis_as_button(GLFW_GAMEPAD_AXIS_LEFT_X, false) == ButtonBinding.axis_as_button(btn, state == 1);
+        return ButtonBinding.axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, false) == ButtonBinding.axisAsButton(btn, state == 1);
     }
 
-    public boolean is_right_button(int btn, boolean is_btn, int state)
+    public boolean isRightButton(int btn, boolean isBtn, int state)
     {
-        if (!is_btn && state == 0)
+        if (!isBtn && state == 0)
             return false;
-        return ButtonBinding.axis_as_button(GLFW_GAMEPAD_AXIS_LEFT_X, true) == ButtonBinding.axis_as_button(btn, state == 1);
+        return ButtonBinding.axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, true) == ButtonBinding.axisAsButton(btn, state == 1);
     }
 
     /**
@@ -582,7 +608,7 @@ public class LambdaControlsConfig
      * @param axis The axis index.
      * @return True if the axis is used for movements, else false.
      */
-    public boolean is_movement_axis(int axis)
+    public boolean isMovementAxis(int axis)
     {
         return axis == GLFW_GAMEPAD_AXIS_LEFT_Y || axis == GLFW_GAMEPAD_AXIS_LEFT_X;
     }

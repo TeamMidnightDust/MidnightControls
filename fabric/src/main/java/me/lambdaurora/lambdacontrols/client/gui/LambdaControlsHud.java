@@ -10,11 +10,13 @@
 package me.lambdaurora.lambdacontrols.client.gui;
 
 import me.lambdaurora.lambdacontrols.ControlsMode;
+import me.lambdaurora.lambdacontrols.LambdaControlsConstants;
 import me.lambdaurora.lambdacontrols.client.HudSide;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
+import me.lambdaurora.spruceui.hud.Hud;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.HitResult;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,32 +27,39 @@ import org.jetbrains.annotations.NotNull;
  * @version 1.1.0
  * @since 1.0.0
  */
-public class LambdaControlsHud extends DrawableHelper
+public class LambdaControlsHud extends Hud
 {
-    private final MinecraftClient      client;
     private final LambdaControlsClient mod;
-    private       int                  width_bottom = 0;
-    private       int                  width_top    = 0;
+    private       MinecraftClient      client;
+    private       int                  widthBottom = 0;
+    private       int                  widthTop    = 0;
 
-    public LambdaControlsHud(@NotNull MinecraftClient client, @NotNull LambdaControlsClient mod)
+    public LambdaControlsHud(@NotNull LambdaControlsClient mod)
     {
-        this.client = client;
+        super(new Identifier(LambdaControlsConstants.NAMESPACE, "hud/button_indicator"));
         this.mod = mod;
+    }
+
+    @Override
+    public void init(@NotNull MinecraftClient client, int screenWidth, int screenHeight)
+    {
+        super.init(client, screenWidth, screenHeight);
+        this.client = client;
     }
 
     /**
      * Renders the LambdaControls' HUD.
      */
-    public void render()
+    public void render(float tickDelta)
     {
-        if (this.mod.config.get_controls_mode() == ControlsMode.CONTROLLER && this.mod.config.is_hud_enabled() && this.client.currentScreen == null && !this.client.options.hudHidden) {
-            int x = this.mod.config.get_hud_side() == HudSide.LEFT ? 10 : client.getWindow().getScaledWidth() - 10 - this.width_bottom, y = bottom(10);
-            x += (this.width_bottom = this.draw_button_tip(x, y, ButtonBinding.INVENTORY, true) + 10);
-            this.width_bottom += this.draw_button_tip(x, y, ButtonBinding.SWAP_HANDS, true);
-            x = this.mod.config.get_hud_side() == HudSide.LEFT ? 10 : client.getWindow().getScaledWidth() - 10 - this.width_top;
-            x += (this.width_top = this.draw_button_tip(x, (y -= 20), ButtonBinding.DROP_ITEM, !this.client.player.getMainHandStack().isEmpty()) + 10);
-            this.width_top += this.draw_button_tip(x, y, ButtonBinding.ATTACK.get_button(),
-                    this.client.crosshairTarget.getType() == HitResult.Type.BLOCK ? "lambdacontrols.action.hit" : ButtonBinding.ATTACK.get_translation_key(),
+        if (this.mod.config.getControlsMode() == ControlsMode.CONTROLLER && this.client.currentScreen == null) {
+            int x = this.mod.config.getHudSide() == HudSide.LEFT ? 10 : client.getWindow().getScaledWidth() - 10 - this.widthBottom, y = bottom(10);
+            x += (this.widthBottom = this.drawButtonTip(x, y, ButtonBinding.INVENTORY, true) + 10);
+            this.widthBottom += this.drawButtonTip(x, y, ButtonBinding.SWAP_HANDS, true);
+            x = this.mod.config.getHudSide() == HudSide.LEFT ? 10 : client.getWindow().getScaledWidth() - 10 - this.widthTop;
+            x += (this.widthTop = this.drawButtonTip(x, (y -= 20), ButtonBinding.DROP_ITEM, !this.client.player.getMainHandStack().isEmpty()) + 10);
+            this.widthTop += this.drawButtonTip(x, y, ButtonBinding.ATTACK.getButton(),
+                    this.client.crosshairTarget.getType() == HitResult.Type.BLOCK ? "lambdacontrols.action.hit" : ButtonBinding.ATTACK.getTranslationKey(),
                     this.client.crosshairTarget.getType() != HitResult.Type.MISS);
         }
     }
@@ -60,13 +69,13 @@ public class LambdaControlsHud extends DrawableHelper
         return this.client.getWindow().getScaledHeight() - y - 15;
     }
 
-    private int draw_button_tip(int x, int y, @NotNull ButtonBinding button, boolean display)
+    private int drawButtonTip(int x, int y, @NotNull ButtonBinding button, boolean display)
     {
-        return LambdaControlsClient.draw_button_tip(x, y, button, display, this.client);
+        return LambdaControlsClient.drawButtonTip(x, y, button, display, this.client);
     }
 
-    private int draw_button_tip(int x, int y, int[] button, @NotNull String action, boolean display)
+    private int drawButtonTip(int x, int y, int[] button, @NotNull String action, boolean display)
     {
-        return LambdaControlsClient.draw_button_tip(x, y, button, action, display, this.client);
+        return LambdaControlsClient.drawButtonTip(x, y, button, action, display, this.client);
     }
 }

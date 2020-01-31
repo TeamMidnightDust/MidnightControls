@@ -32,14 +32,14 @@ public abstract class MouseMixin implements MouseAccessor
     protected abstract void onMouseButton(long window, int button, int action, int mods);
 
     @Inject(method = "lockCursor", at = @At("HEAD"), cancellable = true)
-    private void on_mouse_locked(CallbackInfo ci)
+    private void lambdacontrols_onMouseLocked(CallbackInfo ci)
     {
-        if (LambdaControlsClient.get().config.get_controls_mode() == ControlsMode.TOUCHSCREEN)
+        if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.TOUCHSCREEN)
             ci.cancel();
     }
 
     @Override
-    public void lambdacontrols_on_cursor_pos(long window, double x, double y)
+    public void lambdacontrols_onCursorPos(long window, double x, double y)
     {
         this.onCursorPos(window, x, y);
     }

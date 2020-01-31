@@ -9,6 +9,8 @@
 
 package me.lambdaurora.lambdacontrols;
 
+import org.aperlambda.lambdacommon.Identifier;
+
 /**
  * Represents the constants used by LambdaControls.
  *
@@ -18,5 +20,8 @@ package me.lambdaurora.lambdacontrols;
  */
 public class LambdaControlsConstants
 {
-    public static final String NAMESPACE = "lambdacontrols";
+    public static final String     NAMESPACE             = "lambdacontrols";
+    public static final Identifier CONTROLS_MODE_CHANNEL = new Identifier(NAMESPACE, "controls_mode");
+    public static final Identifier FEATURE_CHANNEL       = new Identifier(NAMESPACE, "feature");
+    public static final Identifier HELLO_CHANNEL         = new Identifier(NAMESPACE, "hello");
 }

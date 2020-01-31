@@ -1,0 +1,50 @@
+plugins {
+    id 'java-library'
+}
+
+archivesBaseName = project.archives_base_name + "-spigot"
+
+repositories {
+    maven { url = 'https://hub.spigotmc.org/nexus/content/groups/public/' }
+    maven { url = 'https://libraries.minecraft.net/' }
+}
+
+configurations {
+    include
+}
+
+dependencies {
+    api project(":core")
+    include(project(":core")) {
+        exclude group: 'com.google.code.gson'
+        exclude group: 'com.google.guava'
+    }
+    api 'org.spigotmc:spigot-api:1.15.1-R0.1-SNAPSHOT'
+    api 'io.netty:netty-all:4.1.28.Final'
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include "plugin.yml"
+
+        expand 'version': project.version.toString().replace("#", "")
+    }
+}
+
+jar {
+    from '../LICENSE'
+
+    dependsOn configurations.include
+    from {
+        (configurations.include).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}

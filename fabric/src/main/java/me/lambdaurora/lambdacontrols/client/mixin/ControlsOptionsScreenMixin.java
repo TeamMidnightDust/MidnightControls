@@ -9,7 +9,7 @@
 
 package me.lambdaurora.lambdacontrols.client.mixin;
 
-import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsControlsScreen;
+import me.lambdaurora.lambdacontrols.client.gui.ControllerControlsScreen;
 import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsSettingsScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
@@ -29,18 +29,18 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ControlsOptionsScreen.class)
 public class ControlsOptionsScreenMixin extends GameOptionsScreen
 {
-    public ControlsOptionsScreenMixin(Screen parent, GameOptions game_options, Text text)
+    public ControlsOptionsScreenMixin(Screen parent, GameOptions gameOptions, Text text)
     {
-        super(parent, game_options, text);
+        super(parent, gameOptions, text);
     }
 
     @Redirect(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/options/ControlsOptionsScreen;addButton(Lnet/minecraft/client/gui/widget/AbstractButtonWidget;)Lnet/minecraft/client/gui/widget/AbstractButtonWidget;", ordinal = 1))
     private AbstractButtonWidget on_init(ControlsOptionsScreen screen, AbstractButtonWidget btn)
     {
-        if (this.parent instanceof LambdaControlsControlsScreen)
+        if (this.parent instanceof ControllerControlsScreen)
             return this.addButton(btn);
         else
-            return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).lambdacontrols_get_height(), I18n.translate("menu.options"),
+            return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).lambdacontrols_getHeight(), I18n.translate("menu.options"),
                     b -> this.minecraft.openScreen(new LambdaControlsSettingsScreen(this, this.gameOptions, true))));
     }
 }

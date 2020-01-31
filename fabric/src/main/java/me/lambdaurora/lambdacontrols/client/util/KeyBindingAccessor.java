@@ -9,21 +9,16 @@
 
 package me.lambdaurora.lambdacontrols.client.util;
 
-import net.minecraft.client.util.InputUtil;
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Represents a Minecraft keybinding with extra access.
  */
 public interface KeyBindingAccessor
 {
-    @NotNull InputUtil.KeyCode get_key_code();
-
     boolean lambdacontrols_press();
 
     boolean lambdacontrols_unpress();
 
-    default boolean handle_press_state(boolean pressed)
+    default boolean lambdacontrols_handlePressState(boolean pressed)
     {
         if (pressed)
             return this.lambdacontrols_press();

@@ -31,10 +31,10 @@ public class LambdaControlsCompat
      */
     public static void init(@NotNull LambdaControlsClient mod)
     {
-        if (FabricLoader.getInstance().isModLoaded("okzoomer") && LambdaReflection.does_class_exist(OkZoomerCompat.OKZOOMER_CLASS_PATH)) {
+        if (FabricLoader.getInstance().isModLoaded("okzoomer") && LambdaReflection.doesClassExist(OkZoomerCompat.OKZOOMER_CLASS_PATH)) {
             mod.log("Adding okzoomer compatibility...");
             new OkZoomerCompat().handle(mod);
         }
-        InputManager.load_button_bindings(mod.config);
+        InputManager.loadButtonBindings(mod.config);
     }
 }

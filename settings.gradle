@@ -10,4 +10,4 @@ pluginManagement {
 }
 
 rootProject.name = 'lambdacontrols'
-include 'core', 'fabric', 'elytra'
+include 'core', 'fabric', 'spigot'

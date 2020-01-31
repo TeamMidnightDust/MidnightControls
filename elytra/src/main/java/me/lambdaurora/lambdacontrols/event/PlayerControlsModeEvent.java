@@ -27,12 +27,12 @@ import org.mcelytra.core.event.player.PlayerEvent;
 public class PlayerControlsModeEvent extends PlayerEvent
 {
     private static final HandlerList  HANDLERS = new HandlerList();
-    private final        ControlsMode controls_mode;
+    private final        ControlsMode controlsMode;
 
-    public PlayerControlsModeEvent(@NotNull EntityPlayer player, @NotNull ControlsMode controls_mode)
+    public PlayerControlsModeEvent(@NotNull EntityPlayer player, @NotNull ControlsMode controlsMode)
     {
         super(new Identifier(LambdaControlsConstants.NAMESPACE, "player_controls_mode"), player, true);
-        this.controls_mode = controls_mode;
+        this.controlsMode = controlsMode;
     }
 
     /**
@@ -40,13 +40,13 @@ public class PlayerControlsModeEvent extends PlayerEvent
      *
      * @return The player's controls mode.
      */
-    public ControlsMode get_controls_mode()
+    public ControlsMode getControlsMode()
     {
-        return this.controls_mode;
+        return this.controlsMode;
     }
 
     @Override
-    public @NotNull HandlerList get_handlers()
+    public @NotNull HandlerList getHandlers()
     {
         return HANDLERS;
     }

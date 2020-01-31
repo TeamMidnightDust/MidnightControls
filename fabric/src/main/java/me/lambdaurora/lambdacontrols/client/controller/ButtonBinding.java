@@ -14,16 +14,18 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
+import org.aperlambda.lambdacommon.Identifier;
 import org.aperlambda.lambdacommon.utils.Nameable;
+import org.aperlambda.lambdacommon.utils.function.PairPredicate;
+import org.aperlambda.lambdacommon.utils.function.Predicates;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static me.lambdaurora.lambdacontrols.client.controller.InputManager.register_binding;
-import static me.lambdaurora.lambdacontrols.client.controller.InputManager.register_default_category;
+import static me.lambdaurora.lambdacontrols.client.controller.InputManager.registerDefaultCategory;
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Represents a button binding.
@@ -40,53 +42,66 @@ public class ButtonBinding implements Nameable
     public static final ButtonCategory MULTIPLAYER_CATEGORY;
     public static final ButtonCategory MISC_CATEGORY;
 
-    public static final ButtonBinding ATTACK             = register_binding(new ButtonBinding("attack", new int[]{axis_as_button(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true)}, false));
-    public static final ButtonBinding BACK               = register_binding(new ButtonBinding("back", new int[]{axis_as_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y, false)}, false));
-    public static final ButtonBinding CHAT               = register_binding(new ButtonBinding("chat", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT}, true));
-    public static final ButtonBinding DROP_ITEM          = register_binding(new ButtonBinding("drop_item", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_B}, true));
-    public static final ButtonBinding FORWARD            = register_binding(new ButtonBinding("forward", new int[]{axis_as_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y, true)}, false));
-    public static final ButtonBinding HOTBAR_LEFT        = register_binding(new ButtonBinding("hotbar_left", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER},
-            Collections.singletonList(InputHandlers.handle_hotbar(false)), true));
-    public static final ButtonBinding HOTBAR_RIGHT       = register_binding(new ButtonBinding("hotbar_right", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER},
-            Collections.singletonList(InputHandlers.handle_hotbar(true)), true));
-    public static final ButtonBinding INVENTORY          = register_binding(new ButtonBinding("inventory", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_Y}, true));
-    public static final ButtonBinding JUMP               = register_binding(new ButtonBinding("jump", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_A}, false));
-    public static final ButtonBinding LEFT               = register_binding(new ButtonBinding("left", new int[]{axis_as_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X, false)}, false));
-    public static final ButtonBinding PAUSE_GAME         = register_binding(new ButtonBinding("pause_game", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_START},
-            Collections.singletonList(InputHandlers::handle_pause_game), true));
-    public static final ButtonBinding PICK_BLOCK         = register_binding(new ButtonBinding("pick_block", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT}, true));
-    public static final ButtonBinding PLAYER_LIST        = register_binding(new ButtonBinding("player_list", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_BACK}, false));
-    public static final ButtonBinding RIGHT              = register_binding(new ButtonBinding("right", new int[]{axis_as_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X, true)}, false));
-    public static final ButtonBinding SCREENSHOT         = register_binding(new ButtonBinding("screenshot", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW.GLFW_GAMEPAD_BUTTON_A},
-            Collections.singletonList(InputHandlers::handle_screenshot), true));
-    public static final ButtonBinding SMOOTH_CAMERA      = register_binding(new ButtonBinding("toggle_smooth_camera", new int[]{-1}, true));
-    public static final ButtonBinding SNEAK              = register_binding(new ButtonBinding("sneak", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB},
-            Arrays.asList(PressAction.DEFAULT_ACTION, InputHandlers::handle_toggle_sneak), true));
-    public static final ButtonBinding SPRINT             = register_binding(new ButtonBinding("sprint", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB}, false));
-    public static final ButtonBinding SWAP_HANDS         = register_binding(new ButtonBinding("swap_hands", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_X}, true));
-    public static final ButtonBinding TOGGLE_PERSPECTIVE = register_binding(new ButtonBinding("toggle_perspective", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW.GLFW_GAMEPAD_BUTTON_Y}, true));
-    public static final ButtonBinding USE                = register_binding(new ButtonBinding("use", new int[]{axis_as_button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true)}, false));
+    public static final ButtonBinding ATTACK             = new Builder("attack").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true)).onlyInGame().register();
+    public static final ButtonBinding BACK               = new Builder("back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, false)).onlyInGame().register();
+    public static final ButtonBinding CHAT               = new Builder("chat").buttons(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT).onlyInGame().cooldown(true).register();
+    public static final ButtonBinding DROP_ITEM          = new Builder("drop_item").buttons(GLFW_GAMEPAD_BUTTON_B).onlyInGame().cooldown(true).register();
+    public static final ButtonBinding FORWARD            = new Builder("forward").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, true)).onlyInGame().register();
+    public static final ButtonBinding HOTBAR_LEFT        = new Builder("hotbar_left").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
+            .action(InputHandlers.handleHotbar(false)).onlyInGame().cooldown(true).register();
+    public static final ButtonBinding HOTBAR_RIGHT       = new Builder("hotbar_right").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
+            .action(InputHandlers.handleHotbar(true)).onlyInGame().cooldown(true).register();
+    public static final ButtonBinding INVENTORY          = new Builder("inventory").buttons(GLFW_GAMEPAD_BUTTON_Y).onlyInGame().cooldown(true).register();
+    public static final ButtonBinding JUMP               = new Builder("jump").buttons(GLFW_GAMEPAD_BUTTON_A).onlyInGame().register();
+    public static final ButtonBinding LEFT               = new Builder("left").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, false)).onlyInGame().register();
+    public static final ButtonBinding PAUSE_GAME         = new Builder("pause_game").buttons(GLFW_GAMEPAD_BUTTON_START).action(InputHandlers::handlePauseGame).cooldown(true).register();
+    public static final ButtonBinding PICK_BLOCK         = new Builder("pick_block").buttons(GLFW_GAMEPAD_BUTTON_DPAD_LEFT).onlyInGame().cooldown(true).register();
+    public static final ButtonBinding PLAYER_LIST        = new Builder("player_list").buttons(GLFW_GAMEPAD_BUTTON_BACK).onlyInGame().register();
+    public static final ButtonBinding RIGHT              = new Builder("right").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, true)).register();
+    public static final ButtonBinding SCREENSHOT         = new Builder("screenshot").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_A)
+            .action(InputHandlers::handleScreenshot).cooldown(true).register();
+    public static final ButtonBinding SLOT_DOWN          = new Builder("slot_down").buttons(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)
+            .action(InputHandlers.handleInventorySlotPad(1)).onlyInInventory().cooldown(true).register();
+    public static final ButtonBinding SLOT_LEFT          = new Builder("slot_left").buttons(GLFW_GAMEPAD_BUTTON_DPAD_LEFT)
+            .action(InputHandlers.handleInventorySlotPad(3)).onlyInInventory().cooldown(true).register();
+    public static final ButtonBinding SLOT_RIGHT         = new Builder("slot_right").buttons(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT)
+            .action(InputHandlers.handleInventorySlotPad(2)).onlyInInventory().cooldown(true).register();
+    public static final ButtonBinding SLOT_UP            = new Builder("slot_up").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP)
+            .action(InputHandlers.handleInventorySlotPad(0)).onlyInInventory().cooldown(true).register();
+    public static final ButtonBinding SMOOTH_CAMERA      = new Builder("toggle_smooth_camera").cooldown(true).register();
+    public static final ButtonBinding SNEAK              = new Builder("sneak").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_THUMB)
+            .actions(PressAction.DEFAULT_ACTION, InputHandlers::handleToggleSneak).onlyInGame().cooldown(true).register();
+    public static final ButtonBinding SPRINT             = new Builder("sprint").buttons(GLFW_GAMEPAD_BUTTON_LEFT_THUMB).register();
+    public static final ButtonBinding SWAP_HANDS         = new Builder("swap_hands").buttons(GLFW_GAMEPAD_BUTTON_X).cooldown(true).register();
+    public static final ButtonBinding TAB_LEFT           = new Builder("tab_left").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
+            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements)).cooldown(true).register();
+    public static final ButtonBinding TAB_RIGHT          = new Builder("tab_right").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
+            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements)).cooldown(true).register();
+    public static final ButtonBinding TOGGLE_PERSPECTIVE = new Builder("toggle_perspective").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_Y).cooldown(true).register();
+    public static final ButtonBinding USE                = new Builder("use").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true)).register();
 
-    private int[]             button;
-    private int[]             default_button;
-    private String            key;
-    private KeyBinding        minecraft_key_binding = null;
-    private List<PressAction> actions               = new ArrayList<>(Collections.singletonList(PressAction.DEFAULT_ACTION));
-    private boolean           has_cooldown;
-    private int               cooldown              = 0;
+    private   int[]                                         button;
+    private   int[]                                         defaultButton;
+    private   String                                        key;
+    private   KeyBinding                                    mcKeyBinding = null;
+    protected PairPredicate<MinecraftClient, ButtonBinding> filter;
+    private   List<PressAction>                             actions      = new ArrayList<>(Collections.singletonList(PressAction.DEFAULT_ACTION));
+    private   boolean                                       hasCooldown;
+    private   int                                           cooldown     = 0;
     boolean pressed = false;
 
-    public ButtonBinding(@NotNull String key, int[] default_button, @NotNull List<PressAction> actions, boolean has_cooldown)
+    public ButtonBinding(@NotNull String key, int[] defaultButton, @NotNull List<PressAction> actions, PairPredicate<MinecraftClient, ButtonBinding> filter, boolean hasCooldown)
     {
-        this.set_button(this.default_button = default_button);
+        this.setButton(this.defaultButton = defaultButton);
         this.key = key;
+        this.filter = filter;
         this.actions.addAll(actions);
-        this.has_cooldown = has_cooldown;
+        this.hasCooldown = hasCooldown;
     }
 
-    public ButtonBinding(@NotNull String key, int[] default_button, boolean has_cooldown)
+    public ButtonBinding(@NotNull String key, int[] defaultButton, boolean hasCooldown)
     {
-        this(key, default_button, Collections.emptyList(), has_cooldown);
+        this(key, defaultButton, Collections.emptyList(), Predicates.pairAlwaysTrue(), hasCooldown);
     }
 
     /**
@@ -94,7 +109,7 @@ public class ButtonBinding implements Nameable
      *
      * @return The bound button.
      */
-    public int[] get_button()
+    public int[] getButton()
     {
         return this.button;
     }
@@ -104,12 +119,12 @@ public class ButtonBinding implements Nameable
      *
      * @param button The bound button.
      */
-    public void set_button(int[] button)
+    public void setButton(int[] button)
     {
         this.button = button;
 
-        if (InputManager.has_binding(this))
-            InputManager.sort_bindings();
+        if (InputManager.hasBinding(this))
+            InputManager.sortBindings();
     }
 
     /**
@@ -118,9 +133,9 @@ public class ButtonBinding implements Nameable
      * @param button The button to check.
      * @return True if the bound button is the specified button, else false.
      */
-    public boolean is_button(int[] button)
+    public boolean isButton(int[] button)
     {
-        return InputManager.are_buttons_equivalent(button, this.button);
+        return InputManager.areButtonsEquivalent(button, this.button);
     }
 
     /**
@@ -128,7 +143,7 @@ public class ButtonBinding implements Nameable
      *
      * @return True if the button is down, else false.
      */
-    public boolean is_button_down()
+    public boolean isButtonDown()
     {
         return this.pressed;
     }
@@ -138,7 +153,7 @@ public class ButtonBinding implements Nameable
      *
      * @return True if this button binding is bound, else false.
      */
-    public boolean is_not_bound()
+    public boolean isNotBound()
     {
         return this.button.length == 0 || this.button[0] == -1;
     }
@@ -148,9 +163,9 @@ public class ButtonBinding implements Nameable
      *
      * @return The default button.
      */
-    public int[] get_default_button()
+    public int[] getDefaultButton()
     {
-        return this.default_button;
+        return this.defaultButton;
     }
 
     /**
@@ -158,9 +173,9 @@ public class ButtonBinding implements Nameable
      *
      * @return True if the assigned button is the default button, else false.
      */
-    public boolean is_default()
+    public boolean isDefault()
     {
-        return this.button.length == this.default_button.length && InputManager.are_buttons_equivalent(this.button, this.default_button);
+        return this.button.length == this.defaultButton.length && InputManager.areButtonsEquivalent(this.button, this.defaultButton);
     }
 
     /**
@@ -168,7 +183,8 @@ public class ButtonBinding implements Nameable
      *
      * @return The button code.
      */
-    public @NotNull String get_button_code()
+    public @NotNull
+    String getButtonCode()
     {
         return Arrays.stream(this.button)
                 .mapToObj(btn -> Integer.valueOf(btn).toString())
@@ -178,11 +194,22 @@ public class ButtonBinding implements Nameable
     /**
      * Sets the key binding to emulate with this button binding.
      *
-     * @param key_binding The optional key binding.
+     * @param keyBinding The optional key binding.
      */
-    public void set_key_binding(@Nullable KeyBinding key_binding)
+    public void setKeyBinding(@Nullable KeyBinding keyBinding)
     {
-        this.minecraft_key_binding = key_binding;
+        this.mcKeyBinding = keyBinding;
+    }
+
+    /**
+     * Returns whether the button binding is available in the current context.
+     *
+     * @param client The client instance.
+     * @return True if the button binding is available, else false.
+     */
+    public boolean isAvailable(@NotNull MinecraftClient client)
+    {
+        return this.filter.test(client, this);
     }
 
     /**
@@ -190,7 +217,7 @@ public class ButtonBinding implements Nameable
      */
     public void update()
     {
-        if (this.has_cooldown && this.cooldown > 0)
+        if (this.hasCooldown && this.cooldown > 0)
             this.cooldown--;
     }
 
@@ -202,9 +229,9 @@ public class ButtonBinding implements Nameable
      */
     public void handle(@NotNull MinecraftClient client, @NotNull ButtonState state)
     {
-        if (state == ButtonState.REPEAT && this.has_cooldown && this.cooldown != 0)
+        if (state == ButtonState.REPEAT && this.hasCooldown && this.cooldown != 0)
             return;
-        if (this.has_cooldown && state.is_pressed()) {
+        if (this.hasCooldown && state.isPressed()) {
             this.cooldown = 5;
 
         }
@@ -215,7 +242,7 @@ public class ButtonBinding implements Nameable
     }
 
     @Override
-    public @NotNull String get_name()
+    public @NotNull String getName()
     {
         return this.key;
     }
@@ -225,9 +252,10 @@ public class ButtonBinding implements Nameable
      *
      * @return The translation key.
      */
-    public @NotNull String get_translation_key()
+    public @NotNull
+    String getTranslationKey()
     {
-        return "lambdacontrols.action." + this.get_name();
+        return "lambdacontrols.action." + this.getName();
     }
 
     /**
@@ -235,9 +263,10 @@ public class ButtonBinding implements Nameable
      *
      * @return The key binding equivalent.
      */
-    public @NotNull Optional<KeyBinding> as_key_binding()
+    public @NotNull
+    Optional<KeyBinding> asKeyBinding()
     {
-        return Optional.ofNullable(this.minecraft_key_binding);
+        return Optional.ofNullable(this.mcKeyBinding);
     }
 
     /**
@@ -247,7 +276,7 @@ public class ButtonBinding implements Nameable
      * @param positive True if the axis part is positive, else false.
      * @return The axis as a button.
      */
-    public static int axis_as_button(int axis, boolean positive)
+    public static int axisAsButton(int axis, boolean positive)
     {
         return positive ? 100 + axis : 200 + axis;
     }
@@ -258,31 +287,31 @@ public class ButtonBinding implements Nameable
      * @param button The raw button code.
      * @return The second Joycon's button code.
      */
-    public static int controller2_button(int button)
+    public static int controller2Button(int button)
     {
         return 500 + button;
     }
 
     public static void init(@NotNull GameOptions options)
     {
-        ATTACK.minecraft_key_binding = options.keyAttack;
-        BACK.minecraft_key_binding = options.keyBack;
-        CHAT.minecraft_key_binding = options.keyChat;
-        DROP_ITEM.minecraft_key_binding = options.keyDrop;
-        FORWARD.minecraft_key_binding = options.keyForward;
-        INVENTORY.minecraft_key_binding = options.keyInventory;
-        JUMP.minecraft_key_binding = options.keyJump;
-        LEFT.minecraft_key_binding = options.keyLeft;
-        PICK_BLOCK.minecraft_key_binding = options.keyPickItem;
-        PLAYER_LIST.minecraft_key_binding = options.keyPlayerList;
-        RIGHT.minecraft_key_binding = options.keyRight;
-        SCREENSHOT.minecraft_key_binding = options.keyScreenshot;
-        SMOOTH_CAMERA.minecraft_key_binding = options.keySmoothCamera;
-        SNEAK.minecraft_key_binding = options.keySneak;
-        SPRINT.minecraft_key_binding = options.keySprint;
-        SWAP_HANDS.minecraft_key_binding = options.keySwapHands;
-        TOGGLE_PERSPECTIVE.minecraft_key_binding = options.keyTogglePerspective;
-        USE.minecraft_key_binding = options.keyUse;
+        ATTACK.mcKeyBinding = options.keyAttack;
+        BACK.mcKeyBinding = options.keyBack;
+        CHAT.mcKeyBinding = options.keyChat;
+        DROP_ITEM.mcKeyBinding = options.keyDrop;
+        FORWARD.mcKeyBinding = options.keyForward;
+        INVENTORY.mcKeyBinding = options.keyInventory;
+        JUMP.mcKeyBinding = options.keyJump;
+        LEFT.mcKeyBinding = options.keyLeft;
+        PICK_BLOCK.mcKeyBinding = options.keyPickItem;
+        PLAYER_LIST.mcKeyBinding = options.keyPlayerList;
+        RIGHT.mcKeyBinding = options.keyRight;
+        SCREENSHOT.mcKeyBinding = options.keyScreenshot;
+        SMOOTH_CAMERA.mcKeyBinding = options.keySmoothCamera;
+        SNEAK.mcKeyBinding = options.keySneak;
+        SPRINT.mcKeyBinding = options.keySprint;
+        SWAP_HANDS.mcKeyBinding = options.keySwapHands;
+        TOGGLE_PERSPECTIVE.mcKeyBinding = options.keyTogglePerspective;
+        USE.mcKeyBinding = options.keyUse;
     }
 
     /**
@@ -291,40 +320,41 @@ public class ButtonBinding implements Nameable
      * @param button The button.
      * @return The localized name of the button.
      */
-    public static @NotNull String get_localized_button_name(int button)
+    public static @NotNull
+    String getLocalizedButtonName(int button)
     {
         switch (button % 500) {
             case -1:
                 return I18n.translate("key.keyboard.unknown");
-            case GLFW.GLFW_GAMEPAD_BUTTON_A:
+            case GLFW_GAMEPAD_BUTTON_A:
                 return I18n.translate("lambdacontrols.button.a");
-            case GLFW.GLFW_GAMEPAD_BUTTON_B:
+            case GLFW_GAMEPAD_BUTTON_B:
                 return I18n.translate("lambdacontrols.button.b");
-            case GLFW.GLFW_GAMEPAD_BUTTON_X:
+            case GLFW_GAMEPAD_BUTTON_X:
                 return I18n.translate("lambdacontrols.button.x");
-            case GLFW.GLFW_GAMEPAD_BUTTON_Y:
+            case GLFW_GAMEPAD_BUTTON_Y:
                 return I18n.translate("lambdacontrols.button.y");
-            case GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER:
+            case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER:
                 return I18n.translate("lambdacontrols.button.left_bumper");
-            case GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER:
+            case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER:
                 return I18n.translate("lambdacontrols.button.right_bumper");
-            case GLFW.GLFW_GAMEPAD_BUTTON_BACK:
+            case GLFW_GAMEPAD_BUTTON_BACK:
                 return I18n.translate("lambdacontrols.button.back");
-            case GLFW.GLFW_GAMEPAD_BUTTON_START:
+            case GLFW_GAMEPAD_BUTTON_START:
                 return I18n.translate("lambdacontrols.button.start");
-            case GLFW.GLFW_GAMEPAD_BUTTON_GUIDE:
+            case GLFW_GAMEPAD_BUTTON_GUIDE:
                 return I18n.translate("lambdacontrols.button.guide");
-            case GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB:
+            case GLFW_GAMEPAD_BUTTON_LEFT_THUMB:
                 return I18n.translate("lambdacontrols.button.left_thumb");
-            case GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB:
+            case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB:
                 return I18n.translate("lambdacontrols.button.right_thumb");
-            case GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP:
+            case GLFW_GAMEPAD_BUTTON_DPAD_UP:
                 return I18n.translate("lambdacontrols.button.dpad_up");
-            case GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT:
+            case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT:
                 return I18n.translate("lambdacontrols.button.dpad_right");
-            case GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN:
+            case GLFW_GAMEPAD_BUTTON_DPAD_DOWN:
                 return I18n.translate("lambdacontrols.button.dpad_down");
-            case GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT:
+            case GLFW_GAMEPAD_BUTTON_DPAD_LEFT:
                 return I18n.translate("lambdacontrols.button.dpad_left");
             case 100:
                 return I18n.translate("lambdacontrols.axis.left_x+");
@@ -352,7 +382,7 @@ public class ButtonBinding implements Nameable
     }
 
     static {
-        MOVEMENT_CATEGORY = register_default_category("key.categories.movement", category -> category.register_all_bindings(
+        MOVEMENT_CATEGORY = registerDefaultCategory("key.categories.movement", category -> category.registerAllBindings(
                 ButtonBinding.FORWARD,
                 ButtonBinding.BACK,
                 ButtonBinding.LEFT,
@@ -360,24 +390,207 @@ public class ButtonBinding implements Nameable
                 ButtonBinding.JUMP,
                 ButtonBinding.SNEAK,
                 ButtonBinding.SPRINT));
-        GAMEPLAY_CATEGORY = register_default_category("key.categories.gameplay", category -> category.register_all_bindings(
+        GAMEPLAY_CATEGORY = registerDefaultCategory("key.categories.gameplay", category -> category.registerAllBindings(
                 ButtonBinding.ATTACK,
                 ButtonBinding.PICK_BLOCK,
                 ButtonBinding.USE
         ));
-        INVENTORY_CATEGORY = register_default_category("key.categories.inventory", category -> category.register_all_bindings(
+        INVENTORY_CATEGORY = registerDefaultCategory("key.categories.inventory", category -> category.registerAllBindings(
                 ButtonBinding.DROP_ITEM,
                 ButtonBinding.HOTBAR_LEFT,
                 ButtonBinding.HOTBAR_RIGHT,
                 ButtonBinding.INVENTORY,
                 ButtonBinding.SWAP_HANDS
         ));
-        MULTIPLAYER_CATEGORY = register_default_category("key.categories.multiplayer",
-                category -> category.register_all_bindings(ButtonBinding.CHAT, ButtonBinding.PLAYER_LIST));
-        MISC_CATEGORY = register_default_category("key.categories.misc", category -> category.register_all_bindings(
+        MULTIPLAYER_CATEGORY = registerDefaultCategory("key.categories.multiplayer",
+                category -> category.registerAllBindings(ButtonBinding.CHAT, ButtonBinding.PLAYER_LIST));
+        MISC_CATEGORY = registerDefaultCategory("key.categories.misc", category -> category.registerAllBindings(
                 ButtonBinding.SCREENSHOT,
                 //SMOOTH_CAMERA,
                 ButtonBinding.TOGGLE_PERSPECTIVE
         ));
+    }
+
+    /**
+     * Represents a quick {@link ButtonBinding} builder.
+     *
+     * @author LambdAurora
+     * @version 1.1.0
+     * @since 1.1.0
+     */
+    public static class Builder
+    {
+        private final String                                        key;
+        private       int[]                                         buttons   = new int[0];
+        private       List<PressAction>                             actions   = new ArrayList<>();
+        private       PairPredicate<MinecraftClient, ButtonBinding> filter    = Predicates.pairAlwaysTrue();
+        private       boolean                                       cooldown  = false;
+        private       ButtonCategory                                category  = null;
+        private       KeyBinding                                    mcBinding = null;
+
+        /**
+         * This constructor shouldn't be used for other mods.
+         *
+         * @param key The key with format {@code "<namespace>.<name>"}.
+         */
+        public Builder(@NotNull String key)
+        {
+            this.key = key;
+            this.unbound();
+        }
+
+        public Builder(@NotNull Identifier identifier)
+        {
+            this(identifier.getNamespace() + "." + identifier.getName());
+        }
+
+        public Builder(@NotNull net.minecraft.util.Identifier identifier)
+        {
+            this(new Identifier(identifier.toString()));
+        }
+
+        /**
+         * Defines the default buttons of the {@link ButtonBinding}.
+         *
+         * @param buttons The default buttons.
+         * @return The builder instance.
+         */
+        public Builder buttons(int... buttons)
+        {
+            this.buttons = buttons;
+            return this;
+        }
+
+        /**
+         * Sets the {@link ButtonBinding} to unbound.
+         *
+         * @return The builder instance.
+         */
+        public Builder unbound()
+        {
+            return this.buttons(-1);
+        }
+
+        /**
+         * Adds the actions to the {@link ButtonBinding}.
+         *
+         * @param actions The actions to add.
+         * @return The builder instance.
+         */
+        public Builder actions(@NotNull PressAction... actions)
+        {
+            this.actions.addAll(Arrays.asList(actions));
+            return this;
+        }
+
+        /**
+         * Adds an action to the {@link ButtonBinding}.
+         *
+         * @param action The action to add.
+         * @return The builder instance.
+         */
+        public Builder action(@NotNull PressAction action)
+        {
+            this.actions.add(action);
+            return this;
+        }
+
+        /**
+         * Sets a filter for the {@link ButtonBinding}.
+         *
+         * @param filter The filter.
+         * @return The builder instance.
+         */
+        public Builder filter(@NotNull PairPredicate<MinecraftClient, ButtonBinding> filter)
+        {
+            this.filter = filter;
+            return this;
+        }
+
+        /**
+         * Sets the filter of {@link ButtonBinding} to only in game.
+         *
+         * @return The builder instance.
+         * @see #filter(PairPredicate)
+         * @see InputHandlers#inGame(MinecraftClient, ButtonBinding)
+         */
+        public Builder onlyInGame()
+        {
+            return this.filter(InputHandlers::inGame);
+        }
+
+        /**
+         * Sets the filter of {@link ButtonBinding} to only in inventory.
+         *
+         * @return The builder instance.
+         * @see #filter(PairPredicate)
+         * @see InputHandlers#inInventory(MinecraftClient, ButtonBinding)
+         */
+        public Builder onlyInInventory()
+        {
+            return this.filter(InputHandlers::inInventory);
+        }
+
+        /**
+         * Sets whether the {@link ButtonBinding} has a cooldown or not.
+         *
+         * @param cooldown True if the {@link ButtonBinding} has a cooldown, else false.
+         * @return The builder instance.
+         */
+        public Builder cooldown(boolean cooldown)
+        {
+            this.cooldown = cooldown;
+            return this;
+        }
+
+        /**
+         * Sets the category of the {@link ButtonBinding}.
+         *
+         * @param category The category.
+         * @return The builder instance.
+         */
+        public Builder category(@Nullable ButtonCategory category)
+        {
+            this.category = category;
+            return this;
+        }
+
+        /**
+         * Sets the keybinding linked to the {@link ButtonBinding}.
+         *
+         * @param binding The keybinding to link.
+         * @return The builder instance.
+         */
+        public Builder linkKeybind(@Nullable KeyBinding binding)
+        {
+            this.mcBinding = binding;
+            return this;
+        }
+
+        /**
+         * Builds the {@link ButtonBinding}.
+         *
+         * @return The built {@link ButtonBinding}.
+         */
+        public ButtonBinding build()
+        {
+            ButtonBinding binding = new ButtonBinding(this.key, this.buttons, this.actions, this.filter, this.cooldown);
+            if (this.category != null)
+                this.category.registerBinding(binding);
+            if (this.mcBinding != null)
+                binding.setKeyBinding(this.mcBinding);
+            return binding;
+        }
+
+        /**
+         * Builds and registers the {@link ButtonBinding}.
+         *
+         * @return The built {@link ButtonBinding}.
+         * @see #build()
+         */
+        public ButtonBinding register()
+        {
+            return InputManager.registerBinding(this.build());
+        }
     }
 }

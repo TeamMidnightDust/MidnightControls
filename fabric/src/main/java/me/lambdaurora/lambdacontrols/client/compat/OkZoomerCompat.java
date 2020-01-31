@@ -12,7 +12,6 @@ package me.lambdaurora.lambdacontrols.client.compat;
 import io.github.joaoh1.okzoomer.OkZoomer;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
-import me.lambdaurora.lambdacontrols.client.controller.InputManager;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -30,8 +29,12 @@ public class OkZoomerCompat implements CompatHandler
     @Override
     public void handle(@NotNull LambdaControlsClient mod)
     {
-        ButtonBinding binding = InputManager.register_binding(new ButtonBinding("zoom", new int[]{GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW.GLFW_GAMEPAD_BUTTON_X}, true));
-        binding.set_key_binding(OkZoomer.zoomKeyBinding);
-        ButtonBinding.MISC_CATEGORY.register_binding(binding);
+        new ButtonBinding.Builder("zoom")
+                .buttons(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW.GLFW_GAMEPAD_BUTTON_X)
+                .onlyInGame()
+                .cooldown(true)
+                .category(ButtonBinding.MISC_CATEGORY)
+                .linkKeybind(OkZoomer.zoomKeyBinding)
+                .register();
     }
 }

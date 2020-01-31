@@ -14,21 +14,21 @@ import net.minecraft.container.Slot;
 /**
  * Represents an accessor to AbstractContainerScreen.
  */
-public interface AbstractContainerScreenAccessor
+public interface ContainerScreenAccessor
 {
     /**
      * Gets the left coordinate of the GUI.
      *
      * @return The left coordinate of the GUI.
      */
-    int lambdacontrols_get_x();
+    int lambdacontrols_getX();
 
     /**
      * Gets the top coordinate of the GUI.
      *
      * @return The top coordinate of the GUI.
      */
-    int lambdacontrols_get_y();
+    int lambdacontrols_getY();
 
     /**
      * Gets the slot at position.
@@ -37,5 +37,5 @@ public interface AbstractContainerScreenAccessor
      * @param pos_y The Y position to check.
      * @return The slot at the specified position.
      */
-    Slot lambdacontrols_get_slot_at(double pos_x, double pos_y);
+    Slot lambdacontrols_getSlotAt(double pos_x, double pos_y);
 }

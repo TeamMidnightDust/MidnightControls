@@ -10,8 +10,10 @@
 package me.lambdaurora.lambdacontrols.client.mixin;
 
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.container.Slot;
 import net.minecraft.item.ItemGroup;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
@@ -28,7 +30,7 @@ public interface CreativeInventoryScreenAccessor
      * @return The selected tab index.
      */
     @Accessor("selectedTab")
-    int lambdacontrols_get_selected_tab();
+    int lambdacontrols_getSelectedTab();
 
     /**
      * Sets the selected tab.
@@ -36,5 +38,14 @@ public interface CreativeInventoryScreenAccessor
      * @param group The tab's item group.
      */
     @Invoker("setSelectedTab")
-    void lambdacontrols_set_selected_tab(@NotNull ItemGroup group);
+    void lambdacontrols_setSelectedTab(@NotNull ItemGroup group);
+
+    /**
+     * Returns whether the slot belongs to the creative inventory or not.
+     *
+     * @param slot The slot to check.
+     * @return True if the slot is from the creative inventory, else false.
+     */
+    @Invoker("isCreativeInventorySlot")
+    boolean lambdacontrols_isCreativeInventorySlot(@Nullable Slot slot);
 }

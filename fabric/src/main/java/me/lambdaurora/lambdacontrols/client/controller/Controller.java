@@ -52,7 +52,7 @@ public class Controller implements Nameable
      *
      * @return The identifier of this controller.
      */
-    public int get_id()
+    public int getId()
     {
         return this.id;
     }
@@ -62,7 +62,7 @@ public class Controller implements Nameable
      *
      * @return The controller's GUID.
      */
-    public String get_guid()
+    public String getGuid()
     {
         String guid = GLFW.glfwGetJoystickGUID(this.id);
         return guid == null ? "" : guid;
@@ -73,7 +73,7 @@ public class Controller implements Nameable
      *
      * @return True if this controller is connected, else false.
      */
-    public boolean is_connected()
+    public boolean isConnected()
     {
         return GLFW.glfwJoystickPresent(this.id);
     }
@@ -83,9 +83,9 @@ public class Controller implements Nameable
      *
      * @return True if this controller is a gamepad, else false.
      */
-    public boolean is_gamepad()
+    public boolean isGamepad()
     {
-        return this.is_connected() && GLFW.glfwJoystickIsGamepad(this.id);
+        return this.isConnected() && GLFW.glfwJoystickIsGamepad(this.id);
     }
 
     /**
@@ -94,10 +94,10 @@ public class Controller implements Nameable
      * @return The controller's name.
      */
     @Override
-    public @NotNull String get_name()
+    public @NotNull String getName()
     {
-        String name = this.is_gamepad() ? GLFW.glfwGetGamepadName(this.id) : GLFW.glfwGetJoystickName(this.id);
-        return name == null ? String.valueOf(this.get_id()) : name;
+        String name = this.isGamepad() ? GLFW.glfwGetGamepadName(this.id) : GLFW.glfwGetJoystickName(this.id);
+        return name == null ? String.valueOf(this.getId()) : name;
     }
 
     /**
@@ -105,15 +105,15 @@ public class Controller implements Nameable
      *
      * @return The state of the controller input.
      */
-    public GLFWGamepadState get_state()
+    public GLFWGamepadState getState()
     {
         GLFWGamepadState state = GLFWGamepadState.create();
-        if (this.is_gamepad())
+        if (this.isGamepad())
             GLFW.glfwGetGamepadState(this.id, state);
         return state;
     }
 
-    public static @NotNull Controller by_id(int id)
+    public static @NotNull Controller byId(int id)
     {
         if (id > GLFW.GLFW_JOYSTICK_LAST) {
             LambdaControlsClient.get().log("Controller '" + id + "' doesn't exist.");
@@ -129,22 +129,22 @@ public class Controller implements Nameable
         }
     }
 
-    public static @NotNull Optional<Controller> by_guid(@NotNull String guid)
+    public static @NotNull Optional<Controller> byGuid(@NotNull String guid)
     {
-        return CONTROLLERS.values().stream().filter(Controller::is_connected)
-                .filter(controller -> controller.get_guid().equals(guid))
-                .max(Comparator.comparingInt(Controller::get_id));
+        return CONTROLLERS.values().stream().filter(Controller::isConnected)
+                .filter(controller -> controller.getGuid().equals(guid))
+                .max(Comparator.comparingInt(Controller::getId));
     }
 
     /**
      * Reads the specified resource and returns the raw data as a ByteBuffer.
      *
-     * @param resource    The resource to read.
-     * @param buffer_size The initial buffer size.
+     * @param resource   The resource to read.
+     * @param bufferSize The initial buffer size.
      * @return The resource data.
      * @throws IOException If an IO error occurs.
      */
-    private static ByteBuffer io_resource_to_buffer(String resource, int buffer_size) throws IOException
+    private static ByteBuffer ioResourceToBuffer(String resource, int bufferSize) throws IOException
     {
         ByteBuffer buffer = null;
 
@@ -164,14 +164,14 @@ public class Controller implements Nameable
     /**
      * Updates the controller mappings.
      */
-    public static void update_mappings()
+    public static void updateMappings()
     {
         try {
-            File mappings_file = new File("config/gamecontrollerdb.txt");
-            if (!mappings_file.exists())
+            File mappingsFile = new File("config/gamecontrollerdb.txt");
+            if (!mappingsFile.exists())
                 return;
             LambdaControlsClient.get().log("Updating controller mappings...");
-            ByteBuffer buffer = io_resource_to_buffer(mappings_file.getPath(), 1024);
+            ByteBuffer buffer = ioResourceToBuffer(mappingsFile.getPath(), 1024);
             GLFW.glfwUpdateGamepadMappings(buffer);
         } catch (IOException e) {
             e.printStackTrace();

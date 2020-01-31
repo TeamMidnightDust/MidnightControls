@@ -23,37 +23,37 @@ import org.jetbrains.annotations.NotNull;
 public class ControllerButtonWidget extends AbstractIconButtonWidget
 {
     private ButtonBinding binding;
-    private int           icon_width;
+    private int           iconWidth;
 
-    public ControllerButtonWidget(int x, int y, int width, @NotNull ButtonBinding button_binding, @NotNull PressAction on_press)
+    public ControllerButtonWidget(int x, int y, int width, @NotNull ButtonBinding binding, @NotNull PressAction action)
     {
-        super(x, y, width, 20, ButtonBinding.get_localized_button_name(button_binding.get_button()[0]), on_press);
-        this.binding = button_binding;
+        super(x, y, width, 20, ButtonBinding.getLocalizedButtonName(binding.getButton()[0]), action);
+        this.binding = binding;
     }
 
     public void update()
     {
-        int length = binding.get_button().length;
-        this.setMessage(this.binding.is_not_bound() ? I18n.translate("lambdacontrols.not_bound") :
-                (length > 0 ? ButtonBinding.get_localized_button_name(binding.get_button()[0]) : "<>"));
+        int length = binding.getButton().length;
+        this.setMessage(this.binding.isNotBound() ? I18n.translate("lambdacontrols.not_bound") :
+                (length > 0 ? ButtonBinding.getLocalizedButtonName(binding.getButton()[0]) : "<>"));
     }
 
     @Override
     public String getMessage()
     {
-        if (this.binding.get_button().length > 1)
+        if (this.binding.getButton().length > 1)
             return "";
         return super.getMessage();
     }
 
     @Override
-    protected int render_icon(int mouse_x, int mouse_y, float delta, int x, int y)
+    protected int renderIcon(int mouseX, int mouseY, float delta, int x, int y)
     {
-        if (this.binding.get_button().length > 1) {
-            x += (this.width / 2 - this.icon_width / 2) - 4;
+        if (this.binding.getButton().length > 1) {
+            x += (this.width / 2 - this.iconWidth / 2) - 4;
         }
-        Pair<Integer, Integer> size = LambdaControlsClient.draw_button(x, y, this.binding, MinecraftClient.getInstance());
-        this.icon_width = size.get_key();
-        return size.get_value();
+        Pair<Integer, Integer> size = LambdaControlsClient.drawButton(x, y, this.binding, MinecraftClient.getInstance());
+        this.iconWidth = size.key;
+        return size.value;
     }
 }

@@ -13,14 +13,19 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import me.lambdaurora.lambdacontrols.ControlsMode;
 import me.lambdaurora.lambdacontrols.LambdaControls;
 import me.lambdaurora.lambdacontrols.LambdaControlsConstants;
+import me.lambdaurora.lambdacontrols.LambdaControlsFeature;
 import me.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.Controller;
 import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsHud;
+import me.lambdaurora.lambdacontrols.client.gui.TouchscreenOverlay;
+import me.lambdaurora.spruceui.event.OpenScreenCallback;
+import me.lambdaurora.spruceui.hud.HudManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.event.client.ClientTickCallback;
+import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
@@ -57,7 +62,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
     public final        LambdaControlsConfig config             = new LambdaControlsConfig(this);
     public final        LambdaInput          input              = new LambdaInput(this);
     private             LambdaControlsHud    hud;
-    private             ControlsMode         previous_controls_mode;
+    private             ControlsMode         previousControlsMode;
 
     @Override
     public void onInitializeClient()
@@ -68,31 +73,51 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
         KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_DOWN);
         KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_LEFT);
 
-        HudRenderCallback.EVENT.register(delta -> this.hud.render());
+        ClientSidePacketRegistry.INSTANCE.register(CONTROLS_MODE_CHANNEL, (context, attachedData) -> context.getTaskQueue()
+                .execute(() -> ClientSidePacketRegistry.INSTANCE.sendToServer(CONTROLS_MODE_CHANNEL, this.makeControlsModeBuffer(this.config.getControlsMode()))));
+        ClientSidePacketRegistry.INSTANCE.register(FEATURE_CHANNEL, (context, attachedData) -> {
+            String name = attachedData.readString(64);
+            boolean allowed = attachedData.readBoolean();
+            LambdaControlsFeature.fromName(name).ifPresent(feature -> context.getTaskQueue().execute(() -> feature.setAllowed(allowed)));
+        });
+
+        ClientTickCallback.EVENT.register(this::onTick);
+
+        OpenScreenCallback.EVENT.register((client, screen) -> {
+            if (screen == null && this.config.getControlsMode() == ControlsMode.TOUCHSCREEN) {
+                screen = new TouchscreenOverlay(this);
+                screen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
+                client.skipGameRender = false;
+                client.currentScreen = screen;
+            } else if (screen != null) {
+                this.input.onScreenOpen(client, client.getWindow().getWidth(), client.getWindow().getHeight());
+            }
+        });
+
+        HudManager.register(this.hud = new LambdaControlsHud(this));
     }
 
     /**
      * This method is called when Minecraft is initializing.
      */
-    public void on_mc_init(@NotNull MinecraftClient client)
+    public void onMcInit(@NotNull MinecraftClient client)
     {
         ButtonBinding.init(client.options);
         this.config.load();
-        Controller.update_mappings();
+        this.hud.setVisible(this.config.isHudEnabled());
+        Controller.updateMappings();
         GLFW.glfwSetJoystickCallback((jid, event) -> {
             if (event == GLFW.GLFW_CONNECTED) {
-                Controller controller = Controller.by_id(jid);
+                Controller controller = Controller.byId(jid);
                 client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, new TranslatableText("lambdacontrols.controller.connected", jid),
-                        new LiteralText(controller.get_name())));
+                        new LiteralText(controller.getName())));
             } else if (event == GLFW.GLFW_DISCONNECTED) {
                 client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, new TranslatableText("lambdacontrols.controller.disconnected", jid),
                         null));
             }
 
-            this.switch_controls_mode();
+            this.switchControlsMode();
         });
-
-        this.hud = new LambdaControlsHud(client, this);
 
         LambdaControlsCompat.init(this);
     }
@@ -102,35 +127,54 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
      *
      * @param client The client instance.
      */
-    public void on_tick(@NotNull MinecraftClient client)
+    public void onTick(@NotNull MinecraftClient client)
     {
-        this.input.on_tick(client);
-        if (this.config.get_controls_mode() == ControlsMode.CONTROLLER && (client.isWindowFocused() || this.config.has_unfocused_input()))
-            this.input.on_controller_tick(client);
+        this.input.onTick(client);
+        if (this.config.getControlsMode() == ControlsMode.CONTROLLER && (client.isWindowFocused() || this.config.hasUnfocusedInput()))
+            this.input.onControllerTick(client);
     }
 
-    public void on_render(MinecraftClient client)
+    public void onRender(MinecraftClient client)
     {
-        this.input.on_render(client);
+        this.input.onRender(client);
+    }
+
+    /**
+     * Called when leaving a server.
+     */
+    public void onLeave()
+    {
+        LambdaControlsFeature.resetAllAllowed();
     }
 
     /**
      * Switches the controls mode if the auto switch is enabled.
      */
-    public void switch_controls_mode()
+    public void switchControlsMode()
     {
-        if (this.config.has_auto_switch_mode()) {
-            if (this.config.get_controller().is_gamepad()) {
-                this.previous_controls_mode = this.config.get_controls_mode();
-                this.config.set_controls_mode(ControlsMode.CONTROLLER);
+        if (this.config.hasAutoSwitchMode()) {
+            if (this.config.getController().isGamepad()) {
+                this.previousControlsMode = this.config.getControlsMode();
+                this.config.setControlsMode(ControlsMode.CONTROLLER);
             } else {
-                if (this.previous_controls_mode == null) {
-                    this.previous_controls_mode = ControlsMode.DEFAULT;
+                if (this.previousControlsMode == null) {
+                    this.previousControlsMode = ControlsMode.DEFAULT;
                 }
 
-                this.config.set_controls_mode(this.previous_controls_mode);
+                this.config.setControlsMode(this.previousControlsMode);
             }
         }
+    }
+
+    /**
+     * Sets whether the HUD is enabled or not.
+     *
+     * @param enabled True if the HUD is enabled, else false.
+     */
+    public void setHudEnabled(boolean enabled)
+    {
+        this.config.setHudEnabled(enabled);
+        this.hud.setVisible(enabled);
     }
 
     /**
@@ -143,31 +187,32 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
         return INSTANCE;
     }
 
-    public static Pair<Integer, Integer> draw_button(int x, int y, @NotNull ButtonBinding button, @NotNull MinecraftClient client)
+    public static Pair<Integer, Integer> drawButton(int x, int y, @NotNull ButtonBinding button, @NotNull MinecraftClient client)
     {
-        return draw_button(x, y, button.get_button(), client);
+        return drawButton(x, y, button.getButton(), client);
     }
 
-    public static Pair<Integer, Integer> draw_button(int x, int y, int[] buttons, @NotNull MinecraftClient client)
+    public static Pair<Integer, Integer> drawButton(int x, int y, int[] buttons, @NotNull MinecraftClient client)
     {
         int height = 0;
         int length = 0;
-        int current_x = x;
+        int currentX = x;
         for (int i = 0; i < buttons.length; i++) {
             int btn = buttons[i];
-            Pair<Integer, Integer> size = draw_button(current_x, y, btn, client);
-            if (size.get_key() > height)
-                height = size.get_value();
-            length += size.get_key();
+            Pair<Integer, Integer> size = drawButton(currentX, y, btn, client);
+            if (size.key > height)
+                height = size.key;
+            length += size.key;
             if (i + 1 < buttons.length) {
                 length += 2;
-                current_x = x + length;
+                currentX = x + length;
             }
         }
         return Pair.of(length, height);
     }
 
-    public static Pair<Integer, Integer> draw_button(int x, int y, int button, @NotNull MinecraftClient client)
+    @SuppressWarnings("deprecated")
+    public static Pair<Integer, Integer> drawButton(int x, int y, int button, @NotNull MinecraftClient client)
     {
         boolean second = false;
         if (button == -1)
@@ -177,70 +222,70 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
             second = true;
         }
 
-        int controller_type = get().config.get_controller_type().get_id();
+        int controllerType = get().config.getControllerType().getId();
         boolean axis = false;
-        int button_offset = button * 15;
+        int buttonOffset = button * 15;
         switch (button) {
             case GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER:
-                button_offset = 7 * 15;
+                buttonOffset = 7 * 15;
                 break;
             case GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER:
-                button_offset = 8 * 15;
+                buttonOffset = 8 * 15;
                 break;
             case GLFW.GLFW_GAMEPAD_BUTTON_BACK:
-                button_offset = 4 * 15;
+                buttonOffset = 4 * 15;
                 break;
             case GLFW.GLFW_GAMEPAD_BUTTON_START:
-                button_offset = 6 * 15;
+                buttonOffset = 6 * 15;
                 break;
             case GLFW.GLFW_GAMEPAD_BUTTON_GUIDE:
-                button_offset = 5 * 15;
+                buttonOffset = 5 * 15;
                 break;
             case GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB:
-                button_offset = 15 * 15;
+                buttonOffset = 15 * 15;
                 break;
             case GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB:
-                button_offset = 16 * 15;
+                buttonOffset = 16 * 15;
                 break;
             case GLFW.GLFW_GAMEPAD_AXIS_LEFT_X + 100:
-                button_offset = 0;
+                buttonOffset = 0;
                 axis = true;
                 break;
             case GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y + 100:
-                button_offset = 18;
+                buttonOffset = 18;
                 axis = true;
                 break;
             case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X + 100:
-                button_offset = 2 * 18;
+                buttonOffset = 2 * 18;
                 axis = true;
                 break;
             case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y + 100:
-                button_offset = 3 * 18;
+                buttonOffset = 3 * 18;
                 axis = true;
                 break;
             case GLFW.GLFW_GAMEPAD_AXIS_LEFT_X + 200:
-                button_offset = 4 * 18;
+                buttonOffset = 4 * 18;
                 axis = true;
                 break;
             case GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y + 200:
-                button_offset = 5 * 18;
+                buttonOffset = 5 * 18;
                 axis = true;
                 break;
             case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X + 200:
-                button_offset = 6 * 18;
+                buttonOffset = 6 * 18;
                 axis = true;
                 break;
             case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y + 200:
-                button_offset = 7 * 18;
+                buttonOffset = 7 * 18;
                 axis = true;
                 break;
             case GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER + 100:
             case GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER + 200:
-                button_offset = 9 * 15;
+                buttonOffset = 9 * 15;
                 break;
             case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER + 100:
             case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER + 200:
-                button_offset = 10 * 15;
+                buttonOffset = 10 * 15;
                 break;
         }
 
@@ -248,34 +293,34 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
         GlStateManager.disableDepthTest();
 
         GlStateManager.color4f(1.0F, second ? 0.0F : 1.0F, 1.0F, 1.0F);
-        DrawableHelper.blit(x, y, (float) button_offset, (float) (controller_type * (axis ? 18 : 15)), axis ? 18 : 15, axis ? 18 : 15, 256, 256);
+        DrawableHelper.blit(x, y, (float) buttonOffset, (float) (controllerType * (axis ? 18 : 15)), axis ? 18 : 15, axis ? 18 : 15, 256, 256);
         GlStateManager.enableDepthTest();
 
         return axis ? Pair.of(18, 18) : Pair.of(15, 15);
     }
 
-    public static int draw_button_tip(int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull MinecraftClient client)
+    public static int drawButtonTip(int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull MinecraftClient client)
     {
-        return draw_button_tip(x, y, button.get_button(), button.get_translation_key(), display, client);
+        return drawButtonTip(x, y, button.getButton(), button.getTranslationKey(), display, client);
     }
 
-    public static int draw_button_tip(int x, int y, int[] button, @NotNull String action, boolean display, @NotNull MinecraftClient client)
+    public static int drawButtonTip(int x, int y, int[] button, @NotNull String action, boolean display, @NotNull MinecraftClient client)
     {
         if (display) {
-            int button_width = draw_button(x, y, button, client).get_key();
+            int buttonWidth = drawButton(x, y, button, client).key;
 
-            String translated_action = I18n.translate(action);
-            int text_y = (15 - client.textRenderer.fontHeight) / 2;
-            client.textRenderer.drawWithShadow(translated_action, (float) (x + button_width + 5), (float) (y + text_y), 14737632);
+            String translatedAction = I18n.translate(action);
+            int textY = (15 - client.textRenderer.fontHeight) / 2;
+            client.textRenderer.drawWithShadow(translatedAction, (float) (x + buttonWidth + 5), (float) (y + textY), 14737632);
 
-            return get_button_tip_width(translated_action, client.textRenderer);
+            return getButtonTipWidth(translatedAction, client.textRenderer);
         }
 
         return -10;
     }
 
-    private static int get_button_tip_width(@NotNull String action, @NotNull TextRenderer text_renderer)
+    private static int getButtonTipWidth(@NotNull String action, @NotNull TextRenderer textRenderer)
     {
-        return 15 + 5 + text_renderer.getStringWidth(action);
+        return 15 + 5 + textRenderer.getStringWidth(action);
     }
 }
