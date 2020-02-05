@@ -41,6 +41,7 @@ public class LambdaControlsConfig
     private static final HudSide        DEFAULT_HUD_SIDE              = HudSide.LEFT;
     // Gameplay
     private static final boolean        DEFAULT_FRONT_BLOCK_PLACING   = false;
+    private static final boolean        DEFAULT_FAST_BLOCK_INTERACT   = true;
     private static final boolean        DEFAULT_FLY_DRIFTING          = false;
     private static final boolean        DEFAULT_FLY_VERTICAL_DRIFTING = true;
     // Controller
@@ -84,6 +85,7 @@ public class LambdaControlsConfig
         this.hudSide = HudSide.byId(this.config.getOrElse("hud.side", DEFAULT_HUD_SIDE.getName())).orElse(DEFAULT_HUD_SIDE);
         // Gameplay
         LambdaControlsFeature.FRONT_BLOCK_PLACING.setEnabled(this.config.getOrElse("gameplay.front_block_placing", DEFAULT_FRONT_BLOCK_PLACING));
+        LambdaControlsFeature.FAST_BLOCK_INTERACT.setEnabled(this.config.getOrElse("gameplay.fast_block_interact", DEFAULT_FAST_BLOCK_INTERACT));
         // Controller settings.
         this.controllerType = ControllerType.byId(this.config.getOrElse("controller.type", DEFAULT_CONTROLLER_TYPE.getName())).orElse(DEFAULT_CONTROLLER_TYPE);
         this.deadZone = this.config.getOrElse("controller.dead_zone", DEFAULT_DEAD_ZONE);
@@ -132,6 +134,7 @@ public class LambdaControlsConfig
         this.setHudSide(DEFAULT_HUD_SIDE);
         // Gameplay
         this.setFrontBlockPlacing(DEFAULT_FRONT_BLOCK_PLACING);
+        this.setFastBlockInteract(DEFAULT_FAST_BLOCK_INTERACT);
         this.setFlyDrifting(DEFAULT_FLY_DRIFTING);
         this.setFlyVerticalDrifting(DEFAULT_FLY_VERTICAL_DRIFTING);
         // Controller
@@ -255,6 +258,16 @@ public class LambdaControlsConfig
     {
         LambdaControlsFeature.FRONT_BLOCK_PLACING.setEnabled(enable);
         this.config.set("gameplay.front_block_placing", enable);
+    }
+
+    /**
+     * Gets whether fast block interaction is enabled or not.
+     * 
+     * @return True if fast block interaction is enabled, else false.
+     */
+    public boolean hasFastBlockPlacement()
+    {
+        return LambdaControlsFeature.FAST_BLOCK_PLACEMENT.isEnabled();
     }
 
     /**
