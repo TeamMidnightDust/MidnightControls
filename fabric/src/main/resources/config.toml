@@ -13,10 +13,10 @@ auto_switch_mode = false
 
 # Gameplay settings
 [gameplay]
+    # Enables fast block interaction like in Bedrock Edition.
+    fast_block_interaction = true
     # Enables front block placing like in Bedrock Edition.
     front_block_placing = false
-    # Enables fast block interaction like in Bedrock Edition.
-    fast_block_interact = true
     # Fly behaviors
     [gameplay.fly]
         # Enables fly drifting.

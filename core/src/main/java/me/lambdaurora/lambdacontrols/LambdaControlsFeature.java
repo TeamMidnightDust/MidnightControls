@@ -26,9 +26,9 @@ import java.util.Optional;
  */
 public class LambdaControlsFeature implements Nameable
 {
-    private static final List<LambdaControlsFeature> FEATURES             = new ArrayList<>();
-    public static final  LambdaControlsFeature       FRONT_BLOCK_PLACING  = new LambdaControlsFeature("front_block_placing", true, false);
-    public static final  LambdaControlsFeature       FAST_BLOCK_PLACEMENT = new LambdaControlsFeature("fast_block_placement", true, true);
+    private static final List<LambdaControlsFeature> FEATURES               = new ArrayList<>();
+    public static final  LambdaControlsFeature       FRONT_BLOCK_PLACING    = new LambdaControlsFeature("front_block_placing", true, false);
+    public static final  LambdaControlsFeature       FAST_BLOCK_INTERACTION = new LambdaControlsFeature("fast_block_interaction", true, true);
 
     private final String  key;
     private final boolean defaultAllowed;
@@ -156,6 +156,6 @@ public class LambdaControlsFeature implements Nameable
 
     static {
         FEATURES.add(FRONT_BLOCK_PLACING);
-        FEATURES.add(FAST_BLOCK_PLACEMENT);
+        FEATURES.add(FAST_BLOCK_INTERACTION);
     }
 }
