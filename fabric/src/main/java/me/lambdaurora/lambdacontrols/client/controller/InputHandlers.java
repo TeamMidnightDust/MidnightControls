@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * Represents some input handlers.
  *
  * @author LambdAurora
- * @version 1.1.0
+ * @version 1.1.1
  * @since 1.1.0
  */
 public class InputHandlers
@@ -59,7 +59,7 @@ public class InputHandlers
                 return true;
             } else if (client.currentScreen instanceof CreativeInventoryScreen) {
                 CreativeInventoryScreenAccessor inventory = (CreativeInventoryScreenAccessor) client.currentScreen;
-                int currentSelectedTab = inventory.lambdacontrols_getSelectedTab();
+                int currentSelectedTab = inventory.getSelectedTab();
                 int nextTab = currentSelectedTab + (right ? 1 : -1);
                 if (nextTab < 0)
                     nextTab = ItemGroup.GROUPS.length - 1;
@@ -69,8 +69,8 @@ public class InputHandlers
                 return true;
             } else if (client.currentScreen instanceof AdvancementsScreen) {
                 AdvancementsScreenAccessor screen = (AdvancementsScreenAccessor) client.currentScreen;
-                List<AdvancementTab> tabs = screen.lambdacontrols_getTabs().values().stream().distinct().collect(Collectors.toList());
-                AdvancementTab tab = screen.lambdacontrols_getSelectedTab();
+                List<AdvancementTab> tabs = screen.getTabs().values().stream().distinct().collect(Collectors.toList());
+                AdvancementTab tab = screen.getSelectedTab();
                 for (int i = 0; i < tabs.size(); i++) {
                     if (tabs.get(i).equals(tab)) {
                         int nextTab = i + (right ? 1 : -1);
@@ -78,7 +78,7 @@ public class InputHandlers
                             nextTab = tabs.size() - 1;
                         else if (nextTab >= tabs.size())
                             nextTab = 0;
-                        screen.lambdacontrols_getAdvancementManager().selectTab(tabs.get(nextTab).getRoot(), true);
+                        screen.getAdvancementManager().selectTab(tabs.get(nextTab).getRoot(), true);
                         break;
                     }
                 }
@@ -134,8 +134,8 @@ public class InputHandlers
 
             ContainerScreen inventory = (ContainerScreen) client.currentScreen;
             ContainerScreenAccessor accessor = (ContainerScreenAccessor) inventory;
-            int guiLeft = accessor.lambdacontrols_getX();
-            int guiTop = accessor.lambdacontrols_getY();
+            int guiLeft = accessor.getX();
+            int guiTop = accessor.getY();
             double mouseX = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
             double mouseY = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
 

@@ -14,6 +14,7 @@ import me.lambdaurora.lambdacontrols.client.controller.Controller;
 import me.lambdaurora.lambdacontrols.client.controller.InputManager;
 import me.lambdaurora.lambdacontrols.client.gui.ControllerControlsScreen;
 import me.lambdaurora.lambdacontrols.client.gui.TouchscreenOverlay;
+import me.lambdaurora.lambdacontrols.client.mixin.AdvancementsScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.mixin.CreativeInventoryScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.mixin.EntryListWidgetAccessor;
 import me.lambdaurora.lambdacontrols.client.util.ContainerScreenAccessor;
@@ -22,6 +23,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
@@ -55,7 +57,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents the LambdaControls' input handler.
  *
  * @author LambdAurora
- * @version 1.1.0
+ * @version 1.1.1
  * @since 1.0.0
  */
 public class LambdaInput
@@ -311,6 +313,7 @@ public class LambdaInput
                             slotAction = SlotActionType.CLONE;
                     }
                     client.interactionManager.clickSlot(((ContainerScreen) client.currentScreen).getContainer().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_1, slotAction, client.player);
+                    client.player.playerContainer.sendContentUpdates();
                     this.actionGuiCooldown = 5;
                     return;
                 } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
@@ -381,6 +384,8 @@ public class LambdaInput
             }
         }
 
+        double deadZone = this.config.getDeadZone();
+
         if (client.currentScreen instanceof ControllerControlsScreen) {
             ControllerControlsScreen screen = (ControllerControlsScreen) client.currentScreen;
             if (screen.focusedBinding != null) {
@@ -397,9 +402,27 @@ public class LambdaInput
                 }
                 return;
             }
+        } else if (client.currentScreen instanceof CreativeInventoryScreen) {
+            if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
+                CreativeInventoryScreen screen = (CreativeInventoryScreen) client.currentScreen;
+                CreativeInventoryScreenAccessor accessor = (CreativeInventoryScreenAccessor) screen;
+                if (accessor.lambdacontrols_hasScrollbar() && absValue >= deadZone) {
+                    screen.mouseScrolled(0.0, 0.0, -value);
+                }
+                return;
+            }
+        } else if (client.currentScreen instanceof AdvancementsScreen) {
+            if (axis == GLFW_GAMEPAD_AXIS_RIGHT_X || axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
+                AdvancementsScreen screen = (AdvancementsScreen) client.currentScreen;
+                AdvancementsScreenAccessor accessor = (AdvancementsScreenAccessor) screen;
+                if (absValue >= deadZone) {
+                    AdvancementTab tab = accessor.getSelectedTab();
+                    tab.move(axis == GLFW_GAMEPAD_AXIS_RIGHT_X ? -value * 5.0 : 0.0, axis == GLFW_GAMEPAD_AXIS_RIGHT_Y ? -value * 5.0 : 0.0);
+                }
+                return;
+            }
         }
 
-        double deadZone = this.config.getDeadZone();
         if (client.currentScreen == null) {
             // Handles the look direction.
             this.handleLook(client, axis, (float) (absValue / (1.0 - this.config.getDeadZone())), state);
@@ -590,8 +613,8 @@ public class LambdaInput
         if (screen instanceof ContainerScreen) {
             ContainerScreen inventoryScreen = (ContainerScreen) screen;
             ContainerScreenAccessor accessor = (ContainerScreenAccessor) inventoryScreen;
-            int guiLeft = accessor.lambdacontrols_getX();
-            int guiTop = accessor.lambdacontrols_getY();
+            int guiLeft = accessor.getX();
+            int guiTop = accessor.getY();
             int mouseX = (int) (targetMouseX * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth());
             int mouseY = (int) (targetMouseY * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight());
 

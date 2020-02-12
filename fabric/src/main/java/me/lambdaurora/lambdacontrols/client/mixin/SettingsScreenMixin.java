@@ -36,7 +36,7 @@ public class SettingsScreenMixin extends Screen
     private AbstractButtonWidget lambdacontrols_onInit(SettingsScreen screen, AbstractButtonWidget btn)
     {
         if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER) {
-            return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).lambdacontrols_getHeight(), btn.getMessage(),
+            return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).getHeight(), btn.getMessage(),
                     b -> this.minecraft.openScreen(new ControllerControlsScreen(this, false))));
         } else {
             return this.addButton(btn);

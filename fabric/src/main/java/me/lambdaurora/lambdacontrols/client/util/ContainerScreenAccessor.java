@@ -21,14 +21,14 @@ public interface ContainerScreenAccessor
      *
      * @return The left coordinate of the GUI.
      */
-    int lambdacontrols_getX();
+    int getX();
 
     /**
      * Gets the top coordinate of the GUI.
      *
      * @return The top coordinate of the GUI.
      */
-    int lambdacontrols_getY();
+    int getY();
 
     /**
      * Gets the slot at position.

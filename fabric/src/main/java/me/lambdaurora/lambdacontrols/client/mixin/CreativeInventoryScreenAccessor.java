@@ -30,7 +30,7 @@ public interface CreativeInventoryScreenAccessor
      * @return The selected tab index.
      */
     @Accessor("selectedTab")
-    int lambdacontrols_getSelectedTab();
+    int getSelectedTab();
 
     /**
      * Sets the selected tab.
@@ -48,4 +48,12 @@ public interface CreativeInventoryScreenAccessor
      */
     @Invoker("isCreativeInventorySlot")
     boolean lambdacontrols_isCreativeInventorySlot(@Nullable Slot slot);
+
+    /**
+     * Returns whether the current tab has a scrollbar or not.
+     *
+     * @return True if the current tab has a scrollbar, else false.
+     */
+    @Invoker("hasScrollbar")
+    boolean lambdacontrols_hasScrollbar();
 }

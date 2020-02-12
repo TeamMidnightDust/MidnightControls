@@ -15,6 +15,7 @@ import me.lambdaurora.lambdacontrols.client.util.MouseAccessor;
 import net.minecraft.client.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -25,22 +26,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Mouse.class)
 public abstract class MouseMixin implements MouseAccessor
 {
-    @Shadow
-    protected abstract void onCursorPos(long window, double x, double y);
-
-    @Shadow
-    protected abstract void onMouseButton(long window, int button, int action, int mods);
+    @Invoker("onCursorPos")
+    public abstract void lambdacontrols_onCursorPos(long window, double x, double y);
 
     @Inject(method = "lockCursor", at = @At("HEAD"), cancellable = true)
-    private void lambdacontrols_onMouseLocked(CallbackInfo ci)
+    private void onMouseLocked(CallbackInfo ci)
     {
         if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.TOUCHSCREEN)
             ci.cancel();
-    }
-
-    @Override
-    public void lambdacontrols_onCursorPos(long window, double x, double y)
-    {
-        this.onCursorPos(window, x, y);
     }
 }

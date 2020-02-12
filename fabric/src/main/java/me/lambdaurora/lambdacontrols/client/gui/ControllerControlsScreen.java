@@ -60,7 +60,7 @@ public class ControllerControlsScreen extends Screen
                 btn -> this.minecraft.openScreen(new ControlsOptionsScreen(this, this.minecraft.options))));
         if (!this.hideSettings)
             this.addButton(new SpruceButtonWidget(this.width / 2 - 155 + 160, 18, 150, 20, I18n.translate("menu.options"),
-                    btn -> this.minecraft.openScreen(new LambdaControlsSettingsScreen(this, this.minecraft.options, true))));
+                    btn -> this.minecraft.openScreen(new LambdaControlsSettingsScreen(this, true))));
         this.bindingsListWidget = new ControlsListWidget(this, this.minecraft);
         this.children.add(this.bindingsListWidget);
         this.resetButton = this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 29, 150, 20, I18n.translate("controls.resetAll"),

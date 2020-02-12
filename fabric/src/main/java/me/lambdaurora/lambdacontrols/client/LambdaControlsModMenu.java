@@ -9,6 +9,7 @@
 
 package me.lambdaurora.lambdacontrols.client;
 
+import io.github.prospector.modmenu.api.ConfigScreenFactory;
 import io.github.prospector.modmenu.api.ModMenuApi;
 import me.lambdaurora.lambdacontrols.LambdaControlsConstants;
 import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsSettingsScreen;
@@ -21,7 +22,7 @@ import java.util.function.Function;
  * Represents the API implementation of ModMenu for LambdaControls.
  *
  * @author LambdAurora
- * @version 1.1.0
+ * @version 1.1.1
  * @since 1.1.0
  */
 public class LambdaControlsModMenu implements ModMenuApi
@@ -33,8 +34,8 @@ public class LambdaControlsModMenu implements ModMenuApi
     }
 
     @Override
-    public Function<Screen, ? extends Screen> getConfigScreenFactory()
+    public ConfigScreenFactory<?> getModConfigScreenFactory()
     {
-        return screen -> new LambdaControlsSettingsScreen(screen, MinecraftClient.getInstance().options, false);
+        return parent -> new LambdaControlsSettingsScreen(parent, false);
     }
 }

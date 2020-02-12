@@ -19,9 +19,6 @@ import org.spongepowered.asm.mixin.Shadow;
 public class KeyBindingMixin implements KeyBindingAccessor
 {
     @Shadow
-    private InputUtil.KeyCode keyCode;
-
-    @Shadow
     private int timesPressed;
 
     @Shadow

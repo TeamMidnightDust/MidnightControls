@@ -35,12 +35,12 @@ public class ControlsOptionsScreenMixin extends GameOptionsScreen
     }
 
     @Redirect(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/options/ControlsOptionsScreen;addButton(Lnet/minecraft/client/gui/widget/AbstractButtonWidget;)Lnet/minecraft/client/gui/widget/AbstractButtonWidget;", ordinal = 1))
-    private AbstractButtonWidget on_init(ControlsOptionsScreen screen, AbstractButtonWidget btn)
+    private AbstractButtonWidget onInit(ControlsOptionsScreen screen, AbstractButtonWidget btn)
     {
         if (this.parent instanceof ControllerControlsScreen)
             return this.addButton(btn);
         else
-            return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).lambdacontrols_getHeight(), I18n.translate("menu.options"),
-                    b -> this.minecraft.openScreen(new LambdaControlsSettingsScreen(this, this.gameOptions, true))));
+            return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).getHeight(), I18n.translate("menu.options"),
+                    b -> this.minecraft.openScreen(new LambdaControlsSettingsScreen(this, true))));
     }
 }

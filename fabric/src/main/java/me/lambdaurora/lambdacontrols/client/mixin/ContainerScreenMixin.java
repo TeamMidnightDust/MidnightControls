@@ -17,6 +17,7 @@ import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.container.Slot;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,26 +29,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ContainerScreen.class)
 public abstract class ContainerScreenMixin implements ContainerScreenAccessor
 {
-    protected int x;
-    protected int y;
+    @Accessor("x")
+    public abstract int getX();
 
-    @Override
-    public int lambdacontrols_getX()
-    {
-        return this.x;
-    }
-
-    @Override
-    public int lambdacontrols_getY()
-    {
-        return this.y;
-    }
+    @Accessor("y")
+    public abstract int getY();
 
     @Invoker("getSlotAt")
     public abstract Slot lambdacontrols_getSlotAt(double posX, double posY);
 
     @Inject(method = "render", at = @At("RETURN"))
-    public void render(int mouseX, int mouseY, float delta, CallbackInfo ci)
+    public void onRender(int mouseX, int mouseY, float delta, CallbackInfo ci)
     {
         if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER) {
             MinecraftClient client = MinecraftClient.getInstance();

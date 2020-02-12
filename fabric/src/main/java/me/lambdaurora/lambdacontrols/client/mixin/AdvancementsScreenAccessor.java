@@ -25,11 +25,11 @@ import java.util.Map;
 public interface AdvancementsScreenAccessor
 {
     @Accessor("advancementHandler")
-    ClientAdvancementManager lambdacontrols_getAdvancementManager();
+    ClientAdvancementManager getAdvancementManager();
 
     @Accessor("tabs")
-    Map<Advancement, AdvancementTab> lambdacontrols_getTabs();
+    Map<Advancement, AdvancementTab> getTabs();
 
     @Accessor("selectedTab")
-    AdvancementTab lambdacontrols_getSelectedTab();
+    AdvancementTab getSelectedTab();
 }

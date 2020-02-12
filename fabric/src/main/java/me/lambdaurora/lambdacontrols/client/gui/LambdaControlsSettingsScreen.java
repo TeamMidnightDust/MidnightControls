@@ -65,7 +65,7 @@ public class LambdaControlsSettingsScreen extends Screen
     private             ButtonListWidget     list;
     private             SpruceLabelWidget    gamepadToolUrlLabel;
 
-    public LambdaControlsSettingsScreen(Screen parent, @NotNull GameOptions options, boolean hideControls)
+    public LambdaControlsSettingsScreen(Screen parent, boolean hideControls)
     {
         super(new TranslatableText("lambdacontrols.title.settings"));
         this.mod = LambdaControlsClient.get();

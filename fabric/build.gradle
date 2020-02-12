@@ -42,7 +42,7 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modCompile "io.github.prospector:modmenu:1.8.5+build.23"
+    modCompile "io.github.prospector:modmenu:${project.modmenu_version}"
     modCompile "com.github.lambdaurora:spruceui:${project.spruceui_version}"
     include "com.github.lambdaurora:spruceui:${project.spruceui_version}"
 

@@ -61,25 +61,25 @@ public abstract class MinecraftClientMixin
     public GameRenderer gameRenderer;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void lambdacontrols_onInit(CallbackInfo ci)
+    private void onInit(CallbackInfo ci)
     {
         LambdaControlsClient.get().onMcInit((MinecraftClient) (Object) this);
     }
 
     @Inject(method = "render", at = @At("HEAD"))
-    private void lambdacontrols_onRender(boolean fullRender, CallbackInfo ci)
+    private void onRender(boolean fullRender, CallbackInfo ci)
     {
         LambdaControlsClient.get().onRender((MinecraftClient) (Object) (this));
     }
 
     @Inject(method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V", at = @At("RETURN"))
-    private void lambdacontrols_onLeave(@Nullable Screen screen, CallbackInfo ci)
+    private void onLeave(@Nullable Screen screen, CallbackInfo ci)
     {
         LambdaControlsClient.get().onLeave();
     }
 
     @Inject(method = "doItemUse()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/HitResult;getType()Lnet/minecraft/util/hit/HitResult$Type;"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true)
-    private void lambdacontrols_onItemUse(CallbackInfo ci, Hand[] hands, int handCount, int handIndex, Hand hand, ItemStack stackInHand)
+    private void onItemUse(CallbackInfo ci, Hand[] hands, int handCount, int handIndex, Hand hand, ItemStack stackInHand)
     {
         if (!stackInHand.isEmpty() && this.player.pitch > 35.0F && LambdaControlsFeature.FRONT_BLOCK_PLACING.isAvailable()) {
             if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.MISS && this.player.onGround) {

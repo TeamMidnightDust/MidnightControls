@@ -17,5 +17,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface AbstractButtonWidgetAccessor
 {
     @Accessor("height")
-    int lambdacontrols_getHeight();
+    int getHeight();
 }
