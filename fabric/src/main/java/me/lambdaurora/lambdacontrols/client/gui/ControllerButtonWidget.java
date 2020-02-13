@@ -52,7 +52,7 @@ public class ControllerButtonWidget extends AbstractIconButtonWidget
         if (this.binding.getButton().length > 1) {
             x += (this.width / 2 - this.iconWidth / 2) - 4;
         }
-        Pair<Integer, Integer> size = LambdaControlsClient.drawButton(x, y, this.binding, MinecraftClient.getInstance());
+        Pair<Integer, Integer> size = LambdaControlsRenderer.drawButton(x, y, this.binding, MinecraftClient.getInstance());
         this.iconWidth = size.key;
         return size.value;
     }

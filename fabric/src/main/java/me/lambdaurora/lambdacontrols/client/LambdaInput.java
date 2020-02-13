@@ -19,6 +19,8 @@ import me.lambdaurora.lambdacontrols.client.mixin.CreativeInventoryScreenAccesso
 import me.lambdaurora.lambdacontrols.client.mixin.EntryListWidgetAccessor;
 import me.lambdaurora.lambdacontrols.client.util.ContainerScreenAccessor;
 import me.lambdaurora.spruceui.SpruceLabelWidget;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.FluidBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
@@ -35,6 +37,10 @@ import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.container.Slot;
 import net.minecraft.container.SlotActionType;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -661,5 +667,27 @@ public class LambdaInput
             this.mouseSpeedX = 0.F;
             this.mouseSpeedY = 0.F;
         }
+    }
+
+    public static @Nullable BlockHitResult tryFrontPlace(@NotNull MinecraftClient client)
+    {
+        if (client.player != null && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.MISS && client.player.onGround) {
+            if (client.player.isRiding())
+                return null;
+            BlockPos playerPos = client.player.getBlockPos().down();
+            BlockPos targetPos = new BlockPos(client.crosshairTarget.getPos()).subtract(playerPos);
+            BlockPos vector = new BlockPos(MathHelper.clamp(targetPos.getX(), -1, 1), 0, MathHelper.clamp(targetPos.getZ(), -1, 1));
+            BlockPos blockPos = playerPos.add(vector);
+
+            Direction direction = client.player.getHorizontalFacing();
+
+            BlockState adjacentBlockState = client.world.getBlockState(blockPos.offset(direction.getOpposite()));
+            if (adjacentBlockState.isAir() || adjacentBlockState.getBlock() instanceof FluidBlock || (vector.getX() == 0 && vector.getZ() == 0)) {
+                return null;
+            }
+
+            return new BlockHitResult(client.crosshairTarget.getPos(), direction.getOpposite(), blockPos, false);
+        }
+        return null;
     }
 }

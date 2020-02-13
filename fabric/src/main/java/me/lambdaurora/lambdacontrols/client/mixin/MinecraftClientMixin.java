@@ -11,6 +11,7 @@ package me.lambdaurora.lambdacontrols.client.mixin;
 
 import me.lambdaurora.lambdacontrols.LambdaControlsFeature;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
+import me.lambdaurora.lambdacontrols.client.LambdaInput;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.client.MinecraftClient;
@@ -28,6 +29,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -60,10 +62,31 @@ public abstract class MinecraftClientMixin
     @Final
     public GameRenderer gameRenderer;
 
+    @Shadow
+    private int itemUseCooldown;
+
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(CallbackInfo ci)
     {
         LambdaControlsClient.get().onMcInit((MinecraftClient) (Object) this);
+    }
+
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void onStartTick(CallbackInfo ci)
+    {
+        if (this.player != null && this.player.isCreative()) {
+            int cooldown = this.itemUseCooldown;
+            if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.BLOCK && this.player.abilities.flying) {
+                if (cooldown > 1)
+                    this.itemUseCooldown = 1;
+            } else if (this.player.isSprinting()) {
+                BlockHitResult result = LambdaInput.tryFrontPlace(((MinecraftClient) (Object) this));
+                if (result != null) {
+                    if (cooldown > 0)
+                        this.itemUseCooldown = 0;
+                }
+            }
+        }
     }
 
     @Inject(method = "render", at = @At("HEAD"))
@@ -84,19 +107,10 @@ public abstract class MinecraftClientMixin
         if (!stackInHand.isEmpty() && this.player.pitch > 35.0F && LambdaControlsFeature.FRONT_BLOCK_PLACING.isAvailable()) {
             if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.MISS && this.player.onGround) {
                 if (!stackInHand.isEmpty() && stackInHand.getItem() instanceof BlockItem) {
-                    BlockPos playerPos = this.player.getBlockPos().down();
-                    BlockPos targetPos = new BlockPos(this.crosshairTarget.getPos()).subtract(playerPos);
-                    BlockPos vector = new BlockPos(MathHelper.clamp(targetPos.getX(), -1, 1), 0, MathHelper.clamp(targetPos.getZ(), -1, 1));
-                    BlockPos blockPos = playerPos.add(vector);
+                    BlockHitResult hitResult = LambdaInput.tryFrontPlace(((MinecraftClient) (Object) this));
 
-                    Direction direction = player.getHorizontalFacing();
-
-                    BlockState adjacentBlockState = this.world.getBlockState(blockPos.offset(direction.getOpposite()));
-                    if (adjacentBlockState.isAir() || adjacentBlockState.getBlock() instanceof FluidBlock || (vector.getX() == 0 && vector.getZ() == 0)) {
+                    if (hitResult == null)
                         return;
-                    }
-
-                    BlockHitResult hitResult = new BlockHitResult(this.crosshairTarget.getPos(), direction.getOpposite(), blockPos, false);
 
                     int previousStackCount = stackInHand.getCount();
                     ActionResult result = this.interactionManager.interactBlock(this.player, this.world, hand, hitResult);

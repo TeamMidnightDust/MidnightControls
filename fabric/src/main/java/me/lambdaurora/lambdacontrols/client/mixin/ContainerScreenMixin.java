@@ -11,6 +11,7 @@ package me.lambdaurora.lambdacontrols.client.mixin;
 
 import me.lambdaurora.lambdacontrols.ControlsMode;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
+import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsRenderer;
 import me.lambdaurora.lambdacontrols.client.util.ContainerScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.ContainerScreen;
@@ -45,10 +46,10 @@ public abstract class ContainerScreenMixin implements ContainerScreenAccessor
             MinecraftClient client = MinecraftClient.getInstance();
             int x = 10, y = client.getWindow().getScaledHeight() - 10 - 15;
 
-            x += LambdaControlsClient.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_A}, "lambdacontrols.action.pickup_all", true, client) + 10;
-            x += LambdaControlsClient.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_B}, "lambdacontrols.action.exit", true, client) + 10;
-            x += LambdaControlsClient.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_X}, "lambdacontrols.action.pickup", true, client) + 10;
-            LambdaControlsClient.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_Y}, "lambdacontrols.action.quick_move", true, client);
+            x += LambdaControlsRenderer.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_A}, "lambdacontrols.action.pickup_all", true, client) + 10;
+            x += LambdaControlsRenderer.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_B}, "lambdacontrols.action.exit", true, client) + 10;
+            x += LambdaControlsRenderer.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_X}, "lambdacontrols.action.pickup", true, client) + 10;
+            LambdaControlsRenderer.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_Y}, "lambdacontrols.action.quick_move", true, client);
         }
     }
 }
