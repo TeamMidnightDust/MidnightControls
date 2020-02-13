@@ -241,7 +241,7 @@ public class LambdaControlsConfig
 
     /**
      * Gets whether fast block interaction is enabled or not.
-     * 
+     *
      * @return True if fast block interaction is enabled, else false.
      */
     public boolean hasFastBlockInteraction()
@@ -251,7 +251,7 @@ public class LambdaControlsConfig
 
     /**
      * Sets whether fast block interaction is enabled or not.
-     * 
+     *
      * @param enable True if fast block interaction is enabled, else false.
      */
     public void setFastBlockInteraction(boolean enable)

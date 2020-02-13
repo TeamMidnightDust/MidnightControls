@@ -9,7 +9,6 @@
 
 package me.lambdaurora.lambdacontrols.client.gui;
 
-import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.spruceui.AbstractIconButtonWidget;
 import net.minecraft.client.MinecraftClient;

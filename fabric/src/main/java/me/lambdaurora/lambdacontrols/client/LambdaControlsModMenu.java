@@ -13,10 +13,6 @@ import io.github.prospector.modmenu.api.ConfigScreenFactory;
 import io.github.prospector.modmenu.api.ModMenuApi;
 import me.lambdaurora.lambdacontrols.LambdaControlsConstants;
 import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsSettingsScreen;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-
-import java.util.function.Function;
 
 /**
  * Represents the API implementation of ModMenu for LambdaControls.
