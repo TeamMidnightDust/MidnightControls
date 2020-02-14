@@ -45,6 +45,7 @@ public class LambdaControlsSettingsScreen extends Screen
     private final       Option               mouseSpeedOption;
     private final       Option               resetOption;
     // Gameplay options
+    private final       Option               autoJumpOption;
     private final       Option               frontBlockPlacingOption;
     private final       Option               flyDriftingOption;
     private final       Option               flyVerticalDriftingOption;
@@ -92,6 +93,7 @@ public class LambdaControlsSettingsScreen extends Screen
             this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
         });
         // Gameplay options
+        this.autoJumpOption = SpruceBooleanOption.fromVanilla("options.autoJump", Option.AUTO_JUMP, null, true);
         this.frontBlockPlacingOption = new SpruceBooleanOption("lambdacontrols.menu.front_block_placing", this.mod.config::hasFrontBlockPlacing,
                 this.mod.config::setFrontBlockPlacing, new TranslatableText("lambdacontrols.tooltip.front_block_placing"), true);
         this.flyDriftingOption = new SpruceBooleanOption("lambdacontrols.menu.fly_drifting", this.mod.config::hasFlyDrifting,
@@ -221,6 +223,7 @@ public class LambdaControlsSettingsScreen extends Screen
         this.list.addSingleOptionEntry(this.autoSwitchModeOption);
         // Gameplay options
         this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.gameplay", true, null));
+        this.list.addSingleOptionEntry(this.autoJumpOption);
         this.list.addSingleOptionEntry(this.frontBlockPlacingOption);
         this.list.addSingleOptionEntry(this.flyDriftingOption);
         this.list.addSingleOptionEntry(this.flyVerticalDriftingOption);

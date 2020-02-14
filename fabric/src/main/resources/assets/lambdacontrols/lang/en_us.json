@@ -19,6 +19,7 @@
   "lambdacontrols.action.pick_block": "Pick Block",
   "lambdacontrols.action.pickup": "Pickup",
   "lambdacontrols.action.pickup_all": "Pickup all",
+  "lambdacontrols.action.place": "Place",
   "lambdacontrols.action.player_list": "Player List",
   "lambdacontrols.action.quick_move": "Quick move",
   "lambdacontrols.action.right": "Right",

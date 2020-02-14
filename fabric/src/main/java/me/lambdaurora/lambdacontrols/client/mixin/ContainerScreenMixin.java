@@ -13,6 +13,7 @@ import me.lambdaurora.lambdacontrols.ControlsMode;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsRenderer;
 import me.lambdaurora.lambdacontrols.client.util.ContainerScreenAccessor;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.container.Slot;
@@ -44,11 +45,15 @@ public abstract class ContainerScreenMixin implements ContainerScreenAccessor
     {
         if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER) {
             MinecraftClient client = MinecraftClient.getInstance();
-            int x = 10, y = client.getWindow().getScaledHeight() - 10 - 15;
+            int x = 2, y = client.getWindow().getScaledHeight() - 2 - LambdaControlsRenderer.ICON_SIZE;
 
-            x += LambdaControlsRenderer.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_A}, "lambdacontrols.action.pickup_all", true, client) + 10;
-            x += LambdaControlsRenderer.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_B}, "lambdacontrols.action.exit", true, client) + 10;
-            x += LambdaControlsRenderer.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_X}, "lambdacontrols.action.pickup", true, client) + 10;
+            x = LambdaControlsRenderer.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_A}, "lambdacontrols.action.pickup_all", true, client) + 2;
+            x = LambdaControlsRenderer.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_B}, "lambdacontrols.action.exit", true, client) + 2;
+            if (FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) {
+                x = 2;
+                y -= 24;
+            }
+            x = LambdaControlsRenderer.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_X}, "lambdacontrols.action.pickup", true, client) + 2;
             LambdaControlsRenderer.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_Y}, "lambdacontrols.action.quick_move", true, client);
         }
     }

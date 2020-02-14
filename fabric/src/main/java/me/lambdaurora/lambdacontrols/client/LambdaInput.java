@@ -671,7 +671,7 @@ public class LambdaInput
 
     public static @Nullable BlockHitResult tryFrontPlace(@NotNull MinecraftClient client)
     {
-        if (client.player != null && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.MISS && client.player.onGround) {
+        if (client.player != null && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.MISS && client.player.onGround && client.player.pitch > 35.0F) {
             if (client.player.isRiding())
                 return null;
             BlockPos playerPos = client.player.getBlockPos().down();

@@ -16,17 +16,72 @@ import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.Matrix4f;
-import net.minecraft.client.util.math.Rotation3;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * Represents the LambdaControls renderer.
+ *
+ * @author LambdAurora
+ * @version 1.1.1
+ * @since 1.1.1
+ */
 public class LambdaControlsRenderer
 {
+    public static final  int ICON_SIZE   = 20;
+    private static final int BUTTON_SIZE = 15;
+    private static final int AXIS_SIZE   = 18;
+
+    public static int getButtonSize(int button)
+    {
+        switch (button) {
+            case -1:
+                return 0;
+            case GLFW.GLFW_GAMEPAD_AXIS_LEFT_X + 100:
+            case GLFW.GLFW_GAMEPAD_AXIS_LEFT_X + 200:
+            case GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y + 100:
+            case GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y + 200:
+            case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X + 100:
+            case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X + 200:
+            case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y + 100:
+            case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y + 200:
+                return AXIS_SIZE;
+            default:
+                return BUTTON_SIZE;
+        }
+    }
+
+    /**
+     * Gets the binding icon width.
+     *
+     * @param binding The binding.
+     * @return The width.
+     */
+    public static int getBindingIconWidth(@NotNull ButtonBinding binding)
+    {
+        return getBindingIconWidth(binding.getButton());
+    }
+
+    /**
+     * Gets the binding icon width.
+     *
+     * @param buttons The buttons.
+     * @return The width.
+     */
+    public static int getBindingIconWidth(int[] buttons)
+    {
+        int width = 0;
+        for (int i = 0; i < buttons.length; i++) {
+            width += ICON_SIZE;
+            if (i + 1 < buttons.length) {
+                width += 2;
+            }
+        }
+        return width;
+    }
+
     public static Pair<Integer, Integer> drawButton(int x, int y, @NotNull ButtonBinding button, @NotNull MinecraftClient client)
     {
         return drawButton(x, y, button.getButton(), client);
@@ -39,10 +94,10 @@ public class LambdaControlsRenderer
         int currentX = x;
         for (int i = 0; i < buttons.length; i++) {
             int btn = buttons[i];
-            Pair<Integer, Integer> size = drawButton(currentX, y, btn, client);
-            if (size.key > height)
-                height = size.key;
-            length += size.key;
+            int size = drawButton(currentX, y, btn, client);
+            if (size > height)
+                height = size;
+            length += size;
             if (i + 1 < buttons.length) {
                 length += 2;
                 currentX = x + length;
@@ -52,11 +107,11 @@ public class LambdaControlsRenderer
     }
 
     @SuppressWarnings("deprecated")
-    public static Pair<Integer, Integer> drawButton(int x, int y, int button, @NotNull MinecraftClient client)
+    public static int drawButton(int x, int y, int button, @NotNull MinecraftClient client)
     {
         boolean second = false;
         if (button == -1)
-            return Pair.of(0, 0);
+            return 0;
         else if (button >= 500) {
             button -= 1000;
             second = true;
@@ -132,11 +187,16 @@ public class LambdaControlsRenderer
         client.getTextureManager().bindTexture(axis ? LambdaControlsClient.CONTROLLER_AXIS : LambdaControlsClient.CONTROLLER_BUTTONS);
         GlStateManager.disableDepthTest();
 
-        GlStateManager.color4f(1.0F, second ? 0.0F : 1.0F, 1.0F, 1.0F);
-        DrawableHelper.blit(x, y, (float) buttonOffset, (float) (controllerType * (axis ? 18 : 15)), axis ? 18 : 15, axis ? 18 : 15, 256, 256);
+        int assetSize = axis ? AXIS_SIZE : BUTTON_SIZE;
+
+        RenderSystem.color4f(1.0F, second ? 0.0F : 1.0F, 1.0F, 1.0F);
+        DrawableHelper.blit(x + (ICON_SIZE / 2 - assetSize / 2), y + (ICON_SIZE / 2 - assetSize / 2),
+                (float) buttonOffset, (float) (controllerType * (axis ? AXIS_SIZE : BUTTON_SIZE)),
+                assetSize, assetSize,
+                256, 256);
         GlStateManager.enableDepthTest();
 
-        return axis ? Pair.of(18, 18) : Pair.of(15, 15);
+        return ICON_SIZE;
     }
 
     public static int drawButtonTip(int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull MinecraftClient client)
@@ -146,29 +206,13 @@ public class LambdaControlsRenderer
 
     public static int drawButtonTip(int x, int y, int[] button, @NotNull String action, boolean display, @NotNull MinecraftClient client)
     {
-        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-        int width = drawButtonTip(x, y, button, action, display, client, immediate, Rotation3.identity().getMatrix());
-        immediate.draw();
-        return width;
-    }
-
-    public static int drawButtonTip(int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull MinecraftClient client, @NotNull VertexConsumerProvider.Immediate immediate, @NotNull Matrix4f matrix4f)
-    {
-        return drawButtonTip(x, y, button.getButton(), button.getTranslationKey(), display, client, immediate, matrix4f);
-    }
-
-    public static int drawButtonTip(int x, int y, int[] button, @NotNull String action, boolean display, @NotNull MinecraftClient client, @NotNull VertexConsumerProvider.Immediate immediate, @NotNull Matrix4f matrix4f)
-    {
         if (display) {
-            RenderSystem.enableAlphaTest();
             int buttonWidth = drawButton(x, y, button, client).key;
 
             String translatedAction = I18n.translate(action);
-            int textY = (15 - client.textRenderer.fontHeight) / 2;
-            int width = client.textRenderer.draw(translatedAction, (float) (x + buttonWidth + 5), (float) (y + textY), 14737632, true, matrix4f, immediate,
-                    false, 0, 15728880);
+            int textY = (LambdaControlsRenderer.ICON_SIZE / 2 - client.textRenderer.fontHeight / 2) + 1;
 
-            return width;
+            return client.textRenderer.drawWithShadow(translatedAction, (float) (x + buttonWidth + 2), (float) (y + textY), 14737632);
         }
 
         return -10;

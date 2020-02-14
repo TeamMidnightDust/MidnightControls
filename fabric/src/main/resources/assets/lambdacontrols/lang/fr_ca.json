@@ -19,6 +19,7 @@
   "lambdacontrols.action.pick_block": "Choisir le bloc",
   "lambdacontrols.action.pickup": "Prendre",
   "lambdacontrols.action.pickup_all": "Prendre tout",
+  "lambdacontrols.action.place": "Placer",
   "lambdacontrols.action.player_list": "Afficher la liste des joueurs",
   "lambdacontrols.action.quick_move": "Mouvement rapide",
   "lambdacontrols.action.right": "Aller à droite",
