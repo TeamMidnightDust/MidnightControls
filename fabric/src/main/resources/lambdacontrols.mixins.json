@@ -16,7 +16,9 @@
     "KeyBindingMixin",
     "MinecraftClientMixin",
     "MouseMixin",
-    "SettingsScreenMixin"
+    "RecipeBookWidgetAccessor",
+    "SettingsScreenMixin",
+    "WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

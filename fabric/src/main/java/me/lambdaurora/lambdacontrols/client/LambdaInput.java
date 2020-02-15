@@ -9,6 +9,7 @@
 
 package me.lambdaurora.lambdacontrols.client;
 
+import me.lambdaurora.lambdacontrols.LambdaControlsFeature;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.Controller;
 import me.lambdaurora.lambdacontrols.client.controller.InputManager;
@@ -19,8 +20,10 @@ import me.lambdaurora.lambdacontrols.client.mixin.CreativeInventoryScreenAccesso
 import me.lambdaurora.lambdacontrols.client.mixin.EntryListWidgetAccessor;
 import me.lambdaurora.lambdacontrols.client.util.ContainerScreenAccessor;
 import me.lambdaurora.spruceui.SpruceLabelWidget;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidBlock;
+import net.minecraft.block.SlabBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
@@ -37,6 +40,8 @@ import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.container.Slot;
 import net.minecraft.container.SlotActionType;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -671,6 +676,8 @@ public class LambdaInput
 
     public static @Nullable BlockHitResult tryFrontPlace(@NotNull MinecraftClient client)
     {
+        if (!LambdaControlsFeature.FRONT_BLOCK_PLACING.isAvailable())
+            return null;
         if (client.player != null && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.MISS && client.player.onGround && client.player.pitch > 35.0F) {
             if (client.player.isRiding())
                 return null;
@@ -686,8 +693,22 @@ public class LambdaInput
                 return null;
             }
 
-            return new BlockHitResult(client.crosshairTarget.getPos(), direction.getOpposite(), blockPos, false);
+            return new BlockHitResult(client.crosshairTarget.getPos(), direction, blockPos, false);
         }
         return null;
+    }
+
+    public static @NotNull BlockHitResult withSideForFrontPlace(@NotNull BlockHitResult result, @Nullable ItemStack stack)
+    {
+        if (stack == null || stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
+            return result;
+        return withSideForFrontPlace(result, Block.getBlockFromItem(stack.getItem()));
+    }
+
+    public static @NotNull BlockHitResult withSideForFrontPlace(@NotNull BlockHitResult result, @NotNull Block block)
+    {
+        if (block instanceof SlabBlock)
+            result = result.withSide(Direction.DOWN);
+        return result;
     }
 }

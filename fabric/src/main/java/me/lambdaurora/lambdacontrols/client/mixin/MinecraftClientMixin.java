@@ -24,6 +24,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -59,6 +61,10 @@ public abstract class MinecraftClientMixin
     @Shadow
     private int itemUseCooldown;
 
+    private BlockPos  lambdacontrols_lastTargetPos;
+    private Direction lambdacontrols_lockedSide;
+    private int       lambdacontrols_lockedSideCooldown;
+
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(CallbackInfo ci)
     {
@@ -68,14 +74,31 @@ public abstract class MinecraftClientMixin
     @Inject(method = "tick", at = @At("HEAD"))
     private void onStartTick(CallbackInfo ci)
     {
-        if (this.player != null && this.player.isCreative()) {
+        if (!LambdaControlsFeature.FAST_BLOCK_INTERACTION.isAvailable())
+            return;
+        if (this.player != null) {
             int cooldown = this.itemUseCooldown;
+            BlockHitResult hitResult;
             if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.BLOCK && this.player.abilities.flying) {
-                if (cooldown > 1)
+                hitResult = (BlockHitResult) this.crosshairTarget;
+                BlockPos targetPos = hitResult.getBlockPos();
+                Direction side = hitResult.getSide();
+
+                if (cooldown > 1 && !targetPos.equals(this.lambdacontrols_lastTargetPos) && (side.equals(this.lambdacontrols_lockedSide) || this.lambdacontrols_lockedSide == null)) {
                     this.itemUseCooldown = 1;
+                    this.lambdacontrols_lockedSide = side;
+                    this.lambdacontrols_lockedSideCooldown = 10;
+                } else {
+                    if (this.lambdacontrols_lockedSideCooldown == 0)
+                        this.lambdacontrols_lockedSide = null;
+                    else if (this.lambdacontrols_lockedSideCooldown > 0)
+                        this.lambdacontrols_lockedSideCooldown--;
+                }
+
+                this.lambdacontrols_lastTargetPos = targetPos.toImmutable();
             } else if (this.player.isSprinting()) {
-                BlockHitResult result = LambdaInput.tryFrontPlace(((MinecraftClient) (Object) this));
-                if (result != null) {
+                hitResult = LambdaInput.tryFrontPlace(((MinecraftClient) (Object) this));
+                if (hitResult != null) {
                     if (cooldown > 0)
                         this.itemUseCooldown = 0;
                 }
@@ -105,6 +128,8 @@ public abstract class MinecraftClientMixin
 
                     if (hitResult == null)
                         return;
+
+                    hitResult = LambdaInput.withSideForFrontPlace(hitResult, stackInHand);
 
                     int previousStackCount = stackInHand.getCount();
                     ActionResult result = this.interactionManager.interactBlock(this.player, this.world, hand, hitResult);

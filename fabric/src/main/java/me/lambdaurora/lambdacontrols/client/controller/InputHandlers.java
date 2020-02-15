@@ -12,6 +12,7 @@ package me.lambdaurora.lambdacontrols.client.controller;
 import me.lambdaurora.lambdacontrols.client.ButtonState;
 import me.lambdaurora.lambdacontrols.client.mixin.AdvancementsScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.mixin.CreativeInventoryScreenAccessor;
+import me.lambdaurora.lambdacontrols.client.mixin.RecipeBookWidgetAccessor;
 import me.lambdaurora.lambdacontrols.client.util.ContainerScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.util.KeyBindingAccessor;
 import net.minecraft.client.MinecraftClient;
@@ -19,6 +20,8 @@ import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.screen.recipebook.RecipeGroupButtonWidget;
 import net.minecraft.client.util.ScreenshotUtils;
 import net.minecraft.container.Slot;
 import net.minecraft.item.ItemGroup;
@@ -59,14 +62,27 @@ public class InputHandlers
                 return true;
             } else if (client.currentScreen instanceof CreativeInventoryScreen) {
                 CreativeInventoryScreenAccessor inventory = (CreativeInventoryScreenAccessor) client.currentScreen;
-                int currentSelectedTab = inventory.getSelectedTab();
-                int nextTab = currentSelectedTab + (right ? 1 : -1);
+                int currentTab = inventory.getSelectedTab();
+                int nextTab = currentTab + (right ? 1 : -1);
                 if (nextTab < 0)
                     nextTab = ItemGroup.GROUPS.length - 1;
                 else if (nextTab >= ItemGroup.GROUPS.length)
                     nextTab = 0;
                 inventory.lambdacontrols_setSelectedTab(ItemGroup.GROUPS[nextTab]);
                 return true;
+            } else if (client.currentScreen instanceof InventoryScreen) {
+                RecipeBookWidgetAccessor recipeBook = (RecipeBookWidgetAccessor) ((InventoryScreen) client.currentScreen).getRecipeBookWidget();
+                List<RecipeGroupButtonWidget> tabs = recipeBook.getTabButtons();
+                RecipeGroupButtonWidget currentTab = recipeBook.getCurrentTab();
+                int nextTab = tabs.indexOf(currentTab) + (right ? 1 : -1);
+                if (nextTab < 0)
+                    nextTab = tabs.size() - 1;
+                else if (nextTab >= tabs.size())
+                    nextTab = 0;
+                currentTab.setToggled(false);
+                recipeBook.setCurrentTab(currentTab = tabs.get(nextTab));
+                currentTab.setToggled(true);
+                recipeBook.lambdacontrols_refreshResults(true);
             } else if (client.currentScreen instanceof AdvancementsScreen) {
                 AdvancementsScreenAccessor screen = (AdvancementsScreenAccessor) client.currentScreen;
                 List<AdvancementTab> tabs = screen.getTabs().values().stream().distinct().collect(Collectors.toList());
