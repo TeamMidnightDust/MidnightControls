@@ -12,7 +12,6 @@ package me.lambdaurora.lambdacontrols.client.mixin;
 import me.lambdaurora.lambdacontrols.client.LambdaInput;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.SlabBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.Matrix4f;
@@ -27,7 +26,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.shape.VoxelShape;
@@ -92,7 +90,7 @@ public abstract class WorldRendererMixin
             if (placementState == null)
                 return;
             VoxelShape outlineShape = placementState.getOutlineShape(this.client.world, blockPos, EntityContext.of(camera.getFocusedEntity()));
-            drawShapeOutline(matrices, vertexConsumer, outlineShape, (double) blockPos.getX() - x, (double) blockPos.getY() - y, (double) blockPos.getZ() - z, 0.0F, 0.0F, 0.0F, 0.4F);
+            drawShapeOutline(matrices, vertexConsumer, outlineShape, (double) blockPos.getX() - x, (double) blockPos.getY() - y, (double) blockPos.getZ() - z, 1.0F, 1.0F, 1.0F, 0.4F);
         }
     }
 }
