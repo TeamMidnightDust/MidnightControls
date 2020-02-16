@@ -12,6 +12,7 @@ package me.lambdaurora.lambdacontrols.client.mixin;
 import me.lambdaurora.lambdacontrols.LambdaControlsFeature;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.LambdaInput;
+import me.lambdaurora.lambdacontrols.client.util.FrontBlockPlaceResultAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -36,7 +37,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(MinecraftClient.class)
-public abstract class MinecraftClientMixin
+public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAccessor
 {
     @Shadow
     @Nullable
@@ -61,9 +62,17 @@ public abstract class MinecraftClientMixin
     @Shadow
     private int itemUseCooldown;
 
+    private BlockHitResult lambdacontrols_frontBlockPlaceResult = null;
+
     private BlockPos  lambdacontrols_lastTargetPos;
     private Direction lambdacontrols_lockedSide;
     private int       lambdacontrols_lockedSideCooldown;
+
+    @Override
+    public @Nullable BlockHitResult lambdacontrols_getFrontBlockPlaceResult()
+    {
+        return this.lambdacontrols_frontBlockPlaceResult;
+    }
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(CallbackInfo ci)
@@ -74,34 +83,35 @@ public abstract class MinecraftClientMixin
     @Inject(method = "tick", at = @At("HEAD"))
     private void onStartTick(CallbackInfo ci)
     {
-        if (!LambdaControlsFeature.FAST_BLOCK_INTERACTION.isAvailable())
+        if (this.player == null)
             return;
-        if (this.player != null) {
-            int cooldown = this.itemUseCooldown;
-            BlockHitResult hitResult;
-            if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.BLOCK && this.player.abilities.flying) {
-                hitResult = (BlockHitResult) this.crosshairTarget;
-                BlockPos targetPos = hitResult.getBlockPos();
-                Direction side = hitResult.getSide();
+        this.lambdacontrols_frontBlockPlaceResult = LambdaInput.tryFrontPlace(((MinecraftClient) (Object) this));
+        if (!LambdaControlsFeature.FAST_BLOCK_PLACING.isAvailable())
+            return;
+        int cooldown = this.itemUseCooldown;
+        BlockHitResult hitResult;
+        if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.BLOCK && this.player.abilities.flying) {
+            hitResult = (BlockHitResult) this.crosshairTarget;
+            BlockPos targetPos = hitResult.getBlockPos();
+            Direction side = hitResult.getSide();
 
-                if (cooldown > 1 && !targetPos.equals(this.lambdacontrols_lastTargetPos) && (side.equals(this.lambdacontrols_lockedSide) || this.lambdacontrols_lockedSide == null)) {
-                    this.itemUseCooldown = 1;
-                    this.lambdacontrols_lockedSide = side;
-                    this.lambdacontrols_lockedSideCooldown = 10;
-                } else {
-                    if (this.lambdacontrols_lockedSideCooldown == 0)
-                        this.lambdacontrols_lockedSide = null;
-                    else if (this.lambdacontrols_lockedSideCooldown > 0)
-                        this.lambdacontrols_lockedSideCooldown--;
-                }
+            if (cooldown > 1 && !targetPos.equals(this.lambdacontrols_lastTargetPos) && (side.equals(this.lambdacontrols_lockedSide) || this.lambdacontrols_lockedSide == null)) {
+                this.itemUseCooldown = 1;
+                this.lambdacontrols_lockedSide = side;
+                this.lambdacontrols_lockedSideCooldown = 10;
+            } else {
+                if (this.lambdacontrols_lockedSideCooldown == 0)
+                    this.lambdacontrols_lockedSide = null;
+                else if (this.lambdacontrols_lockedSideCooldown > 0)
+                    this.lambdacontrols_lockedSideCooldown--;
+            }
 
-                this.lambdacontrols_lastTargetPos = targetPos.toImmutable();
-            } else if (this.player.isSprinting()) {
-                hitResult = LambdaInput.tryFrontPlace(((MinecraftClient) (Object) this));
-                if (hitResult != null) {
-                    if (cooldown > 0)
-                        this.itemUseCooldown = 0;
-                }
+            this.lambdacontrols_lastTargetPos = targetPos.toImmutable();
+        } else if (this.player.isSprinting()) {
+            hitResult = this.lambdacontrols_frontBlockPlaceResult;
+            if (hitResult != null) {
+                if (cooldown > 0)
+                    this.itemUseCooldown = 0;
             }
         }
     }

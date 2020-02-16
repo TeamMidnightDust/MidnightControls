@@ -13,16 +13,21 @@ auto_switch_mode = false
 
 # Gameplay settings
 [gameplay]
-    # Enables fast block interaction like in Bedrock Edition.
-    fast_block_interaction = true
-    # Enables front block placing like in Bedrock Edition.
-    front_block_placing = false
+    # Enables fast block placing like in Bedrock Edition.
+    fast_block_placing = true
     # Fly behaviors
     [gameplay.fly]
         # Enables fly drifting.
         drifting = false
         # Enables vertical fly drifting.
         vertical_drifting = true
+    [gameplay.front_block_placing]
+        # Enables front block placing like in Bedrock Edition.
+        enabled = false
+        # Enables front block placing outline.
+        outline = true
+        # The color in a hexadecimal format of the outline.
+        outline_color = "#ffffff66"
 
 # Controller settings
 [controller]

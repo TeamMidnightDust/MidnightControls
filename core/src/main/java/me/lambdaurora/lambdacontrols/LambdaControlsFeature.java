@@ -21,14 +21,14 @@ import java.util.Optional;
  * Represents a feature.
  *
  * @author LambdAurora
- * @version 1.1.1
+ * @version 1.2.0
  * @since 1.1.0
  */
 public class LambdaControlsFeature implements Nameable
 {
-    private static final List<LambdaControlsFeature> FEATURES               = new ArrayList<>();
-    public static final  LambdaControlsFeature       FRONT_BLOCK_PLACING    = new LambdaControlsFeature("front_block_placing", true, false);
-    public static final  LambdaControlsFeature       FAST_BLOCK_INTERACTION = new LambdaControlsFeature("fast_block_interaction", true, true);
+    private static final List<LambdaControlsFeature> FEATURES            = new ArrayList<>();
+    public static final  LambdaControlsFeature       FRONT_BLOCK_PLACING = new LambdaControlsFeature("front_block_placing", true, false);
+    public static final  LambdaControlsFeature       FAST_BLOCK_PLACING  = new LambdaControlsFeature("fast_block_placing", true, true);
 
     private final String  key;
     private final boolean defaultAllowed;
@@ -156,6 +156,6 @@ public class LambdaControlsFeature implements Nameable
 
     static {
         FEATURES.add(FRONT_BLOCK_PLACING);
-        FEATURES.add(FAST_BLOCK_INTERACTION);
+        FEATURES.add(FAST_BLOCK_PLACING);
     }
 }

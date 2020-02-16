@@ -68,7 +68,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents the LambdaControls' input handler.
  *
  * @author LambdAurora
- * @version 1.1.1
+ * @version 1.2.0
  * @since 1.0.0
  */
 public class LambdaInput
@@ -688,6 +688,9 @@ public class LambdaInput
 
             Direction direction = client.player.getHorizontalFacing();
 
+            BlockState state = client.world.getBlockState(blockPos);
+            if (!state.isAir())
+                return null;
             BlockState adjacentBlockState = client.world.getBlockState(blockPos.offset(direction.getOpposite()));
             if (adjacentBlockState.isAir() || adjacentBlockState.getBlock() instanceof FluidBlock || (vector.getX() == 0 && vector.getZ() == 0)) {
                 return null;

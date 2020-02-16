@@ -9,7 +9,9 @@
 
 package me.lambdaurora.lambdacontrols.client.mixin;
 
+import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.LambdaInput;
+import me.lambdaurora.lambdacontrols.client.util.FrontBlockPlaceResultAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -72,9 +74,9 @@ public abstract class WorldRendererMixin
                                  Profiler profiler, Vec3d cameraPos, double x, double y, double z, Matrix4f modelMatrix, boolean bl, Frustum frustum2, boolean bl3,
                                  VertexConsumerProvider.Immediate immediate)
     {
-        if (this.client.crosshairTarget == null || this.client.crosshairTarget.getType() != HitResult.Type.MISS)
+        if (this.client.crosshairTarget == null || this.client.crosshairTarget.getType() != HitResult.Type.MISS || !LambdaControlsClient.get().config.shouldRenderFrontBlockOutline())
             return;
-        BlockHitResult result = LambdaInput.tryFrontPlace(client);
+        BlockHitResult result = ((FrontBlockPlaceResultAccessor) client).lambdacontrols_getFrontBlockPlaceResult();
         if (result == null)
             return;
         BlockPos blockPos = result.getBlockPos();
@@ -90,7 +92,8 @@ public abstract class WorldRendererMixin
             if (placementState == null)
                 return;
             VoxelShape outlineShape = placementState.getOutlineShape(this.client.world, blockPos, EntityContext.of(camera.getFocusedEntity()));
-            drawShapeOutline(matrices, vertexConsumer, outlineShape, (double) blockPos.getX() - x, (double) blockPos.getY() - y, (double) blockPos.getZ() - z, 1.0F, 1.0F, 1.0F, 0.4F);
+            int[] color = LambdaControlsClient.get().config.getFrontBlockOutlineColor();
+            drawShapeOutline(matrices, vertexConsumer, outlineShape, (double) blockPos.getX() - x, (double) blockPos.getY() - y, (double) blockPos.getZ() - z, color[0] / 255.f, color[1] / 255.f, color[2] / 255.f, color[3] / 255.f);
         }
     }
 }

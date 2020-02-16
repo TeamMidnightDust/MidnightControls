@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
  * Represents the LambdaControls HUD.
  *
  * @author LambdAurora
- * @version 1.1.1
+ * @version 1.2.0
  * @since 1.0.0
  */
 public class LambdaControlsHud extends Hud

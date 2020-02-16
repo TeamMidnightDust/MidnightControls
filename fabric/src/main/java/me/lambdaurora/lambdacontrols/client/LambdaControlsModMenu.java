@@ -18,7 +18,7 @@ import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsSettingsScreen;
  * Represents the API implementation of ModMenu for LambdaControls.
  *
  * @author LambdAurora
- * @version 1.1.1
+ * @version 1.2.0
  * @since 1.1.0
  */
 public class LambdaControlsModMenu implements ModMenuApi

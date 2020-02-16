@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * Represents some input handlers.
  *
  * @author LambdAurora
- * @version 1.1.1
+ * @version 1.2.0
  * @since 1.1.0
  */
 public class InputHandlers

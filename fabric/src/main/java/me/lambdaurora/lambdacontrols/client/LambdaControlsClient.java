@@ -38,7 +38,7 @@ import org.lwjgl.glfw.GLFW;
  * Represents the LambdaControls client mod.
  *
  * @author LambdAurora
- * @version 1.1.1
+ * @version 1.2.0
  * @since 1.1.0
  */
 public class LambdaControlsClient extends LambdaControls implements ClientModInitializer

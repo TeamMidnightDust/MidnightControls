@@ -40,10 +40,11 @@ public class LambdaControlsConfig
     private static final boolean        DEFAULT_HUD_ENABLE             = true;
     private static final HudSide        DEFAULT_HUD_SIDE               = HudSide.LEFT;
     // Gameplay
-    private static final boolean        DEFAULT_FRONT_BLOCK_PLACING    = false;
     private static final boolean        DEFAULT_FAST_BLOCK_INTERACTION = true;
     private static final boolean        DEFAULT_FLY_DRIFTING           = false;
     private static final boolean        DEFAULT_FLY_VERTICAL_DRIFTING  = true;
+    private static final boolean        DEFAULT_FRONT_BLOCK_PLACING    = false;
+    private static final boolean        DEFAULT_FRONT_BLOCK_OUTLINE    = true;
     // Controller
     private static final ControllerType DEFAULT_CONTROLLER_TYPE        = ControllerType.DEFAULT;
     private static final double         DEFAULT_DEAD_ZONE              = 0.25;
@@ -57,14 +58,17 @@ public class LambdaControlsConfig
     private final   LambdaControlsClient mod;
     private         ControlsMode         controlsMode;
     private         ControllerType       controllerType;
-    // HUD settings.
-    private         boolean              hudEnable;
-    private         HudSide              hudSide;
+    // Gameplay.
+    private         boolean              shouldRenderFrontBlockOutline;
+    private         int[]                frontBlockOutlineColor;
     // Controller settings
     private         double               deadZone;
     private         double               rotationSpeed;
     private         double               mouseSpeed;
     private         boolean              unfocusedInput;
+    // HUD settings.
+    private         boolean              hudEnable;
+    private         HudSide              hudSide;
 
     public LambdaControlsConfig(@NotNull LambdaControlsClient mod)
     {
@@ -84,8 +88,10 @@ public class LambdaControlsConfig
         this.hudEnable = this.config.getOrElse("hud.enable", DEFAULT_HUD_ENABLE);
         this.hudSide = HudSide.byId(this.config.getOrElse("hud.side", DEFAULT_HUD_SIDE.getName())).orElse(DEFAULT_HUD_SIDE);
         // Gameplay
-        LambdaControlsFeature.FRONT_BLOCK_PLACING.setEnabled(this.config.getOrElse("gameplay.front_block_placing", DEFAULT_FRONT_BLOCK_PLACING));
-        LambdaControlsFeature.FAST_BLOCK_INTERACTION.setEnabled(this.config.getOrElse("gameplay.fast_block_interaction", DEFAULT_FAST_BLOCK_INTERACTION));
+        LambdaControlsFeature.FAST_BLOCK_PLACING.setEnabled(this.config.getOrElse("gameplay.fast_block_placing", DEFAULT_FAST_BLOCK_INTERACTION));
+        LambdaControlsFeature.FRONT_BLOCK_PLACING.setEnabled(this.config.getOrElse("gameplay.front_block_placing.enabled", DEFAULT_FRONT_BLOCK_PLACING));
+        this.shouldRenderFrontBlockOutline = this.config.getOrElse("gameplay.front_block_placing.outline", DEFAULT_FRONT_BLOCK_OUTLINE);
+        this.frontBlockOutlineColor = this.config.getOptional("gameplay.front_block_placing.outline_color").map(hex -> parseColor((String) hex)).orElse(new int[]{255, 255, 255, 102});
         // Controller settings.
         this.controllerType = ControllerType.byId(this.config.getOrElse("controller.type", DEFAULT_CONTROLLER_TYPE.getName())).orElse(DEFAULT_CONTROLLER_TYPE);
         this.deadZone = this.config.getOrElse("controller.dead_zone", DEFAULT_DEAD_ZONE);
@@ -119,6 +125,12 @@ public class LambdaControlsConfig
                 this.config.set(path, String.valueOf(raw));
             }
         });
+
+        // This shouldn't happen if the configuration is new.
+        if (!this.config.contains("gameplay.front_block_placing.enabled") && this.config.contains("gameplay.front_block_placing")) {
+            this.config.remove("gameplay.front_block_placing");
+            this.config.set("gameplay.front_block_placing.enabled", DEFAULT_FRONT_BLOCK_PLACING);
+        }
     }
 
     /**
@@ -134,7 +146,7 @@ public class LambdaControlsConfig
         this.setHudSide(DEFAULT_HUD_SIDE);
         // Gameplay
         this.setFrontBlockPlacing(DEFAULT_FRONT_BLOCK_PLACING);
-        this.setFastBlockInteraction(DEFAULT_FAST_BLOCK_INTERACTION);
+        this.setFastBlockPlacing(DEFAULT_FAST_BLOCK_INTERACTION);
         this.setFlyDrifting(DEFAULT_FLY_DRIFTING);
         this.setFlyVerticalDrifting(DEFAULT_FLY_VERTICAL_DRIFTING);
         // Controller
@@ -240,45 +252,24 @@ public class LambdaControlsConfig
      */
 
     /**
-     * Gets whether fast block interaction is enabled or not.
+     * Gets whether fast block placing is enabled or not.
      *
-     * @return True if fast block interaction is enabled, else false.
+     * @return True if fast block placing is enabled, else false.
      */
-    public boolean hasFastBlockInteraction()
+    public boolean hasFastBlockPlacing()
     {
-        return LambdaControlsFeature.FAST_BLOCK_INTERACTION.isEnabled();
+        return LambdaControlsFeature.FAST_BLOCK_PLACING.isEnabled();
     }
 
     /**
-     * Sets whether fast block interaction is enabled or not.
+     * Sets whether fast block placing is enabled or not.
      *
-     * @param enable True if fast block interaction is enabled, else false.
+     * @param enable True if fast block placing is enabled, else false.
      */
-    public void setFastBlockInteraction(boolean enable)
+    public void setFastBlockPlacing(boolean enable)
     {
-        LambdaControlsFeature.FAST_BLOCK_INTERACTION.setEnabled(enable);
-        this.config.set("gameplay.fast_block_interaction", enable);
-    }
-
-    /**
-     * Returns whether front block placing is enabled or not.
-     *
-     * @return True if front block placing is enabled, else false.
-     */
-    public boolean hasFrontBlockPlacing()
-    {
-        return LambdaControlsFeature.FRONT_BLOCK_PLACING.isEnabled();
-    }
-
-    /**
-     * Sets whether front block placing is enabled or not.
-     *
-     * @param enable True if front block placing is enabled, else false.
-     */
-    public void setFrontBlockPlacing(boolean enable)
-    {
-        LambdaControlsFeature.FRONT_BLOCK_PLACING.setEnabled(enable);
-        this.config.set("gameplay.front_block_placing", enable);
+        LambdaControlsFeature.FAST_BLOCK_PLACING.setEnabled(enable);
+        this.config.set("gameplay.fast_block_placing", enable);
     }
 
     /**
@@ -319,6 +310,59 @@ public class LambdaControlsConfig
     public void setFlyVerticalDrifting(boolean flyDrifting)
     {
         this.config.set("gameplay.fly.vertical_drifting", flyDrifting);
+    }
+
+    /**
+     * Returns whether front block placing is enabled or not.
+     *
+     * @return True if front block placing is enabled, else false.
+     */
+    public boolean hasFrontBlockPlacing()
+    {
+        return LambdaControlsFeature.FRONT_BLOCK_PLACING.isEnabled();
+    }
+
+    /**
+     * Sets whether front block placing is enabled or not.
+     *
+     * @param enable True if front block placing is enabled, else false.
+     */
+    public void setFrontBlockPlacing(boolean enable)
+    {
+        LambdaControlsFeature.FRONT_BLOCK_PLACING.setEnabled(enable);
+        this.config.set("gameplay.front_block_placing.enabled", enable);
+    }
+
+    /**
+     * Returns whether front block placing outline is enabled or not.
+     *
+     * @return True if front block placing outline is enabled, else false.
+     */
+    public boolean shouldRenderFrontBlockOutline()
+    {
+        return this.shouldRenderFrontBlockOutline;
+    }
+
+    /**
+     * Sets whether front block placing outline is enabled or not.
+     *
+     * @param render True if front block placing outline is enabled, else false.
+     */
+    public void setRenderFrontBlockOutline(boolean render)
+    {
+        this.config.set("gameplay.front_block_placing.outline", this.shouldRenderFrontBlockOutline = render);
+    }
+
+    /**
+     * Returns the front block placing outline color as an integer array.
+     * <p>
+     * The integer array has 4 elements: red, green, blue and alpha.
+     *
+     * @return The color as a RGBA integer array.
+     */
+    public int[] getFrontBlockOutlineColor()
+    {
+        return this.frontBlockOutlineColor;
     }
 
     /*
@@ -635,5 +679,33 @@ public class LambdaControlsConfig
     public boolean isMovementAxis(int axis)
     {
         return axis == GLFW_GAMEPAD_AXIS_LEFT_Y || axis == GLFW_GAMEPAD_AXIS_LEFT_X;
+    }
+
+    /**
+     * Parses a color from a hexadecimal color string.
+     *
+     * @param hex The hexadecimal color.
+     * @return The color instance, null if invalid.
+     */
+    private static int[] parseColor(String hex)
+    {
+        hex = hex.replace("#", "");
+        switch (hex.length()) {
+            case 6:
+                return new int[]{
+                        Integer.valueOf(hex.substring(0, 2), 16),
+                        Integer.valueOf(hex.substring(2, 4), 16),
+                        Integer.valueOf(hex.substring(4, 6), 16),
+                        255
+                };
+            case 8:
+                return new int[]{
+                        Integer.valueOf(hex.substring(0, 2), 16),
+                        Integer.valueOf(hex.substring(2, 4), 16),
+                        Integer.valueOf(hex.substring(4, 6), 16),
+                        Integer.valueOf(hex.substring(6, 8), 16)
+                };
+        }
+        return null;
     }
 }
