@@ -27,6 +27,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -65,6 +66,8 @@ public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAcces
     private BlockHitResult lambdacontrols_frontBlockPlaceResult = null;
 
     private BlockPos  lambdacontrols_lastTargetPos;
+    private Vec3d     lambdacontrols_lastPos;
+    private Direction lambdacontrols_lastTargetSide;
     private Direction lambdacontrols_lockedSide;
     private int       lambdacontrols_lockedSideCooldown;
 
@@ -88,14 +91,20 @@ public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAcces
         this.lambdacontrols_frontBlockPlaceResult = LambdaInput.tryFrontPlace(((MinecraftClient) (Object) this));
         if (!LambdaControlsFeature.FAST_BLOCK_PLACING.isAvailable())
             return;
+        if (this.lambdacontrols_lastPos == null)
+            this.lambdacontrols_lastPos = this.player.getPos();
+
         int cooldown = this.itemUseCooldown;
+        double distance = this.lambdacontrols_lastPos.distanceTo(this.player.getPos());
         BlockHitResult hitResult;
         if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.BLOCK && this.player.abilities.flying) {
             hitResult = (BlockHitResult) this.crosshairTarget;
             BlockPos targetPos = hitResult.getBlockPos();
             Direction side = hitResult.getSide();
 
-            if (cooldown > 1 && !targetPos.equals(this.lambdacontrols_lastTargetPos) && (side.equals(this.lambdacontrols_lockedSide) || this.lambdacontrols_lockedSide == null)) {
+            // @TODO Find a very good way to add fast block placing without it being annoying.
+            if (cooldown > 1 && !targetPos.equals(this.lambdacontrols_lastTargetPos)
+                    && distance >= 0.38) {
                 this.itemUseCooldown = 1;
                 this.lambdacontrols_lockedSide = side;
                 this.lambdacontrols_lockedSideCooldown = 10;
@@ -107,6 +116,7 @@ public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAcces
             }
 
             this.lambdacontrols_lastTargetPos = targetPos.toImmutable();
+            this.lambdacontrols_lastTargetSide = side;
         } else if (this.player.isSprinting()) {
             hitResult = this.lambdacontrols_frontBlockPlaceResult;
             if (hitResult != null) {
@@ -114,6 +124,7 @@ public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAcces
                     this.itemUseCooldown = 0;
             }
         }
+        this.lambdacontrols_lastPos = this.player.getPos();
     }
 
     @Inject(method = "render", at = @At("HEAD"))
