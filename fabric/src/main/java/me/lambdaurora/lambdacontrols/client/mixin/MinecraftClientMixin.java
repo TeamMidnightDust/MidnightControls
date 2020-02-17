@@ -68,8 +68,6 @@ public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAcces
     private BlockPos  lambdacontrols_lastTargetPos;
     private Vec3d     lambdacontrols_lastPos;
     private Direction lambdacontrols_lastTargetSide;
-    private Direction lambdacontrols_lockedSide;
-    private int       lambdacontrols_lockedSideCooldown;
 
     @Override
     public @Nullable BlockHitResult lambdacontrols_getFrontBlockPlaceResult()
@@ -95,35 +93,32 @@ public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAcces
             this.lambdacontrols_lastPos = this.player.getPos();
 
         int cooldown = this.itemUseCooldown;
-        double distance = this.lambdacontrols_lastPos.distanceTo(this.player.getPos());
         BlockHitResult hitResult;
         if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.BLOCK && this.player.abilities.flying) {
             hitResult = (BlockHitResult) this.crosshairTarget;
             BlockPos targetPos = hitResult.getBlockPos();
             Direction side = hitResult.getSide();
 
-            // @TODO Find a very good way to add fast block placing without it being annoying.
-            if (cooldown > 1 && !targetPos.equals(this.lambdacontrols_lastTargetPos)
-                    && distance >= 0.38) {
+            boolean sidewaysBlockPlacing = this.lambdacontrols_lastTargetPos == null || !targetPos.equals(this.lambdacontrols_lastTargetPos.offset(this.lambdacontrols_lastTargetSide));
+            boolean backwardsBlockPlacing = this.player.input.movementForward < 0.0f && (this.lambdacontrols_lastTargetPos == null || targetPos.equals(this.lambdacontrols_lastTargetPos.offset(this.lambdacontrols_lastTargetSide)));
+
+            if (cooldown > 1
+                    && !targetPos.equals(this.lambdacontrols_lastTargetPos)
+                    && (sidewaysBlockPlacing || backwardsBlockPlacing)) {
                 this.itemUseCooldown = 1;
-                this.lambdacontrols_lockedSide = side;
-                this.lambdacontrols_lockedSideCooldown = 10;
-            } else {
-                if (this.lambdacontrols_lockedSideCooldown == 0)
-                    this.lambdacontrols_lockedSide = null;
-                else if (this.lambdacontrols_lockedSideCooldown > 0)
-                    this.lambdacontrols_lockedSideCooldown--;
             }
 
             this.lambdacontrols_lastTargetPos = targetPos.toImmutable();
             this.lambdacontrols_lastTargetSide = side;
-        } else if (this.player.isSprinting()) {
+        }
+        // Removed front placing sprinting as way too cheaty.
+        /* else if (this.player.isSprinting()) {
             hitResult = this.lambdacontrols_frontBlockPlaceResult;
             if (hitResult != null) {
                 if (cooldown > 0)
                     this.itemUseCooldown = 0;
             }
-        }
+        } */
         this.lambdacontrols_lastPos = this.player.getPos();
     }
 

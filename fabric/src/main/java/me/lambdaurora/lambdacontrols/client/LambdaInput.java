@@ -674,6 +674,32 @@ public class LambdaInput
         }
     }
 
+    public static Direction getMoveDirection(@Nullable BlockPos lastPos, @NotNull BlockPos newPos)
+    {
+        if (lastPos == null)
+            return null;
+        BlockPos vector = newPos.subtract(lastPos);
+        if (vector.getX() > 0)
+            return Direction.EAST;
+        else if (vector.getX() < 0)
+            return Direction.WEST;
+        else if (vector.getZ() > 0)
+            return Direction.SOUTH;
+        else if (vector.getZ() < 0)
+            return Direction.NORTH;
+        else if (vector.getY() > 0)
+            return Direction.UP;
+        else if (vector.getY() < 0)
+            return Direction.DOWN;
+        return null;
+    }
+
+    /**
+     * Returns a nullable block hit result if front placing is possible.
+     *
+     * @param client The client instance.
+     * @return A block hit result if front placing is possible.
+     */
     public static @Nullable BlockHitResult tryFrontPlace(@NotNull MinecraftClient client)
     {
         if (!LambdaControlsFeature.FRONT_BLOCK_PLACING.isAvailable())
