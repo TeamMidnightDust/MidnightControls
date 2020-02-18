@@ -48,6 +48,7 @@ dependencies {
 
     // Compatibility mods
     modCompile "io.github.joaoh1:okzoomer:2.1.0-beta.2"
+    modCompile "me.shedaniel:RoughlyEnoughItems:3.4.5"
 
     api project(":core")
     shadow project(":core")

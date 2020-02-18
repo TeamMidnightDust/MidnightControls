@@ -10,13 +10,14 @@
 package me.lambdaurora.lambdacontrols.client.compat;
 
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
+import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a compatibility handler for a mod.
  *
  * @author LambdAurora
- * @version 1.1.0
+ * @version 1.2.0
  * @since 1.1.0
  */
 public interface CompatHandler
@@ -27,4 +28,15 @@ public interface CompatHandler
      * @param mod This mod instance.
      */
     void handle(@NotNull LambdaControlsClient mod);
+
+    /**
+     * Returns whether the mouse is required on the specified screen.
+     *
+     * @param screen The screen.
+     * @return True if the mouse is requried on the specified screen, else false.
+     */
+    default boolean requireMouseOnScreen(@NotNull Screen screen)
+    {
+        return false;
+    }
 }

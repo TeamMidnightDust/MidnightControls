@@ -10,6 +10,7 @@
 package me.lambdaurora.lambdacontrols.client;
 
 import me.lambdaurora.lambdacontrols.LambdaControlsFeature;
+import me.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.Controller;
 import me.lambdaurora.lambdacontrols.client.controller.InputManager;
@@ -614,7 +615,7 @@ public class LambdaInput
 
     private static boolean isScreenInteractive(@NotNull Screen screen)
     {
-        return !(screen instanceof AdvancementsScreen || screen instanceof ContainerScreen);
+        return !(screen instanceof AdvancementsScreen || screen instanceof ContainerScreen || LambdaControlsCompat.requireMouseOnScreen(screen));
     }
 
     // Inspired from https://github.com/MrCrayfish/Controllable/blob/1.14.X/src/main/java/com/mrcrayfish/controllable/client/ControllerInput.java#L686.
