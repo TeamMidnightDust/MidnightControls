@@ -73,9 +73,9 @@ public class ButtonBinding implements Nameable
             .actions(PressAction.DEFAULT_ACTION, InputHandlers::handleToggleSneak).onlyInGame().cooldown(true).register();
     public static final ButtonBinding SPRINT             = new Builder("sprint").buttons(GLFW_GAMEPAD_BUTTON_LEFT_THUMB).register();
     public static final ButtonBinding SWAP_HANDS         = new Builder("swap_hands").buttons(GLFW_GAMEPAD_BUTTON_X).cooldown(true).register();
-    public static final ButtonBinding TAB_LEFT           = new Builder("tab_left").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
+    public static final ButtonBinding TAB_LEFT           = new Builder("tab_back").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
             .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements)).cooldown(true).register();
-    public static final ButtonBinding TAB_RIGHT          = new Builder("tab_right").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
+    public static final ButtonBinding TAB_RIGHT          = new Builder("tab_next").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
             .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements)).cooldown(true).register();
     public static final ButtonBinding TOGGLE_PERSPECTIVE = new Builder("toggle_perspective").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_Y).cooldown(true).register();
     public static final ButtonBinding USE                = new Builder("use").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true)).register();

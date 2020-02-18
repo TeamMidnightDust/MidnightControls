@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "me.lambdaurora.lambdacontrols.client.compat.mixin",
+  "plugin": "me.lambdaurora.lambdacontrols.client.compat.LambdaControlsMixinPlugin",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "RecipeViewingScreenAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

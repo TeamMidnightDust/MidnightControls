@@ -41,7 +41,7 @@ public class LambdaControlsCompat
             mod.log("Adding okzoomer compatibility...");
             HANDLERS.add(new OkZoomerCompat());
         }
-        if (FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) {
+        if (isReiPresent()) {
             mod.log("Adding REI compatiblity...");
             HANDLERS.add(new ReiCompat());
         }
@@ -58,5 +58,15 @@ public class LambdaControlsCompat
     public static boolean requireMouseOnScreen(@NotNull Screen screen)
     {
         return HANDLERS.stream().anyMatch(handler -> handler.requireMouseOnScreen(screen));
+    }
+
+    /**
+     * Returns whether Roughly Enough Items is present.
+     *
+     * @return True if Roughly Enough Items is present, else false.
+     */
+    public static boolean isReiPresent()
+    {
+        return FabricLoader.getInstance().isModLoaded("roughlyenoughitems");
     }
 }

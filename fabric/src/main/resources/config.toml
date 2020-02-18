@@ -95,10 +95,10 @@ auto_switch_mode = false
         sprint = "9"
         # Swap hands control.
         swap_hands = "2"
-        # Switch to left tab control.
-        tab_left = "4"
-        # Switch to right tab control.
-        tab_right = "5"
+        # Switch to back tab control.
+        tab_back = "4"
+        # Switch to next tab control.
+        tab_next = "5"
         # Toggle perspective control.
         toggle_perspective = "11+3"
         # Toggle smooth camera control.

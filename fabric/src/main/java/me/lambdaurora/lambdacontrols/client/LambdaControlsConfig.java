@@ -131,6 +131,18 @@ public class LambdaControlsConfig
             this.config.remove("gameplay.front_block_placing");
             this.config.set("gameplay.front_block_placing.enabled", DEFAULT_FRONT_BLOCK_PLACING);
         }
+
+        this.renamed("controller.controls.tab_left", "controller.controls.tab_back");
+        this.renamed("controller.controls.tab_right", "controller.controls.tab_next");
+    }
+
+    private void renamed(String oldPath, String newPath)
+    {
+        if (!this.config.contains(oldPath))
+            return;
+        Object raw = this.config.getRaw(oldPath);
+        this.config.remove(oldPath);
+        this.config.set(newPath, raw);
     }
 
     /**

@@ -11,6 +11,7 @@ package me.lambdaurora.lambdacontrols.client.mixin;
 
 import me.lambdaurora.lambdacontrols.ControlsMode;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
+import me.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
 import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsRenderer;
 import me.lambdaurora.lambdacontrols.client.util.ContainerScreenAccessor;
 import net.fabricmc.loader.api.FabricLoader;
@@ -49,7 +50,7 @@ public abstract class ContainerScreenMixin implements ContainerScreenAccessor
 
             x = LambdaControlsRenderer.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_A}, "lambdacontrols.action.pickup_all", true, client) + 2;
             x = LambdaControlsRenderer.drawButtonTip(x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_B}, "lambdacontrols.action.exit", true, client) + 2;
-            if (FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) {
+            if (LambdaControlsCompat.isReiPresent()) {
                 x = 2;
                 y -= 24;
             }

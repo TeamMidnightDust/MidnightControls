@@ -27,7 +27,8 @@
     ]
   },
   "mixins": [
-    "lambdacontrols.mixins.json"
+    "lambdacontrols.mixins.json",
+    "lambdacontrols_compat.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.4.0",
@@ -40,7 +41,8 @@
     "okzoomer": ">=1.0.4"
   },
   "suggests": {
-    "flamingo": "*"
+    "flamingo": "*",
+    "roughlyenoughitems": ">=3.4.5"
   },
   "breaks": {
     "modmenu": "<1.9.0"
