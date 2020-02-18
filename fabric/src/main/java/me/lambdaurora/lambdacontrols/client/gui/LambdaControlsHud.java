@@ -252,6 +252,8 @@ public class LambdaControlsHud extends Hud
 
     private void drawTip(int x, int y, @NotNull String action, boolean display, @NotNull VertexConsumerProvider.Immediate immediate, @NotNull Matrix4f matrix4f)
     {
+        if (!display)
+            return;
         String translatedAction = I18n.translate(action);
         int textY = (LambdaControlsRenderer.ICON_SIZE / 2 - this.client.textRenderer.fontHeight / 2) + 1;
         client.textRenderer.draw(translatedAction, (float) x, (float) (y + textY), 14737632, true, matrix4f, immediate,

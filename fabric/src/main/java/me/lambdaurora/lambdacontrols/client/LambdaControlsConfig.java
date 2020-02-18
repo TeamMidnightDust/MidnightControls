@@ -153,20 +153,21 @@ public class LambdaControlsConfig
         // General
         this.setControlsMode(DEFAULT_CONTROLS_MODE);
         this.setAutoSwitchMode(DEFAULT_AUTO_SWITCH_MODE);
-        // HUD
-        this.setHudEnabled(DEFAULT_HUD_ENABLE);
-        this.setHudSide(DEFAULT_HUD_SIDE);
         // Gameplay
-        this.setFrontBlockPlacing(DEFAULT_FRONT_BLOCK_PLACING);
         this.setFastBlockPlacing(DEFAULT_FAST_BLOCK_INTERACTION);
         this.setFlyDrifting(DEFAULT_FLY_DRIFTING);
         this.setFlyVerticalDrifting(DEFAULT_FLY_VERTICAL_DRIFTING);
+        this.setFrontBlockPlacing(DEFAULT_FRONT_BLOCK_PLACING);
+        this.setRenderFrontBlockOutline(DEFAULT_FRONT_BLOCK_OUTLINE);
         // Controller
         this.setControllerType(DEFAULT_CONTROLLER_TYPE);
         this.setDeadZone(DEFAULT_DEAD_ZONE);
         this.setRotationSpeed(DEFAULT_ROTATION_SPEED);
         this.setMouseSpeed(DEFAULT_MOUSE_SPEED);
         this.setUnfocusedInput(DEFAULT_UNFOCUSED_INPUT);
+        // HUD
+        this.setHudEnabled(DEFAULT_HUD_ENABLE);
+        this.setHudSide(DEFAULT_HUD_SIDE);
 
         // Collect prevents concurrent modification.
         InputManager.streamBindings().collect(Collectors.toList()).forEach(binding -> this.setButtonBinding(binding, binding.getDefaultButton()));
