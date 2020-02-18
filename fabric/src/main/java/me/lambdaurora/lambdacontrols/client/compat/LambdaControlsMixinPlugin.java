@@ -31,6 +31,7 @@ public class LambdaControlsMixinPlugin implements IMixinConfigPlugin
     public LambdaControlsMixinPlugin()
     {
         this.conditionalMixins.put("me.lambdaurora.lambdacontrols.client.compat.mixin.RecipeViewingScreenAccessor", LambdaControlsCompat.isReiPresent());
+        this.conditionalMixins.put("me.lambdaurora.lambdacontrols.client.compat.mixin.VillagerRecipeViewingScreenAccessor", LambdaControlsCompat.isReiPresent());
     }
 
     @Override

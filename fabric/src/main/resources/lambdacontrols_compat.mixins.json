@@ -4,7 +4,8 @@
   "plugin": "me.lambdaurora.lambdacontrols.client.compat.LambdaControlsMixinPlugin",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "RecipeViewingScreenAccessor"
+    "RecipeViewingScreenAccessor",
+    "VillagerRecipeViewingScreenAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

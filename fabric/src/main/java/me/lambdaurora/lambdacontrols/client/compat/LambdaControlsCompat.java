@@ -55,7 +55,7 @@ public class LambdaControlsCompat
      * @param screen The screen.
      * @return True if the mouse is requried on the specified screen, else false.
      */
-    public static boolean requireMouseOnScreen(@NotNull Screen screen)
+    public static boolean requireMouseOnScreen(Screen screen)
     {
         return HANDLERS.stream().anyMatch(handler -> handler.requireMouseOnScreen(screen));
     }

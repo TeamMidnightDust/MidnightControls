@@ -47,7 +47,7 @@ public class InputHandlers
     {
     }
 
-    public static PressAction handleHotbar(boolean right)
+    public static PressAction handleHotbar(boolean next)
     {
         return (client, button, action) -> {
             if (action == ButtonState.RELEASE)
@@ -55,7 +55,7 @@ public class InputHandlers
 
             // When ingame
             if (client.currentScreen == null && client.player != null) {
-                if (right)
+                if (next)
                     client.player.inventory.selectedSlot = client.player.inventory.selectedSlot == 8 ? 0 : client.player.inventory.selectedSlot + 1;
                 else
                     client.player.inventory.selectedSlot = client.player.inventory.selectedSlot == 0 ? 8 : client.player.inventory.selectedSlot - 1;
@@ -63,7 +63,7 @@ public class InputHandlers
             } else if (client.currentScreen instanceof CreativeInventoryScreen) {
                 CreativeInventoryScreenAccessor inventory = (CreativeInventoryScreenAccessor) client.currentScreen;
                 int currentTab = inventory.getSelectedTab();
-                int nextTab = currentTab + (right ? 1 : -1);
+                int nextTab = currentTab + (next ? 1 : -1);
                 if (nextTab < 0)
                     nextTab = ItemGroup.GROUPS.length - 1;
                 else if (nextTab >= ItemGroup.GROUPS.length)
@@ -74,7 +74,7 @@ public class InputHandlers
                 RecipeBookWidgetAccessor recipeBook = (RecipeBookWidgetAccessor) ((InventoryScreen) client.currentScreen).getRecipeBookWidget();
                 List<RecipeGroupButtonWidget> tabs = recipeBook.getTabButtons();
                 RecipeGroupButtonWidget currentTab = recipeBook.getCurrentTab();
-                int nextTab = tabs.indexOf(currentTab) + (right ? 1 : -1);
+                int nextTab = tabs.indexOf(currentTab) + (next ? 1 : -1);
                 if (nextTab < 0)
                     nextTab = tabs.size() - 1;
                 else if (nextTab >= tabs.size())
@@ -89,7 +89,7 @@ public class InputHandlers
                 AdvancementTab tab = screen.getSelectedTab();
                 for (int i = 0; i < tabs.size(); i++) {
                     if (tabs.get(i).equals(tab)) {
-                        int nextTab = i + (right ? 1 : -1);
+                        int nextTab = i + (next ? 1 : -1);
                         if (nextTab < 0)
                             nextTab = tabs.size() - 1;
                         else if (nextTab >= tabs.size())

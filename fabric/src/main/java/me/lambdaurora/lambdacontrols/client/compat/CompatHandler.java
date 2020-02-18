@@ -35,7 +35,7 @@ public interface CompatHandler
      * @param screen The screen.
      * @return True if the mouse is requried on the specified screen, else false.
      */
-    default boolean requireMouseOnScreen(@NotNull Screen screen)
+    default boolean requireMouseOnScreen(Screen screen)
     {
         return false;
     }
