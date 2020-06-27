@@ -98,6 +98,8 @@
   "lambdacontrols.menu.title.hud": "Options du HUD",
   "lambdacontrols.menu.unbound": "Délier",
   "lambdacontrols.menu.unfocused_input": "Entrée en fond",
+  "lambdacontrols.menu.virtual_mouse": "Souris virtuelle",
+  "lambdacontrols.menu.virtual_mouse.skin": "Apparence souris virtuelle",
   "lambdacontrols.narrator.unbound": "Délier %s",
   "lambdacontrols.not_bound": "Non défini",
   "lambdacontrols.tooltip.auto_switch_mode": "Détermine si le mode de contrôle doit automatiquement changer sur Manette si une manette est connectée et inversement.",
@@ -113,5 +115,10 @@
   "lambdacontrols.tooltip.mouse_speed": "Change la vitesse de la souris émulée par la manette.",
   "lambdacontrols.tooltip.rotation_speed": "Change la vitesse de rotation de la caméra.",
   "lambdacontrols.tooltip.reload_controller_mappings": "Recharge le fichier de configuration des manettes.",
-  "lambdacontrols.tooltip.unfocused_input": "Autorise les entrées manette quand la fenêtre n'est pas sélectionnée."
+  "lambdacontrols.tooltip.unfocused_input": "Autorise les entrées manette quand la fenêtre n'est pas sélectionnée.",
+  "lambdacontrols.tooltip.virtual_mouse": "Active la souris virtuelle qui est pratique dans le cas d'un écran partagé.",
+  "lambdacontrols.virtual_mouse.skin.default_light": "défaut clair",
+  "lambdacontrols.virtual_mouse.skin.default_dark": "défaut foncé",
+  "lambdacontrols.virtual_mouse.skin.second_light": "second clair",
+  "lambdacontrols.virtual_mouse.skin.second_dark": "second foncé"
 }

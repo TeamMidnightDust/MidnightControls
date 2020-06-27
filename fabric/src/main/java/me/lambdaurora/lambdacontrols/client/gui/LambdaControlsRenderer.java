@@ -9,18 +9,23 @@
 
 package me.lambdaurora.lambdacontrols.client.gui;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
+import me.lambdaurora.lambdacontrols.client.util.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.screen.slot.Slot;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.Comparator;
+import java.util.Optional;
 
 /**
  * Represents the LambdaControls renderer.
@@ -186,7 +191,7 @@ public class LambdaControlsRenderer
         }
 
         client.getTextureManager().bindTexture(axis ? LambdaControlsClient.CONTROLLER_AXIS : LambdaControlsClient.CONTROLLER_BUTTONS);
-        GlStateManager.disableDepthTest();
+        RenderSystem.disableDepthTest();
 
         int assetSize = axis ? AXIS_SIZE : BUTTON_SIZE;
 
@@ -195,7 +200,7 @@ public class LambdaControlsRenderer
                 (float) buttonOffset, (float) (controllerType * (axis ? AXIS_SIZE : BUTTON_SIZE)),
                 assetSize, assetSize,
                 256, 256);
-        GlStateManager.enableDepthTest();
+        RenderSystem.enableDepthTest();
 
         return ICON_SIZE;
     }
@@ -222,5 +227,71 @@ public class LambdaControlsRenderer
     private static int getButtonTipWidth(@NotNull String action, @NotNull TextRenderer textRenderer)
     {
         return 15 + 5 + textRenderer.getWidth(action);
+    }
+
+    public static void renderVirtualCursor(@NotNull MatrixStack matrices, @NotNull MinecraftClient client)
+    {
+        if (!LambdaControlsClient.get().config.hasVirtualMouse() || client.currentScreen == null)
+            return;
+
+        int mouseX = (int) (client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth());
+        int mouseY = (int) (client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight());
+
+        boolean hoverSlot = false;
+
+        if (client.currentScreen instanceof HandledScreen) {
+            HandledScreen inventoryScreen = (HandledScreen) client.currentScreen;
+            HandledScreenAccessor accessor = (HandledScreenAccessor) inventoryScreen;
+            int guiLeft = accessor.getX();
+            int guiTop = accessor.getY();
+
+            // Finds the closest slot in the GUI within 14 pixels.
+            int finalMouseX = mouseX;
+            int finalMouseY = mouseY;
+            Optional<Pair<Slot, Double>> closestSlot = inventoryScreen.getScreenHandler().slots.parallelStream()
+                    .map(slot -> {
+                        int x = guiLeft + slot.x + 8;
+                        int y = guiTop + slot.y + 8;
+
+                        // Distance between the slot and the cursor.
+                        double distance = Math.sqrt(Math.pow(x - finalMouseX, 2) + Math.pow(y - finalMouseY, 2));
+                        return Pair.of(slot, distance);
+                    }).filter(entry -> entry.value <= 9.0)
+                    .min(Comparator.comparingDouble(p -> p.value));
+
+            if (closestSlot.isPresent()) {
+                Slot slot = closestSlot.get().key;
+                mouseX = guiLeft + slot.x;
+                mouseY = guiTop + slot.y;
+                hoverSlot = true;
+            }
+        }
+
+        if (!hoverSlot) {
+            mouseX -= 8;
+            mouseY -= 8;
+        }
+
+        drawCursor(matrices, mouseX, mouseY, hoverSlot, client);
+    }
+
+    /**
+     * Draws the virtual cursor.
+     *
+     * @param matrices  The matrix stack.
+     * @param x         X coordinate.
+     * @param y         Y coordinate.
+     * @param hoverSlot True if hovering a slot, else false.
+     * @param client    The client instance.
+     */
+    public static void drawCursor(@NotNull MatrixStack matrices, int x, int y, boolean hoverSlot, @NotNull MinecraftClient client)
+    {
+        client.getTextureManager().bindTexture(LambdaControlsClient.CURSOR_TEXTURE);
+
+        RenderSystem.disableDepthTest();
+
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        DrawableHelper.drawTexture(matrices, x, y, hoverSlot ? 16.F : 0.F, LambdaControlsClient.get().config.getVirtualMouseSkin().ordinal() * 16.F, 16, 16, 32, 64);
+        RenderSystem.enableDepthTest();
     }
 }

@@ -61,6 +61,8 @@ public class LambdaControlsSettingsScreen extends Screen
     private final       Option               invertsRightXAxis;
     private final       Option               invertsRightYAxis;
     private final       Option               unfocusedInputOption;
+    private final       Option               virtualMouseOption;
+    private final       Option               virtualMouseSkinOption;
     // Hud options
     private final       Option               hudEnableOption;
     private final       Option               hudSideOption;
@@ -168,6 +170,12 @@ public class LambdaControlsSettingsScreen extends Screen
                 }, null, true);
         this.unfocusedInputOption = new SpruceBooleanOption("lambdacontrols.menu.unfocused_input", this.mod.config::hasUnfocusedInput,
                 this.mod.config::setUnfocusedInput, new TranslatableText("lambdacontrols.tooltip.unfocused_input"), true);
+        this.virtualMouseOption = new SpruceBooleanOption("lambdacontrols.menu.virtual_mouse", this.mod.config::hasVirtualMouse,
+                this.mod.config::setVirtualMouse, new TranslatableText("lambdacontrols.tooltip.virtual_mouse"), true);
+        this.virtualMouseSkinOption = new SpruceCyclingOption("lambdacontrols.menu.virtual_mouse.skin",
+                amount -> this.mod.config.setVirtualMouseSkin(this.mod.config.getVirtualMouseSkin().next()),
+                option -> option.getDisplayPrefix().append(this.mod.config.getVirtualMouseSkin().getTranslatedName()),
+                null);
         // HUD options
         this.hudEnableOption = new SpruceBooleanOption("lambdacontrols.menu.hud_enable", this.mod.config::isHudEnabled,
                 this.mod::setHudEnabled, new TranslatableText("lambdacontrols.tooltip.hud_enable"), true);
@@ -241,7 +249,8 @@ public class LambdaControlsSettingsScreen extends Screen
         this.list.addSingleOptionEntry(this.secondControllerOption);
         this.list.addOptionEntry(this.controllerTypeOption, this.deadZoneOption);
         this.list.addOptionEntry(this.invertsRightXAxis, this.invertsRightYAxis);
-        this.list.addSingleOptionEntry(this.unfocusedInputOption);
+        this.list.addOptionEntry(this.unfocusedInputOption, this.virtualMouseOption);
+        this.list.addSingleOptionEntry(this.virtualMouseSkinOption);
         this.list.addSingleOptionEntry(new ReloadControllerMappingsOption());
         // HUD options
         this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.hud", true, null));

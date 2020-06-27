@@ -12,12 +12,14 @@ package me.lambdaurora.lambdacontrols.client.mixin;
 import me.lambdaurora.lambdacontrols.LambdaControlsFeature;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.LambdaInput;
+import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsRenderer;
 import me.lambdaurora.lambdacontrols.client.util.FrontBlockPlaceResultAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -126,6 +128,11 @@ public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAcces
     private void onRender(boolean fullRender, CallbackInfo ci)
     {
         LambdaControlsClient.get().onRender((MinecraftClient) (Object) (this));
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;render(FJZ)V", shift = At.Shift.AFTER))
+    private void renderVirtualCursor(boolean fullRender, CallbackInfo ci) {
+        LambdaControlsRenderer.renderVirtualCursor(new MatrixStack(), (MinecraftClient) (Object) this);
     }
 
     @Inject(method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V", at = @At("RETURN"))

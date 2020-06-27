@@ -20,6 +20,7 @@ import me.lambdaurora.lambdacontrols.client.mixin.AdvancementsScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.mixin.CreativeInventoryScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.mixin.EntryListWidgetAccessor;
 import me.lambdaurora.lambdacontrols.client.util.HandledScreenAccessor;
+import me.lambdaurora.lambdacontrols.client.util.MouseAccessor;
 import me.lambdaurora.spruceui.SpruceLabelWidget;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -81,7 +82,6 @@ public class LambdaInput
     // Cooldowns
     private              int                   actionGuiCooldown = 0;
     private              int                   ignoreNextA       = 0;
-    // Sneak state.
     private              double                targetYaw         = 0.0;
     private              double                targetPitch       = 0.0;
     private              float                 prevXAxis         = 0.F;
@@ -222,6 +222,9 @@ public class LambdaInput
         if (client.currentScreen == null) {
             this.mouseSpeedX = this.mouseSpeedY = 0.0F;
             INPUT_MANAGER.resetMousePosition(windowWidth, windowHeight);
+        } else if (isScreenInteractive(client.currentScreen) && this.config.hasVirtualMouse()) {
+            ((MouseAccessor) client.mouse).lambdacontrols_onCursorPos(client.getWindow().getHandle(), 0, 0);
+            INPUT_MANAGER.resetMouseTarget(client);
         }
     }
 
@@ -616,7 +619,7 @@ public class LambdaInput
         }
     }
 
-    private static boolean isScreenInteractive(@NotNull Screen screen)
+    public static boolean isScreenInteractive(@NotNull Screen screen)
     {
         return !(screen instanceof AdvancementsScreen || screen instanceof HandledScreen || LambdaControlsCompat.requireMouseOnScreen(screen));
     }
