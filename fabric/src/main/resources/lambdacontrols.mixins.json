@@ -5,7 +5,6 @@
   "client": [
     "AbstractButtonWidgetAccessor",
     "AdvancementsScreenAccessor",
-    "ContainerScreenMixin",
     "ClientPlayerEntityMixin",
     "ClientPlayNetworkHandlerMixin",
     "ControlsOptionsScreenMixin",
@@ -13,11 +12,12 @@
     "EntryListWidgetAccessor",
     "GameOptionsMixin",
     "GameRendererMixin",
+    "HandledScreenMixin",
     "KeyBindingMixin",
     "MinecraftClientMixin",
     "MouseMixin",
+    "OptionsScreenMixin",
     "RecipeBookWidgetAccessor",
-    "SettingsScreenMixin",
     "WorldRendererMixin"
   ],
   "injectors": {

@@ -138,7 +138,7 @@ public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAcces
     private void onItemUse(CallbackInfo ci, Hand[] hands, int handCount, int handIndex, Hand hand, ItemStack stackInHand)
     {
         if (!stackInHand.isEmpty() && this.player.pitch > 35.0F && LambdaControlsFeature.FRONT_BLOCK_PLACING.isAvailable()) {
-            if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.MISS && this.player.onGround) {
+            if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.MISS && this.player.isOnGround()) {
                 if (!stackInHand.isEmpty() && stackInHand.getItem() instanceof BlockItem) {
                     BlockHitResult hitResult = LambdaInput.tryFrontPlace(((MinecraftClient) (Object) this));
 

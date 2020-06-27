@@ -13,18 +13,18 @@ import me.lambdaurora.lambdacontrols.client.ButtonState;
 import me.lambdaurora.lambdacontrols.client.mixin.AdvancementsScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.mixin.CreativeInventoryScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.mixin.RecipeBookWidgetAccessor;
-import me.lambdaurora.lambdacontrols.client.util.ContainerScreenAccessor;
+import me.lambdaurora.lambdacontrols.client.util.HandledScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.util.KeyBindingAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
-import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeGroupButtonWidget;
 import net.minecraft.client.util.ScreenshotUtils;
-import net.minecraft.container.Slot;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.screen.slot.Slot;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * Represents some input handlers.
  *
  * @author LambdAurora
- * @version 1.2.0
+ * @version 1.3.0
  * @since 1.1.0
  */
 public class InputHandlers
@@ -109,8 +109,8 @@ public class InputHandlers
             // If in game, then pause the game.
             if (client.currentScreen == null)
                 client.openPauseMenu(false);
-            else if (client.currentScreen instanceof ContainerScreen && client.player != null) // If the current screen is a container then close it.
-                client.player.closeContainer();
+            else if (client.currentScreen instanceof HandledScreen && client.player != null) // If the current screen is a container then close it.
+                client.player.closeHandledScreen();
             else // Else just close the current screen.
                 client.currentScreen.onClose();
         }
@@ -145,11 +145,11 @@ public class InputHandlers
     public static PressAction handleInventorySlotPad(int direction)
     {
         return (client, binding, action) -> {
-            if (!(client.currentScreen instanceof ContainerScreen && action != ButtonState.RELEASE))
+            if (!(client.currentScreen instanceof HandledScreen && action != ButtonState.RELEASE))
                 return false;
 
-            ContainerScreen inventory = (ContainerScreen) client.currentScreen;
-            ContainerScreenAccessor accessor = (ContainerScreenAccessor) inventory;
+            HandledScreen inventory = (HandledScreen) client.currentScreen;
+            HandledScreenAccessor accessor = (HandledScreenAccessor) inventory;
             int guiLeft = accessor.getX();
             int guiTop = accessor.getY();
             double mouseX = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
@@ -159,17 +159,17 @@ public class InputHandlers
             Slot mouseSlot = accessor.lambdacontrols_getSlotAt(mouseX, mouseY);
 
             // Finds the closest slot in the GUI within 14 pixels.
-            Optional<Slot> closestSlot = inventory.getContainer().slots.parallelStream()
+            Optional<Slot> closestSlot = inventory.getScreenHandler().slots.parallelStream()
                     .filter(Predicate.isEqual(mouseSlot).negate())
                     .map(slot -> {
-                        int posX = guiLeft + slot.xPosition + 8;
-                        int posY = guiTop + slot.yPosition + 8;
+                        int posX = guiLeft + slot.x + 8;
+                        int posY = guiTop + slot.y + 8;
 
                         int otherPosX = (int) mouseX;
                         int otherPosY = (int) mouseY;
                         if (mouseSlot != null) {
-                            otherPosX = guiLeft + mouseSlot.xPosition + 8;
-                            otherPosY = guiTop + mouseSlot.yPosition + 8;
+                            otherPosX = guiLeft + mouseSlot.x + 8;
+                            otherPosY = guiTop + mouseSlot.y + 8;
                         }
 
                         // Distance between the slot and the cursor.
@@ -177,13 +177,13 @@ public class InputHandlers
                         return Pair.of(slot, distance);
                     }).filter(entry -> {
                         Slot slot = entry.key;
-                        int posX = guiLeft + slot.xPosition + 8;
-                        int posY = guiTop + slot.yPosition + 8;
+                        int posX = guiLeft + slot.x + 8;
+                        int posY = guiTop + slot.y + 8;
                         int otherPosX = (int) mouseX;
                         int otherPosY = (int) mouseY;
                         if (mouseSlot != null) {
-                            otherPosX = guiLeft + mouseSlot.xPosition + 8;
-                            otherPosY = guiTop + mouseSlot.yPosition + 8;
+                            otherPosX = guiLeft + mouseSlot.x + 8;
+                            otherPosY = guiTop + mouseSlot.y + 8;
                         }
                         if (direction == 0)
                             return posY < otherPosY;
@@ -201,8 +201,8 @@ public class InputHandlers
 
             if (closestSlot.isPresent()) {
                 Slot slot = closestSlot.get();
-                int x = guiLeft + slot.xPosition + 8;
-                int y = guiTop + slot.yPosition + 8;
+                int x = guiLeft + slot.x + 8;
+                int y = guiTop + slot.y + 8;
                 InputManager.queueMousePosition(x * (double) client.getWindow().getWidth() / (double) client.getWindow().getScaledWidth(),
                         y * (double) client.getWindow().getHeight() / (double) client.getWindow().getScaledHeight());
                 return true;
@@ -244,7 +244,7 @@ public class InputHandlers
      */
     public static boolean inInventory(@NotNull MinecraftClient client, @NotNull ButtonBinding binding)
     {
-        return client.currentScreen instanceof ContainerScreen;
+        return client.currentScreen instanceof HandledScreen;
     }
 
     /**

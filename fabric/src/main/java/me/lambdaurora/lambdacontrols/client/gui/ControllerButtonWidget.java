@@ -9,10 +9,13 @@
 
 package me.lambdaurora.lambdacontrols.client.gui;
 
+import me.lambdaurora.lambdacontrols.LambdaControls;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.spruceui.AbstractIconButtonWidget;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,25 +36,25 @@ public class ControllerButtonWidget extends AbstractIconButtonWidget
     public void update()
     {
         int length = binding.getButton().length;
-        this.setMessage(this.binding.isNotBound() ? I18n.translate("lambdacontrols.not_bound") :
-                (length > 0 ? ButtonBinding.getLocalizedButtonName(binding.getButton()[0]) : "<>"));
+        this.setMessage(this.binding.isNotBound() ? LambdaControls.NOT_BOUND_TEXT :
+                (length > 0 ? ButtonBinding.getLocalizedButtonName(binding.getButton()[0]) : new LiteralText("<>")));
     }
 
     @Override
-    public String getMessage()
+    public Text getMessage()
     {
         if (this.binding.getButton().length > 1)
-            return "";
+            return LiteralText.EMPTY;
         return super.getMessage();
     }
 
     @Override
-    protected int renderIcon(int mouseX, int mouseY, float delta, int x, int y)
+    protected int renderIcon(MatrixStack matrices, int mouseX, int mouseY, float delta, int x, int y)
     {
         if (this.binding.getButton().length > 1) {
             x += (this.width / 2 - this.iconWidth / 2) - 4;
         }
-        Pair<Integer, Integer> size = LambdaControlsRenderer.drawButton(x, y, this.binding, MinecraftClient.getInstance());
+        Pair<Integer, Integer> size = LambdaControlsRenderer.drawButton(matrices, x, y, this.binding, MinecraftClient.getInstance());
         this.iconWidth = size.key;
         return size.value;
     }

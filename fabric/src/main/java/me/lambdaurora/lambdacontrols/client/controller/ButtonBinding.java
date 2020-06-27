@@ -14,6 +14,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.Identifier;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.aperlambda.lambdacommon.utils.function.PairPredicate;
@@ -31,7 +33,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents a button binding.
  *
  * @author LambdAurora
- * @version 1.1.0
+ * @version 1.3.0
  * @since 1.0.0
  */
 public class ButtonBinding implements Nameable
@@ -320,64 +322,63 @@ public class ButtonBinding implements Nameable
      * @param button The button.
      * @return The localized name of the button.
      */
-    public static @NotNull
-    String getLocalizedButtonName(int button)
+    public static @NotNull Text getLocalizedButtonName(int button)
     {
         switch (button % 500) {
             case -1:
-                return I18n.translate("key.keyboard.unknown");
+                return new TranslatableText("key.keyboard.unknown");
             case GLFW_GAMEPAD_BUTTON_A:
-                return I18n.translate("lambdacontrols.button.a");
+                return new TranslatableText("lambdacontrols.button.a");
             case GLFW_GAMEPAD_BUTTON_B:
-                return I18n.translate("lambdacontrols.button.b");
+                return new TranslatableText("lambdacontrols.button.b");
             case GLFW_GAMEPAD_BUTTON_X:
-                return I18n.translate("lambdacontrols.button.x");
+                return new TranslatableText("lambdacontrols.button.x");
             case GLFW_GAMEPAD_BUTTON_Y:
-                return I18n.translate("lambdacontrols.button.y");
+                return new TranslatableText("lambdacontrols.button.y");
             case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER:
-                return I18n.translate("lambdacontrols.button.left_bumper");
+                return new TranslatableText("lambdacontrols.button.left_bumper");
             case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER:
-                return I18n.translate("lambdacontrols.button.right_bumper");
+                return new TranslatableText("lambdacontrols.button.right_bumper");
             case GLFW_GAMEPAD_BUTTON_BACK:
-                return I18n.translate("lambdacontrols.button.back");
+                return new TranslatableText("lambdacontrols.button.back");
             case GLFW_GAMEPAD_BUTTON_START:
-                return I18n.translate("lambdacontrols.button.start");
+                return new TranslatableText("lambdacontrols.button.start");
             case GLFW_GAMEPAD_BUTTON_GUIDE:
-                return I18n.translate("lambdacontrols.button.guide");
+                return new TranslatableText("lambdacontrols.button.guide");
             case GLFW_GAMEPAD_BUTTON_LEFT_THUMB:
-                return I18n.translate("lambdacontrols.button.left_thumb");
+                return new TranslatableText("lambdacontrols.button.left_thumb");
             case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB:
-                return I18n.translate("lambdacontrols.button.right_thumb");
+                return new TranslatableText("lambdacontrols.button.right_thumb");
             case GLFW_GAMEPAD_BUTTON_DPAD_UP:
-                return I18n.translate("lambdacontrols.button.dpad_up");
+                return new TranslatableText("lambdacontrols.button.dpad_up");
             case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT:
-                return I18n.translate("lambdacontrols.button.dpad_right");
+                return new TranslatableText("lambdacontrols.button.dpad_right");
             case GLFW_GAMEPAD_BUTTON_DPAD_DOWN:
-                return I18n.translate("lambdacontrols.button.dpad_down");
+                return new TranslatableText("lambdacontrols.button.dpad_down");
             case GLFW_GAMEPAD_BUTTON_DPAD_LEFT:
-                return I18n.translate("lambdacontrols.button.dpad_left");
+                return new TranslatableText("lambdacontrols.button.dpad_left");
             case 100:
-                return I18n.translate("lambdacontrols.axis.left_x+");
+                return new TranslatableText("lambdacontrols.axis.left_x+");
             case 101:
-                return I18n.translate("lambdacontrols.axis.left_y+");
+                return new TranslatableText("lambdacontrols.axis.left_y+");
             case 102:
-                return I18n.translate("lambdacontrols.axis.right_x+");
+                return new TranslatableText("lambdacontrols.axis.right_x+");
             case 103:
-                return I18n.translate("lambdacontrols.axis.right_y+");
+                return new TranslatableText("lambdacontrols.axis.right_y+");
             case 104:
-                return I18n.translate("lambdacontrols.axis.left_trigger");
+                return new TranslatableText("lambdacontrols.axis.left_trigger");
             case 105:
-                return I18n.translate("lambdacontrols.axis.right_trigger");
+                return new TranslatableText("lambdacontrols.axis.right_trigger");
             case 200:
-                return I18n.translate("lambdacontrols.axis.left_x-");
+                return new TranslatableText("lambdacontrols.axis.left_x-");
             case 201:
-                return I18n.translate("lambdacontrols.axis.left_y-");
+                return new TranslatableText("lambdacontrols.axis.left_y-");
             case 202:
-                return I18n.translate("lambdacontrols.axis.right_x-");
+                return new TranslatableText("lambdacontrols.axis.right_x-");
             case 203:
-                return I18n.translate("lambdacontrols.axis.right_y-");
+                return new TranslatableText("lambdacontrols.axis.right_y-");
             default:
-                return I18n.translate("lambdacontrols.button.unknown", button);
+                return new TranslatableText("lambdacontrols.button.unknown", button);
         }
     }
 

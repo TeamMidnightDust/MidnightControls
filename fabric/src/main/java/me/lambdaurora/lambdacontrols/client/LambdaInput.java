@@ -19,7 +19,7 @@ import me.lambdaurora.lambdacontrols.client.gui.TouchscreenOverlay;
 import me.lambdaurora.lambdacontrols.client.mixin.AdvancementsScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.mixin.CreativeInventoryScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.mixin.EntryListWidgetAccessor;
-import me.lambdaurora.lambdacontrols.client.util.ContainerScreenAccessor;
+import me.lambdaurora.lambdacontrols.client.util.HandledScreenAccessor;
 import me.lambdaurora.spruceui.SpruceLabelWidget;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -31,18 +31,20 @@ import net.minecraft.client.gui.ParentElement;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
-import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
+import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.container.Slot;
-import net.minecraft.container.SlotActionType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -69,7 +71,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents the LambdaControls' input handler.
  *
  * @author LambdAurora
- * @version 1.2.0
+ * @version 1.3.0
  * @since 1.0.0
  */
 public class LambdaInput
@@ -80,8 +82,6 @@ public class LambdaInput
     private              int                   actionGuiCooldown = 0;
     private              int                   ignoreNextA       = 0;
     // Sneak state.
-    private              double                prevTargetYaw     = 0.0;
-    private              double                prevTargetPitch   = 0.0;
     private              double                targetYaw         = 0.0;
     private              double                targetPitch       = 0.0;
     private              float                 prevXAxis         = 0.F;
@@ -103,8 +103,8 @@ public class LambdaInput
      */
     public void onTick(@NotNull MinecraftClient client)
     {
-        this.prevTargetYaw = this.targetYaw;
-        this.prevTargetPitch = this.targetPitch;
+        this.targetYaw = 0.F;
+        this.targetPitch = 0.F;
 
         // Handles the key bindings.
         if (LambdaControlsClient.BINDING_LOOK_UP.isPressed()) {
@@ -189,20 +189,24 @@ public class LambdaInput
      *
      * @param client The client instance.
      */
-    public void onRender(@NotNull MinecraftClient client)
+    public void onRender(float tickDelta, @NotNull MinecraftClient client)
     {
-        if ((client.currentScreen == null || client.currentScreen instanceof TouchscreenOverlay) &&
-                (this.prevTargetYaw != this.targetYaw || this.prevTargetPitch != this.targetPitch)) {
-            float deltaYaw = (float) ((this.targetYaw - client.player.prevYaw) * client.getTickDelta());
-            float deltaPitch = (float) ((this.targetPitch - client.player.prevPitch) * client.getTickDelta());
-            float rotationYaw = client.player.prevYaw + deltaYaw;
-            float rotationPitch = client.player.prevPitch + deltaPitch;
+        if (!(client.currentScreen == null || client.currentScreen instanceof TouchscreenOverlay))
+            return;
+
+        PlayerEntity player = client.player;
+        if (player == null)
+            return;
+
+        if (this.targetYaw != 0F || this.targetPitch != 0F) {
+            float rotationYaw = (float) (player.prevYaw + (this.targetYaw / 0.10) * tickDelta);
+            float rotationPitch = (float) (player.prevPitch + (this.targetPitch / 0.10) * tickDelta);
             client.player.yaw = rotationYaw;
             client.player.pitch = MathHelper.clamp(rotationPitch, -90.F, 90.F);
             if (client.player.isRiding()) {
                 client.player.getVehicle().copyPositionAndRotation(client.player);
             }
-            client.getTutorialManager().onUpdateMouse(deltaPitch, deltaYaw);
+            client.getTutorialManager().onUpdateMouse(this.targetPitch, this.targetYaw);
         }
     }
 
@@ -314,28 +318,28 @@ public class LambdaInput
                 }
             }
 
-            if (client.currentScreen instanceof ContainerScreen && client.interactionManager != null && client.player != null) {
+            if (client.currentScreen instanceof HandledScreen && client.interactionManager != null && client.player != null) {
                 double x = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
                 double y = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
-                Slot slot = ((ContainerScreenAccessor) client.currentScreen).lambdacontrols_getSlotAt(x, y);
+                Slot slot = ((HandledScreenAccessor) client.currentScreen).lambdacontrols_getSlotAt(x, y);
                 SlotActionType slotAction = SlotActionType.PICKUP;
                 if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && slot != null) {
                     if (client.currentScreen instanceof CreativeInventoryScreen) {
                         if (((CreativeInventoryScreenAccessor) client.currentScreen).lambdacontrols_isCreativeInventorySlot(slot))
                             slotAction = SlotActionType.CLONE;
                     }
-                    client.interactionManager.clickSlot(((ContainerScreen) client.currentScreen).getContainer().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_1, slotAction, client.player);
-                    client.player.playerContainer.sendContentUpdates();
+                    client.interactionManager.clickSlot(((HandledScreen) client.currentScreen).getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_1, slotAction, client.player);
+                    client.player.playerScreenHandler.sendContentUpdates();
                     this.actionGuiCooldown = 5;
                     return;
                 } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
-                    client.player.closeContainer();
+                    client.player.closeHandledScreen();
                     return;
                 } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_X && slot != null) {
-                    client.interactionManager.clickSlot(((ContainerScreen) client.currentScreen).getContainer().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_2, SlotActionType.PICKUP, client.player);
+                    client.interactionManager.clickSlot(((HandledScreen) client.currentScreen).getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_2, SlotActionType.PICKUP, client.player);
                     return;
                 } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_Y && slot != null) {
-                    client.interactionManager.clickSlot(((ContainerScreen) client.currentScreen).getContainer().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_1, SlotActionType.QUICK_MOVE, client.player);
+                    client.interactionManager.clickSlot(((HandledScreen) client.currentScreen).getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_1, SlotActionType.QUICK_MOVE, client.player);
                     return;
                 }
             } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
@@ -437,6 +441,7 @@ public class LambdaInput
 
         if (client.currentScreen == null) {
             // Handles the look direction.
+            absValue -= this.config.getDeadZone();
             this.handleLook(client, axis, (float) (absValue / (1.0 - this.config.getDeadZone())), state);
         } else {
             boolean allowMouseControl = true;
@@ -555,7 +560,7 @@ public class LambdaInput
             this.actionGuiCooldown = 2; // Prevent to press too quickly the focused element, so we have to skip 5 ticks.
             return false;
         } else if (element instanceof AlwaysSelectedEntryListWidget) {
-            ((EntryListWidgetAccessor) element).lambdacontrols_moveSelection(right ? 1 : -1);
+            ((EntryListWidgetAccessor) element).lambdacontrols_moveSelection(right ? EntryListWidget.class_5403.field_25661 : EntryListWidget.class_5403.field_25662);
             return false;
         } else if (element instanceof ParentElement) {
             ParentElement entryList = (ParentElement) element;
@@ -570,7 +575,7 @@ public class LambdaInput
     /**
      * Handles the look direction input.
      *
-     * @param client The client isntance.
+     * @param client The client instance.
      * @param axis   The axis to change.
      * @param value  The value of the look.
      * @param state  The state.
@@ -579,21 +584,19 @@ public class LambdaInput
     {
         // Handles the look direction.
         if (client.player != null) {
-            double powValue = Math.pow(value, 4.0);
+            double powValue = Math.pow(value, 2.0);
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
                 if (state == 2) {
-                    this.targetPitch = client.player.pitch - this.config.getRightYAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
-                    this.targetPitch = MathHelper.clamp(this.targetPitch, -90.0D, 90.0D);
+                    this.targetPitch = -this.config.getRightYAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
                 } else if (state == 1) {
-                    this.targetPitch = client.player.pitch + this.config.getRightYAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
-                    this.targetPitch = MathHelper.clamp(this.targetPitch, -90.0D, 90.0D);
+                    this.targetPitch = this.config.getRightYAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
                 }
             }
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_X) {
                 if (state == 2) {
-                    this.targetYaw = client.player.yaw - this.config.getRightXAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
+                    this.targetYaw = -this.config.getRightXAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
                 } else if (state == 1) {
-                    this.targetYaw = client.player.yaw + this.config.getRightXAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
+                    this.targetYaw = this.config.getRightXAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
                 }
             }
         }
@@ -615,26 +618,26 @@ public class LambdaInput
 
     private static boolean isScreenInteractive(@NotNull Screen screen)
     {
-        return !(screen instanceof AdvancementsScreen || screen instanceof ContainerScreen || LambdaControlsCompat.requireMouseOnScreen(screen));
+        return !(screen instanceof AdvancementsScreen || screen instanceof HandledScreen || LambdaControlsCompat.requireMouseOnScreen(screen));
     }
 
     // Inspired from https://github.com/MrCrayfish/Controllable/blob/1.14.X/src/main/java/com/mrcrayfish/controllable/client/ControllerInput.java#L686.
     private void moveMouseToClosestSlot(@NotNull MinecraftClient client, @Nullable Screen screen)
     {
         // Makes the mouse attracted to slots. This helps with selecting items when using a controller.
-        if (screen instanceof ContainerScreen) {
-            ContainerScreen inventoryScreen = (ContainerScreen) screen;
-            ContainerScreenAccessor accessor = (ContainerScreenAccessor) inventoryScreen;
+        if (screen instanceof HandledScreen) {
+            HandledScreen inventoryScreen = (HandledScreen) screen;
+            HandledScreenAccessor accessor = (HandledScreenAccessor) inventoryScreen;
             int guiLeft = accessor.getX();
             int guiTop = accessor.getY();
             int mouseX = (int) (targetMouseX * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth());
             int mouseY = (int) (targetMouseY * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight());
 
             // Finds the closest slot in the GUI within 14 pixels.
-            Optional<Pair<Slot, Double>> closestSlot = inventoryScreen.getContainer().slots.parallelStream()
+            Optional<Pair<Slot, Double>> closestSlot = inventoryScreen.getScreenHandler().slots.parallelStream()
                     .map(slot -> {
-                        int x = guiLeft + slot.xPosition + 8;
-                        int y = guiTop + slot.yPosition + 8;
+                        int x = guiLeft + slot.x + 8;
+                        int y = guiTop + slot.y + 8;
 
                         // Distance between the slot and the cursor.
                         double distance = Math.sqrt(Math.pow(x - mouseX, 2) + Math.pow(y - mouseY, 2));
@@ -645,8 +648,8 @@ public class LambdaInput
             if (closestSlot.isPresent()) {
                 Slot slot = closestSlot.get().key;
                 if (slot.hasStack() || !client.player.inventory.getMainHandStack().isEmpty()) {
-                    int slotCenterXScaled = guiLeft + slot.xPosition + 8;
-                    int slotCenterYScaled = guiTop + slot.yPosition + 8;
+                    int slotCenterXScaled = guiLeft + slot.x + 8;
+                    int slotCenterYScaled = guiTop + slot.y + 8;
                     int slotCenterX = (int) (slotCenterXScaled / ((double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth()));
                     int slotCenterY = (int) (slotCenterYScaled / ((double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight()));
                     double deltaX = slotCenterX - targetMouseX;
@@ -705,7 +708,7 @@ public class LambdaInput
     {
         if (!LambdaControlsFeature.FRONT_BLOCK_PLACING.isAvailable())
             return null;
-        if (client.player != null && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.MISS && client.player.onGround && client.player.pitch > 35.0F) {
+        if (client.player != null && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.MISS && client.player.isOnGround() && client.player.pitch > 35.0F) {
             if (client.player.isRiding())
                 return null;
             BlockPos playerPos = client.player.getBlockPos().down();

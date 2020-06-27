@@ -60,7 +60,6 @@
   "lambdacontrols.controller.connected": "Controller %d connected.",
   "lambdacontrols.controller.disconnected": "Controller %d disconnected.",
   "lambdacontrols.controller.mappings.1": "To configure the controller mappings, please use %sSDL2 Gamepad Tool%s",
-  "lambdacontrols.controller.mappings.2": "(%s%s%s),",
   "lambdacontrols.controller.mappings.3": "and put the mapping in `%s.minecraft/config/gamecontrollerdb.txt%s`.",
   "lambdacontrols.controller.mappings.updated": "Updated mappings!",
   "lambdacontrols.controller_type.default": "default",

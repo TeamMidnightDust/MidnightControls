@@ -60,7 +60,6 @@
   "lambdacontrols.controller.connected": "Manette %d connecté.",
   "lambdacontrols.controller.disconnected": "Manette %d déconnecté.",
   "lambdacontrols.controller.mappings.1": "Pour configurer les correspondances de la manette, veuillez utiliser %sSDL2 Gamepad Tool%s",
-  "lambdacontrols.controller.mappings.2": "(%s%s%s),",
   "lambdacontrols.controller.mappings.3": "et mettez les correspondances dans le fichier `%s.minecraft/config/gamecontrollerdb.txt%s`.",
   "lambdacontrols.controller.mappings.updated": "Configuration des manettes mise à jour!",
   "lambdacontrols.controller_type.default": "default",

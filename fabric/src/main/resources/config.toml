@@ -40,7 +40,7 @@ auto_switch_mode = false
     # Controller's dead zone.
     dead_zone = 0.20
     # Rotation speed for look directions.
-    rotation_speed = 40.0
+    rotation_speed = 10.0
     # Mouse speed in GUI.
     mouse_speed = 30.0
     # Inverts the right X axis.

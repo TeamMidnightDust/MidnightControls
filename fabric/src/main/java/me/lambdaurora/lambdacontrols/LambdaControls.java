@@ -15,8 +15,9 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +29,7 @@ import java.util.Optional;
  * Represents the LambdaControls mod.
  *
  * @author LambdAurora
- * @version 1.1.0
+ * @version 1.3.0
  * @since 1.0.0
  */
 public class LambdaControls implements ModInitializer
@@ -37,6 +38,8 @@ public class LambdaControls implements ModInitializer
     public static final Identifier     CONTROLS_MODE_CHANNEL = new Identifier(LambdaControlsConstants.CONTROLS_MODE_CHANNEL.toString());
     public static final Identifier     FEATURE_CHANNEL       = new Identifier(LambdaControlsConstants.FEATURE_CHANNEL.toString());
     public static final Identifier     HELLO_CHANNEL         = new Identifier(LambdaControlsConstants.HELLO_CHANNEL.toString());
+
+    public static final TranslatableText NOT_BOUND_TEXT = new TranslatableText("lambdacontrols.not_bound");
 
     public final Logger logger = LogManager.getLogger("LambdaControls");
 

@@ -17,11 +17,8 @@ import me.lambdaurora.lambdacontrols.client.LambdaInput;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.spruceui.hud.Hud;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.Matrix4f;
-import net.minecraft.client.util.math.Rotation3;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -34,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  * Represents the LambdaControls HUD.
  *
  * @author LambdAurora
- * @version 1.2.0
+ * @version 1.3.0
  * @since 1.0.0
  */
 public class LambdaControlsHud extends Hud
@@ -79,26 +76,24 @@ public class LambdaControlsHud extends Hud
     /**
      * Renders the LambdaControls' HUD.
      */
-    public void render(float tickDelta)
+    @Override
+    public void render(MatrixStack matrices, float tickDelta)
     {
         if (this.mod.config.getControlsMode() == ControlsMode.CONTROLLER && this.client.currentScreen == null) {
             int y = bottom(2);
-            this.renderFirstIcons(this.mod.config.getHudSide() == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
-            this.renderSecondIcons(this.mod.config.getHudSide() == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);
-            VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-            Matrix4f matrix4f = Rotation3.identity().getMatrix();
-            this.renderFirstSection(this.mod.config.getHudSide() == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y, immediate, matrix4f);
-            this.renderSecondSection(this.mod.config.getHudSide() == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y, immediate, matrix4f);
-            immediate.draw();
+            this.renderFirstIcons(matrices, this.mod.config.getHudSide() == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
+            this.renderSecondIcons(matrices, this.mod.config.getHudSide() == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);
+            this.renderFirstSection(matrices, this.mod.config.getHudSide() == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
+            this.renderSecondSection(matrices, this.mod.config.getHudSide() == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);
         }
     }
 
-    public void renderFirstIcons(int x, int y)
+    public void renderFirstIcons(MatrixStack matrices, int x, int y)
     {
         int offset = 2 + this.inventoryWidth + this.inventoryButtonWidth + 4;
         int currentX = this.mod.config.getHudSide() == HudSide.LEFT ? x : x - this.inventoryButtonWidth;
-        this.drawButton(currentX, y, ButtonBinding.INVENTORY, true);
-        this.drawButton(currentX += (this.mod.config.getHudSide() == HudSide.LEFT ? offset : -offset), y, ButtonBinding.SWAP_HANDS, true);
+        this.drawButton(matrices, currentX, y, ButtonBinding.INVENTORY, true);
+        this.drawButton(matrices, currentX += (this.mod.config.getHudSide() == HudSide.LEFT ? offset : -offset), y, ButtonBinding.SWAP_HANDS, true);
         offset = 2 + this.swapHandsWidth + this.dropItemButtonWidth + 4;
         if (this.client.options.showSubtitles && this.mod.config.getHudSide() == HudSide.RIGHT) {
             currentX += -offset;
@@ -106,17 +101,17 @@ public class LambdaControlsHud extends Hud
             currentX = this.mod.config.getHudSide() == HudSide.LEFT ? x : x - this.dropItemButtonWidth;
             y -= 24;
         }
-        this.drawButton(currentX, y, ButtonBinding.DROP_ITEM, !this.client.player.getMainHandStack().isEmpty());
+        this.drawButton(matrices, currentX, y, ButtonBinding.DROP_ITEM, !this.client.player.getMainHandStack().isEmpty());
     }
 
-    public void renderSecondIcons(int x, int y)
+    public void renderSecondIcons(MatrixStack matrices, int x, int y)
     {
         int offset;
         int currentX = x;
         if (!this.placeAction.isEmpty()) {
             if (this.mod.config.getHudSide() == HudSide.LEFT)
                 currentX -= this.useButtonWidth;
-            this.drawButton(currentX, y, ButtonBinding.USE, true);
+            this.drawButton(matrices, currentX, y, ButtonBinding.USE, true);
             offset = 2 + this.useWidth + 4;
             if (this.client.options.showSubtitles && this.mod.config.getHudSide() == HudSide.LEFT) {
                 currentX -= offset;
@@ -129,33 +124,33 @@ public class LambdaControlsHud extends Hud
         if (this.mod.config.getHudSide() == HudSide.LEFT)
             currentX -= this.attackButtonWidth;
 
-        this.drawButton(currentX, y, ButtonBinding.ATTACK, this.attackWidth != 0);
+        this.drawButton(matrices, currentX, y, ButtonBinding.ATTACK, this.attackWidth != 0);
     }
 
-    public void renderFirstSection(int x, int y, @NotNull VertexConsumerProvider.Immediate immediate, @NotNull Matrix4f matrix4f)
+    public void renderFirstSection(MatrixStack matrices, int x, int y)
     {
         int currentX = this.mod.config.getHudSide() == HudSide.LEFT ? x + this.inventoryButtonWidth + 2 : x - this.inventoryButtonWidth - 2 - this.inventoryWidth;
-        this.drawTip(currentX, y, ButtonBinding.INVENTORY, true, immediate, matrix4f);
+        this.drawTip(matrices, currentX, y, ButtonBinding.INVENTORY, true);
         currentX += this.mod.config.getHudSide() == HudSide.LEFT ? this.inventoryWidth + 4 + this.swapHandsButtonWidth + 2
                 : -this.swapHandsWidth - 2 - this.swapHandsButtonWidth - 4;
-        this.drawTip(currentX, y, ButtonBinding.SWAP_HANDS, true, immediate, matrix4f);
+        this.drawTip(matrices, currentX, y, ButtonBinding.SWAP_HANDS, true);
         if (this.client.options.showSubtitles && this.mod.config.getHudSide() == HudSide.RIGHT) {
             currentX += -this.dropItemWidth - 2 - this.dropItemButtonWidth - 4;
         } else {
             y -= 24;
             currentX = this.mod.config.getHudSide() == HudSide.LEFT ? x + this.dropItemButtonWidth + 2 : x - this.dropItemButtonWidth - 2 - this.dropItemWidth;
         }
-        this.drawTip(currentX, y, ButtonBinding.DROP_ITEM, !this.client.player.getMainHandStack().isEmpty(), immediate, matrix4f);
+        this.drawTip(matrices, currentX, y, ButtonBinding.DROP_ITEM, !this.client.player.getMainHandStack().isEmpty());
     }
 
-    public void renderSecondSection(int x, int y, @NotNull VertexConsumerProvider.Immediate immediate, @NotNull Matrix4f matrix4f)
+    public void renderSecondSection(MatrixStack matrices, int x, int y)
     {
         int currentX = x;
 
         if (!this.placeAction.isEmpty()) {
             currentX += this.mod.config.getHudSide() == HudSide.RIGHT ? this.useButtonWidth + 2 : -this.useButtonWidth - 2 - this.useWidth;
 
-            this.drawTip(currentX, y, this.placeAction, true, immediate, matrix4f);
+            this.drawTip(matrices, currentX, y, this.placeAction, true);
 
             if (this.client.options.showSubtitles && this.mod.config.getHudSide() == HudSide.LEFT) {
                 currentX -= 4;
@@ -167,7 +162,7 @@ public class LambdaControlsHud extends Hud
 
         currentX += this.mod.config.getHudSide() == HudSide.RIGHT ? this.attackButtonWidth + 2 : -this.attackButtonWidth - 2 - this.attackWidth;
 
-        this.drawTip(currentX, y, this.attackAction, this.attackWidth != 0, immediate, matrix4f);
+        this.drawTip(matrices, currentX, y, this.attackAction, this.attackWidth != 0);
     }
 
     @Override
@@ -236,27 +231,26 @@ public class LambdaControlsHud extends Hud
     {
         if (text == null || text.isEmpty())
             return 0;
-        return this.client.textRenderer.getStringWidth(I18n.translate(text));
+        return this.client.textRenderer.getWidth(I18n.translate(text));
     }
 
-    private void drawButton(int x, int y, @NotNull ButtonBinding button, boolean display)
+    private void drawButton(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, boolean display)
     {
         if (display)
-            LambdaControlsRenderer.drawButton(x, y, button, this.client);
+            LambdaControlsRenderer.drawButton(matrices, x, y, button, this.client);
     }
 
-    private void drawTip(int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull VertexConsumerProvider.Immediate immediate, @NotNull Matrix4f matrix4f)
+    private void drawTip(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, boolean display)
     {
-        this.drawTip(x, y, button.getTranslationKey(), display, immediate, matrix4f);
+        this.drawTip(matrices, x, y, button.getTranslationKey(), display);
     }
 
-    private void drawTip(int x, int y, @NotNull String action, boolean display, @NotNull VertexConsumerProvider.Immediate immediate, @NotNull Matrix4f matrix4f)
+    private void drawTip(MatrixStack matrices, int x, int y, @NotNull String action, boolean display)
     {
         if (!display)
             return;
         String translatedAction = I18n.translate(action);
         int textY = (LambdaControlsRenderer.ICON_SIZE / 2 - this.client.textRenderer.fontHeight / 2) + 1;
-        client.textRenderer.draw(translatedAction, (float) x, (float) (y + textY), 14737632, true, matrix4f, immediate,
-                false, 0, 15728880);
+        this.client.textRenderer.draw(matrices, translatedAction, (float) x, (float) (y + textY), 14737632);
     }
 }

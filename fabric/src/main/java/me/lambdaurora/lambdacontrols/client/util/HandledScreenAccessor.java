@@ -9,12 +9,12 @@
 
 package me.lambdaurora.lambdacontrols.client.util;
 
-import net.minecraft.container.Slot;
+import net.minecraft.screen.slot.Slot;
 
 /**
  * Represents an accessor to AbstractContainerScreen.
  */
-public interface ContainerScreenAccessor
+public interface HandledScreenAccessor
 {
     /**
      * Gets the left coordinate of the GUI.

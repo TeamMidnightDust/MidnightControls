@@ -19,6 +19,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -40,7 +41,7 @@ public class ControlsOptionsScreenMixin extends GameOptionsScreen
         if (this.parent instanceof ControllerControlsScreen)
             return this.addButton(btn);
         else
-            return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).getHeight(), I18n.translate("menu.options"),
-                    b -> this.minecraft.openScreen(new LambdaControlsSettingsScreen(this, true))));
+            return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).getHeight(), new TranslatableText("menu.options"),
+                    b -> this.client.openScreen(new LambdaControlsSettingsScreen(this, true))));
     }
 }

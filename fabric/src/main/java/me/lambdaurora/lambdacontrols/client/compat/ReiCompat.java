@@ -37,7 +37,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents a compatibility handler for REI.
  *
  * @author LambdAurora
- * @version 1.2.0
+ * @version 1.3.0
  * @since 1.2.0
  */
 public class ReiCompat implements CompatHandler
@@ -155,9 +155,9 @@ public class ReiCompat implements CompatHandler
             if (client.currentScreen instanceof RecipeViewingScreen) {
                 RecipeViewingScreenAccessor screen = (RecipeViewingScreenAccessor) client.currentScreen;
                 if (next)
-                    screen.getCategoryNext().onPressed();
+                    screen.getCategoryNext().onClick();
                 else
-                    screen.getCategoryBack().onPressed();
+                    screen.getCategoryBack().onClick();
                 return true;
             } else if (client.currentScreen instanceof VillagerRecipeViewingScreen) {
                 VillagerRecipeViewingScreenAccessor screen = (VillagerRecipeViewingScreenAccessor) client.currentScreen;

@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.2.6-SNAPSHOT'
+    id 'fabric-loom' version '0.4-SNAPSHOT'
     id 'java-library'
     id 'maven-publish'
 }
@@ -47,8 +47,8 @@ dependencies {
     include "com.github.lambdaurora:spruceui:${project.spruceui_version}"
 
     // Compatibility mods
-    modCompile "io.github.joaoh1:okzoomer:2.1.0-beta.2"
-    modCompile "me.shedaniel:RoughlyEnoughItems:3.4.5"
+    modCompile "io.github.joaoh1:okzoomer:4.0.0-alpha.3.1.16.pre5"
+    modCompile "me.shedaniel:RoughlyEnoughItems:4.5.5"
 
     api project(":core")
     shadow project(":core")

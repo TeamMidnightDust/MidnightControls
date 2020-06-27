@@ -17,6 +17,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -25,7 +26,7 @@ import org.lwjgl.glfw.GLFW;
  * Represents the LambdaControls renderer.
  *
  * @author LambdAurora
- * @version 1.2.0
+ * @version 1.3.0
  * @since 1.2.0
  */
 public class LambdaControlsRenderer
@@ -82,19 +83,19 @@ public class LambdaControlsRenderer
         return width;
     }
 
-    public static Pair<Integer, Integer> drawButton(int x, int y, @NotNull ButtonBinding button, @NotNull MinecraftClient client)
+    public static Pair<Integer, Integer> drawButton(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, @NotNull MinecraftClient client)
     {
-        return drawButton(x, y, button.getButton(), client);
+        return drawButton(matrices, x, y, button.getButton(), client);
     }
 
-    public static Pair<Integer, Integer> drawButton(int x, int y, int[] buttons, @NotNull MinecraftClient client)
+    public static Pair<Integer, Integer> drawButton(MatrixStack matrices, int x, int y, int[] buttons, @NotNull MinecraftClient client)
     {
         int height = 0;
         int length = 0;
         int currentX = x;
         for (int i = 0; i < buttons.length; i++) {
             int btn = buttons[i];
-            int size = drawButton(currentX, y, btn, client);
+            int size = drawButton(matrices, currentX, y, btn, client);
             if (size > height)
                 height = size;
             length += size;
@@ -107,7 +108,7 @@ public class LambdaControlsRenderer
     }
 
     @SuppressWarnings("deprecated")
-    public static int drawButton(int x, int y, int button, @NotNull MinecraftClient client)
+    public static int drawButton(MatrixStack matrices, int x, int y, int button, @NotNull MinecraftClient client)
     {
         boolean second = false;
         if (button == -1)
@@ -190,7 +191,7 @@ public class LambdaControlsRenderer
         int assetSize = axis ? AXIS_SIZE : BUTTON_SIZE;
 
         RenderSystem.color4f(1.0F, second ? 0.0F : 1.0F, 1.0F, 1.0F);
-        DrawableHelper.blit(x + (ICON_SIZE / 2 - assetSize / 2), y + (ICON_SIZE / 2 - assetSize / 2),
+        DrawableHelper.drawTexture(matrices, x + (ICON_SIZE / 2 - assetSize / 2), y + (ICON_SIZE / 2 - assetSize / 2),
                 (float) buttonOffset, (float) (controllerType * (axis ? AXIS_SIZE : BUTTON_SIZE)),
                 assetSize, assetSize,
                 256, 256);
@@ -199,20 +200,20 @@ public class LambdaControlsRenderer
         return ICON_SIZE;
     }
 
-    public static int drawButtonTip(int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull MinecraftClient client)
+    public static int drawButtonTip(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull MinecraftClient client)
     {
-        return drawButtonTip(x, y, button.getButton(), button.getTranslationKey(), display, client);
+        return drawButtonTip(matrices, x, y, button.getButton(), button.getTranslationKey(), display, client);
     }
 
-    public static int drawButtonTip(int x, int y, int[] button, @NotNull String action, boolean display, @NotNull MinecraftClient client)
+    public static int drawButtonTip(MatrixStack matrices, int x, int y, int[] button, @NotNull String action, boolean display, @NotNull MinecraftClient client)
     {
         if (display) {
-            int buttonWidth = drawButton(x, y, button, client).key;
+            int buttonWidth = drawButton(matrices, x, y, button, client).key;
 
             String translatedAction = I18n.translate(action);
             int textY = (LambdaControlsRenderer.ICON_SIZE / 2 - client.textRenderer.fontHeight / 2) + 1;
 
-            return client.textRenderer.drawWithShadow(translatedAction, (float) (x + buttonWidth + 2), (float) (y + textY), 14737632);
+            return client.textRenderer.drawWithShadow(matrices, translatedAction, (float) (x + buttonWidth + 2), (float) (y + textY), 14737632);
         }
 
         return -10;
@@ -220,6 +221,6 @@ public class LambdaControlsRenderer
 
     private static int getButtonTipWidth(@NotNull String action, @NotNull TextRenderer textRenderer)
     {
-        return 15 + 5 + textRenderer.getStringWidth(action);
+        return 15 + 5 + textRenderer.getWidth(action);
     }
 }

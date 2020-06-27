@@ -9,7 +9,7 @@
 
 package me.lambdaurora.lambdacontrols.client.compat;
 
-import io.github.joaoh1.okzoomer.OkZoomer;
+import io.github.joaoh1.okzoomer.client.OkZoomerClientMod;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import org.jetbrains.annotations.NotNull;
@@ -19,12 +19,12 @@ import org.lwjgl.glfw.GLFW;
  * Represents a compatibility handler for OkZoomer.
  *
  * @author LambdAurora
- * @version 1.1.0
+ * @version 1.3.0
  * @since 1.1.0
  */
 public class OkZoomerCompat implements CompatHandler
 {
-    public static final String OKZOOMER_CLASS_PATH = "io.github.joaoh1.okzoomer.OkZoomer";
+    public static final String OKZOOMER_CLASS_PATH = "io.github.joaoh1.okzoomer.client.OkZoomerClientMod";
 
     @Override
     public void handle(@NotNull LambdaControlsClient mod)
@@ -34,7 +34,7 @@ public class OkZoomerCompat implements CompatHandler
                 .onlyInGame()
                 .cooldown(true)
                 .category(ButtonBinding.MISC_CATEGORY)
-                .linkKeybind(OkZoomer.zoomKeyBinding)
+                .linkKeybind(OkZoomerClientMod.zoomKeyBinding)
                 .register();
     }
 }

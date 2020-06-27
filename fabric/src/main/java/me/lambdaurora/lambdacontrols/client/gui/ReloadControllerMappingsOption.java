@@ -36,7 +36,7 @@ public class ReloadControllerMappingsOption extends Option implements Nameable
     @Override
     public AbstractButtonWidget createButton(GameOptions options, int x, int y, int width)
     {
-        SpruceButtonWidget button = new SpruceButtonWidget(x, y, width, 20, this.getName(), btn -> {
+        SpruceButtonWidget button = new SpruceButtonWidget(x, y, width, 20, new TranslatableText(KEY), btn -> {
             MinecraftClient client = MinecraftClient.getInstance();
             Controller.updateMappings();
             if (client.currentScreen != null)

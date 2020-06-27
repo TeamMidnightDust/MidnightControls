@@ -15,6 +15,8 @@ import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsConfig;
 import me.lambdaurora.lambdacontrols.client.util.MouseAccessor;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.Identifier;
 import org.aperlambda.lambdacommon.utils.function.PairPredicate;
@@ -356,5 +358,35 @@ public class InputManager
     public static @NotNull Stream<ButtonCategory> streamCategories()
     {
         return CATEGORIES.stream();
+    }
+
+    /**
+     * Returns a new key binding instance.
+     * @param id The identifier of the key binding.
+     * @param type The type.
+     * @param code The code.
+     * @param category The category of the key binding.
+     * @return The key binding.
+     *
+     * @see #makeKeyBinding(Identifier, InputUtil.Type, int, String)
+     */
+    public static @NotNull KeyBinding makeKeyBinding(@NotNull net.minecraft.util.Identifier id, InputUtil.Type type, int code, @NotNull String category)
+    {
+        return makeKeyBinding(new Identifier(id.getNamespace(), id.getPath()), type, code, category);
+    }
+
+    /**
+     * Returns a new key binding instance.
+     * @param id The identifier of the key binding.
+     * @param type The type.
+     * @param code The code.
+     * @param category The category of the key binding.
+     * @return The key binding.
+     *
+     * @see #makeKeyBinding(net.minecraft.util.Identifier, InputUtil.Type, int, String)
+     */
+    public static @NotNull KeyBinding makeKeyBinding(@NotNull Identifier id, InputUtil.Type type, int code, @NotNull String category)
+    {
+        return new KeyBinding(String.format("key.%s.%s", id.getNamespace(), id.getName()), type, code, category);
     }
 }

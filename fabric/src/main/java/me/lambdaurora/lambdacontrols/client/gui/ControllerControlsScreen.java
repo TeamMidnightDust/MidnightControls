@@ -16,7 +16,7 @@ import me.lambdaurora.spruceui.SpruceButtonWidget;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.function.Predicates;
 import org.jetbrains.annotations.NotNull;
@@ -56,26 +56,30 @@ public class ControllerControlsScreen extends Screen
     @Override
     protected void init()
     {
-        this.addButton(new SpruceButtonWidget(this.width / 2 - 155, 18, this.hideSettings ? 310 : 150, 20, I18n.translate("lambdacontrols.menu.keyboard_controls"),
-                btn -> this.minecraft.openScreen(new ControlsOptionsScreen(this, this.minecraft.options))));
+        this.addButton(new SpruceButtonWidget(this.width / 2 - 155, 18, this.hideSettings ? 310 : 150, 20,
+                new TranslatableText("lambdacontrols.menu.keyboard_controls"),
+                btn -> this.client.openScreen(new ControlsOptionsScreen(this, this.client.options))));
         if (!this.hideSettings)
-            this.addButton(new SpruceButtonWidget(this.width / 2 - 155 + 160, 18, 150, 20, I18n.translate("menu.options"),
-                    btn -> this.minecraft.openScreen(new LambdaControlsSettingsScreen(this, true))));
-        this.bindingsListWidget = new ControlsListWidget(this, this.minecraft);
+            this.addButton(new SpruceButtonWidget(this.width / 2 - 155 + 160, 18, 150, 20,
+                    new TranslatableText("menu.options"),
+                    btn -> this.client.openScreen(new LambdaControlsSettingsScreen(this, true))));
+        this.bindingsListWidget = new ControlsListWidget(this, this.client);
         this.children.add(this.bindingsListWidget);
-        this.resetButton = this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 29, 150, 20, I18n.translate("controls.resetAll"),
+        this.resetButton = this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 29, 150, 20,
+                new TranslatableText("controls.resetAll"),
                 btn -> InputManager.streamBindings().forEach(binding -> this.mod.config.setButtonBinding(binding, binding.getDefaultButton()))));
-        this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, I18n.translate("gui.done"),
-                btn -> this.minecraft.openScreen(this.parent)));
+        this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20,
+                new TranslatableText("gui.done"),
+                btn -> this.client.openScreen(this.parent)));
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float delta)
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta)
     {
-        this.renderBackground();
-        this.bindingsListWidget.render(mouseX, mouseY, delta);
-        this.drawCenteredString(this.font, this.title.asFormattedString(), this.width / 2, 8, 16777215);
+        this.renderBackground(matrices);
+        this.bindingsListWidget.render(matrices, mouseX, mouseY, delta);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 16777215);
         this.resetButton.active = InputManager.streamBindings().anyMatch(Predicates.not(ButtonBinding::isDefault));
-        super.render(mouseX, mouseY, delta);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }

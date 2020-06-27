@@ -20,6 +20,10 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +52,7 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
                     this.addEntry(new CategoryEntry(category));
 
                     category.getBindings().forEach(binding -> {
-                        int i = client.textRenderer.getStringWidth(I18n.translate(binding.getTranslationKey()));
+                        int i = client.textRenderer.getWidth(I18n.translate(binding.getTranslationKey()));
                         if (i > this.field_2733) {
                             this.field_2733 = i;
                         }
@@ -59,9 +63,9 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
     }
 
     @Override
-    protected int getScrollbarPosition()
+    protected int getScrollbarPositionX()
     {
-        return super.getScrollbarPosition() + 15;
+        return super.getScrollbarPositionX() + 15;
     }
 
     @Override
@@ -88,28 +92,28 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
                 gui.waiting = true;
             })
             {
-                protected String getNarrationMessage()
+                protected MutableText getNarrationMessage()
                 {
-                    return binding.isNotBound() ? I18n.translate("narrator.controls.unbound", bindingName) : I18n.translate("narrator.controls.bound", bindingName, super.getNarrationMessage());
+                    return binding.isNotBound() ? new TranslatableText("narrator.controls.unbound", bindingName) : new TranslatableText("narrator.controls.bound", bindingName, super.getNarrationMessage());
                 }
             };
-            this.resetButton = new ButtonWidget(0, 0, 50, 20, I18n.translate("controls.reset"),
+            this.resetButton = new ButtonWidget(0, 0, 50, 20, new TranslatableText("controls.reset"),
                     btn -> gui.mod.config.setButtonBinding(binding, binding.getDefaultButton()))
             {
-                protected String getNarrationMessage()
+                protected MutableText getNarrationMessage()
                 {
-                    return I18n.translate("narrator.controls.reset", bindingName);
+                    return new TranslatableText("narrator.controls.reset", bindingName);
                 }
             };
-            this.unboundButton = new ButtonWidget(0, 0, 50, 20, I18n.translate("lambdacontrols.menu.unbound"),
+            this.unboundButton = new ButtonWidget(0, 0, 50, 20, new TranslatableText("lambdacontrols.menu.unbound"),
                     btn -> {
                         gui.mod.config.setButtonBinding(binding, UNBOUND);
                         gui.focusedBinding = null;
                     })
             {
-                protected String getNarrationMessage()
+                protected MutableText getNarrationMessage()
                 {
-                    return I18n.translate("lambdacontrols.narrator.unbound", bindingName);
+                    return new TranslatableText("lambdacontrols.narrator.unbound", bindingName);
                 }
             };
         }
@@ -121,34 +125,38 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
         }
 
         @Override
-        public void render(int index, int y, int x, int width, int height, int mouseX, int mouseY, boolean hovering, float delta)
+        public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY, boolean hovering, float delta)
         {
             boolean focused = gui.focusedBinding == this.binding;
-            TextRenderer textRenderer = ControlsListWidget.this.minecraft.textRenderer;
+            TextRenderer textRenderer = ControlsListWidget.this.client.textRenderer;
             String bindingName = this.bindingName;
             float var10002 = (float) (x + 70 - ControlsListWidget.this.field_2733);
             int var10003 = y + height / 2;
-            textRenderer.draw(bindingName, var10002, (float) (var10003 - 9 / 2), 16777215);
+            textRenderer.draw(matrices, bindingName, var10002, (float) (var10003 - 9 / 2), 16777215);
             this.resetButton.x = this.unboundButton.x = x + 190;
             this.resetButton.y = this.unboundButton.y = y;
             this.resetButton.active = !this.binding.isDefault();
             if (focused)
-                this.unboundButton.render(mouseX, mouseY, delta);
+                this.unboundButton.render(matrices, mouseX, mouseY, delta);
             else
-                this.resetButton.render(mouseX, mouseY, delta);
+                this.resetButton.render(matrices, mouseX, mouseY, delta);
             this.editButton.x = x + 75;
             this.editButton.y = y;
             this.editButton.update();
 
             if (focused) {
-                this.editButton.setMessage(Formatting.WHITE + "> " + Formatting.YELLOW + this.editButton.getMessage() + Formatting.WHITE + " <");
+                MutableText text = new LiteralText("> ").formatted(Formatting.WHITE);
+                text.append(this.editButton.getMessage().copy().formatted(Formatting.YELLOW));
+                this.editButton.setMessage(text.append(new LiteralText(" <").formatted(Formatting.WHITE)));
             } else if (!this.binding.isNotBound() && InputManager.hasDuplicatedBindings(this.binding)) {
-                this.editButton.setMessage(Formatting.RED + this.editButton.getMessage());
+                MutableText text = this.editButton.getMessage().copy();
+                this.editButton.setMessage(text.formatted(Formatting.RED));
             } else if (this.binding.isNotBound()) {
-                this.editButton.setMessage(Formatting.GOLD + this.editButton.getMessage());
+                MutableText text = this.editButton.getMessage().copy();
+                this.editButton.setMessage(text.formatted(Formatting.GOLD));
             }
 
-            this.editButton.render(mouseX, mouseY, delta);
+            this.editButton.render(matrices, mouseX, mouseY, delta);
         }
 
         public boolean mouseClicked(double mouseX, double mouseY, int button)
@@ -175,13 +183,13 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
         public CategoryEntry(@NotNull ButtonCategory category)
         {
             this.name = category.getTranslatedName();
-            this.nameWidth = ControlsListWidget.this.minecraft.textRenderer.getStringWidth(this.name);
+            this.nameWidth = ControlsListWidget.this.client.textRenderer.getWidth(this.name);
         }
 
         @Override
-        public void render(int index, int y, int x, int width, int height, int mouseX, int mouseY, boolean hovering, float delta)
+        public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY, boolean hovering, float delta)
         {
-            ControlsListWidget.this.minecraft.textRenderer.draw(this.name, (float) (ControlsListWidget.this.minecraft.currentScreen.width / 2 - this.nameWidth / 2),
+            ControlsListWidget.this.client.textRenderer.draw(matrices, this.name, (float) (ControlsListWidget.this.client.currentScreen.width / 2 - this.nameWidth / 2),
                     (float) ((y + height) - 9 - 1), 16777215);
         }
 

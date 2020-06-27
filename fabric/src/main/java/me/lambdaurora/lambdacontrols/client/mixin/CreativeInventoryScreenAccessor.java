@@ -10,8 +10,8 @@
 package me.lambdaurora.lambdacontrols.client.mixin;
 
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.container.Slot;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.screen.slot.Slot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;

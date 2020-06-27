@@ -14,12 +14,11 @@ import me.lambdaurora.lambdacontrols.client.LambdaInput;
 import me.lambdaurora.lambdacontrols.client.util.FrontBlockPlaceResultAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.Matrix4f;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.EntityContext;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -28,6 +27,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.shape.VoxelShape;
@@ -91,7 +91,7 @@ public abstract class WorldRendererMixin
             BlockState placementState = block.getPlacementState(context);
             if (placementState == null)
                 return;
-            VoxelShape outlineShape = placementState.getOutlineShape(this.client.world, blockPos, EntityContext.of(camera.getFocusedEntity()));
+            VoxelShape outlineShape = placementState.getOutlineShape(this.client.world, blockPos, ShapeContext.of(camera.getFocusedEntity()));
             int[] color = LambdaControlsClient.get().config.getFrontBlockOutlineColor();
             drawShapeOutline(matrices, vertexConsumer, outlineShape, (double) blockPos.getX() - x, (double) blockPos.getY() - y, (double) blockPos.getZ() - z, color[0] / 255.f, color[1] / 255.f, color[2] / 255.f, color[3] / 255.f);
         }

@@ -16,16 +16,18 @@ import me.lambdaurora.lambdacontrols.LambdaControlsFeature;
 import me.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.Controller;
+import me.lambdaurora.lambdacontrols.client.controller.InputManager;
 import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsHud;
 import me.lambdaurora.lambdacontrols.client.gui.TouchscreenOverlay;
 import me.lambdaurora.spruceui.event.OpenScreenCallback;
 import me.lambdaurora.spruceui.hud.HudManager;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
-import net.fabricmc.fabric.api.event.client.ClientTickCallback;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.LiteralText;
@@ -38,20 +40,20 @@ import org.lwjgl.glfw.GLFW;
  * Represents the LambdaControls client mod.
  *
  * @author LambdAurora
- * @version 1.2.0
+ * @version 1.3.0
  * @since 1.1.0
  */
 public class LambdaControlsClient extends LambdaControls implements ClientModInitializer
 {
     private static      LambdaControlsClient INSTANCE;
-    public static final FabricKeyBinding     BINDING_LOOK_UP    = FabricKeyBinding.Builder.create(new Identifier(LambdaControlsConstants.NAMESPACE, "look_up"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.movement").build();
-    public static final FabricKeyBinding     BINDING_LOOK_RIGHT = FabricKeyBinding.Builder.create(new Identifier(LambdaControlsConstants.NAMESPACE, "look_right"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, "key.categories.movement").build();
-    public static final FabricKeyBinding     BINDING_LOOK_DOWN  = FabricKeyBinding.Builder.create(new Identifier(LambdaControlsConstants.NAMESPACE, "look_down"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.movement").build();
-    public static final FabricKeyBinding     BINDING_LOOK_LEFT  = FabricKeyBinding.Builder.create(new Identifier(LambdaControlsConstants.NAMESPACE, "look_left"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement").build();
+    public static final KeyBinding           BINDING_LOOK_UP    = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_up"),
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.movement");
+    public static final KeyBinding           BINDING_LOOK_RIGHT = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_right"),
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, "key.categories.movement");
+    public static final KeyBinding           BINDING_LOOK_DOWN  = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_down"),
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.movement");
+    public static final KeyBinding           BINDING_LOOK_LEFT  = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_left"),
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement");
     public static final Identifier           CONTROLLER_BUTTONS = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/controller_buttons.png");
     public static final Identifier           CONTROLLER_AXIS    = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/controller_axis.png");
     public final        LambdaControlsConfig config             = new LambdaControlsConfig(this);
@@ -63,10 +65,10 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
     public void onInitializeClient()
     {
         INSTANCE = this;
-        KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_UP);
-        KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_RIGHT);
-        KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_DOWN);
-        KeyBindingRegistry.INSTANCE.register(BINDING_LOOK_LEFT);
+        KeyBindingHelper.registerKeyBinding(BINDING_LOOK_UP);
+        KeyBindingHelper.registerKeyBinding(BINDING_LOOK_RIGHT);
+        KeyBindingHelper.registerKeyBinding(BINDING_LOOK_DOWN);
+        KeyBindingHelper.registerKeyBinding(BINDING_LOOK_LEFT);
 
         ClientSidePacketRegistry.INSTANCE.register(CONTROLS_MODE_CHANNEL, (context, attachedData) -> context.getTaskQueue()
                 .execute(() -> ClientSidePacketRegistry.INSTANCE.sendToServer(CONTROLS_MODE_CHANNEL, this.makeControlsModeBuffer(this.config.getControlsMode()))));
@@ -76,7 +78,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
             LambdaControlsFeature.fromName(name).ifPresent(feature -> context.getTaskQueue().execute(() -> feature.setAllowed(allowed)));
         });
 
-        ClientTickCallback.EVENT.register(this::onTick);
+        ClientTickEvents.END_CLIENT_TICK.register(this::onTick);
 
         OpenScreenCallback.EVENT.register((client, screen) -> {
             if (screen == null && this.config.getControlsMode() == ControlsMode.TOUCHSCREEN) {
@@ -131,7 +133,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
 
     public void onRender(MinecraftClient client)
     {
-        this.input.onRender(client);
+        this.input.onRender(client.getTickDelta(), client);
     }
 
     /**

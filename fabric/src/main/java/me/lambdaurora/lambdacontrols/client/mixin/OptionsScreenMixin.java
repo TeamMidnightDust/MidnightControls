@@ -13,7 +13,7 @@ import me.lambdaurora.lambdacontrols.ControlsMode;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.gui.ControllerControlsScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.SettingsScreen;
+import net.minecraft.client.gui.screen.options.OptionsScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
@@ -24,20 +24,20 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 /**
  * Injects the new controls settings button.
  */
-@Mixin(SettingsScreen.class)
-public class SettingsScreenMixin extends Screen
+@Mixin(OptionsScreen.class)
+public class OptionsScreenMixin extends Screen
 {
-    protected SettingsScreenMixin(Text title)
+    protected OptionsScreenMixin(Text title)
     {
         super(title);
     }
 
-    @Redirect(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/SettingsScreen;addButton(Lnet/minecraft/client/gui/widget/AbstractButtonWidget;)Lnet/minecraft/client/gui/widget/AbstractButtonWidget;", ordinal = 7))
-    private AbstractButtonWidget lambdacontrols_onInit(SettingsScreen screen, AbstractButtonWidget btn)
+    @Redirect(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/options/OptionsScreen;addButton(Lnet/minecraft/client/gui/widget/AbstractButtonWidget;)Lnet/minecraft/client/gui/widget/AbstractButtonWidget;", ordinal = 7))
+    private AbstractButtonWidget lambdacontrols_onInit(OptionsScreen screen, AbstractButtonWidget btn)
     {
         if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER) {
             return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).getHeight(), btn.getMessage(),
-                    b -> this.minecraft.openScreen(new ControllerControlsScreen(this, false))));
+                    b -> this.client.openScreen(new ControllerControlsScreen(this, false))));
         } else {
             return this.addButton(btn);
         }
