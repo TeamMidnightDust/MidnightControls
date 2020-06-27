@@ -41,6 +41,7 @@ import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.container.Slot;
 import net.minecraft.container.SlotActionType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
@@ -80,8 +81,6 @@ public class LambdaInput
     private              int                   actionGuiCooldown = 0;
     private              int                   ignoreNextA       = 0;
     // Sneak state.
-    private              double                prevTargetYaw     = 0.0;
-    private              double                prevTargetPitch   = 0.0;
     private              double                targetYaw         = 0.0;
     private              double                targetPitch       = 0.0;
     private              float                 prevXAxis         = 0.F;
@@ -103,8 +102,8 @@ public class LambdaInput
      */
     public void onTick(@NotNull MinecraftClient client)
     {
-        this.prevTargetYaw = this.targetYaw;
-        this.prevTargetPitch = this.targetPitch;
+        this.targetYaw = 0.F;
+        this.targetPitch = 0.F;
 
         // Handles the key bindings.
         if (LambdaControlsClient.BINDING_LOOK_UP.isPressed()) {
@@ -189,20 +188,24 @@ public class LambdaInput
      *
      * @param client The client instance.
      */
-    public void onRender(@NotNull MinecraftClient client)
+    public void onRender(float tickDelta, @NotNull MinecraftClient client)
     {
-        if ((client.currentScreen == null || client.currentScreen instanceof TouchscreenOverlay) &&
-                (this.prevTargetYaw != this.targetYaw || this.prevTargetPitch != this.targetPitch)) {
-            float deltaYaw = (float) ((this.targetYaw - client.player.prevYaw) * client.getTickDelta());
-            float deltaPitch = (float) ((this.targetPitch - client.player.prevPitch) * client.getTickDelta());
-            float rotationYaw = client.player.prevYaw + deltaYaw;
-            float rotationPitch = client.player.prevPitch + deltaPitch;
+        if (!(client.currentScreen == null || client.currentScreen instanceof TouchscreenOverlay))
+            return;
+
+        PlayerEntity player = client.player;
+        if (player == null)
+            return;
+
+        if (this.targetYaw != 0F || this.targetPitch != 0F) {
+            float rotationYaw = (float) (player.prevYaw + (this.targetYaw / 0.10) * tickDelta);
+            float rotationPitch = (float) (player.prevPitch + (this.targetPitch / 0.10) * tickDelta);
             client.player.yaw = rotationYaw;
             client.player.pitch = MathHelper.clamp(rotationPitch, -90.F, 90.F);
             if (client.player.isRiding()) {
                 client.player.getVehicle().copyPositionAndRotation(client.player);
             }
-            client.getTutorialManager().onUpdateMouse(deltaPitch, deltaYaw);
+            client.getTutorialManager().onUpdateMouse(this.targetPitch, this.targetYaw);
         }
     }
 
@@ -437,6 +440,7 @@ public class LambdaInput
 
         if (client.currentScreen == null) {
             // Handles the look direction.
+            absValue -= this.config.getDeadZone();
             this.handleLook(client, axis, (float) (absValue / (1.0 - this.config.getDeadZone())), state);
         } else {
             boolean allowMouseControl = true;
@@ -570,7 +574,7 @@ public class LambdaInput
     /**
      * Handles the look direction input.
      *
-     * @param client The client isntance.
+     * @param client The client instance.
      * @param axis   The axis to change.
      * @param value  The value of the look.
      * @param state  The state.
@@ -579,21 +583,19 @@ public class LambdaInput
     {
         // Handles the look direction.
         if (client.player != null) {
-            double powValue = Math.pow(value, 4.0);
+            double powValue = Math.pow(value, 2.0);
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
                 if (state == 2) {
-                    this.targetPitch = client.player.pitch - this.config.getRightYAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
-                    this.targetPitch = MathHelper.clamp(this.targetPitch, -90.0D, 90.0D);
+                    this.targetPitch = -this.config.getRightYAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
                 } else if (state == 1) {
-                    this.targetPitch = client.player.pitch + this.config.getRightYAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
-                    this.targetPitch = MathHelper.clamp(this.targetPitch, -90.0D, 90.0D);
+                    this.targetPitch = this.config.getRightYAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
                 }
             }
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_X) {
                 if (state == 2) {
-                    this.targetYaw = client.player.yaw - this.config.getRightXAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
+                    this.targetYaw = -this.config.getRightXAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
                 } else if (state == 1) {
-                    this.targetYaw = client.player.yaw + this.config.getRightXAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
+                    this.targetYaw = this.config.getRightXAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
                 }
             }
         }

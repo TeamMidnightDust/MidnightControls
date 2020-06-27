@@ -131,7 +131,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
 
     public void onRender(MinecraftClient client)
     {
-        this.input.onRender(client);
+        this.input.onRender(client.getTickDelta(), client);
     }
 
     /**
