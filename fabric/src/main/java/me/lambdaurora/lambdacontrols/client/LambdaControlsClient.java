@@ -54,6 +54,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement").build();
     public static final Identifier           CONTROLLER_BUTTONS = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/controller_buttons.png");
     public static final Identifier           CONTROLLER_AXIS    = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/controller_axis.png");
+    public static final Identifier           CURSOR_TEXTURE     = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/cursor.png");
     public final        LambdaControlsConfig config             = new LambdaControlsConfig(this);
     public final        LambdaInput          input              = new LambdaInput(this);
     private             LambdaControlsHud    hud;

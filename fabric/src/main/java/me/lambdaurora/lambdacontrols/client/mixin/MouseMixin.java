@@ -11,6 +11,7 @@ package me.lambdaurora.lambdacontrols.client.mixin;
 
 import me.lambdaurora.lambdacontrols.ControlsMode;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
+import me.lambdaurora.lambdacontrols.client.LambdaControlsConfig;
 import me.lambdaurora.lambdacontrols.client.util.MouseAccessor;
 import net.minecraft.client.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,7 +32,8 @@ public abstract class MouseMixin implements MouseAccessor
     @Inject(method = "lockCursor", at = @At("HEAD"), cancellable = true)
     private void onMouseLocked(CallbackInfo ci)
     {
-        if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.TOUCHSCREEN)
+        LambdaControlsConfig config = LambdaControlsClient.get().config;
+        if (config.getControlsMode() == ControlsMode.TOUCHSCREEN || config.hasVirtualMouse())
             ci.cancel();
     }
 }

@@ -100,6 +100,8 @@
   "lambdacontrols.menu.title.hud": "HUD Options",
   "lambdacontrols.menu.unbound": "Unbound",
   "lambdacontrols.menu.unfocused_input": "Unfocused Input",
+  "lambdacontrols.menu.virtual_mouse": "Virtual Mouse",
+  "lambdacontrols.menu.virtual_mouse.skin": "Virtual Mouse Skin",
   "lambdacontrols.narrator.unbound": "Unbound %s",
   "lambdacontrols.not_bound": "Not bound",
   "lambdacontrols.tooltip.auto_switch_mode": "If the controls mode should be switched to Controller automatically if one is connected.",
@@ -116,5 +118,10 @@
   "lambdacontrols.tooltip.mouse_speed": "The controller's emulated mouse speed.",
   "lambdacontrols.tooltip.rotation_speed": "The camera rotation speed in controller mode.",
   "lambdacontrols.tooltip.reload_controller_mappings": "Reloads the controller mappings file.",
-  "lambdacontrols.tooltip.unfocused_input": "Allow controller input when the window is not focused."
+  "lambdacontrols.tooltip.unfocused_input": "Allow controller input when the window is not focused.",
+  "lambdacontrols.tooltip.virtual_mouse": "Enable the virtual mouse which is handful in the case of a splitscreen.",
+  "lambdacontrols.virtual_mouse.skin.default_light": "Default Light",
+  "lambdacontrols.virtual_mouse.skin.default_dark": "Default Dark",
+  "lambdacontrols.virtual_mouse.skin.second_light": "Second Light",
+  "lambdacontrols.virtual_mouse.skin.second_dark": "Second Dark"
 }

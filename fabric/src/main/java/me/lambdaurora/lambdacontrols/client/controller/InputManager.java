@@ -30,7 +30,7 @@ import java.util.stream.Stream;
  * Represents an input manager for controllers.
  *
  * @author LambdAurora
- * @version 1.1.0
+ * @version 1.2.0
  * @since 1.1.0
  */
 public class InputManager
@@ -72,7 +72,8 @@ public class InputManager
         if (this.prevTargetMouseX != this.targetMouseX || this.prevTargetMouseY != this.targetMouseY) {
             double mouseX = this.prevTargetMouseX + (this.targetMouseX - this.prevTargetMouseX) * client.getTickDelta() + 0.5;
             double mouseY = this.prevTargetMouseY + (this.targetMouseY - this.prevTargetMouseY) * client.getTickDelta() + 0.5;
-            GLFW.glfwSetCursorPos(client.getWindow().getHandle(), mouseX, mouseY);
+            if (!LambdaControlsClient.get().config.hasVirtualMouse())
+                GLFW.glfwSetCursorPos(client.getWindow().getHandle(), mouseX, mouseY);
             ((MouseAccessor) client.mouse).lambdacontrols_onCursorPos(client.getWindow().getHandle(), mouseX, mouseY);
         }
     }

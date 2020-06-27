@@ -49,6 +49,10 @@ auto_switch_mode = false
     invert_right_y_axis = false
     # Allow unfocused input.
     unfocused_input = false
+    # Virtual mouse.
+    virtual_mouse = false
+    # Virtual mouse skin
+    virtual_mouse_skin = "default_light"
     # Controller controls.
     [controller.controls]
         # Attack control.

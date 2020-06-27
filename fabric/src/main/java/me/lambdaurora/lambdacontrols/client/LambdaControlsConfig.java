@@ -34,23 +34,25 @@ import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
 public class LambdaControlsConfig
 {
     // General
-    private static final ControlsMode   DEFAULT_CONTROLS_MODE          = ControlsMode.DEFAULT;
-    private static final boolean        DEFAULT_AUTO_SWITCH_MODE       = false;
+    private static final ControlsMode     DEFAULT_CONTROLS_MODE          = ControlsMode.DEFAULT;
+    private static final boolean          DEFAULT_AUTO_SWITCH_MODE       = false;
     // HUD
-    private static final boolean        DEFAULT_HUD_ENABLE             = true;
-    private static final HudSide        DEFAULT_HUD_SIDE               = HudSide.LEFT;
+    private static final boolean          DEFAULT_HUD_ENABLE             = true;
+    private static final HudSide          DEFAULT_HUD_SIDE               = HudSide.LEFT;
     // Gameplay
-    private static final boolean        DEFAULT_FAST_BLOCK_INTERACTION = true;
-    private static final boolean        DEFAULT_FLY_DRIFTING           = false;
-    private static final boolean        DEFAULT_FLY_VERTICAL_DRIFTING  = true;
-    private static final boolean        DEFAULT_FRONT_BLOCK_PLACING    = false;
-    private static final boolean        DEFAULT_FRONT_BLOCK_OUTLINE    = true;
+    private static final boolean          DEFAULT_FAST_BLOCK_INTERACTION = true;
+    private static final boolean          DEFAULT_FLY_DRIFTING           = false;
+    private static final boolean          DEFAULT_FLY_VERTICAL_DRIFTING  = true;
+    private static final boolean          DEFAULT_FRONT_BLOCK_PLACING    = false;
+    private static final boolean          DEFAULT_FRONT_BLOCK_OUTLINE    = true;
     // Controller
-    private static final ControllerType DEFAULT_CONTROLLER_TYPE        = ControllerType.DEFAULT;
-    private static final double         DEFAULT_DEAD_ZONE              = 0.25;
-    private static final double         DEFAULT_ROTATION_SPEED         = 40.0;
-    private static final double         DEFAULT_MOUSE_SPEED            = 25.0;
-    private static final boolean        DEFAULT_UNFOCUSED_INPUT        = false;
+    private static final ControllerType   DEFAULT_CONTROLLER_TYPE        = ControllerType.DEFAULT;
+    private static final double           DEFAULT_DEAD_ZONE              = 0.25;
+    private static final double           DEFAULT_ROTATION_SPEED         = 40.0;
+    private static final double           DEFAULT_MOUSE_SPEED            = 25.0;
+    private static final boolean          DEFAULT_UNFOCUSED_INPUT        = false;
+    private static final boolean          DEFAULT_VIRTUAL_MOUSE          = false;
+    private static final VirtualMouseSkin DEFAULT_VIRTUAL_MOUSE_SKIN     = VirtualMouseSkin.DEFAULT_LIGHT;
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
 
@@ -66,6 +68,8 @@ public class LambdaControlsConfig
     private         double               rotationSpeed;
     private         double               mouseSpeed;
     private         boolean              unfocusedInput;
+    private         boolean              virtualMouse;
+    private         VirtualMouseSkin     virtualMouseSkin;
     // HUD settings.
     private         boolean              hudEnable;
     private         HudSide              hudSide;
@@ -98,6 +102,8 @@ public class LambdaControlsConfig
         this.rotationSpeed = this.config.getOrElse("controller.rotation_speed", DEFAULT_ROTATION_SPEED);
         this.mouseSpeed = this.config.getOrElse("controller.mouse_speed", DEFAULT_MOUSE_SPEED);
         this.unfocusedInput = this.config.getOrElse("controller.unfocused_input", DEFAULT_UNFOCUSED_INPUT);
+        this.virtualMouse = this.config.getOrElse("controller.virtual_mouse", DEFAULT_VIRTUAL_MOUSE);
+        this.virtualMouseSkin = VirtualMouseSkin.byId(this.config.getOrElse("controller.virtual_mouse_skin", DEFAULT_VIRTUAL_MOUSE_SKIN.getName())).orElse(DEFAULT_VIRTUAL_MOUSE_SKIN);
         // Controller controls.
         InputManager.loadButtonBindings(this);
     }
@@ -111,6 +117,7 @@ public class LambdaControlsConfig
         this.config.set("controller.rotation_speed", this.rotationSpeed);
         this.config.set("controller.mouse_speed", this.mouseSpeed);
         this.config.set("controller.unfocused_input", this.unfocusedInput);
+        this.config.set("controller.virtual_mouse", this.virtualMouse);
         this.config.save();
         this.mod.log("Configuration saved.");
     }
@@ -165,6 +172,8 @@ public class LambdaControlsConfig
         this.setRotationSpeed(DEFAULT_ROTATION_SPEED);
         this.setMouseSpeed(DEFAULT_MOUSE_SPEED);
         this.setUnfocusedInput(DEFAULT_UNFOCUSED_INPUT);
+        this.setVirtualMouse(DEFAULT_VIRTUAL_MOUSE);
+        this.setVirtualMouseSkin(DEFAULT_VIRTUAL_MOUSE_SKIN);
         // HUD
         this.setHudEnabled(DEFAULT_HUD_ENABLE);
         this.setHudSide(DEFAULT_HUD_SIDE);
@@ -575,6 +584,47 @@ public class LambdaControlsConfig
     public void setUnfocusedInput(boolean unfocusedInput)
     {
         this.unfocusedInput = unfocusedInput;
+    }
+
+    /**
+     * Returns whether the mouse is virtual or not.
+     *
+     * @return True if the mouse is virtual, else false.
+     */
+    public boolean hasVirtualMouse()
+    {
+        return this.virtualMouse;
+    }
+
+    /**
+     * Sets whether the mouse is virtual or not.
+     *
+     * @param virtualMouse True if the mouse is virtual, else false.
+     */
+    public void setVirtualMouse(boolean virtualMouse)
+    {
+        this.virtualMouse = virtualMouse;
+    }
+
+    /**
+     * Gets the virtual mouse skin.
+     *
+     * @return The virtual mouse skin.
+     */
+    public VirtualMouseSkin getVirtualMouseSkin()
+    {
+        return this.virtualMouseSkin;
+    }
+
+    /**
+     * Sets the virtual mouse skin.
+     *
+     * @param skin The virtual mouse skin.
+     */
+    public void setVirtualMouseSkin(VirtualMouseSkin skin)
+    {
+        this.virtualMouseSkin = skin;
+        this.config.set("controller.virtual_mouse_skin", skin.getName());
     }
 
     /**
