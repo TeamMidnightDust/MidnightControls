@@ -18,13 +18,18 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Arrays;
 
 /**
  * Represents the mixin for the class ContainerScreen.
@@ -40,6 +45,12 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor
 
     @Invoker("getSlotAt")
     public abstract Slot lambdacontrols_getSlotAt(double posX, double posY);
+
+    @Invoker("isClickOutsideBounds")
+    public abstract boolean lambdacontrols_isClickOutsideBounds(double mouseX, double mouseY, int x, int y, int button);
+
+    @Invoker("onMouseClick")
+    public abstract void lambdacontrols_onMouseClick(@Nullable Slot slot, int slotId, int clickData, SlotActionType actionType);
 
     @Inject(method = "render", at = @At("RETURN"))
     public void onRender(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci)

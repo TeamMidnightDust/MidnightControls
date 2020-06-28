@@ -72,24 +72,24 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents the LambdaControls' input handler.
  *
  * @author LambdAurora
- * @version 1.3.0
+ * @version 1.3.1
  * @since 1.0.0
  */
 public class LambdaInput
 {
-    private static final Map<Integer, Integer> BUTTON_COOLDOWNS  = new HashMap<>();
+    private static final Map<Integer, Integer> BUTTON_COOLDOWNS   = new HashMap<>();
     private final        LambdaControlsConfig  config;
     // Cooldowns
-    private              int                   actionGuiCooldown = 0;
-    private              int                   ignoreNextA       = 0;
-    private              double                targetYaw         = 0.0;
-    private              double                targetPitch       = 0.0;
-    private              float                 prevXAxis         = 0.F;
-    private              float                 prevYAxis         = 0.F;
-    private              int                   targetMouseX      = 0;
-    private              int                   targetMouseY      = 0;
-    private              float                 mouseSpeedX       = 0.F;
-    private              float                 mouseSpeedY       = 0.F;
+    private              int                   actionGuiCooldown  = 0;
+    private              boolean               ignoreNextARelease = false;
+    private              double                targetYaw          = 0.0;
+    private              double                targetPitch        = 0.0;
+    private              float                 prevXAxis          = 0.F;
+    private              float                 prevYAxis          = 0.F;
+    private              int                   targetMouseX       = 0;
+    private              int                   targetMouseY       = 0;
+    private              float                 mouseSpeedX        = 0.F;
+    private              float                 mouseSpeedY        = 0.F;
 
     public LambdaInput(@NotNull LambdaControlsClient mod)
     {
@@ -155,9 +155,6 @@ public class LambdaInput
 
         if (allowInput)
             InputManager.updateBindings(client);
-
-        if (this.ignoreNextA > 0)
-            this.ignoreNextA--;
 
         if (client.currentScreen instanceof ControllerControlsScreen && InputManager.STATES.entrySet().parallelStream().map(Map.Entry::getValue).allMatch(ButtonState::isUnpressed)) {
             ControllerControlsScreen screen = (ControllerControlsScreen) client.currentScreen;
@@ -321,31 +318,12 @@ public class LambdaInput
                 }
             }
 
-            if (client.currentScreen instanceof HandledScreen && client.interactionManager != null && client.player != null) {
-                double x = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
-                double y = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
-                Slot slot = ((HandledScreenAccessor) client.currentScreen).lambdacontrols_getSlotAt(x, y);
-                SlotActionType slotAction = SlotActionType.PICKUP;
-                if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && slot != null) {
-                    if (client.currentScreen instanceof CreativeInventoryScreen) {
-                        if (((CreativeInventoryScreenAccessor) client.currentScreen).lambdacontrols_isCreativeInventorySlot(slot))
-                            slotAction = SlotActionType.CLONE;
-                    }
-                    client.interactionManager.clickSlot(((HandledScreen) client.currentScreen).getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_1, slotAction, client.player);
-                    client.player.playerScreenHandler.sendContentUpdates();
-                    this.actionGuiCooldown = 5;
-                    return;
-                } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
-                    client.player.closeHandledScreen();
-                    return;
-                } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_X && slot != null) {
-                    client.interactionManager.clickSlot(((HandledScreen) client.currentScreen).getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_2, SlotActionType.PICKUP, client.player);
-                    return;
-                } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_Y && slot != null) {
-                    client.interactionManager.clickSlot(((HandledScreen) client.currentScreen).getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_1, SlotActionType.QUICK_MOVE, client.player);
-                    return;
-                }
-            } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
+            if (this.handleInventory(client, button)) {
+                this.ignoreNextARelease = true;
+                return;
+            }
+
+            if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
                 if (client.currentScreen != null) {
                     client.currentScreen.onClose();
                     return;
@@ -353,16 +331,78 @@ public class LambdaInput
             }
         }
 
-        if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null && !isScreenInteractive(client.currentScreen) && this.actionGuiCooldown == 0 && this.ignoreNextA == 0) {
-            double mouseX = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
-            double mouseY = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
-            if (action == 0) {
-                client.currentScreen.mouseClicked(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1);
-            } else if (action == 1) {
-                client.currentScreen.mouseReleased(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1);
+        if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null && !isScreenInteractive(client.currentScreen) && this.actionGuiCooldown == 0) {
+            if (!this.ignoreNextARelease) {
+                double mouseX = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
+                double mouseY = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
+                if (action == 0) {
+                    client.currentScreen.mouseClicked(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1);
+                } else if (action == 1) {
+                    client.currentScreen.mouseReleased(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1);
+                }
+                this.actionGuiCooldown = 5;
+            } else {
+                this.ignoreNextARelease = false;
             }
-            this.actionGuiCooldown = 5;
         }
+    }
+
+    /**
+     * Handles inventory interaction.
+     *
+     * @param client The client instance.
+     * @param button The button pressed.
+     * @return True if an inventory interaction was done.
+     */
+    private boolean handleInventory(@NotNull MinecraftClient client, int button)
+    {
+        if (!(client.currentScreen instanceof HandledScreen))
+            return false;
+
+        if (client.interactionManager == null || client.player == null)
+            return false;
+
+        if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
+            client.player.closeHandledScreen();
+            return true;
+        }
+
+        double x = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
+        double y = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
+
+        HandledScreen screen = (HandledScreen) client.currentScreen;
+        HandledScreenAccessor accessor = (HandledScreenAccessor) screen;
+        Slot slot = ((HandledScreenAccessor) client.currentScreen).lambdacontrols_getSlotAt(x, y);
+
+        int slotId;
+        if (slot == null) {
+            if (client.player.inventory.getCursorStack().isEmpty())
+                return false;
+            slotId = accessor.lambdacontrols_isClickOutsideBounds(x, y, accessor.getX(), accessor.getY(), GLFW_MOUSE_BUTTON_1) ? -999 : -1;
+        } else {
+            slotId = slot.id;
+        }
+
+        SlotActionType actionType = SlotActionType.PICKUP;
+        int clickData = GLFW.GLFW_MOUSE_BUTTON_1;
+        switch (button) {
+            case GLFW_GAMEPAD_BUTTON_A:
+                if (screen instanceof CreativeInventoryScreen)
+                    if (((CreativeInventoryScreenAccessor) screen).lambdacontrols_isCreativeInventorySlot(slot))
+                        actionType = SlotActionType.CLONE;
+                break;
+            case GLFW.GLFW_GAMEPAD_BUTTON_X:
+                clickData = GLFW_MOUSE_BUTTON_2;
+                break;
+            case GLFW.GLFW_GAMEPAD_BUTTON_Y:
+                actionType = SlotActionType.QUICK_MOVE;
+                break;
+            default:
+                return false;
+        }
+
+        accessor.lambdacontrols_onMouseClick(slot, slotId, clickData, actionType);
+        return true;
     }
 
     private void handleAxe(@NotNull MinecraftClient client, int axis, float value, float absValue, int state)

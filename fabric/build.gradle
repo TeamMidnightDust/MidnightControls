@@ -4,6 +4,7 @@ plugins {
     id 'maven-publish'
 }
 
+version = "${project.mod_version}+${project.minecraft_version}"
 archivesBaseName = project.archives_base_name + "-fabric"
 
 minecraft {
@@ -91,4 +92,20 @@ jar {
     }
 }
 
+// configure the maven publication
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            // add all the jars that should be included when publishing to maven
+            artifact(remapJar) {
+                builtBy remapJar
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+        }
+    }
+}
+
 build.dependsOn(":core:build")
+publish.dependsOn(":core:publish")

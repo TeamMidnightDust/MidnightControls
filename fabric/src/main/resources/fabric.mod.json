@@ -34,7 +34,7 @@
     "fabricloader": ">=0.8.0",
     "fabric": "*",
     "minecraft": ">=1.16",
-    "spruceui": ">=1.5.1"
+    "spruceui": ">=1.5.2"
   },
   "recommends": {
     "modmenu": ">=1.12.2",
@@ -49,6 +49,10 @@
     "optifabric": "*"
   },
   "custom": {
-    "modmenu:clientsideOnly": true
+    "modmenu:clientsideOnly": true,
+    "modupdater": {
+      "strategy": "curseforge",
+      "projectID": 354231
+    }
   }
 }

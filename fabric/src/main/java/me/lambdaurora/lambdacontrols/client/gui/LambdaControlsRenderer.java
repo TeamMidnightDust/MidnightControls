@@ -24,14 +24,11 @@ import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Comparator;
-import java.util.Optional;
-
 /**
  * Represents the LambdaControls renderer.
  *
  * @author LambdAurora
- * @version 1.3.0
+ * @version 1.3.1
  * @since 1.2.0
  */
 public class LambdaControlsRenderer
@@ -240,27 +237,13 @@ public class LambdaControlsRenderer
         boolean hoverSlot = false;
 
         if (client.currentScreen instanceof HandledScreen) {
-            HandledScreen inventoryScreen = (HandledScreen) client.currentScreen;
-            HandledScreenAccessor accessor = (HandledScreenAccessor) inventoryScreen;
-            int guiLeft = accessor.getX();
-            int guiTop = accessor.getY();
+            HandledScreenAccessor inventoryScreen = (HandledScreenAccessor) client.currentScreen;
+            int guiLeft = inventoryScreen.getX();
+            int guiTop = inventoryScreen.getY();
 
-            // Finds the closest slot in the GUI within 14 pixels.
-            int finalMouseX = mouseX;
-            int finalMouseY = mouseY;
-            Optional<Pair<Slot, Double>> closestSlot = inventoryScreen.getScreenHandler().slots.parallelStream()
-                    .map(slot -> {
-                        int x = guiLeft + slot.x + 8;
-                        int y = guiTop + slot.y + 8;
+            Slot slot = inventoryScreen.lambdacontrols_getSlotAt(mouseX, mouseY);
 
-                        // Distance between the slot and the cursor.
-                        double distance = Math.sqrt(Math.pow(x - finalMouseX, 2) + Math.pow(y - finalMouseY, 2));
-                        return Pair.of(slot, distance);
-                    }).filter(entry -> entry.value <= 9.0)
-                    .min(Comparator.comparingDouble(p -> p.value));
-
-            if (closestSlot.isPresent()) {
-                Slot slot = closestSlot.get().key;
+            if (slot != null) {
                 mouseX = guiLeft + slot.x;
                 mouseY = guiTop + slot.y;
                 hoverSlot = true;
