@@ -13,11 +13,12 @@ import me.lambdaurora.lambdacontrols.ControlsMode;
 import me.lambdaurora.lambdacontrols.LambdaControlsConstants;
 import me.lambdaurora.lambdacontrols.client.HudSide;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
-import me.lambdaurora.lambdacontrols.client.LambdaInput;
+import me.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.spruceui.hud.Hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -31,26 +32,27 @@ import org.jetbrains.annotations.Nullable;
  * Represents the LambdaControls HUD.
  *
  * @author LambdAurora
- * @version 1.3.0
+ * @version 1.3.2
  * @since 1.0.0
  */
 public class LambdaControlsHud extends Hud
 {
     private final LambdaControlsClient mod;
     private       MinecraftClient      client;
-    private       int                  attackWidth          = 0;
-    private       int                  attackButtonWidth    = 0;
-    private       int                  dropItemWidth        = 0;
-    private       int                  dropItemButtonWidth  = 0;
-    private       int                  inventoryWidth       = 0;
-    private       int                  inventoryButtonWidth = 0;
-    private       int                  swapHandsWidth       = 0;
-    private       int                  swapHandsButtonWidth = 0;
-    private       int                  useWidth             = 0;
-    private       int                  useButtonWidth       = 0;
+    private       int                  attackWidth             = 0;
+    private       int                  attackButtonWidth       = 0;
+    private       int                  dropItemWidth           = 0;
+    private       int                  dropItemButtonWidth     = 0;
+    private       int                  inventoryWidth          = 0;
+    private       int                  inventoryButtonWidth    = 0;
+    private       int                  swapHandsWidth          = 0;
+    private       int                  swapHandsButtonWidth    = 0;
+    private       int                  useWidth                = 0;
+    private       int                  useButtonWidth          = 0;
     private       BlockHitResult       placeHitResult;
-    private       String               attackAction         = "";
-    private       String               placeAction          = "";
+    private       String               attackAction            = "";
+    private       String               placeAction             = "";
+    private       int                  ticksDisplayedCrosshair = 0;
 
     public LambdaControlsHud(@NotNull LambdaControlsClient mod)
     {
@@ -85,6 +87,19 @@ public class LambdaControlsHud extends Hud
             this.renderSecondIcons(matrices, this.mod.config.getHudSide() == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);
             this.renderFirstSection(matrices, this.mod.config.getHudSide() == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
             this.renderSecondSection(matrices, this.mod.config.getHudSide() == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);
+        }
+
+        if (this.mod.reacharound.isLastReacharoundVertical()) {
+            // Render crosshair indicator.
+            Window window = this.client.getWindow();
+            String text = "[  ]";
+
+            float scale = Math.min(5, this.ticksDisplayedCrosshair + tickDelta) / 5F;
+            scale *= scale;
+            int opacity = ((int) (255 * scale)) << 24;
+
+            this.client.textRenderer.draw(matrices, text, window.getScaledWidth() / 2.f - this.client.textRenderer.getWidth(text) / 2.f,
+                    window.getScaledHeight() / 2.f - 4, 0xCCCCCC | opacity);
         }
     }
 
@@ -177,7 +192,7 @@ public class LambdaControlsHud extends Hud
 
             // Update "Use" tip status.
             if (this.client.crosshairTarget.getType() == HitResult.Type.MISS) {
-                this.placeHitResult = LambdaInput.tryFrontPlace(this.client);
+                this.placeHitResult = this.mod.reacharound.getLastReacharoundResult();
                 this.attackAction = "";
                 this.attackWidth = 0;
             } else {
@@ -190,8 +205,26 @@ public class LambdaControlsHud extends Hud
                 this.attackWidth = this.width(attackAction);
             }
 
-            ItemStack stack = this.client.player.getMainHandStack();
-            if ((stack == null || stack.isEmpty()) && ((stack = this.client.player.getOffHandStack()) == null || stack.isEmpty())) {
+            if (this.mod.reacharound.isLastReacharoundVertical()) {
+                if (this.ticksDisplayedCrosshair < 5)
+                    this.ticksDisplayedCrosshair++;
+            } else {
+                this.ticksDisplayedCrosshair = 0;
+            }
+
+            String customAttackAction = LambdaControlsCompat.getAttackActionAt(this.client, this.placeHitResult);
+            if (customAttackAction != null) {
+                this.attackAction = customAttackAction;
+                this.attackWidth = this.width(customAttackAction);
+            }
+
+            ItemStack stack = null;
+            if (this.client.player != null) {
+                stack = this.client.player.getMainHandStack();
+                if (stack == null || stack.isEmpty())
+                    stack = this.client.player.getOffHandStack();
+            }
+            if (stack == null || stack.isEmpty()) {
                 placeAction = "";
             } else {
                 if (this.placeHitResult != null && stack.getItem() instanceof BlockItem) {
@@ -200,6 +233,10 @@ public class LambdaControlsHud extends Hud
                     placeAction = ButtonBinding.USE.getTranslationKey();
                 }
             }
+
+            String customUseAction = LambdaControlsCompat.getUseActionAt(this.client, this.placeHitResult);
+            if (customUseAction != null)
+                placeAction = customUseAction;
 
             this.placeAction = placeAction;
 

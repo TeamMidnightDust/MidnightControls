@@ -11,6 +11,7 @@ package me.lambdaurora.lambdacontrols.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
+import me.lambdaurora.lambdacontrols.client.LambdaInput;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.util.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
@@ -28,7 +29,7 @@ import org.lwjgl.glfw.GLFW;
  * Represents the LambdaControls renderer.
  *
  * @author LambdAurora
- * @version 1.3.1
+ * @version 1.3.2
  * @since 1.2.0
  */
 public class LambdaControlsRenderer
@@ -228,7 +229,7 @@ public class LambdaControlsRenderer
 
     public static void renderVirtualCursor(@NotNull MatrixStack matrices, @NotNull MinecraftClient client)
     {
-        if (!LambdaControlsClient.get().config.hasVirtualMouse() || client.currentScreen == null)
+        if (!LambdaControlsClient.get().config.hasVirtualMouse() || (client.currentScreen == null || LambdaInput.isScreenInteractive(client.currentScreen)))
             return;
 
         int mouseX = (int) (client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth());

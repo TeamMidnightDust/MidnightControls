@@ -23,7 +23,6 @@ import me.lambdaurora.spruceui.event.OpenScreenCallback;
 import me.lambdaurora.spruceui.hud.HudManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.minecraft.client.MinecraftClient;
@@ -40,7 +39,7 @@ import org.lwjgl.glfw.GLFW;
  * Represents the LambdaControls client mod.
  *
  * @author LambdAurora
- * @version 1.3.0
+ * @version 1.3.2
  * @since 1.1.0
  */
 public class LambdaControlsClient extends LambdaControls implements ClientModInitializer
@@ -59,6 +58,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
     public static final Identifier           CURSOR_TEXTURE     = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/cursor.png");
     public final        LambdaControlsConfig config             = new LambdaControlsConfig(this);
     public final        LambdaInput          input              = new LambdaInput(this);
+    public final        LambdaReacharound    reacharound        = new LambdaReacharound();
     private             LambdaControlsHud    hud;
     private             ControlsMode         previousControlsMode;
 
@@ -79,6 +79,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
             LambdaControlsFeature.fromName(name).ifPresent(feature -> context.getTaskQueue().execute(() -> feature.setAllowed(allowed)));
         });
 
+        ClientTickEvents.START_CLIENT_TICK.register(this.reacharound::tick);
         ClientTickEvents.END_CLIENT_TICK.register(this::onTick);
 
         OpenScreenCallback.EVENT.register((client, screen) -> {

@@ -21,12 +21,14 @@ This mod adds a controller support (and an experimental touchscreen support).
  - Touchscreen support (very experimental and buggy).
  - Keyboard controls to look around.
  - Toggleable on screen button indicator (like in Bedrock Edition).
+ - Vertical reacharound.
  - Many Bedrock Edition features:
    - Toggleable fly drifting
    - Front block placing (be careful with this one)
  - New controls settings!
  - Many options in config to change to your liking.
  - Many controllers supported and in a simply way your own controller mappings.
+ - An easy API for developers to add their own button bindings.
 
 ## 🎮 Supported Controllers:
 

@@ -34,37 +34,39 @@ import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
 public class LambdaControlsConfig
 {
     // General
-    private static final ControlsMode     DEFAULT_CONTROLS_MODE          = ControlsMode.DEFAULT;
-    private static final boolean          DEFAULT_AUTO_SWITCH_MODE       = false;
+    private static final ControlsMode     DEFAULT_CONTROLS_MODE             = ControlsMode.DEFAULT;
+    private static final boolean          DEFAULT_AUTO_SWITCH_MODE          = false;
     // HUD
-    private static final boolean          DEFAULT_HUD_ENABLE             = true;
-    private static final HudSide          DEFAULT_HUD_SIDE               = HudSide.LEFT;
+    private static final boolean          DEFAULT_HUD_ENABLE                = true;
+    private static final HudSide          DEFAULT_HUD_SIDE                  = HudSide.LEFT;
     // Gameplay
-    private static final boolean          DEFAULT_FAST_BLOCK_INTERACTION = true;
-    private static final boolean          DEFAULT_FLY_DRIFTING           = false;
-    private static final boolean          DEFAULT_FLY_VERTICAL_DRIFTING  = true;
-    private static final boolean          DEFAULT_FRONT_BLOCK_PLACING    = false;
-    private static final boolean          DEFAULT_FRONT_BLOCK_OUTLINE    = true;
+    private static final boolean          DEFAULT_FAST_BLOCK_INTERACTION    = true;
+    private static final boolean          DEFAULT_FLY_DRIFTING              = false;
+    private static final boolean          DEFAULT_FLY_VERTICAL_DRIFTING     = true;
+    private static final boolean          DEFAULT_FRONT_BLOCK_PLACING       = false;
+    private static final boolean          DEFAULT_VERTICAL_REACHAROUND      = false;
+    private static final boolean          DEFAULT_REACHAROUND_OUTLINE       = true;
+    private static final int[]            DEFAULT_REACHAROUND_OUTLINE_COLOR = new int[]{255, 255, 255, 102};
     // Controller
-    private static final ControllerType   DEFAULT_CONTROLLER_TYPE        = ControllerType.DEFAULT;
-    private static final double           DEFAULT_DEAD_ZONE              = 0.25;
-    private static final double           DEFAULT_ROTATION_SPEED         = 40.0;
-    private static final double           DEFAULT_MOUSE_SPEED            = 25.0;
-    private static final boolean          DEFAULT_UNFOCUSED_INPUT        = false;
-    private static final boolean          DEFAULT_VIRTUAL_MOUSE          = false;
-    private static final VirtualMouseSkin DEFAULT_VIRTUAL_MOUSE_SKIN     = VirtualMouseSkin.DEFAULT_LIGHT;
+    private static final ControllerType   DEFAULT_CONTROLLER_TYPE           = ControllerType.DEFAULT;
+    private static final double           DEFAULT_DEAD_ZONE                 = 0.25;
+    private static final double           DEFAULT_ROTATION_SPEED            = 40.0;
+    private static final double           DEFAULT_MOUSE_SPEED               = 25.0;
+    private static final boolean          DEFAULT_UNFOCUSED_INPUT           = false;
+    private static final boolean          DEFAULT_VIRTUAL_MOUSE             = false;
+    private static final VirtualMouseSkin DEFAULT_VIRTUAL_MOUSE_SKIN        = VirtualMouseSkin.DEFAULT_LIGHT;
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
 
     protected final FileConfig           config = FileConfig.builder("config/lambdacontrols.toml").concurrent().defaultResource("/config.toml").build();
     private final   LambdaControlsClient mod;
     private         ControlsMode         controlsMode;
-    private         ControllerType       controllerType;
+    private         ControllerType controllerType;
     // Gameplay.
-    private         boolean              shouldRenderFrontBlockOutline;
-    private         int[]                frontBlockOutlineColor;
+    private         boolean shouldRenderReacharoundOutline;
+    private         int[]   reacharoundOutlineColor;
     // Controller settings
-    private         double               deadZone;
+    private         double  deadZone;
     private         double               rotationSpeed;
     private         double               mouseSpeed;
     private         boolean              unfocusedInput;
@@ -93,9 +95,10 @@ public class LambdaControlsConfig
         this.hudSide = HudSide.byId(this.config.getOrElse("hud.side", DEFAULT_HUD_SIDE.getName())).orElse(DEFAULT_HUD_SIDE);
         // Gameplay
         LambdaControlsFeature.FAST_BLOCK_PLACING.setEnabled(this.config.getOrElse("gameplay.fast_block_placing", DEFAULT_FAST_BLOCK_INTERACTION));
-        LambdaControlsFeature.FRONT_BLOCK_PLACING.setEnabled(this.config.getOrElse("gameplay.front_block_placing.enabled", DEFAULT_FRONT_BLOCK_PLACING));
-        this.shouldRenderFrontBlockOutline = this.config.getOrElse("gameplay.front_block_placing.outline", DEFAULT_FRONT_BLOCK_OUTLINE);
-        this.frontBlockOutlineColor = this.config.getOptional("gameplay.front_block_placing.outline_color").map(hex -> parseColor((String) hex)).orElse(new int[]{255, 255, 255, 102});
+        LambdaControlsFeature.FRONT_BLOCK_PLACING.setEnabled(this.config.getOrElse("gameplay.reacharound.horizontal", DEFAULT_FRONT_BLOCK_PLACING));
+        LambdaControlsFeature.VERTICAL_REACHAROUND.setEnabled(this.config.getOrElse("gameplay.reacharound.vertical", DEFAULT_VERTICAL_REACHAROUND));
+        this.shouldRenderReacharoundOutline = this.config.getOrElse("gameplay.reacharound.outline", DEFAULT_REACHAROUND_OUTLINE);
+        this.reacharoundOutlineColor = this.config.getOptional("gameplay.reacharound.outline_color").map(hex -> parseColor((String) hex)).orElse(DEFAULT_REACHAROUND_OUTLINE_COLOR);
         // Controller settings.
         this.controllerType = ControllerType.byId(this.config.getOrElse("controller.type", DEFAULT_CONTROLLER_TYPE.getName())).orElse(DEFAULT_CONTROLLER_TYPE);
         this.deadZone = this.config.getOrElse("controller.dead_zone", DEFAULT_DEAD_ZONE);
@@ -133,10 +136,19 @@ public class LambdaControlsConfig
             }
         });
 
-        // This shouldn't happen if the configuration is new.
-        if (!this.config.contains("gameplay.front_block_placing.enabled") && this.config.contains("gameplay.front_block_placing")) {
-            this.config.remove("gameplay.front_block_placing");
-            this.config.set("gameplay.front_block_placing.enabled", DEFAULT_FRONT_BLOCK_PLACING);
+        if (this.config.contains("gameplay.front_block_placing.enabled")) {
+            this.setFrontBlockPlacing(this.config.getOrElse("gameplay.front_block_placing.enabled", DEFAULT_FRONT_BLOCK_PLACING));
+            this.config.remove("gameplay.front_block_placing.enabled");
+        }
+
+        if (this.config.contains("gameplay.front_block_placing.outline")) {
+            this.setRenderReacharoundOutline(this.config.getOrElse("gameplay.front_block_placing.outline", DEFAULT_REACHAROUND_OUTLINE));
+            this.config.remove("gameplay.front_block_placing.outline");
+        }
+
+        if (this.config.contains("gameplay.front_block_placing.outline_color")) {
+            this.config.getOptional("gameplay.front_block_placing.outline_color").ifPresent(color -> this.config.set("gameplay.reacharound.outline_color", color));
+            this.config.remove("gameplay.front_block_placing.outline_color");
         }
 
         this.renamed("controller.controls.tab_left", "controller.controls.tab_back");
@@ -165,7 +177,8 @@ public class LambdaControlsConfig
         this.setFlyDrifting(DEFAULT_FLY_DRIFTING);
         this.setFlyVerticalDrifting(DEFAULT_FLY_VERTICAL_DRIFTING);
         this.setFrontBlockPlacing(DEFAULT_FRONT_BLOCK_PLACING);
-        this.setRenderFrontBlockOutline(DEFAULT_FRONT_BLOCK_OUTLINE);
+        this.setVerticalReacharound(DEFAULT_VERTICAL_REACHAROUND);
+        this.setRenderReacharoundOutline(DEFAULT_REACHAROUND_OUTLINE);
         // Controller
         this.setControllerType(DEFAULT_CONTROLLER_TYPE);
         this.setDeadZone(DEFAULT_DEAD_ZONE);
@@ -352,7 +365,28 @@ public class LambdaControlsConfig
     public void setFrontBlockPlacing(boolean enable)
     {
         LambdaControlsFeature.FRONT_BLOCK_PLACING.setEnabled(enable);
-        this.config.set("gameplay.front_block_placing.enabled", enable);
+        this.config.set("gameplay.reacharound.horizontal", enable);
+    }
+
+    /**
+     * Returns whether vertical reacharound is enabled or not.
+     *
+     * @return True if vertical reacharound is enabled, else false.
+     */
+    public boolean hasVerticalReacharound()
+    {
+        return LambdaControlsFeature.VERTICAL_REACHAROUND.isEnabled();
+    }
+
+    /**
+     * Sets whether vertical reacharound is enabled or not.
+     *
+     * @param enable True if vertical reacharound is enabled, else false.
+     */
+    public void setVerticalReacharound(boolean enable)
+    {
+        LambdaControlsFeature.VERTICAL_REACHAROUND.setEnabled(enable);
+        this.config.set("gameplay.reacharound.vertical", enable);
     }
 
     /**
@@ -360,9 +394,9 @@ public class LambdaControlsConfig
      *
      * @return True if front block placing outline is enabled, else false.
      */
-    public boolean shouldRenderFrontBlockOutline()
+    public boolean shouldRenderReacharoundOutline()
     {
-        return this.shouldRenderFrontBlockOutline;
+        return this.shouldRenderReacharoundOutline;
     }
 
     /**
@@ -370,9 +404,9 @@ public class LambdaControlsConfig
      *
      * @param render True if front block placing outline is enabled, else false.
      */
-    public void setRenderFrontBlockOutline(boolean render)
+    public void setRenderReacharoundOutline(boolean render)
     {
-        this.config.set("gameplay.front_block_placing.outline", this.shouldRenderFrontBlockOutline = render);
+        this.config.set("gameplay.reacharound.outline", this.shouldRenderReacharoundOutline = render);
     }
 
     /**
@@ -382,9 +416,9 @@ public class LambdaControlsConfig
      *
      * @return The color as a RGBA integer array.
      */
-    public int[] getFrontBlockOutlineColor()
+    public int[] getReacharoundOutlineColor()
     {
-        return this.frontBlockOutlineColor;
+        return this.reacharoundOutlineColor;
     }
 
     /*

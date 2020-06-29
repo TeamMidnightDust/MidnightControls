@@ -17,12 +17,14 @@ import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.InputHandlers;
 import me.lambdaurora.lambdacontrols.client.controller.InputManager;
 import me.lambdaurora.lambdacontrols.client.controller.PressAction;
+import me.shedaniel.rei.api.REIHelper;
 import me.shedaniel.rei.api.RecipeCategory;
 import me.shedaniel.rei.gui.ContainerScreenOverlay;
 import me.shedaniel.rei.gui.RecipeViewingScreen;
 import me.shedaniel.rei.gui.VillagerRecipeViewingScreen;
 import me.shedaniel.rei.gui.widget.EntryListWidget;
 import me.shedaniel.rei.impl.ScreenHelper;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.Identifier;
 import org.aperlambda.lambdacommon.utils.LambdaReflection;
@@ -37,13 +39,12 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents a compatibility handler for REI.
  *
  * @author LambdAurora
- * @version 1.3.0
+ * @version 1.3.2
  * @since 1.2.0
  */
 public class ReiCompat implements CompatHandler
 {
     private static EntryListWidget ENTRY_LIST_WIDGET;
-    public static  ButtonBinding   TAB_BACK;
 
     @Override
     public void handle(@NotNull LambdaControlsClient mod)
@@ -104,6 +105,17 @@ public class ReiCompat implements CompatHandler
     private static boolean isViewingScreen(Screen screen)
     {
         return screen instanceof RecipeViewingScreen || screen instanceof VillagerRecipeViewingScreen;
+    }
+
+    @Override
+    public boolean handleMenuBack(@NotNull MinecraftClient client, @NotNull Screen screen)
+    {
+        if (!isViewingScreen(screen))
+            return false;
+
+        MinecraftClient.getInstance().openScreen(REIHelper.getInstance().getPreviousContainerScreen());
+        ScreenHelper.getLastOverlay().init();
+        return true;
     }
 
     private static EntryListWidget getEntryListWidget()

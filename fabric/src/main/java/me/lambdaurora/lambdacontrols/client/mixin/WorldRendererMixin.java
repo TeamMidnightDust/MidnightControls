@@ -10,8 +10,7 @@
 package me.lambdaurora.lambdacontrols.client.mixin;
 
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
-import me.lambdaurora.lambdacontrols.client.LambdaInput;
-import me.lambdaurora.lambdacontrols.client.util.FrontBlockPlaceResultAccessor;
+import me.lambdaurora.lambdacontrols.client.LambdaReacharound;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
@@ -74,9 +73,9 @@ public abstract class WorldRendererMixin
                                  Profiler profiler, Vec3d cameraPos, double x, double y, double z, Matrix4f modelMatrix, boolean bl, Frustum frustum2, boolean bl3,
                                  VertexConsumerProvider.Immediate immediate)
     {
-        if (this.client.crosshairTarget == null || this.client.crosshairTarget.getType() != HitResult.Type.MISS || !LambdaControlsClient.get().config.shouldRenderFrontBlockOutline())
+        if (this.client.crosshairTarget == null || this.client.crosshairTarget.getType() != HitResult.Type.MISS || !LambdaControlsClient.get().config.shouldRenderReacharoundOutline())
             return;
-        BlockHitResult result = ((FrontBlockPlaceResultAccessor) client).lambdacontrols_getFrontBlockPlaceResult();
+        BlockHitResult result = LambdaControlsClient.get().reacharound.getLastReacharoundResult();
         if (result == null)
             return;
         BlockPos blockPos = result.getBlockPos();
@@ -85,14 +84,14 @@ public abstract class WorldRendererMixin
             if (stack == null || !(stack.getItem() instanceof BlockItem))
                 return;
             Block block = ((BlockItem) stack.getItem()).getBlock();
-            result = LambdaInput.withSideForFrontPlace(result, block);
+            result = LambdaReacharound.withSideForReacharound(result, block);
             ItemPlacementContext context = new ItemPlacementContext(new ItemUsageContext(this.client.player, Hand.MAIN_HAND, result));
             VertexConsumer vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
             BlockState placementState = block.getPlacementState(context);
             if (placementState == null)
                 return;
             VoxelShape outlineShape = placementState.getOutlineShape(this.client.world, blockPos, ShapeContext.of(camera.getFocusedEntity()));
-            int[] color = LambdaControlsClient.get().config.getFrontBlockOutlineColor();
+            int[] color = LambdaControlsClient.get().config.getReacharoundOutlineColor();
             drawShapeOutline(matrices, vertexConsumer, outlineShape, (double) blockPos.getX() - x, (double) blockPos.getY() - y, (double) blockPos.getZ() - z, color[0] / 255.f, color[1] / 255.f, color[2] / 255.f, color[3] / 255.f);
         }
     }

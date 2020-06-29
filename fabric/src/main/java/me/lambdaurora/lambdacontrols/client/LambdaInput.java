@@ -9,7 +9,6 @@
 
 package me.lambdaurora.lambdacontrols.client;
 
-import me.lambdaurora.lambdacontrols.LambdaControlsFeature;
 import me.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.Controller;
@@ -22,10 +21,6 @@ import me.lambdaurora.lambdacontrols.client.mixin.EntryListWidgetAccessor;
 import me.lambdaurora.lambdacontrols.client.util.HandledScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.util.MouseAccessor;
 import me.lambdaurora.spruceui.SpruceLabelWidget;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FluidBlock;
-import net.minecraft.block.SlabBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
@@ -42,14 +37,8 @@ import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -72,7 +61,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents the LambdaControls' input handler.
  *
  * @author LambdAurora
- * @version 1.3.1
+ * @version 1.3.2
  * @since 1.0.0
  */
 public class LambdaInput
@@ -325,7 +314,8 @@ public class LambdaInput
 
             if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
                 if (client.currentScreen != null) {
-                    client.currentScreen.onClose();
+                    if (!LambdaControlsCompat.handleMenuBack(client, client.currentScreen))
+                        client.currentScreen.onClose();
                     return;
                 }
             }
@@ -390,6 +380,8 @@ public class LambdaInput
                 if (screen instanceof CreativeInventoryScreen)
                     if (((CreativeInventoryScreenAccessor) screen).lambdacontrols_isCreativeInventorySlot(slot))
                         actionType = SlotActionType.CLONE;
+                if (slot != null && LambdaControlsCompat.streamCompatHandlers().anyMatch(handler -> handler.isCreativeSlot(screen, slot)))
+                    actionType = SlotActionType.CLONE;
                 break;
             case GLFW.GLFW_GAMEPAD_BUTTON_X:
                 clickData = GLFW_MOUSE_BUTTON_2;
@@ -719,72 +711,5 @@ public class LambdaInput
             this.mouseSpeedX = 0.F;
             this.mouseSpeedY = 0.F;
         }
-    }
-
-    public static Direction getMoveDirection(@Nullable BlockPos lastPos, @NotNull BlockPos newPos)
-    {
-        if (lastPos == null)
-            return null;
-        BlockPos vector = newPos.subtract(lastPos);
-        if (vector.getX() > 0)
-            return Direction.EAST;
-        else if (vector.getX() < 0)
-            return Direction.WEST;
-        else if (vector.getZ() > 0)
-            return Direction.SOUTH;
-        else if (vector.getZ() < 0)
-            return Direction.NORTH;
-        else if (vector.getY() > 0)
-            return Direction.UP;
-        else if (vector.getY() < 0)
-            return Direction.DOWN;
-        return null;
-    }
-
-    /**
-     * Returns a nullable block hit result if front placing is possible.
-     *
-     * @param client The client instance.
-     * @return A block hit result if front placing is possible.
-     */
-    public static @Nullable BlockHitResult tryFrontPlace(@NotNull MinecraftClient client)
-    {
-        if (!LambdaControlsFeature.FRONT_BLOCK_PLACING.isAvailable())
-            return null;
-        if (client.player != null && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.MISS && client.player.isOnGround() && client.player.pitch > 35.0F) {
-            if (client.player.isRiding())
-                return null;
-            BlockPos playerPos = client.player.getBlockPos().down();
-            BlockPos targetPos = new BlockPos(client.crosshairTarget.getPos()).subtract(playerPos);
-            BlockPos vector = new BlockPos(MathHelper.clamp(targetPos.getX(), -1, 1), 0, MathHelper.clamp(targetPos.getZ(), -1, 1));
-            BlockPos blockPos = playerPos.add(vector);
-
-            Direction direction = client.player.getHorizontalFacing();
-
-            BlockState state = client.world.getBlockState(blockPos);
-            if (!state.isAir())
-                return null;
-            BlockState adjacentBlockState = client.world.getBlockState(blockPos.offset(direction.getOpposite()));
-            if (adjacentBlockState.isAir() || adjacentBlockState.getBlock() instanceof FluidBlock || (vector.getX() == 0 && vector.getZ() == 0)) {
-                return null;
-            }
-
-            return new BlockHitResult(client.crosshairTarget.getPos(), direction, blockPos, false);
-        }
-        return null;
-    }
-
-    public static @NotNull BlockHitResult withSideForFrontPlace(@NotNull BlockHitResult result, @Nullable ItemStack stack)
-    {
-        if (stack == null || stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
-            return result;
-        return withSideForFrontPlace(result, Block.getBlockFromItem(stack.getItem()));
-    }
-
-    public static @NotNull BlockHitResult withSideForFrontPlace(@NotNull BlockHitResult result, @NotNull Block block)
-    {
-        if (block instanceof SlabBlock)
-            result = result.withSide(Direction.DOWN);
-        return result;
     }
 }

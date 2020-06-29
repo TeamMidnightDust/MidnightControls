@@ -11,9 +11,8 @@ package me.lambdaurora.lambdacontrols.client.mixin;
 
 import me.lambdaurora.lambdacontrols.LambdaControlsFeature;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
-import me.lambdaurora.lambdacontrols.client.LambdaInput;
+import me.lambdaurora.lambdacontrols.client.LambdaReacharound;
 import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsRenderer;
-import me.lambdaurora.lambdacontrols.client.util.FrontBlockPlaceResultAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -40,7 +39,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(MinecraftClient.class)
-public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAccessor
+public abstract class MinecraftClientMixin
 {
     @Shadow
     @Nullable
@@ -65,17 +64,9 @@ public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAcces
     @Shadow
     private int itemUseCooldown;
 
-    private BlockHitResult lambdacontrols_frontBlockPlaceResult = null;
-
     private BlockPos  lambdacontrols_lastTargetPos;
     private Vec3d     lambdacontrols_lastPos;
     private Direction lambdacontrols_lastTargetSide;
-
-    @Override
-    public @Nullable BlockHitResult lambdacontrols_getFrontBlockPlaceResult()
-    {
-        return this.lambdacontrols_frontBlockPlaceResult;
-    }
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(CallbackInfo ci)
@@ -88,7 +79,7 @@ public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAcces
     {
         if (this.player == null)
             return;
-        this.lambdacontrols_frontBlockPlaceResult = LambdaInput.tryFrontPlace(((MinecraftClient) (Object) this));
+
         if (!LambdaControlsFeature.FAST_BLOCK_PLACING.isAvailable())
             return;
         if (this.lambdacontrols_lastPos == null)
@@ -131,7 +122,8 @@ public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAcces
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;render(FJZ)V", shift = At.Shift.AFTER))
-    private void renderVirtualCursor(boolean fullRender, CallbackInfo ci) {
+    private void renderVirtualCursor(boolean fullRender, CallbackInfo ci)
+    {
         LambdaControlsRenderer.renderVirtualCursor(new MatrixStack(), (MinecraftClient) (Object) this);
     }
 
@@ -144,15 +136,15 @@ public abstract class MinecraftClientMixin implements FrontBlockPlaceResultAcces
     @Inject(method = "doItemUse()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/HitResult;getType()Lnet/minecraft/util/hit/HitResult$Type;"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true)
     private void onItemUse(CallbackInfo ci, Hand[] hands, int handCount, int handIndex, Hand hand, ItemStack stackInHand)
     {
-        if (!stackInHand.isEmpty() && this.player.pitch > 35.0F && LambdaControlsFeature.FRONT_BLOCK_PLACING.isAvailable()) {
+        if (!stackInHand.isEmpty() && this.player.pitch > 35.0F && LambdaControlsClient.get().reacharound.isReacharoundAvailable()) {
             if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.MISS && this.player.isOnGround()) {
                 if (!stackInHand.isEmpty() && stackInHand.getItem() instanceof BlockItem) {
-                    BlockHitResult hitResult = LambdaInput.tryFrontPlace(((MinecraftClient) (Object) this));
+                    BlockHitResult hitResult = LambdaControlsClient.get().reacharound.getLastReacharoundResult();
 
                     if (hitResult == null)
                         return;
 
-                    hitResult = LambdaInput.withSideForFrontPlace(hitResult, stackInHand);
+                    hitResult = LambdaReacharound.withSideForReacharound(hitResult, stackInHand);
 
                     int previousStackCount = stackInHand.getCount();
                     ActionResult result = this.interactionManager.interactBlock(this.player, this.world, hand, hitResult);

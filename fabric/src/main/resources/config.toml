@@ -21,9 +21,11 @@ auto_switch_mode = false
         drifting = false
         # Enables vertical fly drifting.
         vertical_drifting = true
-    [gameplay.front_block_placing]
+    [gameplay.reacharound]
         # Enables front block placing like in Bedrock Edition.
-        enabled = false
+        horizontal = false
+        # Enables vertical reacharound.
+        vertical = false
         # Enables front block placing outline.
         outline = true
         # The color in a hexadecimal format of the outline.

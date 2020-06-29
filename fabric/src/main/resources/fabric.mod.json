@@ -37,12 +37,12 @@
     "spruceui": ">=1.5.2"
   },
   "recommends": {
-    "modmenu": ">=1.12.2",
-    "okzoomer": ">=4.0.0"
+    "modmenu": ">=1.12.2"
   },
   "suggests": {
     "flamingo": "*",
-    "roughlyenoughitems": ">=4.5.5"
+    "roughlyenoughitems": ">=4.5.5",
+    "okzoomer": ">=4.0.0"
   },
   "breaks": {
     "modmenu": "<1.12.2",

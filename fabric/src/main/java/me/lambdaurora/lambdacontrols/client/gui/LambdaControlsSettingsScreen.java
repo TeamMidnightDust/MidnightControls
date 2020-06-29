@@ -51,6 +51,7 @@ public class LambdaControlsSettingsScreen extends Screen
     private final       Option               autoJumpOption;
     private final       Option               fastBlockPlacingOption;
     private final       Option               frontBlockPlacingOption;
+    private final       Option               verticalReacharoundOption;
     private final       Option               flyDriftingOption;
     private final       Option               flyVerticalDriftingOption;
     // Controller options
@@ -104,8 +105,10 @@ public class LambdaControlsSettingsScreen extends Screen
         this.autoJumpOption = SpruceBooleanOption.fromVanilla("options.autoJump", Option.AUTO_JUMP, null, true);
         this.fastBlockPlacingOption = new SpruceBooleanOption("lambdacontrols.menu.fast_block_placing", this.mod.config::hasFastBlockPlacing,
                 this.mod.config::setFastBlockPlacing, new TranslatableText("lambdacontrols.tooltip.fast_block_placing"), true);
-        this.frontBlockPlacingOption = new SpruceBooleanOption("lambdacontrols.menu.front_block_placing", this.mod.config::hasFrontBlockPlacing,
-                this.mod.config::setFrontBlockPlacing, new TranslatableText("lambdacontrols.tooltip.front_block_placing"), true);
+        this.frontBlockPlacingOption = new SpruceBooleanOption("lambdacontrols.menu.reacharound.horizontal", this.mod.config::hasFrontBlockPlacing,
+                this.mod.config::setFrontBlockPlacing, new TranslatableText("lambdacontrols.tooltip.reacharound.horizontal"), true);
+        this.verticalReacharoundOption = new SpruceBooleanOption("lambdacontrols.menu.reacharound.vertical", this.mod.config::hasVerticalReacharound,
+                this.mod.config::setVerticalReacharound, new TranslatableText("lambdacontrols.tooltip.reacharound.vertical"), true);
         this.flyDriftingOption = new SpruceBooleanOption("lambdacontrols.menu.fly_drifting", this.mod.config::hasFlyDrifting,
                 this.mod.config::setFlyDrifting, new TranslatableText("lambdacontrols.tooltip.fly_drifting"), true);
         this.flyVerticalDriftingOption = new SpruceBooleanOption("lambdacontrols.menu.fly_drifting_vertical", this.mod.config::hasFlyVerticalDrifting,
@@ -239,8 +242,8 @@ public class LambdaControlsSettingsScreen extends Screen
         this.list.addSingleOptionEntry(this.autoSwitchModeOption);
         // Gameplay options
         this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.gameplay", true, null));
-        this.list.addSingleOptionEntry(this.autoJumpOption);
-        this.list.addOptionEntry(this.fastBlockPlacingOption, this.frontBlockPlacingOption);
+        this.list.addOptionEntry(this.autoJumpOption, this.fastBlockPlacingOption);
+        this.list.addOptionEntry(this.frontBlockPlacingOption, this.verticalReacharoundOption);
         this.list.addSingleOptionEntry(this.flyDriftingOption);
         this.list.addSingleOptionEntry(this.flyVerticalDriftingOption);
         // Controller options
