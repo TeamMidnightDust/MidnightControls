@@ -9,6 +9,7 @@
 
 package me.lambdaurora.lambdacontrols.client;
 
+import com.google.common.collect.ImmutableSet;
 import me.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.Controller;
@@ -39,6 +40,7 @@ import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -315,7 +317,8 @@ public class LambdaInput
             if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
                 if (client.currentScreen != null) {
                     if (!LambdaControlsCompat.handleMenuBack(client, client.currentScreen))
-                        client.currentScreen.onClose();
+                        if (!this.tryGoBack(client.currentScreen))
+                            client.currentScreen.onClose();
                     return;
                 }
             }
@@ -395,6 +398,27 @@ public class LambdaInput
 
         accessor.lambdacontrols_onMouseClick(slot, slotId, clickData, actionType);
         return true;
+    }
+
+    /**
+     * Tries to go back.
+     *
+     * @param screen The current screen.
+     * @return True if successful, else false.
+     */
+    public boolean tryGoBack(@NotNull Screen screen)
+    {
+        ImmutableSet<String> set = ImmutableSet.of("gui.back", "gui.done", "gui.cancel", "gui.toTitle", "gui.toMenu");
+        return screen.children().stream().filter(element -> element instanceof AbstractPressableButtonWidget)
+                .map(element -> (AbstractPressableButtonWidget) element)
+                .filter(element -> element.getMessage() instanceof TranslatableText)
+                .anyMatch(element -> {
+                    if (set.stream().anyMatch(key -> key.equals(((TranslatableText) element.getMessage()).getKey()))) {
+                        element.onPress();
+                        return true;
+                    }
+                    return false;
+                });
     }
 
     private void handleAxe(@NotNull MinecraftClient client, int axis, float value, float absValue, int state)
