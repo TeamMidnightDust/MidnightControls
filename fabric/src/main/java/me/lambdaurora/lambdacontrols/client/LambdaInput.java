@@ -595,7 +595,7 @@ public class LambdaInput
             this.actionGuiCooldown = 2; // Prevent to press too quickly the focused element, so we have to skip 5 ticks.
             return false;
         } else if (element instanceof AlwaysSelectedEntryListWidget) {
-            ((EntryListWidgetAccessor) element).lambdacontrols_moveSelection(right ? EntryListWidget.class_5403.field_25661 : EntryListWidget.class_5403.field_25662);
+            ((EntryListWidgetAccessor) element).lambdacontrols_moveSelection(right ? EntryListWidget.MoveDirection.UP : EntryListWidget.MoveDirection.DOWN);
             return false;
         } else if (element instanceof ParentElement) {
             ParentElement entryList = (ParentElement) element;

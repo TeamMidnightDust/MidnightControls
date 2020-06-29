@@ -17,5 +17,5 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface EntryListWidgetAccessor
 {
     @Invoker("moveSelection")
-    void lambdacontrols_moveSelection(EntryListWidget.class_5403 direction);
+    void lambdacontrols_moveSelection(EntryListWidget.MoveDirection direction);
 }
