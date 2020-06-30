@@ -45,3 +45,32 @@ This update also has a backport 1.14.4 version ([#9](https://github.com/LambdAur
 - Added reset settings button.
 - HUD side affects button indicators now.
 - Added support for Advancements tabs.
+
+### v1.1.1
+
+## v1.2.0-1.3.0
+
+- Improved rotation algorithm ([#11](https://github.com/LambdAurora/LambdaControls/issues/11)).
+- Added virtual mouse.
+- Added outline on front block placing.
+- Added fast block placement ([#8](https://github.com/LambdAurora/LambdaControls/issues/8)).
+- Added [REI](https://www.curseforge.com/minecraft/mc-mods/roughly-enough-items) compatibility.
+- Improved HUD.
+- Added recipe book control.
+- And more!
+- v1.3.0 specific: Updated to Minecraft 1.16.1
+
+### v1.3.1
+
+- Fixed broken inventory interactions ([#13](https://github.com/LambdAurora/LambdaControls/issues/13))
+- Fixed virtual mouse preventing continuous attack (thus making breaking blocks impossible).
+- Added support for [ModUpdater](https://gitea.thebrokenrail.com/TheBrokenRail/ModUpdater) hopefully.
+- Updated [SpruceUI](https://github.com/LambdAurora/SpruceUI) to 1.5.2.
+
+### v1.3.2
+
+- Added vertical reacharound.
+- Added more API for compatibility handlers.
+- Improved reacharound API.
+- Improved [REI](https://www.curseforge.com/minecraft/mc-mods/roughly-enough-items) compatibility.
+  
