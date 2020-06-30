@@ -10,6 +10,7 @@
 package me.lambdaurora.lambdacontrols.client.controller;
 
 import me.lambdaurora.lambdacontrols.client.ButtonState;
+import me.lambdaurora.lambdacontrols.client.LambdaInput;
 import me.lambdaurora.lambdacontrols.client.mixin.AdvancementsScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.mixin.CreativeInventoryScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.mixin.RecipeBookWidgetAccessor;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
  * Represents some input handlers.
  *
  * @author LambdAurora
- * @version 1.3.0
+ * @version 1.4.0
  * @since 1.1.0
  */
 public class InputHandlers
@@ -49,7 +50,7 @@ public class InputHandlers
 
     public static PressAction handleHotbar(boolean next)
     {
-        return (client, button, action) -> {
+        return (client, button, value, action) -> {
             if (action == ButtonState.RELEASE)
                 return false;
 
@@ -74,6 +75,8 @@ public class InputHandlers
                 RecipeBookWidgetAccessor recipeBook = (RecipeBookWidgetAccessor) ((InventoryScreen) client.currentScreen).getRecipeBookWidget();
                 List<RecipeGroupButtonWidget> tabs = recipeBook.getTabButtons();
                 RecipeGroupButtonWidget currentTab = recipeBook.getCurrentTab();
+                if (currentTab == null)
+                    return false;
                 int nextTab = tabs.indexOf(currentTab) + (next ? 1 : -1);
                 if (nextTab < 0)
                     nextTab = tabs.size() - 1;
@@ -83,10 +86,13 @@ public class InputHandlers
                 recipeBook.setCurrentTab(currentTab = tabs.get(nextTab));
                 currentTab.setToggled(true);
                 recipeBook.lambdacontrols_refreshResults(true);
+                return true;
             } else if (client.currentScreen instanceof AdvancementsScreen) {
                 AdvancementsScreenAccessor screen = (AdvancementsScreenAccessor) client.currentScreen;
                 List<AdvancementTab> tabs = screen.getTabs().values().stream().distinct().collect(Collectors.toList());
                 AdvancementTab tab = screen.getSelectedTab();
+                if (tab == null)
+                    return false;
                 for (int i = 0; i < tabs.size(); i++) {
                     if (tabs.get(i).equals(tab)) {
                         int nextTab = i + (next ? 1 : -1);
@@ -98,12 +104,13 @@ public class InputHandlers
                         break;
                     }
                 }
+                return true;
             }
             return false;
         };
     }
 
-    public static boolean handlePauseGame(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, @NotNull ButtonState action)
+    public static boolean handlePauseGame(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action)
     {
         if (action == ButtonState.PRESS) {
             // If in game, then pause the game.
@@ -125,15 +132,15 @@ public class InputHandlers
      * @param action  The action done on the binding.
      * @return True if handled, else false.
      */
-    public static boolean handleScreenshot(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, @NotNull ButtonState action)
+    public static boolean handleScreenshot(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action)
     {
-        if (action == ButtonState.PRESS)
+        if (action == ButtonState.RELEASE)
             ScreenshotUtils.saveScreenshot(client.runDirectory, client.getWindow().getFramebufferWidth(), client.getWindow().getFramebufferHeight(), client.getFramebuffer(),
                     text -> client.execute(() -> client.inGameHud.getChatHud().addMessage(text)));
         return true;
     }
 
-    public static boolean handleToggleSneak(@NotNull MinecraftClient client, @NotNull ButtonBinding button, @NotNull ButtonState action)
+    public static boolean handleToggleSneak(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action)
     {
         if (client.player != null && !client.player.abilities.flying) {
             button.asKeyBinding().filter(binding -> action == ButtonState.PRESS).ifPresent(binding -> ((KeyBindingAccessor) binding).lambdacontrols_handlePressState(!binding.isPressed()));
@@ -144,7 +151,7 @@ public class InputHandlers
 
     public static PressAction handleInventorySlotPad(int direction)
     {
-        return (client, binding, action) -> {
+        return (client, binding, value, action) -> {
             if (!(client.currentScreen instanceof HandledScreen && action != ButtonState.RELEASE))
                 return false;
 
@@ -233,6 +240,20 @@ public class InputHandlers
     public static boolean inGame(@NotNull MinecraftClient client, @NotNull ButtonBinding binding)
     {
         return client.currentScreen == null;
+    }
+
+    /**
+     * Returns whether the client is in a non-interactive screen (which means require mouse input) or not.
+     *
+     * @param client  The client instance.
+     * @param binding The affected binding.
+     * @return True if the client is in a non-interactive screen, else false.
+     */
+    public static boolean inNonInteractiveScreens(@NotNull MinecraftClient client, @NotNull ButtonBinding binding)
+    {
+        if (client.currentScreen == null)
+            return false;
+        return !LambdaInput.isScreenInteractive(client.currentScreen);
     }
 
     /**

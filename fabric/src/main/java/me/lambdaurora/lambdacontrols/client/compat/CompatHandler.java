@@ -13,7 +13,6 @@ import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.hit.BlockHitResult;
 import org.jetbrains.annotations.NotNull;

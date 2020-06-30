@@ -32,6 +32,7 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
+import net.minecraft.client.gui.screen.pack.ResourcePackScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
@@ -63,24 +64,25 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents the LambdaControls' input handler.
  *
  * @author LambdAurora
- * @version 1.3.2
+ * @version 1.4.0
  * @since 1.0.0
  */
 public class LambdaInput
 {
-    private static final Map<Integer, Integer> BUTTON_COOLDOWNS   = new HashMap<>();
+    private static final Map<Integer, Integer> BUTTON_COOLDOWNS             = new HashMap<>();
     private final        LambdaControlsConfig  config;
     // Cooldowns
-    private              int                   actionGuiCooldown  = 0;
-    private              boolean               ignoreNextARelease = false;
-    private              double                targetYaw          = 0.0;
-    private              double                targetPitch        = 0.0;
-    private              float                 prevXAxis          = 0.F;
-    private              float                 prevYAxis          = 0.F;
-    private              int                   targetMouseX       = 0;
-    private              int                   targetMouseY       = 0;
-    private              float                 mouseSpeedX        = 0.F;
-    private              float                 mouseSpeedY        = 0.F;
+    private              int                   actionGuiCooldown            = 0;
+    private              boolean               ignoreNextARelease           = false;
+    private              double                targetYaw                    = 0.0;
+    private              double                targetPitch                  = 0.0;
+    private              float                 prevXAxis                    = 0.F;
+    private              float                 prevYAxis                    = 0.F;
+    private              int                   targetMouseX                 = 0;
+    private              int                   targetMouseY                 = 0;
+    private              float                 mouseSpeedX                  = 0.F;
+    private              float                 mouseSpeedY                  = 0.F;
+    private              int                   inventoryInteractionCooldown = 0;
 
     public LambdaInput(@NotNull LambdaControlsClient mod)
     {
@@ -157,6 +159,9 @@ public class LambdaInput
                 screen.focusedBinding = null;
             }
         }
+
+        if (this.inventoryInteractionCooldown > 0)
+            this.inventoryInteractionCooldown--;
     }
 
     /**
@@ -214,6 +219,7 @@ public class LambdaInput
             ((MouseAccessor) client.mouse).lambdacontrols_onCursorPos(client.getWindow().getHandle(), 0, 0);
             INPUT_MANAGER.resetMouseTarget(client);
         }
+        this.inventoryInteractionCooldown = 5;
     }
 
     private void fetchButtonInput(@NotNull MinecraftClient client, @NotNull GLFWGamepadState gamepadState, boolean leftJoycon)
@@ -329,9 +335,11 @@ public class LambdaInput
                 double mouseX = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
                 double mouseY = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
                 if (action == 0) {
-                    client.currentScreen.mouseClicked(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1);
+                    Screen.wrapScreenError(() -> client.currentScreen.mouseClicked(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1),
+                            "mouseClicked event handler", client.currentScreen.getClass().getCanonicalName());
                 } else if (action == 1) {
-                    client.currentScreen.mouseReleased(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1);
+                    Screen.wrapScreenError(() -> client.currentScreen.mouseReleased(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1),
+                            "mouseReleased event handler", client.currentScreen.getClass().getCanonicalName());
                 }
                 this.actionGuiCooldown = 5;
             } else {
@@ -354,6 +362,9 @@ public class LambdaInput
 
         if (client.interactionManager == null || client.player == null)
             return false;
+
+        if (this.inventoryInteractionCooldown > 0)
+            return true;
 
         if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
             client.player.closeHandledScreen();
@@ -457,6 +468,17 @@ public class LambdaInput
                     BUTTON_COOLDOWNS.put(axisAsButton(axis, false), 5);
                 }
             }
+
+            float axisValue = absValue < this.config.getDeadZone() ? 0.f : (float) (absValue - this.config.getDeadZone());
+            axisValue /= (1.0 - this.config.getDeadZone());
+            if (currentPlusState)
+                InputManager.BUTTON_VALUES.put(axisAsButton(axis, true), axisValue);
+            else
+                InputManager.BUTTON_VALUES.put(axisAsButton(axis, true), 0.f);
+            if (currentMinusState)
+                InputManager.BUTTON_VALUES.put(axisAsButton(axis, false), axisValue);
+            else
+                InputManager.BUTTON_VALUES.put(axisAsButton(axis, false), 0.f);
         }
 
         double deadZone = this.config.getDeadZone();
@@ -481,6 +503,7 @@ public class LambdaInput
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
                 CreativeInventoryScreen screen = (CreativeInventoryScreen) client.currentScreen;
                 CreativeInventoryScreenAccessor accessor = (CreativeInventoryScreenAccessor) screen;
+                // @TODO allow rebinding to left stick
                 if (accessor.lambdacontrols_hasScrollbar() && absValue >= deadZone) {
                     screen.mouseScrolled(0.0, 0.0, -value);
                 }
@@ -677,7 +700,7 @@ public class LambdaInput
 
     public static boolean isScreenInteractive(@NotNull Screen screen)
     {
-        return !(screen instanceof AdvancementsScreen || screen instanceof HandledScreen || LambdaControlsCompat.requireMouseOnScreen(screen));
+        return !(screen instanceof AdvancementsScreen || screen instanceof HandledScreen || screen instanceof ResourcePackScreen || LambdaControlsCompat.requireMouseOnScreen(screen));
     }
 
     // Inspired from https://github.com/MrCrayfish/Controllable/blob/1.14.X/src/main/java/com/mrcrayfish/controllable/client/ControllerInput.java#L686.

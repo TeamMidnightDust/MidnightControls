@@ -19,6 +19,7 @@ import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.Identifier;
+import org.aperlambda.lambdacommon.utils.Pair;
 import org.aperlambda.lambdacommon.utils.function.PairPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -32,7 +33,7 @@ import java.util.stream.Stream;
  * Represents an input manager for controllers.
  *
  * @author LambdAurora
- * @version 1.3.0
+ * @version 1.4.0
  * @since 1.1.0
  */
 public class InputManager
@@ -41,6 +42,7 @@ public class InputManager
     private static final List<ButtonBinding>       BINDINGS         = new ArrayList<>();
     private static final List<ButtonCategory>      CATEGORIES       = new ArrayList<>();
     public static final  Map<Integer, ButtonState> STATES           = new HashMap<>();
+    public static final  Map<Integer, Float>       BUTTON_VALUES    = new HashMap<>();
     private              int                       prevTargetMouseX = 0;
     private              int                       prevTargetMouseY = 0;
     private              int                       targetMouseX     = 0;
@@ -244,6 +246,23 @@ public class InputManager
         return state;
     }
 
+    public static float getBindingValue(@NotNull ButtonBinding binding, @NotNull ButtonState state)
+    {
+        if (state.isUnpressed())
+            return 0.f;
+
+        float value = 0.f;
+        for (int btn : binding.getButton()) {
+            if (ButtonBinding.isAxis(btn)) {
+                value = BUTTON_VALUES.getOrDefault(btn, 1.f);
+                break;
+            } else {
+                value = 1.f;
+            }
+        }
+        return value;
+    }
+
     /**
      * Returns whether the button has duplicated bindings.
      *
@@ -317,7 +336,7 @@ public class InputManager
     public static void updateBindings(@NotNull MinecraftClient client)
     {
         List<Integer> skipButtons = new ArrayList<>();
-        Map<ButtonBinding, ButtonState> states = new HashMap<>();
+        Map<ButtonBinding, Pair<ButtonState, Float>> states = new HashMap<>();
         for (ButtonBinding binding : BINDINGS) {
             ButtonState state = binding.isAvailable(client) ? getBindingState(binding) : ButtonState.NONE;
             if (skipButtons.stream().anyMatch(btn -> containsButton(binding.getButton(), btn))) {
@@ -330,12 +349,15 @@ public class InputManager
             binding.update();
             if (binding.pressed)
                 Arrays.stream(binding.getButton()).forEach(skipButtons::add);
-            states.put(binding, state);
+
+            float value = getBindingValue(binding, state);
+
+            states.put(binding, Pair.of(state, value));
         }
 
         states.forEach((binding, state) -> {
-            if (state != ButtonState.NONE) {
-                binding.handle(client, state);
+            if (state.key != ButtonState.NONE) {
+                binding.handle(client, state.value, state.key);
             }
         });
     }
@@ -363,12 +385,12 @@ public class InputManager
 
     /**
      * Returns a new key binding instance.
-     * @param id The identifier of the key binding.
-     * @param type The type.
-     * @param code The code.
+     *
+     * @param id       The identifier of the key binding.
+     * @param type     The type.
+     * @param code     The code.
      * @param category The category of the key binding.
      * @return The key binding.
-     *
      * @see #makeKeyBinding(Identifier, InputUtil.Type, int, String)
      */
     public static @NotNull KeyBinding makeKeyBinding(@NotNull net.minecraft.util.Identifier id, InputUtil.Type type, int code, @NotNull String category)
@@ -378,12 +400,12 @@ public class InputManager
 
     /**
      * Returns a new key binding instance.
-     * @param id The identifier of the key binding.
-     * @param type The type.
-     * @param code The code.
+     *
+     * @param id       The identifier of the key binding.
+     * @param type     The type.
+     * @param code     The code.
      * @param category The category of the key binding.
      * @return The key binding.
-     *
      * @see #makeKeyBinding(net.minecraft.util.Identifier, InputUtil.Type, int, String)
      */
     public static @NotNull KeyBinding makeKeyBinding(@NotNull Identifier id, InputUtil.Type type, int code, @NotNull String category)

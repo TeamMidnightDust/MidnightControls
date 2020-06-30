@@ -18,7 +18,7 @@ import java.util.Optional;
 
 /**
  * Represents HQM compatibility handler.
- *
+ * <p>
  * This is bad.
  *
  * @author LambdAurora
@@ -27,8 +27,8 @@ import java.util.Optional;
  */
 public class HQMCompat implements CompatHandler
 {
-    public static final String GUI_BASE_CLASS_PATH = "hardcorequesting.client.interfaces.GuiBase";
-    private Optional<Class<?>> guiBaseClass;
+    public static final String             GUI_BASE_CLASS_PATH = "hardcorequesting.client.interfaces.GuiBase";
+    private             Optional<Class<?>> guiBaseClass;
 
     @Override
     public void handle(@NotNull LambdaControlsClient mod)

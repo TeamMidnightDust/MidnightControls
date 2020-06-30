@@ -18,13 +18,13 @@ import org.jetbrains.annotations.NotNull;
  * Represents a press action callback.
  *
  * @author LambdAurora
- * @version 1.1.0
+ * @version 1.4.0
  * @since 1.0.0
  */
 @FunctionalInterface
 public interface PressAction
 {
-    PressAction DEFAULT_ACTION = (client, button, action) -> {
+    PressAction DEFAULT_ACTION = (client, button, value, action) -> {
         if (action == ButtonState.REPEAT || client.currentScreen != null)
             return false;
         button.asKeyBinding().ifPresent(binding -> ((KeyBindingAccessor) binding).lambdacontrols_handlePressState(button.isButtonDown()));
@@ -37,5 +37,5 @@ public interface PressAction
      * @param client The client instance.
      * @param action The action done.
      */
-    boolean press(@NotNull MinecraftClient client, @NotNull ButtonBinding button, @NotNull ButtonState action);
+    boolean press(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action);
 }

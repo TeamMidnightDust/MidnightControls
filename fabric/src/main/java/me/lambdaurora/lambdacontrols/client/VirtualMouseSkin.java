@@ -31,7 +31,8 @@ public enum VirtualMouseSkin implements Nameable
 
     private String name;
 
-    VirtualMouseSkin(String name) {
+    VirtualMouseSkin(String name)
+    {
         this.name = name;
     }
 

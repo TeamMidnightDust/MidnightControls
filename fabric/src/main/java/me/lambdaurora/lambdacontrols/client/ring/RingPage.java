@@ -10,13 +10,15 @@
 package me.lambdaurora.lambdacontrols.client.ring;
 
 /**
- * Represents a key binding ring.
+ * Represents a ring page.
  *
  * @author LambdAurora
  * @version 1.4.0
  * @since 1.4.0
  */
-public class KeyBindingRing
+public class RingPage
 {
+    private RingAction[] actions = new RingAction[8];
+
 
 }

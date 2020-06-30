@@ -11,6 +11,7 @@ package me.lambdaurora.lambdacontrols.client.mixin;
 
 import com.mojang.authlib.GameProfile;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
+import me.lambdaurora.lambdacontrols.client.controller.MovementHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -67,6 +68,12 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
                     this.lambdacontrols_driftingPrevented = false;
             }
         }
+    }
+
+    @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/Input;tick(Z)V", shift = At.Shift.AFTER))
+    public void onInputUpdate(CallbackInfo ci)
+    {
+        MovementHandler.HANDLER.applyMovement((ClientPlayerEntity) (Object) this);
     }
 
     @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isCamera()Z"))

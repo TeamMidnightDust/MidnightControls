@@ -39,7 +39,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents a compatibility handler for REI.
  *
  * @author LambdAurora
- * @version 1.3.2
+ * @version 1.4.0
  * @since 1.2.0
  */
 public class ReiCompat implements CompatHandler
@@ -79,7 +79,7 @@ public class ReiCompat implements CompatHandler
         InputManager.registerBinding(new ButtonBinding.Builder(new Identifier("rei", "show_usage"))
                 .buttons(GLFW_GAMEPAD_BUTTON_RIGHT_THUMB)
                 .filter((client, binding) -> InputHandlers.inInventory(client, binding) || isViewingScreen(client.currentScreen))
-                .action((client, button, action) -> {
+                .action((client, button, value, action) -> {
                     if (action != ButtonState.RELEASE)
                         return false;
                     Optional<ContainerScreenOverlay> overlay = ScreenHelper.getOptionalOverlay();
@@ -130,7 +130,7 @@ public class ReiCompat implements CompatHandler
 
     private static PressAction handlePage(boolean next)
     {
-        return (client, button, action) -> {
+        return (client, button, value, action) -> {
             if (action == ButtonState.RELEASE)
                 return false;
 
@@ -160,7 +160,7 @@ public class ReiCompat implements CompatHandler
      */
     private static PressAction handleTab(boolean next)
     {
-        return (client, button, action) -> {
+        return (client, button, value, action) -> {
             if (action != ButtonState.RELEASE)
                 return false;
 

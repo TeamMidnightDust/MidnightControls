@@ -36,5 +36,7 @@ public class OkZoomerCompat implements CompatHandler
                 .category(ButtonBinding.MISC_CATEGORY)
                 .linkKeybind(OkZoomerClientMod.zoomKeyBinding)
                 .register();
+
+        // @TODO Zoom in and out
     }
 }

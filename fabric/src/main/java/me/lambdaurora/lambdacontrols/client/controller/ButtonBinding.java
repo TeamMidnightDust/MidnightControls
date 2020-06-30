@@ -13,7 +13,6 @@ import me.lambdaurora.lambdacontrols.client.ButtonState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.Identifier;
@@ -33,7 +32,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents a button binding.
  *
  * @author LambdAurora
- * @version 1.3.0
+ * @version 1.4.0
  * @since 1.0.0
  */
 public class ButtonBinding implements Nameable
@@ -45,21 +44,25 @@ public class ButtonBinding implements Nameable
     public static final ButtonCategory MISC_CATEGORY;
 
     public static final ButtonBinding ATTACK             = new Builder("attack").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true)).onlyInGame().register();
-    public static final ButtonBinding BACK               = new Builder("back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, false)).onlyInGame().register();
+    public static final ButtonBinding BACK               = new Builder("back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, false))
+            .action(MovementHandler.HANDLER).onlyInGame().register();
     public static final ButtonBinding CHAT               = new Builder("chat").buttons(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT).onlyInGame().cooldown(true).register();
     public static final ButtonBinding DROP_ITEM          = new Builder("drop_item").buttons(GLFW_GAMEPAD_BUTTON_B).onlyInGame().cooldown(true).register();
-    public static final ButtonBinding FORWARD            = new Builder("forward").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, true)).onlyInGame().register();
+    public static final ButtonBinding FORWARD            = new Builder("forward").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, true))
+            .action(MovementHandler.HANDLER).onlyInGame().register();
     public static final ButtonBinding HOTBAR_LEFT        = new Builder("hotbar_left").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
             .action(InputHandlers.handleHotbar(false)).onlyInGame().cooldown(true).register();
     public static final ButtonBinding HOTBAR_RIGHT       = new Builder("hotbar_right").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
             .action(InputHandlers.handleHotbar(true)).onlyInGame().cooldown(true).register();
     public static final ButtonBinding INVENTORY          = new Builder("inventory").buttons(GLFW_GAMEPAD_BUTTON_Y).onlyInGame().cooldown(true).register();
     public static final ButtonBinding JUMP               = new Builder("jump").buttons(GLFW_GAMEPAD_BUTTON_A).onlyInGame().register();
-    public static final ButtonBinding LEFT               = new Builder("left").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, false)).onlyInGame().register();
+    public static final ButtonBinding LEFT               = new Builder("left").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, false))
+            .action(MovementHandler.HANDLER).onlyInGame().register();
     public static final ButtonBinding PAUSE_GAME         = new Builder("pause_game").buttons(GLFW_GAMEPAD_BUTTON_START).action(InputHandlers::handlePauseGame).cooldown(true).register();
     public static final ButtonBinding PICK_BLOCK         = new Builder("pick_block").buttons(GLFW_GAMEPAD_BUTTON_DPAD_LEFT).onlyInGame().cooldown(true).register();
     public static final ButtonBinding PLAYER_LIST        = new Builder("player_list").buttons(GLFW_GAMEPAD_BUTTON_BACK).onlyInGame().register();
-    public static final ButtonBinding RIGHT              = new Builder("right").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, true)).register();
+    public static final ButtonBinding RIGHT              = new Builder("right").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, true))
+            .action(MovementHandler.HANDLER).register();
     public static final ButtonBinding SCREENSHOT         = new Builder("screenshot").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_A)
             .action(InputHandlers::handleScreenshot).cooldown(true).register();
     public static final ButtonBinding SLOT_DOWN          = new Builder("slot_down").buttons(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)
@@ -229,7 +232,7 @@ public class ButtonBinding implements Nameable
      * @param client The client instance.
      * @param state  The state.
      */
-    public void handle(@NotNull MinecraftClient client, @NotNull ButtonState state)
+    public void handle(@NotNull MinecraftClient client, float value, @NotNull ButtonState state)
     {
         if (state == ButtonState.REPEAT && this.hasCooldown && this.cooldown != 0)
             return;
@@ -238,7 +241,7 @@ public class ButtonBinding implements Nameable
 
         }
         for (int i = this.actions.size() - 1; i >= 0; i--) {
-            if (this.actions.get(i).press(client, this, state))
+            if (this.actions.get(i).press(client, this, value, state))
                 break;
         }
     }
@@ -254,8 +257,7 @@ public class ButtonBinding implements Nameable
      *
      * @return The translation key.
      */
-    public @NotNull
-    String getTranslationKey()
+    public @NotNull String getTranslationKey()
     {
         return "lambdacontrols.action." + this.getName();
     }
@@ -281,6 +283,18 @@ public class ButtonBinding implements Nameable
     public static int axisAsButton(int axis, boolean positive)
     {
         return positive ? 100 + axis : 200 + axis;
+    }
+
+    /**
+     * Returns whether the specified button is an axis or not.
+     *
+     * @param button The button.
+     * @return True if the button is an axis, else false.
+     */
+    public static boolean isAxis(int button)
+    {
+        button %= 500;
+        return button >= 100;
     }
 
     /**

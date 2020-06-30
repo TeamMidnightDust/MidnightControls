@@ -61,12 +61,12 @@ public class LambdaControlsConfig
     protected final FileConfig           config = FileConfig.builder("config/lambdacontrols.toml").concurrent().defaultResource("/config.toml").build();
     private final   LambdaControlsClient mod;
     private         ControlsMode         controlsMode;
-    private         ControllerType controllerType;
+    private         ControllerType       controllerType;
     // Gameplay.
-    private         boolean shouldRenderReacharoundOutline;
-    private         int[]   reacharoundOutlineColor;
+    private         boolean              shouldRenderReacharoundOutline;
+    private         int[]                reacharoundOutlineColor;
     // Controller settings
-    private         double  deadZone;
+    private         double               deadZone;
     private         double               rotationSpeed;
     private         double               mouseSpeed;
     private         boolean              unfocusedInput;

@@ -11,7 +11,6 @@ package me.lambdaurora.lambdacontrols.client;
 
 import io.github.prospector.modmenu.api.ConfigScreenFactory;
 import io.github.prospector.modmenu.api.ModMenuApi;
-import me.lambdaurora.lambdacontrols.LambdaControlsConstants;
 import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsSettingsScreen;
 
 /**

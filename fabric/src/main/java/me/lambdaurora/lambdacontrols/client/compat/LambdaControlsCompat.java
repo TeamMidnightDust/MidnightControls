@@ -14,7 +14,6 @@ import me.lambdaurora.lambdacontrols.client.controller.InputManager;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.hit.BlockHitResult;
 import org.aperlambda.lambdacommon.utils.LambdaReflection;
 import org.jetbrains.annotations.NotNull;
@@ -132,7 +131,8 @@ public class LambdaControlsCompat
      * @param screen The screen.
      * @return True if the handle was fired and succeed, else false.
      */
-    public static boolean handleMenuBack(@NotNull MinecraftClient client, @NotNull Screen screen) {
+    public static boolean handleMenuBack(@NotNull MinecraftClient client, @NotNull Screen screen)
+    {
         for (CompatHandler handler : HANDLERS) {
             if (handler.handleMenuBack(client, screen))
                 return true;
