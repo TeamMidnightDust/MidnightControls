@@ -21,19 +21,19 @@ import java.util.List;
  * Represents an accessor to REI's VillagerRecipeViewingScreen.
  *
  * @author LambdAurora
- * @version 1.2.0
+ * @version 1.4.1
  * @since 1.2.0
  */
-@Mixin(value = VillagerRecipeViewingScreen.class, remap = false)
+@Mixin(VillagerRecipeViewingScreen.class)
 public interface VillagerRecipeViewingScreenAccessor
 {
-    @Accessor("categories")
+    @Accessor(value = "categories", remap = false)
     List<RecipeCategory<?>> getCategories();
 
-    @Accessor("selectedCategoryIndex")
+    @Accessor(value = "selectedCategoryIndex", remap = false)
     int getSelectedCategoryIndex();
 
-    @Accessor("selectedCategoryIndex")
+    @Accessor(value = "selectedCategoryIndex", remap = false)
     void setSelectedCategoryIndex(int selectedCategoryIndex);
 
     @Invoker("init")
