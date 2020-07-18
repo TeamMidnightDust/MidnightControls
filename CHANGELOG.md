@@ -89,3 +89,7 @@ This update also has a backport 1.14.4 version ([#9](https://github.com/LambdAur
    - Started to work on action ring.
      - Will allow for better compability with other mods.
      - Might be interesting for keyboard users too.
+
+### v1.4.1
+
+ - Fixed crash with [REI](https://www.curseforge.com/minecraft/mc-mods/roughly-enough-items).
