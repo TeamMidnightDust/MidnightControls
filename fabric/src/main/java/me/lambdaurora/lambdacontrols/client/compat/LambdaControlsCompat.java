@@ -41,7 +41,7 @@ public class LambdaControlsCompat
      */
     public static void init(@NotNull LambdaControlsClient mod)
     {
-        if (FabricLoader.getInstance().isModLoaded("okzoomer") && LambdaReflection.doesClassExist(OkZoomerCompat.OKZOOMER_CLASS_PATH)) {
+        if (FabricLoader.getInstance().isModLoaded("okzoomer")) {
             mod.log("Adding okzoomer compatibility...");
             HANDLERS.add(new OkZoomerCompat());
         }

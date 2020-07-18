@@ -9,7 +9,8 @@
 
 package me.lambdaurora.lambdacontrols.client;
 
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +21,7 @@ import java.util.Optional;
  * Represents a controller type.
  *
  * @author LambdAurora
- * @version 1.0.0
+ * @version 1.4.0
  * @since 1.0.0
  */
 public enum ControllerType implements Nameable
@@ -32,11 +33,13 @@ public enum ControllerType implements Nameable
     STEAM(4),
     OUYA(5);
 
-    private final int id;
+    private final int  id;
+    private final Text text;
 
     ControllerType(int id)
     {
         this.id = id;
+        this.text = new TranslatableText(this.getTranslationKey());
     }
 
     /**
@@ -54,7 +57,7 @@ public enum ControllerType implements Nameable
      *
      * @return The next available controller type.
      */
-    public ControllerType next()
+    public @NotNull ControllerType next()
     {
         ControllerType[] v = values();
         if (v.length == this.ordinal() + 1)
@@ -63,13 +66,23 @@ public enum ControllerType implements Nameable
     }
 
     /**
-     * Gets the translated name of this controller type.
+     * Returns the translation key of this controller type.
      *
-     * @return The translated name of this controller type.
+     * @return The translation key.
      */
-    public String getTranslatedName()
+    public @NotNull String getTranslationKey()
     {
-        return I18n.translate("lambdacontrols.controller_type." + this.getName());
+        return "lambdacontrols.controller_type." + this.getName();
+    }
+
+    /**
+     * Gets the translated text of this controller type.
+     *
+     * @return The translated text of this controller type.
+     */
+    public @NotNull Text getTranslatedText()
+    {
+        return this.text;
     }
 
     @Override
@@ -84,7 +97,7 @@ public enum ControllerType implements Nameable
      * @param id The identifier of the controller type.
      * @return The controller type if found, else empty.
      */
-    public static Optional<ControllerType> byId(@NotNull String id)
+    public static @NotNull Optional<ControllerType> byId(@NotNull String id)
     {
         return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();
     }

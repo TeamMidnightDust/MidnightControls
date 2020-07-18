@@ -10,6 +10,8 @@
 package me.lambdaurora.lambdacontrols.client;
 
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +22,7 @@ import java.util.Optional;
  * Represents the hud side which is the side where the movements buttons are.
  *
  * @author LambdAurora
- * @version 1.0.0
+ * @version 1.4.0
  * @since 1.0.0
  */
 public enum HudSide implements Nameable
@@ -28,12 +30,19 @@ public enum HudSide implements Nameable
     LEFT,
     RIGHT;
 
+    private final Text text;
+
+    HudSide()
+    {
+        this.text = new TranslatableText(this.getTranslationKey());
+    }
+
     /**
      * Returns the next side available.
      *
      * @return The next available side.
      */
-    public HudSide next()
+    public @NotNull HudSide next()
     {
         HudSide[] v = values();
         if (v.length == this.ordinal() + 1)
@@ -42,13 +51,23 @@ public enum HudSide implements Nameable
     }
 
     /**
-     * Gets the translated name of this hud side.
+     * Returns the translation key of this hud side.
      *
-     * @return The translated name of this hud side.
+     * @return The translation key of this hude side.
      */
-    public String getTranslatedName()
+    public @NotNull String getTranslationKey()
     {
-        return I18n.translate("lambdacontrols.hud_side." + this.getName());
+        return "lambdacontrols.hud_side." + this.getName();
+    }
+
+    /**
+     * Gets the translated text of this hud side.
+     *
+     * @return The translated text of this hud side.
+     */
+    public @NotNull Text getTranslatedText()
+    {
+        return this.text;
     }
 
     @Override
@@ -63,7 +82,7 @@ public enum HudSide implements Nameable
      * @param id The identifier of the hud side.
      * @return The hud side if found, else empty.
      */
-    public static Optional<HudSide> byId(@NotNull String id)
+    public static @NotNull Optional<HudSide> byId(@NotNull String id)
     {
         return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();
     }

@@ -1,3 +1,5 @@
+import net.fabricmc.loom.task.RemapJarTask
+
 plugins {
     id 'fabric-loom' version '0.4-SNAPSHOT'
     id 'java-library'
@@ -38,28 +40,27 @@ dependencies {
     //to change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}"
-    modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
-    modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modCompile "io.github.prospector:modmenu:${project.modmenu_version}"
-    modCompile "com.github.lambdaurora:spruceui:${project.spruceui_version}"
+    modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
+    modImplementation "com.github.lambdaurora:spruceui:${project.spruceui_version}"
     include "com.github.lambdaurora:spruceui:${project.spruceui_version}"
 
     // Compatibility mods
-    modCompile "io.github.joaoh1:okzoomer:4.0.0-alpha.3.1.16.pre5"
-    modCompile "me.shedaniel:RoughlyEnoughItems:4.5.5"
+    modImplementation "io.github.joaoh1:okzoomer:4.0.0-alpha.4.1.16.1"
+    modImplementation "me.shedaniel:RoughlyEnoughItems:4.5.5"
 
     api project(":core")
     shadow project(":core")
-    include "org.jetbrains:annotations:17.0.0"
-    include("org.aperlambda:lambdajcommon:1.8.0")  {
+    shadow("org.aperlambda:lambdajcommon:1.8.0")  {
         exclude group: 'com.google.code.gson'
         exclude group: 'com.google.guava'
     }
-    include "com.electronwill.night-config:core:3.5.3"
-    include "com.electronwill.night-config:toml:3.5.3"
+    shadow "com.electronwill.night-config:core:3.5.3"
+    shadow "com.electronwill.night-config:toml:3.5.3"
 }
 
 processResources {
@@ -78,6 +79,8 @@ processResources {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+
+    withSourcesJar()
 }
 
 jar {
@@ -90,6 +93,26 @@ jar {
             it.isDirectory() ? it : zipTree(it)
         }
     }
+}
+
+task shadowJar(type: Jar) {
+    archiveClassifier.set("dev")
+
+    from sourceSets.main.output
+
+    from {
+        configurations.shadow.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
+task shadowRemapJar(type: RemapJarTask) {
+    dependsOn shadowJar
+
+    input = file("${project.buildDir}/libs/$archivesBaseName-$version-dev.jar")
+    archiveName = "${archivesBaseName}-${version}.jar"
+    addNestedDependencies = true
 }
 
 // configure the maven publication
@@ -107,5 +130,6 @@ publishing {
     }
 }
 
+shadowJar.dependsOn(":core:jar")
 build.dependsOn(":core:build")
 publish.dependsOn(":core:publish")

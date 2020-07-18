@@ -12,6 +12,7 @@ package me.lambdaurora.lambdacontrols.client.gui;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonCategory;
 import me.lambdaurora.lambdacontrols.client.controller.InputManager;
+import me.lambdaurora.spruceui.SpruceTexts;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -105,7 +106,7 @@ public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Ent
                     return new TranslatableText("narrator.controls.reset", bindingName);
                 }
             };
-            this.unboundButton = new ButtonWidget(0, 0, 50, 20, new TranslatableText("lambdacontrols.menu.unbound"),
+            this.unboundButton = new ButtonWidget(0, 0, 50, 20, SpruceTexts.OPTIONS_GENERIC_UNBOUND,
                     btn -> {
                         gui.mod.config.setButtonBinding(binding, UNBOUND);
                         gui.focusedBinding = null;

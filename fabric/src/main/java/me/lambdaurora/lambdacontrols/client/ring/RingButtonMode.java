@@ -9,7 +9,8 @@
 
 package me.lambdaurora.lambdacontrols.client.ring;
 
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,11 +27,13 @@ public enum RingButtonMode implements Nameable
     HOLD("hold"),
     TOGGLE("toggle");
 
-    private String name;
+    private final String name;
+    private final Text   text;
 
     RingButtonMode(@NotNull String name)
     {
         this.name = name;
+        this.text = new TranslatableText(this.getTranslationKey());
     }
 
     /**
@@ -38,7 +41,7 @@ public enum RingButtonMode implements Nameable
      *
      * @return The next ring button mode.
      */
-    public RingButtonMode next()
+    public @NotNull RingButtonMode next()
     {
         RingButtonMode[] v = values();
         if (v.length == this.ordinal() + 1)
@@ -47,13 +50,23 @@ public enum RingButtonMode implements Nameable
     }
 
     /**
+     * Returns the translation key of this ring button mode.
+     *
+     * @return The translation key of this ring button mode.
+     */
+    public @NotNull String getTranslationKey()
+    {
+        return "lambdacontrols.ring.button_mode." + this.getName();
+    }
+
+    /**
      * Gets the translated name of this ring button mode.
      *
      * @return The translated name of this ring button mode.
      */
-    public String getTranslatedName()
+    public @NotNull Text getTranslatedText()
     {
-        return I18n.translate("lambdacontrols.ring.button_mode." + this.getName());
+        return this.text;
     }
 
     @Override

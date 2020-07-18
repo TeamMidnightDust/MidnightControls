@@ -13,6 +13,7 @@ import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.InputManager;
 import me.lambdaurora.spruceui.SpruceButtonWidget;
+import me.lambdaurora.spruceui.SpruceTexts;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -61,7 +62,7 @@ public class ControllerControlsScreen extends Screen
                 btn -> this.client.openScreen(new ControlsOptionsScreen(this, this.client.options))));
         if (!this.hideSettings)
             this.addButton(new SpruceButtonWidget(this.width / 2 - 155 + 160, 18, 150, 20,
-                    new TranslatableText("menu.options"),
+                    SpruceTexts.MENU_OPTIONS,
                     btn -> this.client.openScreen(new LambdaControlsSettingsScreen(this, true))));
         this.bindingsListWidget = new ControlsListWidget(this, this.client);
         this.children.add(this.bindingsListWidget);
@@ -69,7 +70,7 @@ public class ControllerControlsScreen extends Screen
                 new TranslatableText("controls.resetAll"),
                 btn -> InputManager.streamBindings().forEach(binding -> this.mod.config.setButtonBinding(binding, binding.getDefaultButton()))));
         this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20,
-                new TranslatableText("gui.done"),
+                SpruceTexts.GUI_DONE,
                 btn -> this.client.openScreen(this.parent)));
     }
 

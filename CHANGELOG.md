@@ -73,4 +73,19 @@ This update also has a backport 1.14.4 version ([#9](https://github.com/LambdAur
 - Added more API for compatibility handlers.
 - Improved reacharound API.
 - Improved [REI](https://www.curseforge.com/minecraft/mc-mods/roughly-enough-items) compatibility.
-  
+
+## v1.4.0
+
+ - Added analog movements ([#10](https://github.com/LambdAurora/LambdaControls/issues/10)).
+ - Improved Ok Zoomer compability.
+ - Updated [SpruceUI](https://github.com/LambdAurora/SpruceUI) to 1.5.8 to ensure 1.16.2 compability.
+ - Internal changes:
+   - Added analog input value to button bindings.
+   - Replace lot of strings with Texts.
+   - Improved block outline rendering injection.
+   - Shadow library jars instead of Jar-in-Jar.
+ - Fixed crash in inventory ([#16](https://github.com/LambdAurora/LambdaControls/issues/16))
+ - WIP:
+   - Started to work on action ring.
+     - Will allow for better compability with other mods.
+     - Might be interesting for keyboard users too.

@@ -9,7 +9,8 @@
 
 package me.lambdaurora.lambdacontrols.client;
 
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +20,7 @@ import java.util.Optional;
 /**
  * Represents the virtual mouse skins.
  *
- * @version 1.2.0
+ * @version 1.4.0
  * @since 1.2.0
  */
 public enum VirtualMouseSkin implements Nameable
@@ -29,11 +30,13 @@ public enum VirtualMouseSkin implements Nameable
     SECOND_LIGHT("second_light"),
     SECOND_DARK("second_dark");
 
-    private String name;
+    private final String name;
+    private final Text   text;
 
     VirtualMouseSkin(String name)
     {
         this.name = name;
+        this.text = new TranslatableText(this.getTranslationKey());
     }
 
     /**
@@ -41,7 +44,7 @@ public enum VirtualMouseSkin implements Nameable
      *
      * @return The next available virtual mouse skin.
      */
-    public VirtualMouseSkin next()
+    public @NotNull VirtualMouseSkin next()
     {
         VirtualMouseSkin[] v = values();
         if (v.length == this.ordinal() + 1)
@@ -50,13 +53,23 @@ public enum VirtualMouseSkin implements Nameable
     }
 
     /**
-     * Gets the translated name of this controller type.
+     * Returns the translation key of this virtual mouse skin.
      *
-     * @return The translated name of this controller type.
+     * @return The virtual mouse skin's translation key.
      */
-    public String getTranslatedName()
+    public @NotNull String getTranslationKey()
     {
-        return I18n.translate("lambdacontrols.virtual_mouse.skin." + this.getName());
+        return "lambdacontrols.virtual_mouse.skin." + this.getName();
+    }
+
+    /**
+     * Gets the translated text of this virtual mouse skin.
+     *
+     * @return The translated text of this virtual mouse skin.
+     */
+    public @NotNull Text getTranslatedText()
+    {
+        return this.text;
     }
 
     @Override
@@ -66,12 +79,12 @@ public enum VirtualMouseSkin implements Nameable
     }
 
     /**
-     * Gets the controller type from its identifier.
+     * Gets the virtual mouse skin from its identifier.
      *
-     * @param id The identifier of the controller type.
-     * @return The controller type if found, else empty.
+     * @param id The identifier of the virtual mouse skin.
+     * @return The virtual mouse skin if found, else empty.
      */
-    public static Optional<VirtualMouseSkin> byId(@NotNull String id)
+    public static @NotNull Optional<VirtualMouseSkin> byId(@NotNull String id)
     {
         return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();
     }

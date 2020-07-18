@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * @version 1.3.0
  * @since 1.2.0
  */
-@Mixin(RecipeViewingScreen.class)
+@Mixin(value = RecipeViewingScreen.class, remap = false)
 public interface RecipeViewingScreenAccessor
 {
     @Accessor("categoryBack")

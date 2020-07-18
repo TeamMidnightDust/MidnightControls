@@ -24,7 +24,7 @@ import java.util.List;
  * @version 1.2.0
  * @since 1.2.0
  */
-@Mixin(VillagerRecipeViewingScreen.class)
+@Mixin(value = VillagerRecipeViewingScreen.class, remap = false)
 public interface VillagerRecipeViewingScreenAccessor
 {
     @Accessor("categories")

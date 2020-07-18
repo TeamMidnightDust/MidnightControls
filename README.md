@@ -7,13 +7,15 @@
 ![Version](https://img.shields.io/github/v/tag/LambdAurora/LambdaControls?label=version&style=flat-square)
 [![CurseForge](http://cf.way2muchnoise.eu/title/354231.svg)](https://www.curseforge.com/minecraft/mc-mods/lambdacontrols)
 
-A Fabric Minecraft mod which adds better controls like controller support.
+A Fabric Minecraft mod which adds better controls, reach-around and controller support.
 
 ## What's this mod?
 
+This mod adds better controls, reach-around features, etc.
+
 Haven't you dreamed to travel in your modded Minecraft world with your controller? Yes? Then this mod is made for you!
 
-This mod adds a controller support (and an experimental touchscreen support).
+This mod also adds controller support.
 
 ## ✅ Features:
 
@@ -21,7 +23,7 @@ This mod adds a controller support (and an experimental touchscreen support).
  - Touchscreen support (very experimental and buggy).
  - Keyboard controls to look around.
  - Toggleable on screen button indicator (like in Bedrock Edition).
- - Vertical reacharound.
+ - Vertical reach-around.
  - Many Bedrock Edition features:
    - Toggleable fly drifting
    - Front block placing (be careful with this one)

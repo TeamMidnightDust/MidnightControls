@@ -15,6 +15,7 @@ import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.controller.Controller;
 import me.lambdaurora.spruceui.SpruceButtonWidget;
 import me.lambdaurora.spruceui.SpruceLabelWidget;
+import me.lambdaurora.spruceui.SpruceTexts;
 import me.lambdaurora.spruceui.Tooltip;
 import me.lambdaurora.spruceui.option.*;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
@@ -87,14 +88,14 @@ public class LambdaControlsSettingsScreen extends Screen
                     synchronized (this.mod.config) {
                         this.mod.config.setRotationSpeed(newValue);
                     }
-                }, option -> option.getDisplayPrefix().append(String.valueOf(option.get())),
+                }, option -> option.getDisplayText(new LiteralText(String.valueOf(option.get()))),
                 new TranslatableText("lambdacontrols.tooltip.rotation_speed"));
         this.mouseSpeedOption = new SpruceDoubleOption("lambdacontrols.menu.mouse_speed", 0.0, 150.0, 0.5F, this.mod.config::getMouseSpeed,
                 newValue -> {
                     synchronized (this.mod.config) {
                         this.mod.config.setMouseSpeed(newValue);
                     }
-                }, option -> option.getDisplayPrefix().append(String.valueOf(option.get())),
+                }, option -> option.getDisplayText(new LiteralText(String.valueOf(option.get()))),
                 new TranslatableText("lambdacontrols.tooltip.mouse_speed"));
         this.resetOption = new SpruceResetOption(btn -> {
             this.mod.config.reset();
@@ -123,11 +124,11 @@ public class LambdaControlsSettingsScreen extends Screen
         }, option -> {
             String controllerName = this.mod.config.getController().getName();
             if (!this.mod.config.getController().isConnected())
-                return option.getDisplayPrefix().append(new LiteralText(controllerName).formatted(Formatting.RED));
+                return option.getDisplayText(new LiteralText(controllerName).formatted(Formatting.RED));
             else if (!this.mod.config.getController().isGamepad())
-                return option.getDisplayPrefix().append(new LiteralText(controllerName).formatted(Formatting.GOLD));
+                return option.getDisplayText(new LiteralText(controllerName).formatted(Formatting.GOLD));
             else
-                return option.getDisplayPrefix().append(controllerName);
+                return option.getDisplayText(new LiteralText(controllerName));
         }, null);
         this.secondControllerOption = new SpruceCyclingOption("lambdacontrols.menu.controller2",
                 amount -> {
@@ -139,16 +140,16 @@ public class LambdaControlsSettingsScreen extends Screen
                 }, option -> this.mod.config.getSecondController().map(controller -> {
             String controllerName = controller.getName();
             if (!controller.isConnected())
-                return option.getDisplayPrefix().append(new LiteralText(controllerName).formatted(Formatting.RED));
+                return option.getDisplayText(new LiteralText(controllerName).formatted(Formatting.RED));
             else if (!controller.isGamepad())
-                return option.getDisplayPrefix().append(new LiteralText(controllerName).formatted(Formatting.GOLD));
+                return option.getDisplayText(new LiteralText(controllerName).formatted(Formatting.GOLD));
             else
-                return option.getDisplayPrefix().append(controllerName);
-        }).orElse(option.getDisplayPrefix().append(new TranslatableText("options.off").formatted(Formatting.RED))),
+                return option.getDisplayText(new LiteralText(controllerName));
+        }).orElse(option.getDisplayText(SpruceTexts.OPTIONS_OFF.shallowCopy().formatted(Formatting.RED))),
                 new TranslatableText("lambdacontrols.tooltip.controller2"));
         this.controllerTypeOption = new SpruceCyclingOption("lambdacontrols.menu.controller_type",
                 amount -> this.mod.config.setControllerType(this.mod.config.getControllerType().next()),
-                option -> option.getDisplayPrefix().append(this.mod.config.getControllerType().getTranslatedName()),
+                option -> option.getDisplayText(this.mod.config.getControllerType().getTranslatedText()),
                 new TranslatableText("lambdacontrols.tooltip.controller_type"));
         this.deadZoneOption = new SpruceDoubleOption("lambdacontrols.menu.dead_zone", 0.05, 1.0, 0.05F, this.mod.config::getDeadZone,
                 newValue -> {
@@ -157,7 +158,7 @@ public class LambdaControlsSettingsScreen extends Screen
                     }
                 }, option -> {
             String value = String.valueOf(option.get());
-            return option.getDisplayPrefix().append(value.substring(0, Math.min(value.length(), 5)));
+            return option.getDisplayText(new LiteralText(value.substring(0, Math.min(value.length(), 5))));
         }, new TranslatableText("lambdacontrols.tooltip.dead_zone"));
         this.invertsRightXAxis = new SpruceBooleanOption("lambdacontrols.menu.invert_right_x_axis", this.mod.config::doesInvertRightXAxis,
                 newValue -> {
@@ -177,14 +178,14 @@ public class LambdaControlsSettingsScreen extends Screen
                 this.mod.config::setVirtualMouse, new TranslatableText("lambdacontrols.tooltip.virtual_mouse"), true);
         this.virtualMouseSkinOption = new SpruceCyclingOption("lambdacontrols.menu.virtual_mouse.skin",
                 amount -> this.mod.config.setVirtualMouseSkin(this.mod.config.getVirtualMouseSkin().next()),
-                option -> option.getDisplayPrefix().append(this.mod.config.getVirtualMouseSkin().getTranslatedName()),
+                option -> option.getDisplayText(this.mod.config.getVirtualMouseSkin().getTranslatedText()),
                 null);
         // HUD options
         this.hudEnableOption = new SpruceBooleanOption("lambdacontrols.menu.hud_enable", this.mod.config::isHudEnabled,
                 this.mod::setHudEnabled, new TranslatableText("lambdacontrols.tooltip.hud_enable"), true);
         this.hudSideOption = new SpruceCyclingOption("lambdacontrols.menu.hud_side",
                 amount -> this.mod.config.setHudSide(this.mod.config.getHudSide().next()),
-                option -> option.getDisplayPrefix().append(this.mod.config.getHudSide().getTranslatedName()),
+                option -> option.getDisplayText(this.mod.config.getHudSide().getTranslatedText()),
                 new TranslatableText("lambdacontrols.tooltip.hud_side"));
     }
 
@@ -266,7 +267,7 @@ public class LambdaControlsSettingsScreen extends Screen
         this.children.add(this.gamepadToolUrlLabel);
 
         this.addButton(this.resetOption.createButton(this.client.options, this.width / 2 - 155, this.height - 29, 150));
-        this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, buttonHeight, new TranslatableText("gui.done"),
+        this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, buttonHeight, SpruceTexts.GUI_DONE,
                 (buttonWidget) -> this.client.openScreen(this.parent)));
     }
 
