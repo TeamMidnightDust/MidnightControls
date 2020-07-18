@@ -33,7 +33,9 @@ repositories {
 }
 
 configurations {
+    shadowInternal
     shadow
+    api.extendsFrom shadow
 }
 
 dependencies {
@@ -54,8 +56,9 @@ dependencies {
     modImplementation "me.shedaniel:RoughlyEnoughItems:4.5.5"
 
     api project(":core")
-    shadow project(":core")
-    shadow("org.aperlambda:lambdajcommon:1.8.0")  {
+    shadowInternal project(":core")
+    shadow("org.aperlambda:lambdajcommon:1.8.0") {
+        // Minecraft already has all that google crap.
         exclude group: 'com.google.code.gson'
         exclude group: 'com.google.guava'
     }
@@ -85,14 +88,6 @@ java {
 
 jar {
     from "../LICENSE"
-
-    from {
-        configurations.shadow.filter {
-            it.getName().contains("lambdacontrols")
-        }.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
-    }
 }
 
 task shadowJar(type: Jar) {
@@ -100,6 +95,13 @@ task shadowJar(type: Jar) {
 
     from sourceSets.main.output
 
+    from {
+        configurations.shadowInternal.filter {
+            it.getName().contains("lambdacontrols")
+        }.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
     from {
         configurations.shadow.collect {
             it.isDirectory() ? it : zipTree(it)

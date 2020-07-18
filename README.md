@@ -42,4 +42,4 @@ This mod also adds controller support.
 
 ## Build
 
-Just do `./gradlew :fabric:build` and everything should build just fine!
+Just do `./gradlew :fabric:shadowRemapJar` and everything should build just fine!
