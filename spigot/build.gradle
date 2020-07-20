@@ -21,6 +21,8 @@ dependencies {
     }
     api 'org.spigotmc:spigot-api:1.15.1-R0.1-SNAPSHOT'
     api 'io.netty:netty-all:4.1.28.Final'
+    implementation "com.electronwill.night-config:core:3.5.3"
+    implementation "com.electronwill.night-config:toml:3.5.3"
 }
 
 processResources {

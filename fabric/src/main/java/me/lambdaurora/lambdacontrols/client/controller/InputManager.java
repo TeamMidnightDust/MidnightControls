@@ -38,15 +38,15 @@ import java.util.stream.Stream;
  */
 public class InputManager
 {
-    public static final  InputManager              INPUT_MANAGER    = new InputManager();
-    private static final List<ButtonBinding>       BINDINGS         = new ArrayList<>();
-    private static final List<ButtonCategory>      CATEGORIES       = new ArrayList<>();
-    public static final  Map<Integer, ButtonState> STATES           = new HashMap<>();
-    public static final  Map<Integer, Float>       BUTTON_VALUES    = new HashMap<>();
-    private              int                       prevTargetMouseX = 0;
-    private              int                       prevTargetMouseY = 0;
-    private              int                       targetMouseX     = 0;
-    private              int                       targetMouseY     = 0;
+    public static final  InputManager                    INPUT_MANAGER    = new InputManager();
+    private static final List<ButtonBinding>             BINDINGS         = new ArrayList<>();
+    private static final List<ButtonCategory>            CATEGORIES       = new ArrayList<>();
+    public static final  Map<Integer, ButtonState>       STATES           = new HashMap<>();
+    public static final  Map<Integer, Float>             BUTTON_VALUES    = new HashMap<>();
+    private              int                             prevTargetMouseX = 0;
+    private              int                             prevTargetMouseY = 0;
+    private              int                             targetMouseX     = 0;
+    private              int                             targetMouseY     = 0;
 
     protected InputManager()
     {
@@ -345,6 +345,11 @@ public class InputManager
                 else
                     state = ButtonState.NONE;
             }
+
+            if (state == ButtonState.RELEASE && !binding.pressed) {
+                state = ButtonState.NONE;
+            }
+
             binding.pressed = state.isPressed();
             binding.update();
             if (binding.pressed)
