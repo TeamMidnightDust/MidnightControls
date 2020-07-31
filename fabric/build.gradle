@@ -20,16 +20,6 @@ repositories {
     repositories {
         maven { url = "https://jitpack.io" }
     }
-    // OkZoomer
-    ivy {
-        url 'https://github.com/joaoh1/OkZoomer/releases/download/'
-        patternLayout {
-            artifact '[revision]/[module]-[revision].[ext]'
-        }
-        metadataSources() {
-            artifact()
-        }
-    }
 }
 
 configurations {
@@ -52,7 +42,7 @@ dependencies {
     include "com.github.lambdaurora:spruceui:${project.spruceui_version}"
 
     // Compatibility mods
-    modImplementation "io.github.joaoh1:okzoomer:4.0.0-alpha.4.1.16.1"
+    modImplementation "com.github.joaoh1:okzoomer:4.0.0-alpha.4plus1.1.16.1"
     modImplementation "me.shedaniel:RoughlyEnoughItems:4.5.5"
 
     api project(":core")

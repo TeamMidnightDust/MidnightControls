@@ -10,10 +10,9 @@
 package me.lambdaurora.lambdacontrols.client.compat;
 
 import io.github.joaoh1.okzoomer.client.OkZoomerClientMod;
-import io.github.joaoh1.okzoomer.main.OkZoomerMod;
+import io.github.joaoh1.okzoomer.client.utils.ZoomUtils;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
-import org.aperlambda.lambdacommon.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -39,25 +38,27 @@ public class OkZoomerCompat implements CompatHandler
                 .linkKeybind(OkZoomerClientMod.zoomKeyBinding)
                 .register();
 
-        new ButtonBinding.Builder("zoom.in")
-                .buttons(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
-                .onlyInGame()
-                .cooldown(true)
-                .category(ButtonBinding.MISC_CATEGORY)
-                .linkKeybind(OkZoomerClientMod.increaseZoomKeyBinding)
-                .register();
-        new ButtonBinding.Builder("zoom.out")
-                .buttons(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
-                .onlyInGame()
-                .cooldown(true)
-                .category(ButtonBinding.MISC_CATEGORY)
-                .linkKeybind(OkZoomerClientMod.decreaseZoomKeyBinding)
-                .register();
-        new ButtonBinding.Builder("zoom.reset")
-                .onlyInGame()
-                .cooldown(true)
-                .category(ButtonBinding.MISC_CATEGORY)
-                .linkKeybind(OkZoomerClientMod.resetZoomKeyBinding)
-                .register();
+        if (ZoomUtils.areExtraKeybindsEnabled()) {
+                new ButtonBinding.Builder("zoom.in")
+                        .buttons(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
+                        .onlyInGame()
+                        .cooldown(true)
+                        .category(ButtonBinding.MISC_CATEGORY)
+                        .linkKeybind(OkZoomerClientMod.increaseZoomKeyBinding)
+                        .register();
+                new ButtonBinding.Builder("zoom.out")
+                        .buttons(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
+                        .onlyInGame()
+                        .cooldown(true)
+                        .category(ButtonBinding.MISC_CATEGORY)
+                        .linkKeybind(OkZoomerClientMod.decreaseZoomKeyBinding)
+                        .register();
+                new ButtonBinding.Builder("zoom.reset")
+                        .onlyInGame()
+                        .cooldown(true)
+                        .category(ButtonBinding.MISC_CATEGORY)
+                        .linkKeybind(OkZoomerClientMod.resetZoomKeyBinding)
+                        .register();
+        }
     }
 }
