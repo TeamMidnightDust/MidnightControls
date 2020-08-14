@@ -42,7 +42,7 @@ dependencies {
     include "com.github.lambdaurora:spruceui:${project.spruceui_version}"
 
     // Compatibility mods
-    modImplementation "com.github.joaoh1:okzoomer:4.0.0-alpha.4plus1.1.16.1"
+    modImplementation "com.github.joaoh1:okzoomer:e13183c59b"
     modImplementation "me.shedaniel:RoughlyEnoughItems:4.5.5"
 
     api project(":core")

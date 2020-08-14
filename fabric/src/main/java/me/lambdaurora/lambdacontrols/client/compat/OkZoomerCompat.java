@@ -9,8 +9,7 @@
 
 package me.lambdaurora.lambdacontrols.client.compat;
 
-import io.github.joaoh1.okzoomer.client.OkZoomerClientMod;
-import io.github.joaoh1.okzoomer.client.utils.ZoomUtils;
+import io.github.joaoh1.okzoomer.client.keybinds.ZoomKeybinds;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import org.jetbrains.annotations.NotNull;
@@ -25,8 +24,6 @@ import org.lwjgl.glfw.GLFW;
  */
 public class OkZoomerCompat implements CompatHandler
 {
-    public static final String OKZOOMER_CLASS_PATH = "io.github.joaoh1.okzoomer.client.OkZoomerClientMod";
-
     @Override
     public void handle(@NotNull LambdaControlsClient mod)
     {
@@ -35,29 +32,29 @@ public class OkZoomerCompat implements CompatHandler
                 .onlyInGame()
                 .cooldown(true)
                 .category(ButtonBinding.MISC_CATEGORY)
-                .linkKeybind(OkZoomerClientMod.zoomKeyBinding)
+                .linkKeybind(ZoomKeybinds.zoomKey)
                 .register();
 
-        if (ZoomUtils.areExtraKeybindsEnabled()) {
+        if (ZoomKeybinds.areExtraKeybindsEnabled()) {
                 new ButtonBinding.Builder("zoom.in")
                         .buttons(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
                         .onlyInGame()
                         .cooldown(true)
                         .category(ButtonBinding.MISC_CATEGORY)
-                        .linkKeybind(OkZoomerClientMod.increaseZoomKeyBinding)
+                        .linkKeybind(ZoomKeybinds.increaseZoomKey)
                         .register();
                 new ButtonBinding.Builder("zoom.out")
                         .buttons(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
                         .onlyInGame()
                         .cooldown(true)
                         .category(ButtonBinding.MISC_CATEGORY)
-                        .linkKeybind(OkZoomerClientMod.decreaseZoomKeyBinding)
+                        .linkKeybind(ZoomKeybinds.decreaseZoomKey)
                         .register();
                 new ButtonBinding.Builder("zoom.reset")
                         .onlyInGame()
                         .cooldown(true)
                         .category(ButtonBinding.MISC_CATEGORY)
-                        .linkKeybind(OkZoomerClientMod.resetZoomKeyBinding)
+                        .linkKeybind(ZoomKeybinds.resetZoomKey)
                         .register();
         }
     }
