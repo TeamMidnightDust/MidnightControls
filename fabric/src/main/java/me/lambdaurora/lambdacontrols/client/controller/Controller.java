@@ -9,13 +9,20 @@
 
 package me.lambdaurora.lambdacontrols.client.controller;
 
+import me.lambdaurora.lambdacontrols.LambdaControls;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.toast.SystemToast;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -34,7 +41,7 @@ import static org.lwjgl.BufferUtils.createByteBuffer;
  * Represents a controller.
  *
  * @author LambdAurora
- * @version 1.0.0
+ * @version 1.4.3
  * @since 1.0.0
  */
 public class Controller implements Nameable
@@ -167,14 +174,47 @@ public class Controller implements Nameable
     public static void updateMappings()
     {
         try {
-            File mappingsFile = new File("config/gamecontrollerdb.txt");
-            if (!mappingsFile.exists())
+            if (!LambdaControlsClient.MAPPINGS_FILE.exists())
                 return;
             LambdaControlsClient.get().log("Updating controller mappings...");
-            ByteBuffer buffer = ioResourceToBuffer(mappingsFile.getPath(), 1024);
+            ByteBuffer buffer = ioResourceToBuffer(LambdaControlsClient.MAPPINGS_FILE.getPath(), 1024);
             GLFW.glfwUpdateGamepadMappings(buffer);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        MemoryStack memoryStack = MemoryStack.stackPush();
+        try {
+            PointerBuffer pointerBuffer = memoryStack.mallocPointer(1);
+            int i = GLFW.glfwGetError(pointerBuffer);
+            if (i != 0) {
+                long l = pointerBuffer.get();
+                String string = l == 0L ? "" : MemoryUtil.memUTF8(l);
+                MinecraftClient client = MinecraftClient.getInstance();
+                if (client != null) {
+                    client.getToastManager().add(SystemToast.create(client, SystemToast.Type.TUTORIAL_HINT,
+                            new TranslatableText("lambdacontrols.controller.mappings.error"), new LiteralText(string)));
+                }
+            }
+        } catch (Throwable e) {
+            /* Ignored :concern: */
+        } finally {
+            memoryStack.close();
+        }
+
+        if (LambdaControlsClient.get().config.hasDebug()) {
+            for (int i = GLFW.GLFW_JOYSTICK_1; i <= GLFW.GLFW_JOYSTICK_16; i++) {
+                Controller controller = byId(i);
+
+                if (!controller.isConnected())
+                    continue;
+
+                LambdaControls.get().log(String.format("Controller #%d name: \"%s\"\n GUID: %s\n Gamepad: %s",
+                        controller.id,
+                        controller.getName(),
+                        controller.getGuid(),
+                        controller.isGamepad()));
+            }
         }
     }
 }

@@ -19,7 +19,7 @@ import org.lwjgl.glfw.GLFW;
  * Represents a compatibility handler for OkZoomer.
  *
  * @author LambdAurora
- * @version 1.3.0
+ * @version 1.4.3
  * @since 1.1.0
  */
 public class OkZoomerCompat implements CompatHandler
@@ -36,21 +36,21 @@ public class OkZoomerCompat implements CompatHandler
                 .register();
 
         if (ZoomKeybinds.areExtraKeybindsEnabled()) {
-                new ButtonBinding.Builder("zoom.in")
+                new ButtonBinding.Builder("zoom_in")
                         .buttons(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
                         .onlyInGame()
                         .cooldown(true)
                         .category(ButtonBinding.MISC_CATEGORY)
                         .linkKeybind(ZoomKeybinds.increaseZoomKey)
                         .register();
-                new ButtonBinding.Builder("zoom.out")
+                new ButtonBinding.Builder("zoom_out")
                         .buttons(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
                         .onlyInGame()
                         .cooldown(true)
                         .category(ButtonBinding.MISC_CATEGORY)
                         .linkKeybind(ZoomKeybinds.decreaseZoomKey)
                         .register();
-                new ButtonBinding.Builder("zoom.reset")
+                new ButtonBinding.Builder("zoom_reset")
                         .onlyInGame()
                         .cooldown(true)
                         .category(ButtonBinding.MISC_CATEGORY)

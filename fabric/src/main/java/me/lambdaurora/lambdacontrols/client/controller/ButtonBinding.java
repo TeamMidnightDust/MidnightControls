@@ -32,7 +32,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents a button binding.
  *
  * @author LambdAurora
- * @version 1.4.0
+ * @version 1.4.3
  * @since 1.0.0
  */
 public class ButtonBinding implements Nameable
@@ -75,7 +75,7 @@ public class ButtonBinding implements Nameable
             .action(InputHandlers.handleInventorySlotPad(0)).onlyInInventory().cooldown(true).register();
     public static final ButtonBinding SMOOTH_CAMERA      = new Builder("toggle_smooth_camera").cooldown(true).register();
     public static final ButtonBinding SNEAK              = new Builder("sneak").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_THUMB)
-            .actions(PressAction.DEFAULT_ACTION, InputHandlers::handleToggleSneak).onlyInGame().cooldown(true).register();
+            .actions(InputHandlers::handleToggleSneak).onlyInGame().cooldown(true).register();
     public static final ButtonBinding SPRINT             = new Builder("sprint").buttons(GLFW_GAMEPAD_BUTTON_LEFT_THUMB).register();
     public static final ButtonBinding SWAP_HANDS         = new Builder("swap_hands").buttons(GLFW_GAMEPAD_BUTTON_X).cooldown(true).register();
     public static final ButtonBinding TAB_LEFT           = new Builder("tab_back").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)

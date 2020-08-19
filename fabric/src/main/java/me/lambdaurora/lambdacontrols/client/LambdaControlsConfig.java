@@ -36,6 +36,7 @@ public class LambdaControlsConfig
     // General
     private static final ControlsMode     DEFAULT_CONTROLS_MODE             = ControlsMode.DEFAULT;
     private static final boolean          DEFAULT_AUTO_SWITCH_MODE          = false;
+    private static final boolean          DEFAULT_DEBUG                     = false;
     // HUD
     private static final boolean          DEFAULT_HUD_ENABLE                = true;
     private static final HudSide          DEFAULT_HUD_SIDE                  = HudSide.LEFT;
@@ -172,6 +173,7 @@ public class LambdaControlsConfig
         // General
         this.setControlsMode(DEFAULT_CONTROLS_MODE);
         this.setAutoSwitchMode(DEFAULT_AUTO_SWITCH_MODE);
+        this.setDebug(DEFAULT_DEBUG);
         // Gameplay
         this.setFastBlockPlacing(DEFAULT_FAST_BLOCK_INTERACTION);
         this.setFlyDrifting(DEFAULT_FLY_DRIFTING);
@@ -234,6 +236,26 @@ public class LambdaControlsConfig
     public void setAutoSwitchMode(boolean autoSwitchMode)
     {
         this.config.set("auto_switch_mode", autoSwitchMode);
+    }
+
+    /**
+     * Returns whether the mod has debug enabled or not.
+     *
+     * @return True if debug is enabled, else false.
+     */
+    public boolean hasDebug()
+    {
+        return this.config.getOrElse("debug", DEFAULT_DEBUG);
+    }
+
+    /**
+     * Sets whether the mod has debug enabled or not.
+     *
+     * @param debug True if debug is enabled, else false.
+     */
+    protected void setDebug(boolean debug)
+    {
+        this.config.set("debug", debug);
     }
 
     /*

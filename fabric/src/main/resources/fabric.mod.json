@@ -31,10 +31,10 @@
     "lambdacontrols_compat.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.8.0",
+    "fabricloader": ">=0.9.0",
     "fabric": ">=0.4.0",
-    "minecraft": ">=1.16",
-    "spruceui": ">=1.5.2"
+    "minecraft": ">=1.16.2",
+    "spruceui": ">=1.6.3"
   },
   "recommends": {
     "modmenu": ">=1.12.2"
@@ -49,7 +49,6 @@
     "optifabric": "*"
   },
   "custom": {
-    "modmenu:clientsideOnly": true,
     "modupdater": {
       "strategy": "curseforge",
       "projectID": 354231

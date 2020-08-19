@@ -31,7 +31,7 @@ configurations {
 dependencies {
     //to change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
@@ -43,11 +43,11 @@ dependencies {
 
     // Compatibility mods
     modImplementation "com.github.joaoh1:okzoomer:e13183c59b"
-    modImplementation "me.shedaniel:RoughlyEnoughItems:4.5.5"
+    modImplementation "me.shedaniel:RoughlyEnoughItems:5.2.3"
 
     api project(":core")
     shadowInternal project(":core")
-    shadow("org.aperlambda:lambdajcommon:1.8.0") {
+    shadow("org.aperlambda:lambdajcommon:1.8.1") {
         // Minecraft already has all that google crap.
         exclude group: 'com.google.code.gson'
         exclude group: 'com.google.guava'

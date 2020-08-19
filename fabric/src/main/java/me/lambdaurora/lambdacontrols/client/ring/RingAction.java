@@ -9,6 +9,10 @@
 
 package me.lambdaurora.lambdacontrols.client.ring;
 
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
@@ -17,19 +21,19 @@ import org.jetbrains.annotations.NotNull;
  * Represents a ring action.
  *
  * @author LambdAurora
- * @version 1.4.0
+ * @version 1.4.3
  * @since 1.4.0
  */
-public abstract class RingAction implements Nameable
+public abstract class RingAction extends DrawableHelper implements Nameable
 {
     protected boolean activated = false;
 
     /**
-     * Gets the translated name of the ring action.
+     * Gets the text name of the ring action.
      *
-     * @return The translated name.
+     * @return The text name.
      */
-    public TranslatableText getTranslatedName()
+    public Text getTextName()
     {
         return new TranslatableText(this.getName());
     }
@@ -52,4 +56,12 @@ public abstract class RingAction implements Nameable
     }
 
     public abstract void onAction(@NotNull RingButtonMode mode);
+
+    public void render(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered)
+    {
+        fill(matrices, x, y, x + LambdaRing.ELEMENT_SIZE, y + LambdaRing.ELEMENT_SIZE, hovered ? 0xbb777777 : 0xbb000000);
+        drawIcon(matrices, textRenderer, x, y, hovered);
+    }
+
+    public abstract void drawIcon(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered);
 }

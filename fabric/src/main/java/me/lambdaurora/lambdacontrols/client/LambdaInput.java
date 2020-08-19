@@ -32,7 +32,7 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
-import net.minecraft.client.gui.screen.pack.ResourcePackScreen;
+import net.minecraft.client.gui.screen.pack.PackScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
@@ -64,7 +64,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents the LambdaControls' input handler.
  *
  * @author LambdAurora
- * @version 1.4.0
+ * @version 1.4.3
  * @since 1.0.0
  */
 public class LambdaInput
@@ -669,16 +669,16 @@ public class LambdaInput
             double powValue = Math.pow(value, 2.0);
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
                 if (state == 2) {
-                    this.targetPitch = -this.config.getRightYAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
+                    this.targetPitch = -this.config.getRightYAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.11D;
                 } else if (state == 1) {
-                    this.targetPitch = this.config.getRightYAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
+                    this.targetPitch = this.config.getRightYAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.11D;
                 }
             }
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_X) {
                 if (state == 2) {
-                    this.targetYaw = -this.config.getRightXAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
+                    this.targetYaw = -this.config.getRightXAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.11D;
                 } else if (state == 1) {
-                    this.targetYaw = this.config.getRightXAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.33D;
+                    this.targetYaw = this.config.getRightXAxisSign() * (this.config.getRotationSpeed() * powValue) * 0.11D;
                 }
             }
         }
@@ -700,7 +700,7 @@ public class LambdaInput
 
     public static boolean isScreenInteractive(@NotNull Screen screen)
     {
-        return !(screen instanceof AdvancementsScreen || screen instanceof HandledScreen || screen instanceof ResourcePackScreen || LambdaControlsCompat.requireMouseOnScreen(screen));
+        return !(screen instanceof AdvancementsScreen || screen instanceof HandledScreen || screen instanceof PackScreen || LambdaControlsCompat.requireMouseOnScreen(screen));
     }
 
     // Inspired from https://github.com/MrCrayfish/Controllable/blob/1.14.X/src/main/java/com/mrcrayfish/controllable/client/ControllerInput.java#L686.

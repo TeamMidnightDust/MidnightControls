@@ -23,6 +23,7 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeGroupButtonWidget;
+import net.minecraft.client.options.Option;
 import net.minecraft.client.util.ScreenshotUtils;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.screen.slot.Slot;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
  * Represents some input handlers.
  *
  * @author LambdAurora
- * @version 1.4.0
+ * @version 1.4.3
  * @since 1.1.0
  */
 public class InputHandlers
@@ -142,11 +143,15 @@ public class InputHandlers
 
     public static boolean handleToggleSneak(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action)
     {
-        if (client.player != null && !client.player.abilities.flying) {
-            button.asKeyBinding().filter(binding -> action == ButtonState.PRESS).ifPresent(binding -> ((KeyBindingAccessor) binding).lambdacontrols_handlePressState(!binding.isPressed()));
-            return true;
-        }
-        return false;
+        button.asKeyBinding().ifPresent(binding -> {
+            boolean sneakToggled = client.options.sneakToggled;
+            if (client.player.abilities.flying && sneakToggled)
+                client.options.sneakToggled = false;
+            binding.setPressed(button.pressed);
+            if (client.player.abilities.flying && sneakToggled)
+                client.options.sneakToggled = true;
+        });
+        return true;
     }
 
     public static PressAction handleInventorySlotPad(int direction)

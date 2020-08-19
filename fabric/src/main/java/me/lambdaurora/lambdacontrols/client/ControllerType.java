@@ -9,6 +9,7 @@
 
 package me.lambdaurora.lambdacontrols.client;
 
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
@@ -21,7 +22,7 @@ import java.util.Optional;
  * Represents a controller type.
  *
  * @author LambdAurora
- * @version 1.4.0
+ * @version 1.4.3
  * @since 1.0.0
  */
 public enum ControllerType implements Nameable
@@ -29,9 +30,10 @@ public enum ControllerType implements Nameable
     DEFAULT(0),
     DUALSHOCK(1),
     SWITCH(2),
-    XBOX(3),
-    STEAM(4),
-    OUYA(5);
+    XBOX_360(3, new LiteralText("Xbox 360")),
+    XBOX(4),
+    STEAM(5),
+    OUYA(6);
 
     private final int  id;
     private final Text text;
@@ -39,7 +41,13 @@ public enum ControllerType implements Nameable
     ControllerType(int id)
     {
         this.id = id;
-        this.text = new TranslatableText(this.getTranslationKey());
+        this.text = new TranslatableText("lambdacontrols.controller_type." + this.getName());
+    }
+
+    ControllerType(int id, @NotNull Text text)
+    {
+        this.id = id;
+        this.text = text;
     }
 
     /**
@@ -63,16 +71,6 @@ public enum ControllerType implements Nameable
         if (v.length == this.ordinal() + 1)
             return v[0];
         return v[this.ordinal() + 1];
-    }
-
-    /**
-     * Returns the translation key of this controller type.
-     *
-     * @return The translation key.
-     */
-    public @NotNull String getTranslationKey()
-    {
-        return "lambdacontrols.controller_type." + this.getName();
     }
 
     /**

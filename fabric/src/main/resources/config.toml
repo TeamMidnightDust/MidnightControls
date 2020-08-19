@@ -4,6 +4,8 @@
 controls = "default"
 # Auto switch mode.
 auto_switch_mode = false
+# Debug mode
+debug = false
 
 [hud]
     # Enables the HUD.

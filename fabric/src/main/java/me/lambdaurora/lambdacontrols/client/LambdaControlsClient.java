@@ -18,7 +18,9 @@ import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.Controller;
 import me.lambdaurora.lambdacontrols.client.controller.InputManager;
 import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsHud;
+import me.lambdaurora.lambdacontrols.client.gui.RingScreen;
 import me.lambdaurora.lambdacontrols.client.gui.TouchscreenOverlay;
+import me.lambdaurora.lambdacontrols.client.ring.LambdaRing;
 import me.lambdaurora.spruceui.event.OpenScreenCallback;
 import me.lambdaurora.spruceui.hud.HudManager;
 import net.fabricmc.api.ClientModInitializer;
@@ -35,11 +37,13 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
+import java.io.File;
+
 /**
  * Represents the LambdaControls client mod.
  *
  * @author LambdAurora
- * @version 1.3.2
+ * @version 1.4.3
  * @since 1.1.0
  */
 public class LambdaControlsClient extends LambdaControls implements ClientModInitializer
@@ -53,11 +57,15 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.movement");
     public static final KeyBinding           BINDING_LOOK_LEFT  = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_left"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement");
+    public static final KeyBinding           BINDING_RING       = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "ring"),
+            InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.categories.misc");
     public static final Identifier           CONTROLLER_BUTTONS = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/controller_buttons.png");
     public static final Identifier           CONTROLLER_AXIS    = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/controller_axis.png");
     public static final Identifier           CURSOR_TEXTURE     = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/cursor.png");
+    public final static File                 MAPPINGS_FILE      = new File("config/gamecontrollerdb.txt");
     public final        LambdaControlsConfig config             = new LambdaControlsConfig(this);
     public final        LambdaInput          input              = new LambdaInput(this);
+    public final        LambdaRing           ring               = new LambdaRing();
     public final        LambdaReacharound    reacharound        = new LambdaReacharound();
     private             LambdaControlsHud    hud;
     private             ControlsMode         previousControlsMode;
@@ -70,6 +78,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_RIGHT);
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_DOWN);
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_LEFT);
+        //KeyBindingHelper.registerKeyBinding(BINDING_RING);
 
         ClientSidePacketRegistry.INSTANCE.register(CONTROLS_MODE_CHANNEL, (context, attachedData) -> context.getTaskQueue()
                 .execute(() -> ClientSidePacketRegistry.INSTANCE.sendToServer(CONTROLS_MODE_CHANNEL, this.makeControlsModeBuffer(this.config.getControlsMode()))));
@@ -131,6 +140,10 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
         this.input.onTick(client);
         if (this.config.getControlsMode() == ControlsMode.CONTROLLER && (client.isWindowFocused() || this.config.hasUnfocusedInput()))
             this.input.onControllerTick(client);
+
+        if (BINDING_RING.wasPressed()) {
+            client.openScreen(new RingScreen());
+        }
     }
 
     public void onRender(MinecraftClient client)

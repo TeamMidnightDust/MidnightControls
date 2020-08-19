@@ -20,6 +20,7 @@ import me.lambdaurora.spruceui.Tooltip;
 import me.lambdaurora.spruceui.option.*;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonListWidget;
@@ -247,6 +248,7 @@ public class LambdaControlsSettingsScreen extends Screen
         this.list.addOptionEntry(this.frontBlockPlacingOption, this.verticalReacharoundOption);
         this.list.addSingleOptionEntry(this.flyDriftingOption);
         this.list.addSingleOptionEntry(this.flyVerticalDriftingOption);
+        this.list.addOptionEntry(Option.SNEAK_TOGGLED, Option.SPRINT_TOGGLED);
         // Controller options
         this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.controller", true, null));
         this.list.addSingleOptionEntry(this.controllerOption);
@@ -256,6 +258,8 @@ public class LambdaControlsSettingsScreen extends Screen
         this.list.addOptionEntry(this.unfocusedInputOption, this.virtualMouseOption);
         this.list.addSingleOptionEntry(this.virtualMouseSkinOption);
         this.list.addSingleOptionEntry(new ReloadControllerMappingsOption());
+        this.list.addSingleOptionEntry(new SpruceSimpleActionOption("lambdacontrols.menu.mappings.open_input_str",
+                btn -> this.client.openScreen(new MappingsStringInputScreen(this))));
         // HUD options
         this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.hud", true, null));
         this.list.addOptionEntry(this.hudEnableOption, this.hudSideOption);
@@ -268,7 +272,7 @@ public class LambdaControlsSettingsScreen extends Screen
 
         this.addButton(this.resetOption.createButton(this.client.options, this.width / 2 - 155, this.height - 29, 150));
         this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, buttonHeight, SpruceTexts.GUI_DONE,
-                (buttonWidget) -> this.client.openScreen(this.parent)));
+                btn -> this.client.openScreen(this.parent)));
     }
 
     @Override
@@ -277,10 +281,10 @@ public class LambdaControlsSettingsScreen extends Screen
         this.renderBackground(matrices);
         this.list.render(matrices, mouseX, mouseY, delta);
         super.render(matrices, mouseX, mouseY, delta);
-        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("lambdacontrols.menu.title"), this.width / 2, 8, 16777215);
-        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("lambdacontrols.controller.mappings.1", Formatting.GREEN.toString(), Formatting.RESET.toString()), this.width / 2, this.height - 29 - (5 + this.textRenderer.fontHeight) * 3, 10526880);
+        drawCenteredString(matrices, this.textRenderer, I18n.translate("lambdacontrols.menu.title"), this.width / 2, 8, 16777215);
+        drawCenteredString(matrices, this.textRenderer, I18n.translate("lambdacontrols.controller.mappings.1", Formatting.GREEN.toString(), Formatting.RESET.toString()), this.width / 2, this.height - 29 - (5 + this.textRenderer.fontHeight) * 3, 10526880);
         this.gamepadToolUrlLabel.render(matrices, mouseX, mouseY, delta);
-        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("lambdacontrols.controller.mappings.3", Formatting.GREEN.toString(), Formatting.RESET.toString()), this.width / 2, this.height - 29 - (5 + this.textRenderer.fontHeight), 10526880);
+        drawCenteredString(matrices, this.textRenderer, I18n.translate("lambdacontrols.controller.mappings.3", Formatting.GREEN.toString(), Formatting.RESET.toString()), this.width / 2, this.height - 29 - (5 + this.textRenderer.fontHeight), 10526880);
 
         Tooltip.renderAll(matrices);
     }

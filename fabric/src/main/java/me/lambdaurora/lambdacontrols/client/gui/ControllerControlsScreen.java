@@ -14,6 +14,7 @@ import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.InputManager;
 import me.lambdaurora.spruceui.SpruceButtonWidget;
 import me.lambdaurora.spruceui.SpruceTexts;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents the controls screen.
@@ -67,8 +69,8 @@ public class ControllerControlsScreen extends Screen
         this.bindingsListWidget = new ControlsListWidget(this, this.client);
         this.children.add(this.bindingsListWidget);
         this.resetButton = this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 29, 150, 20,
-                new TranslatableText("controls.resetAll"),
-                btn -> InputManager.streamBindings().forEach(binding -> this.mod.config.setButtonBinding(binding, binding.getDefaultButton()))));
+                SpruceTexts.CONTROLS_RESET_ALL,
+                btn -> InputManager.streamBindings().collect(Collectors.toSet()).forEach(binding -> this.mod.config.setButtonBinding(binding, binding.getDefaultButton()))));
         this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20,
                 SpruceTexts.GUI_DONE,
                 btn -> this.client.openScreen(this.parent)));
@@ -79,7 +81,7 @@ public class ControllerControlsScreen extends Screen
     {
         this.renderBackground(matrices);
         this.bindingsListWidget.render(matrices, mouseX, mouseY, delta);
-        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 16777215);
+        drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 16777215);
         this.resetButton.active = InputManager.streamBindings().anyMatch(Predicates.not(ButtonBinding::isDefault));
         super.render(matrices, mouseX, mouseY, delta);
     }

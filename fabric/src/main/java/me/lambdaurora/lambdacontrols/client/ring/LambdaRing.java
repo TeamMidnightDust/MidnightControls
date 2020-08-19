@@ -19,13 +19,14 @@ import java.util.List;
  * Represents a key binding ring.
  *
  * @author LambdAurora
- * @version 1.4.0
+ * @version 1.4.3
  * @since 1.4.0
  */
 public class LambdaRing
 {
-    private final List<RingPage> pages       = new ArrayList<>(Collections.singletonList(new RingPage()));
-    private       int            currentPage = 0;
+    public static final int            ELEMENT_SIZE = 50;
+    private final       List<RingPage> pages        = new ArrayList<>(Collections.singletonList(new RingPage()));
+    private             int            currentPage  = 0;
 
     public LambdaRing()
     {

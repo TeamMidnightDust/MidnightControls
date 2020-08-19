@@ -10,46 +10,39 @@
 package me.lambdaurora.lambdacontrols.client.gui;
 
 import me.lambdaurora.lambdacontrols.client.controller.Controller;
-import me.lambdaurora.spruceui.SpruceButtonWidget;
+import me.lambdaurora.spruceui.option.SpruceSimpleActionOption;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
-import net.minecraft.client.options.GameOptions;
-import net.minecraft.client.options.Option;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.toast.SystemToast;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
-import org.aperlambda.lambdacommon.utils.Nameable;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 /**
  * Represents the option to reload the controller mappings.
  */
-public class ReloadControllerMappingsOption extends Option implements Nameable
+public class ReloadControllerMappingsOption extends SpruceSimpleActionOption
 {
     private static final String KEY = "lambdacontrols.menu.reload_controller_mappings";
 
     public ReloadControllerMappingsOption()
     {
-        super(KEY);
+        this(null);
     }
 
-    @Override
-    public AbstractButtonWidget createButton(GameOptions options, int x, int y, int width)
+    public ReloadControllerMappingsOption(@Nullable Consumer<AbstractButtonWidget> before)
     {
-        SpruceButtonWidget button = new SpruceButtonWidget(x, y, width, 20, new TranslatableText(KEY), btn -> {
+        super(KEY, btn -> {
             MinecraftClient client = MinecraftClient.getInstance();
+            if (before != null)
+                before.accept(btn);
             Controller.updateMappings();
-            if (client.currentScreen != null)
+            if (client.currentScreen instanceof LambdaControlsSettingsScreen)
                 client.currentScreen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
-            client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, new TranslatableText("lambdacontrols.controller.mappings.updated"), null));
-        });
-        button.setTooltip(new TranslatableText("lambdacontrols.tooltip.reload_controller_mappings"));
-        return button;
-    }
-
-    @Override
-    public @NotNull String getName()
-    {
-        return I18n.translate(KEY);
+            client.getToastManager().add(SystemToast.create(client, SystemToast.Type.TUTORIAL_HINT,
+                    new TranslatableText("lambdacontrols.controller.mappings.updated"), LiteralText.EMPTY));
+        }, new TranslatableText("lambdacontrols.tooltip.reload_controller_mappings"));
     }
 }
