@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * Represents an accessor to REI's RecipeViewingScreen.
  *
  * @author LambdAurora
- * @version 1.4.0
+ * @version 1.5.0
  * @since 1.2.0
  */
 @Mixin(value = RecipeViewingScreen.class, remap = false)
@@ -29,4 +29,10 @@ public interface RecipeViewingScreenAccessor
 
     @Accessor("categoryNext")
     Button getCategoryNext();
+
+    @Accessor("recipeBack")
+    Button getRecipeBack();
+
+    @Accessor("recipeNext")
+    Button getRecipeNext();
 }

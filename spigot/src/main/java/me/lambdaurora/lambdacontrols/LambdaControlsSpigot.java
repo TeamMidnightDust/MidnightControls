@@ -57,7 +57,7 @@ public class LambdaControlsSpigot extends JavaPlugin implements PluginMessageLis
             PLAYERS_CONTROLS_MODE.put(player, ControlsMode.DEFAULT);
 
             this.requestPlayerControlsMode(player);
-            this.updatePlayerFeature(player, LambdaControlsFeature.FRONT_BLOCK_PLACING);
+            this.updatePlayerFeature(player, LambdaControlsFeature.HORIZONTAL_REACHAROUND);
         });
     }
 
@@ -108,7 +108,7 @@ public class LambdaControlsSpigot extends JavaPlugin implements PluginMessageLis
                 PlayerChangeControlsModeEvent event = new PlayerChangeControlsModeEvent(player, controlsMode);
                 this.getServer().getPluginManager().callEvent(event);
             });
-            this.updatePlayerFeature(player, LambdaControlsFeature.FRONT_BLOCK_PLACING);
+            this.updatePlayerFeature(player, LambdaControlsFeature.HORIZONTAL_REACHAROUND);
         } else if (channel.equals(CONTROLS_MODE_CHANNEL.toString())) {
             NettyPacketBuffer buffer = new NettyPacketBuffer(Unpooled.copiedBuffer(message));
             ControlsMode.byId(buffer.readString(32)).ifPresent(controlsMode -> {

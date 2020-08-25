@@ -9,6 +9,7 @@
 
 package me.lambdaurora.lambdacontrols.client.compat;
 
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -21,7 +22,7 @@ import java.util.Set;
  * This plugin is only present for the conditional mixins.
  *
  * @author LambdAurora
- * @version 1.2.0
+ * @version 1.5.0
  * @since 1.2.0
  */
 public class LambdaControlsMixinPlugin implements IMixinConfigPlugin
@@ -30,8 +31,15 @@ public class LambdaControlsMixinPlugin implements IMixinConfigPlugin
 
     public LambdaControlsMixinPlugin()
     {
-        this.conditionalMixins.put("me.lambdaurora.lambdacontrols.client.compat.mixin.RecipeViewingScreenAccessor", LambdaControlsCompat.isReiPresent());
-        this.conditionalMixins.put("me.lambdaurora.lambdacontrols.client.compat.mixin.VillagerRecipeViewingScreenAccessor", LambdaControlsCompat.isReiPresent());
+        this.putConditionalMixin("EntryListWidgetAccessor", LambdaControlsCompat.isReiPresent());
+        this.putConditionalMixin("EntryWidgetAccessor", LambdaControlsCompat.isReiPresent());
+        this.putConditionalMixin("RecipeViewingScreenAccessor", LambdaControlsCompat.isReiPresent());
+        this.putConditionalMixin("VillagerRecipeViewingScreenAccessor", LambdaControlsCompat.isReiPresent());
+    }
+
+    private void putConditionalMixin(@NotNull String path, boolean condition)
+    {
+        this.conditionalMixins.put("me.lambdaurora.lambdacontrols.client.compat.mixin." + path, condition);
     }
 
     @Override

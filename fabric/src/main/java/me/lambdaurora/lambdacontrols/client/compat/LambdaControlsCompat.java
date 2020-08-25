@@ -14,8 +14,10 @@ import me.lambdaurora.lambdacontrols.client.controller.InputManager;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.hit.BlockHitResult;
 import org.aperlambda.lambdacommon.utils.LambdaReflection;
+import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +29,7 @@ import java.util.stream.Stream;
  * Represents a compatibility handler.
  *
  * @author LambdAurora
- * @version 1.3.2
+ * @version 1.5.0
  * @since 1.1.0
  */
 public class LambdaControlsCompat
@@ -86,6 +88,24 @@ public class LambdaControlsCompat
     public static boolean requireMouseOnScreen(Screen screen)
     {
         return HANDLERS.stream().anyMatch(handler -> handler.requireMouseOnScreen(screen));
+    }
+
+    /**
+     * Returns a slot at the specified location if possible.
+     *
+     * @param screen The screen.
+     * @param mouseX The mouse X-coordinate.
+     * @param mouseY The mouse Y-coordinate.
+     * @return A slot if present, else null.
+     */
+    public static @Nullable Pair<Integer, Integer> getSlotAt(@NotNull Screen screen, int mouseX, int mouseY)
+    {
+        for (CompatHandler handler : HANDLERS) {
+            Pair<Integer, Integer> slot = handler.getSlotAt(screen, mouseX, mouseY);
+            if (slot != null)
+                return slot;
+        }
+        return null;
     }
 
     /**

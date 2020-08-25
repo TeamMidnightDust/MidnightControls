@@ -20,6 +20,7 @@ import me.lambdaurora.lambdacontrols.client.controller.InputManager;
 import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsHud;
 import me.lambdaurora.lambdacontrols.client.gui.RingScreen;
 import me.lambdaurora.lambdacontrols.client.gui.TouchscreenOverlay;
+import me.lambdaurora.lambdacontrols.client.ring.KeyBindingRingAction;
 import me.lambdaurora.lambdacontrols.client.ring.LambdaRing;
 import me.lambdaurora.spruceui.event.OpenScreenCallback;
 import me.lambdaurora.spruceui.hud.HudManager;
@@ -43,7 +44,7 @@ import java.io.File;
  * Represents the LambdaControls client mod.
  *
  * @author LambdAurora
- * @version 1.4.3
+ * @version 1.5.0
  * @since 1.1.0
  */
 public class LambdaControlsClient extends LambdaControls implements ClientModInitializer
@@ -65,7 +66,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
     public final static File                 MAPPINGS_FILE      = new File("config/gamecontrollerdb.txt");
     public final        LambdaControlsConfig config             = new LambdaControlsConfig(this);
     public final        LambdaInput          input              = new LambdaInput(this);
-    public final        LambdaRing           ring               = new LambdaRing();
+    public final        LambdaRing           ring               = new LambdaRing(this);
     public final        LambdaReacharound    reacharound        = new LambdaReacharound();
     private             LambdaControlsHud    hud;
     private             ControlsMode         previousControlsMode;
@@ -78,7 +79,9 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_RIGHT);
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_DOWN);
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_LEFT);
-        //KeyBindingHelper.registerKeyBinding(BINDING_RING);
+        KeyBindingHelper.registerKeyBinding(BINDING_RING);
+
+        this.ring.registerAction("keybinding", KeyBindingRingAction.FACTORY);
 
         ClientSidePacketRegistry.INSTANCE.register(CONTROLS_MODE_CHANNEL, (context, attachedData) -> context.getTaskQueue()
                 .execute(() -> ClientSidePacketRegistry.INSTANCE.sendToServer(CONTROLS_MODE_CHANNEL, this.makeControlsModeBuffer(this.config.getControlsMode()))));

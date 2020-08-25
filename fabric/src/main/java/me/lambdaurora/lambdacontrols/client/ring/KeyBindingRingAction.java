@@ -9,19 +9,26 @@
 
 package me.lambdaurora.lambdacontrols.client.ring;
 
+import com.electronwill.nightconfig.core.Config;
 import me.lambdaurora.lambdacontrols.client.util.KeyBindingAccessor;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Supplier;
 
 public class KeyBindingRingAction extends RingAction
 {
-    public final KeyBinding binding;
+    public static final Factory    FACTORY = new Factory();
+    public final        KeyBinding binding;
 
-    public KeyBindingRingAction(@NotNull KeyBinding binding)
+    public KeyBindingRingAction(@NotNull Config config, @NotNull KeyBinding binding)
     {
+        super(config);
         this.binding = binding;
     }
 
@@ -51,5 +58,20 @@ public class KeyBindingRingAction extends RingAction
     public void drawIcon(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered)
     {
         drawCenteredText(matrices, textRenderer, new TranslatableText(this.getName()), x + 25, y + 25 - textRenderer.fontHeight / 2, 0xffffff);
+    }
+
+    protected static class Factory implements RingAction.Factory
+    {
+        @Override
+        public @NotNull Supplier<RingAction> newFromGui(@NotNull Screen screen)
+        {
+            return () -> null;
+        }
+
+        @Override
+        public @Nullable RingAction parse(@NotNull Config config)
+        {
+            return null;
+        }
     }
 }

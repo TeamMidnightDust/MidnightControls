@@ -7,7 +7,7 @@ archivesBaseName = project.archives_base_name + "-core"
 
 dependencies {
     api "org.jetbrains:annotations:17.0.0"
-    api "org.aperlambda:lambdajcommon:1.8.0"
+    api "org.aperlambda:lambdajcommon:1.8.1"
 }
 
 java {

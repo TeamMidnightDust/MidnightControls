@@ -40,7 +40,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 /**
  * Represents a mixin to WorldRenderer.
  * <p>
- * Handles the rendering of the block outline of the front block placing.
+ * Handles the rendering of the block outline of the reach-around features.
  */
 @Mixin(WorldRenderer.class)
 public abstract class WorldRendererMixin
@@ -84,8 +84,10 @@ public abstract class WorldRendererMixin
             if (stack == null || !(stack.getItem() instanceof BlockItem))
                 return;
 
+            LambdaControlsClient mod = LambdaControlsClient.get();
+
             Block block = ((BlockItem) stack.getItem()).getBlock();
-            result = LambdaReacharound.withSideForReacharound(result, block);
+            result = mod.reacharound.withSideForReacharound(result, block);
             ItemPlacementContext context = new ItemPlacementContext(new ItemUsageContext(this.client.player, Hand.MAIN_HAND, result));
 
             BlockState placementState = block.getPlacementState(context);
@@ -94,7 +96,7 @@ public abstract class WorldRendererMixin
             Vec3d pos = camera.getPos();
 
             VoxelShape outlineShape = placementState.getOutlineShape(this.client.world, blockPos, ShapeContext.of(camera.getFocusedEntity()));
-            int[] color = LambdaControlsClient.get().config.getReacharoundOutlineColor();
+            int[] color = mod.config.getReacharoundOutlineColor();
 
             VertexConsumer vertexConsumer = this.bufferBuilders.getEntityVertexConsumers().getBuffer(RenderLayer.getLines());
             drawShapeOutline(matrices, vertexConsumer, outlineShape,

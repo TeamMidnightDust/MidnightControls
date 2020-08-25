@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.hit.BlockHitResult;
+import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
  * Represents a compatibility handler for a mod.
  *
  * @author LambdAurora
- * @version 1.3.2
+ * @version 1.5.0
  * @since 1.1.0
  */
 public interface CompatHandler
@@ -43,6 +44,20 @@ public interface CompatHandler
     default boolean requireMouseOnScreen(Screen screen)
     {
         return false;
+    }
+
+    /**
+     * Returns a slot at the specified location if possible.
+     *
+     * @param screen The screen.
+     * @param mouseX The mouse X-coordinate.
+     * @param mouseY The mouse Y-coordinate.
+     * @return A slot if present, else null.
+     * @since 1.5.0
+     */
+    default @Nullable Pair<Integer, Integer> getSlotAt(@NotNull Screen screen, int mouseX, int mouseY)
+    {
+        return null;
     }
 
     /**

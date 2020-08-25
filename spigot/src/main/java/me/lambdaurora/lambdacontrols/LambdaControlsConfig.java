@@ -36,6 +36,6 @@ public class LambdaControlsConfig
             configDir.mkdirs();
         this.config.load();
         this.plugin.log("Configuration loaded.");
-        LambdaControlsFeature.FRONT_BLOCK_PLACING.setAllowed(this.config.getOrElse("gameplay.front_block_placing", DEFAULT_FRONT_BLOCK_PLACING));
+        LambdaControlsFeature.HORIZONTAL_REACHAROUND.setAllowed(this.config.getOrElse("gameplay.front_block_placing", DEFAULT_FRONT_BLOCK_PLACING));
     }
 }

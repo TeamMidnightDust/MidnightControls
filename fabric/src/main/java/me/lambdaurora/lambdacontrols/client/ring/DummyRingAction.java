@@ -9,12 +9,18 @@
 
 package me.lambdaurora.lambdacontrols.client.ring;
 
+import com.electronwill.nightconfig.core.Config;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.NotNull;
 
 public class DummyRingAction extends RingAction
 {
+    public DummyRingAction(@NotNull Config config)
+    {
+        super(config);
+    }
+
     @Override
     public @NotNull String getName()
     {

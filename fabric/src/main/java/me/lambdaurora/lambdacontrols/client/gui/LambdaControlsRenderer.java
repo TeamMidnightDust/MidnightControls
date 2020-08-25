@@ -12,6 +12,7 @@ package me.lambdaurora.lambdacontrols.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.LambdaInput;
+import me.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.util.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
@@ -29,7 +30,7 @@ import org.lwjgl.glfw.GLFW;
  * Represents the LambdaControls renderer.
  *
  * @author LambdAurora
- * @version 1.3.2
+ * @version 1.5.0
  * @since 1.2.0
  */
 public class LambdaControlsRenderer
@@ -247,6 +248,16 @@ public class LambdaControlsRenderer
             if (slot != null) {
                 mouseX = guiLeft + slot.x;
                 mouseY = guiTop + slot.y;
+                hoverSlot = true;
+            }
+        }
+
+        if (!hoverSlot) {
+            Pair<Integer, Integer> slot = LambdaControlsCompat.getSlotAt(client.currentScreen, mouseX, mouseY);
+
+            if (slot != null) {
+                mouseX = slot.getFirst();
+                mouseY = slot.getSecond();
                 hoverSlot = true;
             }
         }

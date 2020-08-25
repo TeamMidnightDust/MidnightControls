@@ -9,24 +9,35 @@
 
 package me.lambdaurora.lambdacontrols.client.ring;
 
+import com.electronwill.nightconfig.core.Config;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Supplier;
 
 /**
  * Represents a ring action.
  *
  * @author LambdAurora
- * @version 1.4.3
+ * @version 1.5.0
  * @since 1.4.0
  */
 public abstract class RingAction extends DrawableHelper implements Nameable
 {
+    protected Config  config;
     protected boolean activated = false;
+
+    public RingAction(@NotNull Config config)
+    {
+        this.config = config;
+    }
 
     /**
      * Gets the text name of the ring action.
@@ -64,4 +75,17 @@ public abstract class RingAction extends DrawableHelper implements Nameable
     }
 
     public abstract void drawIcon(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered);
+
+    /**
+     * Represents a factory for {@link RingAction}.
+     *
+     * @version 1.4.3
+     * @since 1.4.3
+     */
+    public interface Factory
+    {
+        @NotNull Supplier<RingAction> newFromGui(@NotNull Screen screen);
+
+        @Nullable RingAction parse(@NotNull Config config);
+    }
 }

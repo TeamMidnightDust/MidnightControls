@@ -9,32 +9,35 @@
 
 package me.lambdaurora.lambdacontrols.client.ring;
 
-import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
+import com.electronwill.nightconfig.core.Config;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
  * Represents a ring page.
  *
  * @author LambdAurora
- * @version 1.4.3
+ * @version 1.5.0
  * @since 1.4.0
  */
 public class RingPage extends DrawableHelper
 {
-    private RingAction[] actions = new RingAction[8];
+    public static final RingPage DEFAULT = new RingPage("Default");
 
-    public RingPage()
+    public final String       name;
+    private      RingAction[] actions = new RingAction[8];
+
+    public RingPage(@NotNull String name)
     {
+        this.name = name;
         for (int i = 0; i < 8; i++) {
-            this.actions[i] = new DummyRingAction();
+            this.actions[i] = null;
         }
-        this.actions[1] = new KeyBindingRingAction(LambdaControlsClient.BINDING_LOOK_UP);
-        this.actions[3] = new KeyBindingRingAction(LambdaControlsClient.BINDING_LOOK_LEFT);
-        this.actions[4] = new KeyBindingRingAction(LambdaControlsClient.BINDING_LOOK_RIGHT);
-        this.actions[6] = new KeyBindingRingAction(LambdaControlsClient.BINDING_LOOK_DOWN);
     }
 
     /**
@@ -83,5 +86,25 @@ public class RingPage extends DrawableHelper
     private static boolean isHovered(int x, int y, int mouseX, int mouseY)
     {
         return mouseX >= x && mouseY >= y && mouseX <= x + LambdaRing.ELEMENT_SIZE && mouseY <= y + LambdaRing.ELEMENT_SIZE;
+    }
+
+    /**
+     * Tries to parse a ring page configuration.
+     *
+     * @param config The configuration.
+     * @return An optional ring page.
+     */
+    public static @NotNull Optional<RingPage> parseRingPage(@NotNull Config config)
+    {
+        String name = config.get("name");
+        if (name == null)
+            return Optional.empty();
+
+        RingPage page = new RingPage(name);
+
+        List<Config> actionConfigs = config.get("actions");
+
+
+        return Optional.of(page);
     }
 }

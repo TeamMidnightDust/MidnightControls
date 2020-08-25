@@ -32,7 +32,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents a button binding.
  *
  * @author LambdAurora
- * @version 1.4.3
+ * @version 1.5.0
  * @since 1.0.0
  */
 public class ButtonBinding implements Nameable
@@ -46,43 +46,43 @@ public class ButtonBinding implements Nameable
     public static final ButtonBinding ATTACK             = new Builder("attack").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true)).onlyInGame().register();
     public static final ButtonBinding BACK               = new Builder("back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, false))
             .action(MovementHandler.HANDLER).onlyInGame().register();
-    public static final ButtonBinding CHAT               = new Builder("chat").buttons(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT).onlyInGame().cooldown(true).register();
-    public static final ButtonBinding DROP_ITEM          = new Builder("drop_item").buttons(GLFW_GAMEPAD_BUTTON_B).onlyInGame().cooldown(true).register();
+    public static final ButtonBinding CHAT               = new Builder("chat").buttons(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT).onlyInGame().cooldown().register();
+    public static final ButtonBinding DROP_ITEM          = new Builder("drop_item").buttons(GLFW_GAMEPAD_BUTTON_B).onlyInGame().cooldown().register();
     public static final ButtonBinding FORWARD            = new Builder("forward").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, true))
             .action(MovementHandler.HANDLER).onlyInGame().register();
     public static final ButtonBinding HOTBAR_LEFT        = new Builder("hotbar_left").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
-            .action(InputHandlers.handleHotbar(false)).onlyInGame().cooldown(true).register();
+            .action(InputHandlers.handleHotbar(false)).onlyInGame().cooldown().register();
     public static final ButtonBinding HOTBAR_RIGHT       = new Builder("hotbar_right").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
-            .action(InputHandlers.handleHotbar(true)).onlyInGame().cooldown(true).register();
-    public static final ButtonBinding INVENTORY          = new Builder("inventory").buttons(GLFW_GAMEPAD_BUTTON_Y).onlyInGame().cooldown(true).register();
+            .action(InputHandlers.handleHotbar(true)).onlyInGame().cooldown().register();
+    public static final ButtonBinding INVENTORY          = new Builder("inventory").buttons(GLFW_GAMEPAD_BUTTON_Y).onlyInGame().cooldown().register();
     public static final ButtonBinding JUMP               = new Builder("jump").buttons(GLFW_GAMEPAD_BUTTON_A).onlyInGame().register();
     public static final ButtonBinding LEFT               = new Builder("left").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, false))
             .action(MovementHandler.HANDLER).onlyInGame().register();
-    public static final ButtonBinding PAUSE_GAME         = new Builder("pause_game").buttons(GLFW_GAMEPAD_BUTTON_START).action(InputHandlers::handlePauseGame).cooldown(true).register();
-    public static final ButtonBinding PICK_BLOCK         = new Builder("pick_block").buttons(GLFW_GAMEPAD_BUTTON_DPAD_LEFT).onlyInGame().cooldown(true).register();
+    public static final ButtonBinding PAUSE_GAME         = new Builder("pause_game").buttons(GLFW_GAMEPAD_BUTTON_START).action(InputHandlers::handlePauseGame).cooldown().register();
+    public static final ButtonBinding PICK_BLOCK         = new Builder("pick_block").buttons(GLFW_GAMEPAD_BUTTON_DPAD_LEFT).onlyInGame().cooldown().register();
     public static final ButtonBinding PLAYER_LIST        = new Builder("player_list").buttons(GLFW_GAMEPAD_BUTTON_BACK).onlyInGame().register();
     public static final ButtonBinding RIGHT              = new Builder("right").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, true))
-            .action(MovementHandler.HANDLER).register();
+            .action(MovementHandler.HANDLER).onlyInGame().register();
     public static final ButtonBinding SCREENSHOT         = new Builder("screenshot").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_A)
-            .action(InputHandlers::handleScreenshot).cooldown(true).register();
+            .action(InputHandlers::handleScreenshot).cooldown().register();
     public static final ButtonBinding SLOT_DOWN          = new Builder("slot_down").buttons(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)
-            .action(InputHandlers.handleInventorySlotPad(1)).onlyInInventory().cooldown(true).register();
+            .action(InputHandlers.handleInventorySlotPad(1)).onlyInInventory().cooldown().register();
     public static final ButtonBinding SLOT_LEFT          = new Builder("slot_left").buttons(GLFW_GAMEPAD_BUTTON_DPAD_LEFT)
-            .action(InputHandlers.handleInventorySlotPad(3)).onlyInInventory().cooldown(true).register();
+            .action(InputHandlers.handleInventorySlotPad(3)).onlyInInventory().cooldown().register();
     public static final ButtonBinding SLOT_RIGHT         = new Builder("slot_right").buttons(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT)
-            .action(InputHandlers.handleInventorySlotPad(2)).onlyInInventory().cooldown(true).register();
+            .action(InputHandlers.handleInventorySlotPad(2)).onlyInInventory().cooldown().register();
     public static final ButtonBinding SLOT_UP            = new Builder("slot_up").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP)
-            .action(InputHandlers.handleInventorySlotPad(0)).onlyInInventory().cooldown(true).register();
-    public static final ButtonBinding SMOOTH_CAMERA      = new Builder("toggle_smooth_camera").cooldown(true).register();
+            .action(InputHandlers.handleInventorySlotPad(0)).onlyInInventory().cooldown().register();
+    public static final ButtonBinding SMOOTH_CAMERA      = new Builder("toggle_smooth_camera").onlyInGame().cooldown().register();
     public static final ButtonBinding SNEAK              = new Builder("sneak").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_THUMB)
-            .actions(InputHandlers::handleToggleSneak).onlyInGame().cooldown(true).register();
-    public static final ButtonBinding SPRINT             = new Builder("sprint").buttons(GLFW_GAMEPAD_BUTTON_LEFT_THUMB).register();
-    public static final ButtonBinding SWAP_HANDS         = new Builder("swap_hands").buttons(GLFW_GAMEPAD_BUTTON_X).cooldown(true).register();
+            .actions(InputHandlers::handleToggleSneak).onlyInGame().cooldown().register();
+    public static final ButtonBinding SPRINT             = new Builder("sprint").buttons(GLFW_GAMEPAD_BUTTON_LEFT_THUMB).onlyInGame().register();
+    public static final ButtonBinding SWAP_HANDS         = new Builder("swap_hands").buttons(GLFW_GAMEPAD_BUTTON_X).onlyInGame().cooldown().register();
     public static final ButtonBinding TAB_LEFT           = new Builder("tab_back").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
-            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements)).cooldown(true).register();
+            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements)).cooldown().register();
     public static final ButtonBinding TAB_RIGHT          = new Builder("tab_next").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
-            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements)).cooldown(true).register();
-    public static final ButtonBinding TOGGLE_PERSPECTIVE = new Builder("toggle_perspective").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_Y).cooldown(true).register();
+            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements)).cooldown().register();
+    public static final ButtonBinding TOGGLE_PERSPECTIVE = new Builder("toggle_perspective").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_Y).cooldown().register();
     public static final ButtonBinding USE                = new Builder("use").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true)).register();
 
     private   int[]                                         button;
@@ -267,10 +267,17 @@ public class ButtonBinding implements Nameable
      *
      * @return The key binding equivalent.
      */
-    public @NotNull
-    Optional<KeyBinding> asKeyBinding()
+    public @NotNull Optional<KeyBinding> asKeyBinding()
     {
         return Optional.ofNullable(this.mcKeyBinding);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "ButtonBinding{id=\"" + this.key + "\","
+                + "hasCooldown=" + this.hasCooldown
+                + "}";
     }
 
     /**
@@ -427,10 +434,35 @@ public class ButtonBinding implements Nameable
     }
 
     /**
+     * Returns a builder instance.
+     *
+     * @param identifier The identifier of the button binding.
+     * @return The builder instance
+     * @since 1.5.0
+     */
+    public static Builder builder(@NotNull Identifier identifier)
+    {
+        return new Builder(identifier);
+    }
+
+    /**
+     * Returns a builder instance.
+     *
+     * @param identifier The identifier of the button binding.
+     * @return The builder instance.
+     * @since 1.5.0
+     */
+    public static Builder builder(@NotNull net.minecraft.util.Identifier identifier)
+    {
+        return new Builder(identifier);
+
+    }
+
+    /**
      * Represents a quick {@link ButtonBinding} builder.
      *
      * @author LambdAurora
-     * @version 1.1.0
+     * @version 1.5.0
      * @since 1.1.0
      */
     public static class Builder
@@ -556,6 +588,17 @@ public class ButtonBinding implements Nameable
         {
             this.cooldown = cooldown;
             return this;
+        }
+
+        /**
+         * Puts a cooldown on the {@link ButtonBinding}.
+         *
+         * @return The builder instance.
+         * @since 1.5.0
+         */
+        public Builder cooldown()
+        {
+            return this.cooldown(true);
         }
 
         /**

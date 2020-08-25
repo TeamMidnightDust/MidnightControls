@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class ControlsListWidget extends ElementListWidget<ControlsListWidget.Entry>
 {
-    private static final int[]                    UNBOUND = new int[0];
+    private static final int[]                    UNBOUND = new int[]{-1};
     private final        ControllerControlsScreen gui;
     private              int                      field_2733;
 

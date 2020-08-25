@@ -29,7 +29,7 @@ import java.util.Optional;
  * Represents the LambdaControls mod.
  *
  * @author LambdAurora
- * @version 1.3.0
+ * @version 1.5.0
  * @since 1.0.0
  */
 public class LambdaControls implements ModInitializer
@@ -56,7 +56,7 @@ public class LambdaControls implements ModInitializer
                             .ifPresent(controlsMode -> context.getTaskQueue()
                                     .execute(() -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.getPlayer(), controlsMode)));
                     context.getTaskQueue().execute(() ->
-                            ServerSidePacketRegistry.INSTANCE.sendToPlayer(context.getPlayer(), FEATURE_CHANNEL, this.makeFeatureBuffer(LambdaControlsFeature.FRONT_BLOCK_PLACING)));
+                            ServerSidePacketRegistry.INSTANCE.sendToPlayer(context.getPlayer(), FEATURE_CHANNEL, this.makeFeatureBuffer(LambdaControlsFeature.HORIZONTAL_REACHAROUND)));
                 });
         ServerSidePacketRegistry.INSTANCE.register(CONTROLS_MODE_CHANNEL,
                 (context, attachedData) -> ControlsMode.byId(attachedData.readString(32))

@@ -106,7 +106,7 @@ public abstract class MinecraftClientMixin
         }
         // Removed front placing sprinting as way too cheaty.
         /* else if (this.player.isSprinting()) {
-            hitResult = this.lambdacontrols_frontBlockPlaceResult;
+            hitResult = LambdaControlsClient.get().reacharound.getLastReacharoundResult();
             if (hitResult != null) {
                 if (cooldown > 0)
                     this.itemUseCooldown = 0;
@@ -136,15 +136,16 @@ public abstract class MinecraftClientMixin
     @Inject(method = "doItemUse()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/HitResult;getType()Lnet/minecraft/util/hit/HitResult$Type;"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true)
     private void onItemUse(CallbackInfo ci, Hand[] hands, int handCount, int handIndex, Hand hand, ItemStack stackInHand)
     {
-        if (!stackInHand.isEmpty() && this.player.pitch > 35.0F && LambdaControlsClient.get().reacharound.isReacharoundAvailable()) {
+        LambdaControlsClient mod = LambdaControlsClient.get();
+        if (!stackInHand.isEmpty() && this.player.pitch > 35.0F && mod.reacharound.isReacharoundAvailable()) {
             if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.MISS && this.player.isOnGround()) {
                 if (!stackInHand.isEmpty() && stackInHand.getItem() instanceof BlockItem) {
-                    BlockHitResult hitResult = LambdaControlsClient.get().reacharound.getLastReacharoundResult();
+                    BlockHitResult hitResult = mod.reacharound.getLastReacharoundResult();
 
                     if (hitResult == null)
                         return;
 
-                    hitResult = LambdaReacharound.withSideForReacharound(hitResult, stackInHand);
+                    hitResult = mod.reacharound.withSideForReacharound(hitResult, stackInHand);
 
                     int previousStackCount = stackInHand.getCount();
                     ActionResult result = this.interactionManager.interactBlock(this.player, this.world, hand, hitResult);

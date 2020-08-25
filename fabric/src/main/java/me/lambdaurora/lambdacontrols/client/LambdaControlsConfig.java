@@ -44,7 +44,7 @@ public class LambdaControlsConfig
     private static final boolean          DEFAULT_FAST_BLOCK_INTERACTION    = true;
     private static final boolean          DEFAULT_FLY_DRIFTING              = false;
     private static final boolean          DEFAULT_FLY_VERTICAL_DRIFTING     = true;
-    private static final boolean          DEFAULT_FRONT_BLOCK_PLACING       = false;
+    private static final boolean          DEFAULT_HORIZONTAL_REACHAROUND    = false;
     private static final boolean          DEFAULT_VERTICAL_REACHAROUND      = false;
     private static final boolean          DEFAULT_REACHAROUND_OUTLINE       = true;
     private static final int[]            DEFAULT_REACHAROUND_OUTLINE_COLOR = new int[]{255, 255, 255, 102};
@@ -96,7 +96,7 @@ public class LambdaControlsConfig
         this.hudSide = HudSide.byId(this.config.getOrElse("hud.side", DEFAULT_HUD_SIDE.getName())).orElse(DEFAULT_HUD_SIDE);
         // Gameplay
         LambdaControlsFeature.FAST_BLOCK_PLACING.setEnabled(this.config.getOrElse("gameplay.fast_block_placing", DEFAULT_FAST_BLOCK_INTERACTION));
-        LambdaControlsFeature.FRONT_BLOCK_PLACING.setEnabled(this.config.getOrElse("gameplay.reacharound.horizontal", DEFAULT_FRONT_BLOCK_PLACING));
+        LambdaControlsFeature.HORIZONTAL_REACHAROUND.setEnabled(this.config.getOrElse("gameplay.reacharound.horizontal", DEFAULT_HORIZONTAL_REACHAROUND));
         LambdaControlsFeature.VERTICAL_REACHAROUND.setEnabled(this.config.getOrElse("gameplay.reacharound.vertical", DEFAULT_VERTICAL_REACHAROUND));
         this.shouldRenderReacharoundOutline = this.config.getOrElse("gameplay.reacharound.outline", DEFAULT_REACHAROUND_OUTLINE);
         this.reacharoundOutlineColor = this.config.getOptional("gameplay.reacharound.outline_color").map(hex -> parseColor((String) hex)).orElse(DEFAULT_REACHAROUND_OUTLINE_COLOR);
@@ -110,6 +110,8 @@ public class LambdaControlsConfig
         this.virtualMouseSkin = VirtualMouseSkin.byId(this.config.getOrElse("controller.virtual_mouse_skin", DEFAULT_VIRTUAL_MOUSE_SKIN.getName())).orElse(DEFAULT_VIRTUAL_MOUSE_SKIN);
         // Controller controls.
         InputManager.loadButtonBindings(this);
+
+        this.mod.ring.load(this.config);
     }
 
     /**
@@ -138,7 +140,7 @@ public class LambdaControlsConfig
         });
 
         if (this.config.contains("gameplay.front_block_placing.enabled")) {
-            this.setFrontBlockPlacing(this.config.getOrElse("gameplay.front_block_placing.enabled", DEFAULT_FRONT_BLOCK_PLACING));
+            this.setFrontBlockPlacing(this.config.getOrElse("gameplay.front_block_placing.enabled", DEFAULT_HORIZONTAL_REACHAROUND));
             this.config.remove("gameplay.front_block_placing.enabled");
         }
 
@@ -178,7 +180,7 @@ public class LambdaControlsConfig
         this.setFastBlockPlacing(DEFAULT_FAST_BLOCK_INTERACTION);
         this.setFlyDrifting(DEFAULT_FLY_DRIFTING);
         this.setFlyVerticalDrifting(DEFAULT_FLY_VERTICAL_DRIFTING);
-        this.setFrontBlockPlacing(DEFAULT_FRONT_BLOCK_PLACING);
+        this.setFrontBlockPlacing(DEFAULT_HORIZONTAL_REACHAROUND);
         this.setVerticalReacharound(DEFAULT_VERTICAL_REACHAROUND);
         this.setRenderReacharoundOutline(DEFAULT_REACHAROUND_OUTLINE);
         // Controller
@@ -376,7 +378,7 @@ public class LambdaControlsConfig
      */
     public boolean hasFrontBlockPlacing()
     {
-        return LambdaControlsFeature.FRONT_BLOCK_PLACING.isEnabled();
+        return LambdaControlsFeature.HORIZONTAL_REACHAROUND.isEnabled();
     }
 
     /**
@@ -386,7 +388,7 @@ public class LambdaControlsConfig
      */
     public void setFrontBlockPlacing(boolean enable)
     {
-        LambdaControlsFeature.FRONT_BLOCK_PLACING.setEnabled(enable);
+        LambdaControlsFeature.HORIZONTAL_REACHAROUND.setEnabled(enable);
         this.config.set("gameplay.reacharound.horizontal", enable);
     }
 
