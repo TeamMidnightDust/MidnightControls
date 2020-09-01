@@ -93,3 +93,20 @@ This update also has a backport 1.14.4 version ([#9](https://github.com/LambdAur
 ### v1.4.1
 
  - Fixed crash with [REI](https://www.curseforge.com/minecraft/mc-mods/roughly-enough-items).
+ 
+## v1.5.0
+
+ - Added mappings string editor screen.
+ - Added Simplified Chinese translations ([#18](https://github.com/LambdAurora/LambdaControls/pull/18)).
+ - Added Mexican Spanish translations ([#22](https://github.com/LambdAurora/LambdaControls/pull/22)).
+ - Added Xbox 360 button skin and overhauled Xbox button skin.
+ - Added debug option.
+ - Respect toggle setting in Accessibility screen.
+ - Tweaked rotation speeds.
+ - Updated to Minecraft 1.16.2.
+ - Updated [SpruceUI](https://github.com/LambdAurora/SpruceUI) to 1.6.4.
+ - Overhauled REI compatibility.
+ - Improved horizontal reach-around.
+ - Fixed crashes with Ok Zoomer.
+ - Fixed crashes with key unbinding.
+ - More WIP on keybind ring.

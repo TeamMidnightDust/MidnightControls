@@ -58,8 +58,8 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.movement");
     public static final KeyBinding           BINDING_LOOK_LEFT  = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_left"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement");
-    public static final KeyBinding           BINDING_RING       = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "ring"),
-            InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.categories.misc");
+    /*public static final KeyBinding           BINDING_RING       = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "ring"),
+            InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.categories.misc");*/
     public static final Identifier           CONTROLLER_BUTTONS = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/controller_buttons.png");
     public static final Identifier           CONTROLLER_AXIS    = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/controller_axis.png");
     public static final Identifier           CURSOR_TEXTURE     = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/cursor.png");
@@ -79,7 +79,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_RIGHT);
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_DOWN);
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_LEFT);
-        KeyBindingHelper.registerKeyBinding(BINDING_RING);
+        //KeyBindingHelper.registerKeyBinding(BINDING_RING);
 
         this.ring.registerAction("keybinding", KeyBindingRingAction.FACTORY);
 
@@ -144,9 +144,9 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
         if (this.config.getControlsMode() == ControlsMode.CONTROLLER && (client.isWindowFocused() || this.config.hasUnfocusedInput()))
             this.input.onControllerTick(client);
 
-        if (BINDING_RING.wasPressed()) {
+        /*if (BINDING_RING.wasPressed()) {
             client.openScreen(new RingScreen());
-        }
+        }*/
     }
 
     public void onRender(MinecraftClient client)

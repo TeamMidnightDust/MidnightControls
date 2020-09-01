@@ -36,8 +36,8 @@ import org.jetbrains.annotations.Nullable;
 public class LambdaReacharound
 {
     private BlockHitResult lastReacharoundResult   = null;
-    private boolean        onSlab                  = false;
     private boolean        lastReacharoundVertical = false;
+    private boolean        onSlab                  = false;
 
     public void tick(@NotNull MinecraftClient client)
     {
