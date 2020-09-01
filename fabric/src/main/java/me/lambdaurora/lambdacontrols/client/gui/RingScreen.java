@@ -51,10 +51,10 @@ public class RingScreen extends Screen
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button)
     {
-        if (LambdaControlsClient.BINDING_RING.matchesMouse(button)) {
+        /*if (LambdaControlsClient.BINDING_RING.matchesMouse(button)) {
             this.onClose();
             return true;
-        }
+        }*/
         return false;
     }
 }
