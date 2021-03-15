@@ -1,11 +1,19 @@
 plugins {
 	id 'java-library'
 	id 'maven-publish'
+	id 'com.github.johnrengelman.shadow' version '6.1.0'
+	id 'org.cadixdev.licenser' version '0.5.0'
 }
 
 allprojects {
+	apply plugin: 'java-library'
+
 	group = project.maven_group
 	version = project.mod_version
+
+	// This field defines the Java version your mod target.
+	// The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too.
+	def targetJavaVersion = 8
 
 	repositories {
 		mavenLocal()
@@ -16,8 +24,21 @@ allprojects {
 	dependencies {
 	}
 
-	tasks.withType(JavaCompile) {
-		options.encoding = "UTF-8"
+	java {
+		sourceCompatibility = JavaVersion.toVersion(targetJavaVersion)
+		targetCompatibility = JavaVersion.toVersion(targetJavaVersion)
+
+		withSourcesJar()
+	}
+
+	tasks.withType(JavaCompile).configureEach {
+		it.options.encoding = "UTF-8"
+
+		if (JavaVersion.current().isJava9Compatible()) {
+			if (JavaVersion.current().isJava9Compatible()) {
+				it.options.release = targetJavaVersion
+			}
+		}
 	}
 
 	publishing {
@@ -34,24 +55,3 @@ allprojects {
 		}
 	}
 }
-
-/*
-// configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
-		}
-	}
-
-	// select the repositories you want to publish to
-	repositories {
-		mavenLocal()
-	}
-}*/

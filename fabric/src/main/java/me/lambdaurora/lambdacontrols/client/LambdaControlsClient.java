@@ -18,7 +18,6 @@ import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.Controller;
 import me.lambdaurora.lambdacontrols.client.controller.InputManager;
 import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsHud;
-import me.lambdaurora.lambdacontrols.client.gui.RingScreen;
 import me.lambdaurora.lambdacontrols.client.gui.TouchscreenOverlay;
 import me.lambdaurora.lambdacontrols.client.ring.KeyBindingRingAction;
 import me.lambdaurora.lambdacontrols.client.ring.LambdaRing;
@@ -140,9 +139,9 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
      */
     public void onTick(@NotNull MinecraftClient client)
     {
-        this.input.onTick(client);
+        this.input.tick(client);
         if (this.config.getControlsMode() == ControlsMode.CONTROLLER && (client.isWindowFocused() || this.config.hasUnfocusedInput()))
-            this.input.onControllerTick(client);
+            this.input.tickController(client);
 
         /*if (BINDING_RING.wasPressed()) {
             client.openScreen(new RingScreen());

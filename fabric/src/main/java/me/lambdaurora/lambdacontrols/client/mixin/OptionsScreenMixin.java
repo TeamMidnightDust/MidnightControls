@@ -11,7 +11,8 @@ package me.lambdaurora.lambdacontrols.client.mixin;
 
 import me.lambdaurora.lambdacontrols.ControlsMode;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
-import me.lambdaurora.lambdacontrols.client.gui.ControllerControlsScreen;
+import me.lambdaurora.lambdacontrols.client.gui.LambdaControlsSettingsScreen;
+import me.lambdaurora.lambdacontrols.client.gui.widget.ControllerControlsWidget;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.options.OptionsScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
@@ -37,7 +38,7 @@ public class OptionsScreenMixin extends Screen
     {
         if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER) {
             return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).getHeight(), btn.getMessage(),
-                    b -> this.client.openScreen(new ControllerControlsScreen(this, false))));
+                    b -> this.client.openScreen(new LambdaControlsSettingsScreen(this, false))));
         } else {
             return this.addButton(btn);
         }

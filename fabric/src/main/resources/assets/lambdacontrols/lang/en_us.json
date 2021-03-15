@@ -99,6 +99,8 @@
   "lambdacontrols.menu.reacharound.vertical": "Vertical Reacharound",
   "lambdacontrols.menu.reload_controller_mappings": "Reload Controller Mappings",
   "lambdacontrols.menu.rotation_speed": "Rotation Speed",
+  "lambdacontrols.menu.separator.controller": "Controller",
+  "lambdacontrols.menu.separator.general": "General",
   "lambdacontrols.menu.title": "LambdaControls - Settings",
   "lambdacontrols.menu.title.controller": "Controller Options",
   "lambdacontrols.menu.title.controller_controls": "Controller Controls",

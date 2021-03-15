@@ -31,62 +31,59 @@ import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
 /**
  * Represents LambdaControls configuration.
  */
-public class LambdaControlsConfig
-{
+public class LambdaControlsConfig {
     // General
-    private static final ControlsMode     DEFAULT_CONTROLS_MODE             = ControlsMode.DEFAULT;
-    private static final boolean          DEFAULT_AUTO_SWITCH_MODE          = false;
-    private static final boolean          DEFAULT_DEBUG                     = false;
+    private static final ControlsMode DEFAULT_CONTROLS_MODE = ControlsMode.DEFAULT;
+    private static final boolean DEFAULT_AUTO_SWITCH_MODE = false;
+    private static final boolean DEFAULT_DEBUG = false;
     // HUD
-    private static final boolean          DEFAULT_HUD_ENABLE                = true;
-    private static final HudSide          DEFAULT_HUD_SIDE                  = HudSide.LEFT;
+    private static final boolean DEFAULT_HUD_ENABLE = true;
+    private static final HudSide DEFAULT_HUD_SIDE = HudSide.LEFT;
     // Gameplay
-    private static final boolean          DEFAULT_FAST_BLOCK_INTERACTION    = true;
-    private static final boolean          DEFAULT_FLY_DRIFTING              = false;
-    private static final boolean          DEFAULT_FLY_VERTICAL_DRIFTING     = true;
-    private static final boolean          DEFAULT_HORIZONTAL_REACHAROUND    = false;
-    private static final boolean          DEFAULT_VERTICAL_REACHAROUND      = false;
-    private static final boolean          DEFAULT_REACHAROUND_OUTLINE       = true;
-    private static final int[]            DEFAULT_REACHAROUND_OUTLINE_COLOR = new int[]{255, 255, 255, 102};
+    private static final boolean DEFAULT_FAST_BLOCK_INTERACTION = true;
+    private static final boolean DEFAULT_FLY_DRIFTING = false;
+    private static final boolean DEFAULT_FLY_VERTICAL_DRIFTING = true;
+    private static final boolean DEFAULT_HORIZONTAL_REACHAROUND = false;
+    private static final boolean DEFAULT_VERTICAL_REACHAROUND = false;
+    private static final boolean DEFAULT_REACHAROUND_OUTLINE = true;
+    private static final int[] DEFAULT_REACHAROUND_OUTLINE_COLOR = new int[]{255, 255, 255, 102};
     // Controller
-    private static final ControllerType   DEFAULT_CONTROLLER_TYPE           = ControllerType.DEFAULT;
-    private static final double           DEFAULT_DEAD_ZONE                 = 0.25;
-    private static final double           DEFAULT_ROTATION_SPEED            = 40.0;
-    private static final double           DEFAULT_MOUSE_SPEED               = 25.0;
-    private static final boolean          DEFAULT_UNFOCUSED_INPUT           = false;
-    private static final boolean          DEFAULT_VIRTUAL_MOUSE             = false;
-    private static final VirtualMouseSkin DEFAULT_VIRTUAL_MOUSE_SKIN        = VirtualMouseSkin.DEFAULT_LIGHT;
+    private static final ControllerType DEFAULT_CONTROLLER_TYPE = ControllerType.DEFAULT;
+    private static final double DEFAULT_DEAD_ZONE = 0.25;
+    private static final double DEFAULT_ROTATION_SPEED = 40.0;
+    private static final double DEFAULT_MOUSE_SPEED = 25.0;
+    private static final boolean DEFAULT_UNFOCUSED_INPUT = false;
+    private static final boolean DEFAULT_VIRTUAL_MOUSE = false;
+    private static final VirtualMouseSkin DEFAULT_VIRTUAL_MOUSE_SKIN = VirtualMouseSkin.DEFAULT_LIGHT;
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
 
-    protected final FileConfig           config = FileConfig.builder("config/lambdacontrols.toml").concurrent().defaultResource("/config.toml").build();
-    private final   LambdaControlsClient mod;
-    private         ControlsMode         controlsMode;
-    private         ControllerType       controllerType;
+    protected final FileConfig config = FileConfig.builder("config/lambdacontrols.toml").concurrent().defaultResource("/config.toml").build();
+    private final LambdaControlsClient mod;
+    private ControlsMode controlsMode;
+    private ControllerType controllerType;
     // Gameplay.
-    private         boolean              shouldRenderReacharoundOutline;
-    private         int[]                reacharoundOutlineColor;
+    private boolean shouldRenderReacharoundOutline;
+    private int[] reacharoundOutlineColor;
     // Controller settings
-    private         double               deadZone;
-    private         double               rotationSpeed;
-    private         double               mouseSpeed;
-    private         boolean              unfocusedInput;
-    private         boolean              virtualMouse;
-    private         VirtualMouseSkin     virtualMouseSkin;
+    private double deadZone;
+    private double rotationSpeed;
+    private double mouseSpeed;
+    private boolean unfocusedInput;
+    private boolean virtualMouse;
+    private VirtualMouseSkin virtualMouseSkin;
     // HUD settings.
-    private         boolean              hudEnable;
-    private         HudSide              hudSide;
+    private boolean hudEnable;
+    private HudSide hudSide;
 
-    public LambdaControlsConfig(@NotNull LambdaControlsClient mod)
-    {
+    public LambdaControlsConfig(@NotNull LambdaControlsClient mod) {
         this.mod = mod;
     }
 
     /**
      * Loads the configuration
      */
-    public void load()
-    {
+    public void load() {
         this.config.load();
         this.checkAndFix();
         this.mod.log("Configuration loaded.");
@@ -117,8 +114,7 @@ public class LambdaControlsConfig
     /**
      * Saves the configuration.
      */
-    public void save()
-    {
+    public void save() {
         this.config.set("controller.dead_zone", this.deadZone);
         this.config.set("controller.rotation_speed", this.rotationSpeed);
         this.config.set("controller.mouse_speed", this.mouseSpeed);
@@ -128,8 +124,7 @@ public class LambdaControlsConfig
         this.mod.log("Configuration saved.");
     }
 
-    public void checkAndFix()
-    {
+    public void checkAndFix() {
         InputManager.streamBindings().forEach(binding -> {
             String path = "controller.controls." + binding.getName();
             Object raw = this.config.getRaw(path);
@@ -158,8 +153,7 @@ public class LambdaControlsConfig
         this.renamed("controller.controls.tab_right", "controller.controls.tab_next");
     }
 
-    private void renamed(String oldPath, String newPath)
-    {
+    private void renamed(String oldPath, String newPath) {
         if (!this.config.contains(oldPath))
             return;
         Object raw = this.config.getRaw(oldPath);
@@ -170,8 +164,7 @@ public class LambdaControlsConfig
     /**
      * Resets the configuration to default values.
      */
-    public void reset()
-    {
+    public void reset() {
         // General
         this.setControlsMode(DEFAULT_CONTROLS_MODE);
         this.setAutoSwitchMode(DEFAULT_AUTO_SWITCH_MODE);
@@ -204,8 +197,7 @@ public class LambdaControlsConfig
      *
      * @return The controls mode.
      */
-    public @NotNull ControlsMode getControlsMode()
-    {
+    public @NotNull ControlsMode getControlsMode() {
         return this.controlsMode;
     }
 
@@ -214,8 +206,7 @@ public class LambdaControlsConfig
      *
      * @param controlsMode The controls mode.
      */
-    public void setControlsMode(@NotNull ControlsMode controlsMode)
-    {
+    public void setControlsMode(@NotNull ControlsMode controlsMode) {
         this.controlsMode = controlsMode;
         this.config.set("controls", controlsMode.getName());
     }
@@ -225,8 +216,7 @@ public class LambdaControlsConfig
      *
      * @return True if the auto switch mode is enabled, else false.
      */
-    public boolean hasAutoSwitchMode()
-    {
+    public boolean hasAutoSwitchMode() {
         return this.config.getOrElse("auto_switch_mode", DEFAULT_AUTO_SWITCH_MODE);
     }
 
@@ -235,8 +225,7 @@ public class LambdaControlsConfig
      *
      * @param autoSwitchMode True if the auto switch mode is enabled, else false.
      */
-    public void setAutoSwitchMode(boolean autoSwitchMode)
-    {
+    public void setAutoSwitchMode(boolean autoSwitchMode) {
         this.config.set("auto_switch_mode", autoSwitchMode);
     }
 
@@ -245,8 +234,7 @@ public class LambdaControlsConfig
      *
      * @return True if debug is enabled, else false.
      */
-    public boolean hasDebug()
-    {
+    public boolean hasDebug() {
         return this.config.getOrElse("debug", DEFAULT_DEBUG);
     }
 
@@ -255,8 +243,7 @@ public class LambdaControlsConfig
      *
      * @param debug True if debug is enabled, else false.
      */
-    protected void setDebug(boolean debug)
-    {
+    protected void setDebug(boolean debug) {
         this.config.set("debug", debug);
     }
 
@@ -269,8 +256,7 @@ public class LambdaControlsConfig
      *
      * @return True if the HUD is enabled, else false.
      */
-    public boolean isHudEnabled()
-    {
+    public boolean isHudEnabled() {
         return this.hudEnable;
     }
 
@@ -279,8 +265,7 @@ public class LambdaControlsConfig
      *
      * @param enable True if the HUD is enabled, else false.
      */
-    public void setHudEnabled(boolean enable)
-    {
+    public void setHudEnabled(boolean enable) {
         this.hudEnable = enable;
         this.config.set("hud.enable", this.hudEnable);
     }
@@ -290,8 +275,7 @@ public class LambdaControlsConfig
      *
      * @return The HUD side.
      */
-    public @NotNull HudSide getHudSide()
-    {
+    public @NotNull HudSide getHudSide() {
         return this.hudSide;
     }
 
@@ -300,8 +284,7 @@ public class LambdaControlsConfig
      *
      * @param hudSide The HUD side.
      */
-    public void setHudSide(@NotNull HudSide hudSide)
-    {
+    public void setHudSide(@NotNull HudSide hudSide) {
         this.hudSide = hudSide;
         this.config.set("hud.side", hudSide.getName());
     }
@@ -315,8 +298,7 @@ public class LambdaControlsConfig
      *
      * @return True if fast block placing is enabled, else false.
      */
-    public boolean hasFastBlockPlacing()
-    {
+    public boolean hasFastBlockPlacing() {
         return LambdaControlsFeature.FAST_BLOCK_PLACING.isEnabled();
     }
 
@@ -325,8 +307,7 @@ public class LambdaControlsConfig
      *
      * @param enable True if fast block placing is enabled, else false.
      */
-    public void setFastBlockPlacing(boolean enable)
-    {
+    public void setFastBlockPlacing(boolean enable) {
         LambdaControlsFeature.FAST_BLOCK_PLACING.setEnabled(enable);
         this.config.set("gameplay.fast_block_placing", enable);
     }
@@ -336,8 +317,7 @@ public class LambdaControlsConfig
      *
      * @return True if fly drifting is enabled, else false.
      */
-    public boolean hasFlyDrifting()
-    {
+    public boolean hasFlyDrifting() {
         return this.config.getOrElse("gameplay.fly.drifting", DEFAULT_FLY_DRIFTING);
     }
 
@@ -346,8 +326,7 @@ public class LambdaControlsConfig
      *
      * @param flyDrifting True if fly drifting is enabled, else false.
      */
-    public void setFlyDrifting(boolean flyDrifting)
-    {
+    public void setFlyDrifting(boolean flyDrifting) {
         this.config.set("gameplay.fly.drifting", flyDrifting);
     }
 
@@ -356,8 +335,7 @@ public class LambdaControlsConfig
      *
      * @return True if vertical fly drifting is enabled, else false.
      */
-    public boolean hasFlyVerticalDrifting()
-    {
+    public boolean hasFlyVerticalDrifting() {
         return this.config.getOrElse("gameplay.fly.vertical_drifting", DEFAULT_FLY_VERTICAL_DRIFTING);
     }
 
@@ -366,8 +344,7 @@ public class LambdaControlsConfig
      *
      * @param flyDrifting True if vertical fly drifting is enabled, else false.
      */
-    public void setFlyVerticalDrifting(boolean flyDrifting)
-    {
+    public void setFlyVerticalDrifting(boolean flyDrifting) {
         this.config.set("gameplay.fly.vertical_drifting", flyDrifting);
     }
 
@@ -376,8 +353,7 @@ public class LambdaControlsConfig
      *
      * @return True if front block placing is enabled, else false.
      */
-    public boolean hasFrontBlockPlacing()
-    {
+    public boolean hasFrontBlockPlacing() {
         return LambdaControlsFeature.HORIZONTAL_REACHAROUND.isEnabled();
     }
 
@@ -386,8 +362,7 @@ public class LambdaControlsConfig
      *
      * @param enable True if front block placing is enabled, else false.
      */
-    public void setFrontBlockPlacing(boolean enable)
-    {
+    public void setFrontBlockPlacing(boolean enable) {
         LambdaControlsFeature.HORIZONTAL_REACHAROUND.setEnabled(enable);
         this.config.set("gameplay.reacharound.horizontal", enable);
     }
@@ -397,8 +372,7 @@ public class LambdaControlsConfig
      *
      * @return True if vertical reacharound is enabled, else false.
      */
-    public boolean hasVerticalReacharound()
-    {
+    public boolean hasVerticalReacharound() {
         return LambdaControlsFeature.VERTICAL_REACHAROUND.isEnabled();
     }
 
@@ -407,8 +381,7 @@ public class LambdaControlsConfig
      *
      * @param enable True if vertical reacharound is enabled, else false.
      */
-    public void setVerticalReacharound(boolean enable)
-    {
+    public void setVerticalReacharound(boolean enable) {
         LambdaControlsFeature.VERTICAL_REACHAROUND.setEnabled(enable);
         this.config.set("gameplay.reacharound.vertical", enable);
     }
@@ -418,8 +391,7 @@ public class LambdaControlsConfig
      *
      * @return True if front block placing outline is enabled, else false.
      */
-    public boolean shouldRenderReacharoundOutline()
-    {
+    public boolean shouldRenderReacharoundOutline() {
         return this.shouldRenderReacharoundOutline;
     }
 
@@ -428,8 +400,7 @@ public class LambdaControlsConfig
      *
      * @param render True if front block placing outline is enabled, else false.
      */
-    public void setRenderReacharoundOutline(boolean render)
-    {
+    public void setRenderReacharoundOutline(boolean render) {
         this.config.set("gameplay.reacharound.outline", this.shouldRenderReacharoundOutline = render);
     }
 
@@ -440,8 +411,7 @@ public class LambdaControlsConfig
      *
      * @return The color as a RGBA integer array.
      */
-    public int[] getReacharoundOutlineColor()
-    {
+    public int[] getReacharoundOutlineColor() {
         return this.reacharoundOutlineColor;
     }
 
@@ -454,8 +424,7 @@ public class LambdaControlsConfig
      *
      * @return The used controller.
      */
-    public @NotNull Controller getController()
-    {
+    public @NotNull Controller getController() {
         Object raw = this.config.getRaw("controller.id");
         if (raw instanceof Number) {
             return Controller.byId((Integer) raw);
@@ -470,8 +439,7 @@ public class LambdaControlsConfig
      *
      * @param controller The used controller.
      */
-    public void setController(@NotNull Controller controller)
-    {
+    public void setController(@NotNull Controller controller) {
         this.config.set("controller.id", controller.getId());
     }
 
@@ -480,8 +448,7 @@ public class LambdaControlsConfig
      *
      * @return The second controller.
      */
-    public @NotNull Optional<Controller> getSecondController()
-    {
+    public @NotNull Optional<Controller> getSecondController() {
         Object raw = this.config.getRaw("controller.id2");
         if (raw instanceof Number) {
             if ((int) raw == -1)
@@ -498,8 +465,7 @@ public class LambdaControlsConfig
      *
      * @param controller The second controller.
      */
-    public void setSecondController(@Nullable Controller controller)
-    {
+    public void setSecondController(@Nullable Controller controller) {
         this.config.set("controller.id2", controller == null ? -1 : controller.getId());
     }
 
@@ -508,8 +474,7 @@ public class LambdaControlsConfig
      *
      * @return The controller's type.
      */
-    public @NotNull ControllerType getControllerType()
-    {
+    public @NotNull ControllerType getControllerType() {
         return this.controllerType;
     }
 
@@ -518,8 +483,7 @@ public class LambdaControlsConfig
      *
      * @param controllerType The controller's type.
      */
-    public void setControllerType(@NotNull ControllerType controllerType)
-    {
+    public void setControllerType(@NotNull ControllerType controllerType) {
         this.controllerType = controllerType;
         this.config.set("controller.type", controllerType.getName());
     }
@@ -529,8 +493,7 @@ public class LambdaControlsConfig
      *
      * @return The controller's dead zone value.
      */
-    public double getDeadZone()
-    {
+    public double getDeadZone() {
         return this.deadZone;
     }
 
@@ -539,8 +502,7 @@ public class LambdaControlsConfig
      *
      * @param deadZone The new controller's dead zone value.
      */
-    public void setDeadZone(double deadZone)
-    {
+    public void setDeadZone(double deadZone) {
         this.deadZone = deadZone;
     }
 
@@ -549,8 +511,7 @@ public class LambdaControlsConfig
      *
      * @return The rotation speed.
      */
-    public double getRotationSpeed()
-    {
+    public double getRotationSpeed() {
         return this.rotationSpeed;
     }
 
@@ -559,8 +520,7 @@ public class LambdaControlsConfig
      *
      * @param rotationSpeed The rotation speed.
      */
-    public void setRotationSpeed(double rotationSpeed)
-    {
+    public void setRotationSpeed(double rotationSpeed) {
         this.rotationSpeed = rotationSpeed;
     }
 
@@ -569,8 +529,7 @@ public class LambdaControlsConfig
      *
      * @return The mouse speed.
      */
-    public double getMouseSpeed()
-    {
+    public double getMouseSpeed() {
         return this.mouseSpeed;
     }
 
@@ -579,8 +538,7 @@ public class LambdaControlsConfig
      *
      * @param mouseSpeed The mouse speed.
      */
-    public void setMouseSpeed(double mouseSpeed)
-    {
+    public void setMouseSpeed(double mouseSpeed) {
         this.mouseSpeed = mouseSpeed;
     }
 
@@ -589,8 +547,7 @@ public class LambdaControlsConfig
      *
      * @return True if the right X axis is inverted, else false.
      */
-    public boolean doesInvertRightXAxis()
-    {
+    public boolean doesInvertRightXAxis() {
         return this.config.getOrElse("controller.invert_right_x_axis", false);
     }
 
@@ -599,8 +556,7 @@ public class LambdaControlsConfig
      *
      * @param invert True if the right X axis is inverted, else false.
      */
-    public void setInvertRightXAxis(boolean invert)
-    {
+    public void setInvertRightXAxis(boolean invert) {
         this.config.set("controller.invert_right_x_axis", invert);
     }
 
@@ -609,8 +565,7 @@ public class LambdaControlsConfig
      *
      * @return True if the right Y axis is inverted, else false.
      */
-    public boolean doesInvertRightYAxis()
-    {
+    public boolean doesInvertRightYAxis() {
         return this.config.getOrElse("controller.invert_right_y_axis", false);
     }
 
@@ -619,8 +574,7 @@ public class LambdaControlsConfig
      *
      * @param invert True if the right Y axis is inverted, else false.
      */
-    public void setInvertRightYAxis(boolean invert)
-    {
+    public void setInvertRightYAxis(boolean invert) {
         this.config.set("controller.invert_right_y_axis", invert);
     }
 
@@ -629,8 +583,7 @@ public class LambdaControlsConfig
      *
      * @return True if unfocused controller input is allowed, else false.
      */
-    public boolean hasUnfocusedInput()
-    {
+    public boolean hasUnfocusedInput() {
         return this.unfocusedInput;
     }
 
@@ -639,8 +592,7 @@ public class LambdaControlsConfig
      *
      * @param unfocusedInput True if unfocused controller input is allowed, else false.
      */
-    public void setUnfocusedInput(boolean unfocusedInput)
-    {
+    public void setUnfocusedInput(boolean unfocusedInput) {
         this.unfocusedInput = unfocusedInput;
     }
 
@@ -649,8 +601,7 @@ public class LambdaControlsConfig
      *
      * @return True if the mouse is virtual, else false.
      */
-    public boolean hasVirtualMouse()
-    {
+    public boolean hasVirtualMouse() {
         return this.virtualMouse;
     }
 
@@ -659,8 +610,7 @@ public class LambdaControlsConfig
      *
      * @param virtualMouse True if the mouse is virtual, else false.
      */
-    public void setVirtualMouse(boolean virtualMouse)
-    {
+    public void setVirtualMouse(boolean virtualMouse) {
         this.virtualMouse = virtualMouse;
     }
 
@@ -669,8 +619,7 @@ public class LambdaControlsConfig
      *
      * @return The virtual mouse skin.
      */
-    public VirtualMouseSkin getVirtualMouseSkin()
-    {
+    public VirtualMouseSkin getVirtualMouseSkin() {
         return this.virtualMouseSkin;
     }
 
@@ -679,8 +628,7 @@ public class LambdaControlsConfig
      *
      * @param skin The virtual mouse skin.
      */
-    public void setVirtualMouseSkin(VirtualMouseSkin skin)
-    {
+    public void setVirtualMouseSkin(VirtualMouseSkin skin) {
         this.virtualMouseSkin = skin;
         this.config.set("controller.virtual_mouse_skin", skin.getName());
     }
@@ -690,8 +638,7 @@ public class LambdaControlsConfig
      *
      * @return The right X axis sign.
      */
-    public double getRightXAxisSign()
-    {
+    public double getRightXAxisSign() {
         return this.doesInvertRightXAxis() ? -1.0 : 1.0;
     }
 
@@ -700,8 +647,7 @@ public class LambdaControlsConfig
      *
      * @return The right Y axis sign.
      */
-    public double getRightYAxisSign()
-    {
+    public double getRightYAxisSign() {
         return this.doesInvertRightYAxis() ? -1.0 : 1.0;
     }
 
@@ -710,8 +656,7 @@ public class LambdaControlsConfig
      *
      * @param button The button binding.
      */
-    public void loadButtonBinding(@NotNull ButtonBinding button)
-    {
+    public void loadButtonBinding(@NotNull ButtonBinding button) {
         button.setButton(button.getDefaultButton());
         String code = this.config.getOrElse("controller.controls." + button.getName(), button.getButtonCode());
 
@@ -741,8 +686,7 @@ public class LambdaControlsConfig
         }
     }
 
-    private boolean checkValidity(@NotNull ButtonBinding binding, @NotNull String input, String group)
-    {
+    private boolean checkValidity(@NotNull ButtonBinding binding, @NotNull String input, String group) {
         if (group == null) {
             this.mod.warn("Malformed config value \"" + input + "\" for binding \"" + binding.getName() + "\".");
             this.config.set("controller.controls." + binding.getName(), binding.getButtonCode());
@@ -755,37 +699,32 @@ public class LambdaControlsConfig
      * Sets the button binding in configuration.
      *
      * @param binding The button binding.
-     * @param button  The button.
+     * @param button The button.
      */
-    public void setButtonBinding(@NotNull ButtonBinding binding, int[] button)
-    {
+    public void setButtonBinding(@NotNull ButtonBinding binding, int[] button) {
         binding.setButton(button);
         this.config.set("controller.controls." + binding.getName(), binding.getButtonCode());
     }
 
-    public boolean isBackButton(int btn, boolean isBtn, int state)
-    {
+    public boolean isBackButton(int btn, boolean isBtn, int state) {
         if (!isBtn && state == 0)
             return false;
         return ButtonBinding.axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, false) == ButtonBinding.axisAsButton(btn, state == 1);
     }
 
-    public boolean isForwardButton(int btn, boolean isBtn, int state)
-    {
+    public boolean isForwardButton(int btn, boolean isBtn, int state) {
         if (!isBtn && state == 0)
             return false;
         return ButtonBinding.axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, true) == ButtonBinding.axisAsButton(btn, state == 1);
     }
 
-    public boolean isLeftButton(int btn, boolean isBtn, int state)
-    {
+    public boolean isLeftButton(int btn, boolean isBtn, int state) {
         if (!isBtn && state == 0)
             return false;
         return ButtonBinding.axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, false) == ButtonBinding.axisAsButton(btn, state == 1);
     }
 
-    public boolean isRightButton(int btn, boolean isBtn, int state)
-    {
+    public boolean isRightButton(int btn, boolean isBtn, int state) {
         if (!isBtn && state == 0)
             return false;
         return ButtonBinding.axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, true) == ButtonBinding.axisAsButton(btn, state == 1);
@@ -797,8 +736,7 @@ public class LambdaControlsConfig
      * @param axis The axis index.
      * @return True if the axis is used for movements, else false.
      */
-    public boolean isMovementAxis(int axis)
-    {
+    public boolean isMovementAxis(int axis) {
         return axis == GLFW_GAMEPAD_AXIS_LEFT_Y || axis == GLFW_GAMEPAD_AXIS_LEFT_X;
     }
 
@@ -808,8 +746,7 @@ public class LambdaControlsConfig
      * @param hex The hexadecimal color.
      * @return The color instance, null if invalid.
      */
-    private static int[] parseColor(String hex)
-    {
+    private static int[] parseColor(String hex) {
         hex = hex.replace("#", "");
         switch (hex.length()) {
             case 6:

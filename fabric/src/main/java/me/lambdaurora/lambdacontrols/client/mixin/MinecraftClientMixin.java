@@ -105,13 +105,13 @@ public abstract class MinecraftClientMixin
             this.lambdacontrols_lastTargetSide = side;
         }
         // Removed front placing sprinting as way too cheaty.
-        /* else if (this.player.isSprinting()) {
+        else if (this.player.isSprinting()) {
             hitResult = LambdaControlsClient.get().reacharound.getLastReacharoundResult();
             if (hitResult != null) {
                 if (cooldown > 0)
                     this.itemUseCooldown = 0;
             }
-        } */
+        }
         this.lambdacontrols_lastPos = this.player.getPos();
     }
 

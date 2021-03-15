@@ -29,7 +29,7 @@ import java.util.Optional;
  * Represents the LambdaControls mod.
  *
  * @author LambdAurora
- * @version 1.5.0
+ * @version 1.6.0
  * @since 1.0.0
  */
 public class LambdaControls implements ModInitializer
@@ -51,7 +51,7 @@ public class LambdaControls implements ModInitializer
 
         ServerSidePacketRegistry.INSTANCE.register(HELLO_CHANNEL,
                 (context, attachedData) -> {
-                    String version = attachedData.readString(16);
+                    String version = attachedData.readString(32);
                     ControlsMode.byId(attachedData.readString(32))
                             .ifPresent(controlsMode -> context.getTaskQueue()
                                     .execute(() -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.getPlayer(), controlsMode)));
@@ -117,7 +117,7 @@ public class LambdaControls implements ModInitializer
         if ((container = FabricLoader.getInstance().getModContainer(LambdaControlsConstants.NAMESPACE)).isPresent()) {
             version = container.get().getMetadata().getVersion().getFriendlyString();
         }
-        return new PacketByteBuf(Unpooled.buffer()).writeString(version, 16).writeString(controlsMode.getName(), 32);
+        return new PacketByteBuf(Unpooled.buffer()).writeString(version, 32).writeString(controlsMode.getName(), 32);
     }
 
     /**

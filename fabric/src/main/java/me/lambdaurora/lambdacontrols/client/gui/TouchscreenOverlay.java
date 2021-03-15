@@ -12,7 +12,6 @@ package me.lambdaurora.lambdacontrols.client.gui;
 import me.lambdaurora.lambdacontrols.client.HudSide;
 import me.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import me.lambdaurora.lambdacontrols.client.util.KeyBindingAccessor;
-import me.lambdaurora.spruceui.SpruceTexturedButtonWidget;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -21,6 +20,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -36,7 +36,11 @@ import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
  */
 public class TouchscreenOverlay extends Screen
 {
-    public static final Identifier                 WIDGETS_LOCATION     = new Identifier("lambdacontrols", "textures/gui/widgets.png");
+    public TouchscreenOverlay(@NotNull LambdaControlsClient mod)
+    {
+        super(new LiteralText("Touchscreen overlay"));
+    }
+    /*public static final Identifier                 WIDGETS_LOCATION     = new Identifier("lambdacontrols", "textures/gui/widgets.png");
     private             LambdaControlsClient       mod;
     private             SpruceTexturedButtonWidget jumpButton;
     private             SpruceTexturedButtonWidget flyButton;
@@ -85,7 +89,7 @@ public class TouchscreenOverlay extends Screen
      * Updates the forward button ticks cooldown.
      *
      * @param state The button state.
-     */
+     *
     private void updateForwardButtonsState(boolean state)
     {
         if (state)
@@ -96,7 +100,7 @@ public class TouchscreenOverlay extends Screen
 
     /**
      * Updates the jump buttons.
-     */
+     *
     private void updateJumpButtons()
     {
         if (this.client == null)
@@ -125,7 +129,7 @@ public class TouchscreenOverlay extends Screen
      *
      * @param btn   The pressed button.
      * @param state The state of the jump button.
-     */
+     *
     private void handleJump(ButtonWidget btn, boolean state)
     {
         ((KeyBindingAccessor) this.client.options.keyJump).lambdacontrols_handlePressState(state);
@@ -293,5 +297,5 @@ public class TouchscreenOverlay extends Screen
                 this.mod.input.handleLook(this.client, GLFW_GAMEPAD_AXIS_RIGHT_X, (float) Math.abs(deltaX / 5.0), 1);
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-    }
+    }*/
 }

@@ -14,14 +14,20 @@ import me.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
 import me.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.lambdacontrols.client.controller.Controller;
 import me.lambdaurora.lambdacontrols.client.controller.InputManager;
-import me.lambdaurora.lambdacontrols.client.gui.ControllerControlsScreen;
 import me.lambdaurora.lambdacontrols.client.gui.TouchscreenOverlay;
+import me.lambdaurora.lambdacontrols.client.gui.widget.ControllerControlsWidget;
 import me.lambdaurora.lambdacontrols.client.mixin.AdvancementsScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.mixin.CreativeInventoryScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.mixin.EntryListWidgetAccessor;
 import me.lambdaurora.lambdacontrols.client.util.HandledScreenAccessor;
 import me.lambdaurora.lambdacontrols.client.util.MouseAccessor;
-import me.lambdaurora.spruceui.SpruceLabelWidget;
+import me.lambdaurora.spruceui.navigation.NavigationDirection;
+import me.lambdaurora.spruceui.screen.SpruceScreen;
+import me.lambdaurora.spruceui.widget.AbstractSprucePressableButtonWidget;
+import me.lambdaurora.spruceui.widget.SpruceElement;
+import me.lambdaurora.spruceui.widget.SpruceLabelWidget;
+import me.lambdaurora.spruceui.widget.SpruceWidget;
+import me.lambdaurora.spruceui.widget.container.SpruceParentWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
@@ -67,25 +73,25 @@ import static org.lwjgl.glfw.GLFW.*;
  * @version 1.4.3
  * @since 1.0.0
  */
-public class LambdaInput
-{
-    private static final Map<Integer, Integer> BUTTON_COOLDOWNS             = new HashMap<>();
-    private final        LambdaControlsConfig  config;
+public class LambdaInput {
+    private static final Map<Integer, Integer> BUTTON_COOLDOWNS = new HashMap<>();
+    private final LambdaControlsConfig config;
     // Cooldowns
-    private              int                   actionGuiCooldown            = 0;
-    private              boolean               ignoreNextARelease           = false;
-    private              double                targetYaw                    = 0.0;
-    private              double                targetPitch                  = 0.0;
-    private              float                 prevXAxis                    = 0.F;
-    private              float                 prevYAxis                    = 0.F;
-    private              int                   targetMouseX                 = 0;
-    private              int                   targetMouseY                 = 0;
-    private              float                 mouseSpeedX                  = 0.F;
-    private              float                 mouseSpeedY                  = 0.F;
-    private              int                   inventoryInteractionCooldown = 0;
+    private int actionGuiCooldown = 0;
+    private boolean ignoreNextARelease = false;
+    private double targetYaw = 0.0;
+    private double targetPitch = 0.0;
+    private float prevXAxis = 0.F;
+    private float prevYAxis = 0.F;
+    private int targetMouseX = 0;
+    private int targetMouseY = 0;
+    private float mouseSpeedX = 0.F;
+    private float mouseSpeedY = 0.F;
+    private int inventoryInteractionCooldown = 0;
 
-    public LambdaInput(@NotNull LambdaControlsClient mod)
-    {
+    private ControllerControlsWidget controlsInput = null;
+
+    public LambdaInput(@NotNull LambdaControlsClient mod) {
         this.config = mod.config;
     }
 
@@ -94,8 +100,7 @@ public class LambdaInput
      *
      * @param client The client instance.
      */
-    public void onTick(@NotNull MinecraftClient client)
-    {
+    public void tick(@NotNull MinecraftClient client) {
         this.targetYaw = 0.F;
         this.targetPitch = 0.F;
 
@@ -119,8 +124,7 @@ public class LambdaInput
      *
      * @param client The client instance.
      */
-    public void onControllerTick(@NotNull MinecraftClient client)
-    {
+    public void tickController(@NotNull MinecraftClient client) {
         BUTTON_COOLDOWNS.entrySet().stream().filter(entry -> entry.getValue() > 0).forEach(entry -> BUTTON_COOLDOWNS.put(entry.getKey(), entry.getValue() - 1));
         // Decreases the cooldown for GUI actions.
         if (this.actionGuiCooldown > 0)
@@ -143,20 +147,21 @@ public class LambdaInput
 
         boolean allowInput = true;
 
-        if (client.currentScreen instanceof ControllerControlsScreen && ((ControllerControlsScreen) client.currentScreen).focusedBinding != null)
+        if (this.controlsInput != null && this.controlsInput.focusedBinding != null)
             allowInput = false;
 
         if (allowInput)
             InputManager.updateBindings(client);
 
-        if (client.currentScreen instanceof ControllerControlsScreen && InputManager.STATES.entrySet().parallelStream().map(Map.Entry::getValue).allMatch(ButtonState::isUnpressed)) {
-            ControllerControlsScreen screen = (ControllerControlsScreen) client.currentScreen;
-            if (screen.focusedBinding != null && !screen.waiting) {
-                int[] buttons = new int[screen.currentButtons.size()];
-                for (int i = 0; i < screen.currentButtons.size(); i++)
-                    buttons[i] = screen.currentButtons.get(i);
-                screen.focusedBinding.setButton(buttons);
-                screen.focusedBinding = null;
+        if (this.controlsInput != null
+                && InputManager.STATES.entrySet().parallelStream().map(Map.Entry::getValue).allMatch(ButtonState::isUnpressed)) {
+            if (this.controlsInput.focusedBinding != null && !this.controlsInput.waiting) {
+                int[] buttons = new int[this.controlsInput.currentButtons.size()];
+                for (int i = 0; i < this.controlsInput.currentButtons.size(); i++)
+                    buttons[i] = this.controlsInput.currentButtons.get(i);
+                this.controlsInput.focusedBinding.setButton(buttons);
+                this.controlsInput.focusedBinding = null;
+                this.controlsInput = null;
             }
         }
 
@@ -170,8 +175,7 @@ public class LambdaInput
      * @param client The client instance.
      * @param screen The screen to render.
      */
-    public void onPreRenderScreen(@NotNull MinecraftClient client, @NotNull Screen screen)
-    {
+    public void onPreRenderScreen(@NotNull MinecraftClient client, @NotNull Screen screen) {
         if (!isScreenInteractive(screen)) {
             INPUT_MANAGER.updateMousePosition(client);
         }
@@ -182,8 +186,7 @@ public class LambdaInput
      *
      * @param client The client instance.
      */
-    public void onRender(float tickDelta, @NotNull MinecraftClient client)
-    {
+    public void onRender(float tickDelta, @NotNull MinecraftClient client) {
         if (!(client.currentScreen == null || client.currentScreen instanceof TouchscreenOverlay))
             return;
 
@@ -206,12 +209,11 @@ public class LambdaInput
     /**
      * This method is called when a Screen is opened.
      *
-     * @param client       The client instance.
-     * @param windowWidth  The window width.
+     * @param client The client instance.
+     * @param windowWidth The window width.
      * @param windowHeight The window height.
      */
-    public void onScreenOpen(@NotNull MinecraftClient client, int windowWidth, int windowHeight)
-    {
+    public void onScreenOpen(@NotNull MinecraftClient client, int windowWidth, int windowHeight) {
         if (client.currentScreen == null) {
             this.mouseSpeedX = this.mouseSpeedY = 0.0F;
             INPUT_MANAGER.resetMousePosition(windowWidth, windowHeight);
@@ -222,8 +224,15 @@ public class LambdaInput
         this.inventoryInteractionCooldown = 5;
     }
 
-    private void fetchButtonInput(@NotNull MinecraftClient client, @NotNull GLFWGamepadState gamepadState, boolean leftJoycon)
-    {
+    public void beginControlsInput(ControllerControlsWidget widget) {
+        this.controlsInput = widget;
+        if (widget != null) {
+            this.controlsInput.currentButtons.clear();
+            this.controlsInput.waiting = true;
+        }
+    }
+
+    private void fetchButtonInput(@NotNull MinecraftClient client, @NotNull GLFWGamepadState gamepadState, boolean leftJoycon) {
         ByteBuffer buffer = gamepadState.buttons();
         for (int i = 0; i < buffer.limit(); i++) {
             int btn = leftJoycon ? ButtonBinding.controller2Button(i) : i;
@@ -248,8 +257,7 @@ public class LambdaInput
         }
     }
 
-    private void fetchAxeInput(@NotNull MinecraftClient client, @NotNull GLFWGamepadState gamepadState, boolean leftJoycon)
-    {
+    private void fetchAxeInput(@NotNull MinecraftClient client, @NotNull GLFWGamepadState gamepadState, boolean leftJoycon) {
         FloatBuffer buffer = gamepadState.axes();
         for (int i = 0; i < buffer.limit(); i++) {
             int axis = leftJoycon ? ButtonBinding.controller2Button(i) : i;
@@ -264,23 +272,19 @@ public class LambdaInput
         }
     }
 
-    private void handleButton(@NotNull MinecraftClient client, int button, int action, boolean state)
-    {
-        if (client.currentScreen instanceof ControllerControlsScreen) {
-            ControllerControlsScreen screen = (ControllerControlsScreen) client.currentScreen;
-            if (screen.focusedBinding != null) {
-                if (action == 0 && !screen.currentButtons.contains(button)) {
-                    screen.currentButtons.add(button);
+    private void handleButton(@NotNull MinecraftClient client, int button, int action, boolean state) {
+        if (this.controlsInput != null && this.controlsInput.focusedBinding != null) {
+            if (action == 0 && !this.controlsInput.currentButtons.contains(button)) {
+                this.controlsInput.currentButtons.add(button);
 
-                    int[] buttons = new int[screen.currentButtons.size()];
-                    for (int i = 0; i < screen.currentButtons.size(); i++)
-                        buttons[i] = screen.currentButtons.get(i);
-                    screen.focusedBinding.setButton(buttons);
+                int[] buttons = new int[this.controlsInput.currentButtons.size()];
+                for (int i = 0; i < this.controlsInput.currentButtons.size(); i++)
+                    buttons[i] = this.controlsInput.currentButtons.get(i);
+                this.controlsInput.focusedBinding.setButton(buttons);
 
-                    screen.waiting = false;
-                }
-                return;
+                this.controlsInput.waiting = false;
             }
+            return;
         }
 
         if (action == 0 || action == 2) {
@@ -289,9 +293,9 @@ public class LambdaInput
                     || button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT || button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT)) {
                 if (this.actionGuiCooldown == 0) {
                     if (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP) {
-                        this.changeFocus(client.currentScreen, false);
+                        this.changeFocus(client.currentScreen, NavigationDirection.UP);
                     } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN) {
-                        this.changeFocus(client.currentScreen, true);
+                        this.changeFocus(client.currentScreen, NavigationDirection.DOWN);
                     } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT) {
                         this.handleLeftRight(client.currentScreen, false);
                     } else {
@@ -355,8 +359,7 @@ public class LambdaInput
      * @param button The button pressed.
      * @return True if an inventory interaction was done.
      */
-    private boolean handleInventory(@NotNull MinecraftClient client, int button)
-    {
+    private boolean handleInventory(@NotNull MinecraftClient client, int button) {
         if (!(client.currentScreen instanceof HandledScreen))
             return false;
 
@@ -417,8 +420,7 @@ public class LambdaInput
      * @param screen The current screen.
      * @return True if successful, else false.
      */
-    public boolean tryGoBack(@NotNull Screen screen)
-    {
+    public boolean tryGoBack(@NotNull Screen screen) {
         ImmutableSet<String> set = ImmutableSet.of("gui.back", "gui.done", "gui.cancel", "gui.toTitle", "gui.toMenu");
         return screen.children().stream().filter(element -> element instanceof AbstractPressableButtonWidget)
                 .map(element -> (AbstractPressableButtonWidget) element)
@@ -432,8 +434,7 @@ public class LambdaInput
                 });
     }
 
-    private void handleAxe(@NotNull MinecraftClient client, int axis, float value, float absValue, int state)
-    {
+    private void handleAxe(@NotNull MinecraftClient client, int axis, float value, float absValue, int state) {
         int asButtonState = value > 0.5F ? 1 : (value < -0.5F ? 2 : 0);
 
         if (axis == GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || axis == GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER || axis == ButtonBinding.controller2Button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) ||
@@ -483,22 +484,19 @@ public class LambdaInput
 
         double deadZone = this.config.getDeadZone();
 
-        if (client.currentScreen instanceof ControllerControlsScreen) {
-            ControllerControlsScreen screen = (ControllerControlsScreen) client.currentScreen;
-            if (screen.focusedBinding != null) {
-                if (asButtonState != 0 && !screen.currentButtons.contains(axisAsButton(axis, asButtonState == 1))) {
+        if (this.controlsInput != null && this.controlsInput.focusedBinding != null) {
+            if (asButtonState != 0 && !this.controlsInput.currentButtons.contains(axisAsButton(axis, asButtonState == 1))) {
 
-                    screen.currentButtons.add(axisAsButton(axis, asButtonState == 1));
+                this.controlsInput.currentButtons.add(axisAsButton(axis, asButtonState == 1));
 
-                    int[] buttons = new int[screen.currentButtons.size()];
-                    for (int i = 0; i < screen.currentButtons.size(); i++)
-                        buttons[i] = screen.currentButtons.get(i);
-                    screen.focusedBinding.setButton(buttons);
+                int[] buttons = new int[this.controlsInput.currentButtons.size()];
+                for (int i = 0; i < this.controlsInput.currentButtons.size(); i++)
+                    buttons[i] = this.controlsInput.currentButtons.get(i);
+                this.controlsInput.focusedBinding.setButton(buttons);
 
-                    screen.waiting = false;
-                }
-                return;
+                this.controlsInput.waiting = false;
             }
+            return;
         } else if (client.currentScreen instanceof CreativeInventoryScreen) {
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
                 CreativeInventoryScreen screen = (CreativeInventoryScreen) client.currentScreen;
@@ -530,9 +528,9 @@ public class LambdaInput
 
             if (this.actionGuiCooldown == 0 && this.config.isMovementAxis(axis) && isScreenInteractive(client.currentScreen)) {
                 if (this.config.isForwardButton(axis, false, asButtonState)) {
-                    allowMouseControl = this.changeFocus(client.currentScreen, false);
+                    allowMouseControl = this.changeFocus(client.currentScreen, NavigationDirection.UP);
                 } else if (this.config.isBackButton(axis, false, asButtonState)) {
-                    allowMouseControl = this.changeFocus(client.currentScreen, true);
+                    allowMouseControl = this.changeFocus(client.currentScreen, NavigationDirection.DOWN);
                 } else if (this.config.isLeftButton(axis, false, asButtonState)) {
                     allowMouseControl = this.handleLeftRight(client.currentScreen, false);
                 } else if (this.config.isRightButton(axis, false, asButtonState)) {
@@ -590,11 +588,15 @@ public class LambdaInput
         }
     }
 
-    private boolean handleAButton(@NotNull Screen screen, @NotNull Element focused)
-    {
+    private boolean handleAButton(@NotNull Screen screen, @NotNull Element focused) {
         if (focused instanceof AbstractPressableButtonWidget) {
             AbstractPressableButtonWidget widget = (AbstractPressableButtonWidget) focused;
             widget.playDownSound(MinecraftClient.getInstance().getSoundManager());
+            widget.onPress();
+            return true;
+        } else if (focused instanceof AbstractSprucePressableButtonWidget) {
+            AbstractSprucePressableButtonWidget widget = (AbstractSprucePressableButtonWidget) focused;
+            widget.playDownSound();
             widget.onPress();
             return true;
         } else if (focused instanceof SpruceLabelWidget) {
@@ -611,6 +613,10 @@ public class LambdaInput
                 ((MultiplayerScreen) screen).select(entry);
                 ((MultiplayerScreen) screen).connect();
             }
+        } else if (focused instanceof SpruceParentWidget) {
+            Element childFocused = ((SpruceParentWidget<?>) focused).getFocused();
+            if (childFocused != null)
+                return this.handleAButton(screen, childFocused);
         } else if (focused instanceof ParentElement) {
             Element childFocused = ((ParentElement) focused).getFocused();
             if (childFocused != null)
@@ -623,19 +629,27 @@ public class LambdaInput
      * Handles the left and right buttons.
      *
      * @param screen The current screen.
-     * @param right  True if the right button is pressed, else false.
+     * @param right True if the right button is pressed, else false.
      */
-    private boolean handleLeftRight(@NotNull Screen screen, boolean right)
-    {
+    private boolean handleLeftRight(@NotNull Screen screen, boolean right) {
+        if (screen instanceof SpruceScreen) {
+            ((SpruceScreen) screen).onNavigation(right ? NavigationDirection.RIGHT : NavigationDirection.LEFT, false);
+            this.actionGuiCooldown = 5;
+            return false;
+        }
         Element focused = screen.getFocused();
         if (focused != null)
             if (this.handleRightLeftElement(focused, right))
-                return this.changeFocus(screen, right);
+                return this.changeFocus(screen, right ? NavigationDirection.RIGHT : NavigationDirection.LEFT);
         return true;
     }
 
-    private boolean handleRightLeftElement(@NotNull Element element, boolean right)
-    {
+    private boolean handleRightLeftElement(@NotNull Element element, boolean right) {
+        if (element instanceof SpruceElement) {
+            if (((SpruceElement) element).requiresCursor())
+                return true;
+            return !((SpruceElement) element).onNavigation(right ? NavigationDirection.RIGHT : NavigationDirection.LEFT, false);
+        }
         if (element instanceof SliderWidget) {
             SliderWidget slider = (SliderWidget) element;
             slider.keyPressed(right ? 262 : 263, 0, 0);
@@ -658,12 +672,11 @@ public class LambdaInput
      * Handles the look direction input.
      *
      * @param client The client instance.
-     * @param axis   The axis to change.
-     * @param value  The value of the look.
-     * @param state  The state.
+     * @param axis The axis to change.
+     * @param value The value of the look.
+     * @param state The state.
      */
-    public void handleLook(@NotNull MinecraftClient client, int axis, float value, int state)
-    {
+    public void handleLook(@NotNull MinecraftClient client, int axis, float value, int state) {
         // Handles the look direction.
         if (client.player != null) {
             double powValue = Math.pow(value, 2.0);
@@ -684,10 +697,15 @@ public class LambdaInput
         }
     }
 
-    private boolean changeFocus(@NotNull Screen screen, boolean down)
-    {
-        if (!screen.changeFocus(down)) {
-            if (screen.changeFocus(down)) {
+    private boolean changeFocus(@NotNull Screen screen, NavigationDirection direction) {
+        if (screen instanceof SpruceScreen) {
+            if (((SpruceScreen) screen).onNavigation(direction, false)) {
+                this.actionGuiCooldown = 5;
+            }
+            return false;
+        }
+        if (!screen.changeFocus(direction.isLookingForward())) {
+            if (screen.changeFocus(direction.isLookingForward())) {
                 this.actionGuiCooldown = 5;
                 return false;
             }
@@ -698,14 +716,14 @@ public class LambdaInput
         }
     }
 
-    public static boolean isScreenInteractive(@NotNull Screen screen)
-    {
-        return !(screen instanceof AdvancementsScreen || screen instanceof HandledScreen || screen instanceof PackScreen || LambdaControlsCompat.requireMouseOnScreen(screen));
+    public static boolean isScreenInteractive(@NotNull Screen screen) {
+        return !(screen instanceof AdvancementsScreen || screen instanceof HandledScreen || screen instanceof PackScreen
+                || (screen instanceof SpruceScreen && ((SpruceScreen) screen).requiresCursor())
+                || LambdaControlsCompat.requireMouseOnScreen(screen));
     }
 
     // Inspired from https://github.com/MrCrayfish/Controllable/blob/1.14.X/src/main/java/com/mrcrayfish/controllable/client/ControllerInput.java#L686.
-    private void moveMouseToClosestSlot(@NotNull MinecraftClient client, @Nullable Screen screen)
-    {
+    private void moveMouseToClosestSlot(@NotNull MinecraftClient client, @Nullable Screen screen) {
         // Makes the mouse attracted to slots. This helps with selecting items when using a controller.
         if (screen instanceof HandledScreen) {
             HandledScreen inventoryScreen = (HandledScreen) screen;
