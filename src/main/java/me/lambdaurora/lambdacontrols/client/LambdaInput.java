@@ -604,7 +604,7 @@ public class LambdaInput {
             return true;
         } else if (focused instanceof WorldListWidget) {
             WorldListWidget list = (WorldListWidget) focused;
-            list.method_20159().ifPresent(WorldListWidget.Entry::play);
+            list.getSelectedAsOptional().ifPresent(WorldListWidget.Entry::play);
             return true;
         } else if (focused instanceof MultiplayerServerListWidget) {
             MultiplayerServerListWidget list = (MultiplayerServerListWidget) focused;
