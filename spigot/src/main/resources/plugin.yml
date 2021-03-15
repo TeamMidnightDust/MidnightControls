@@ -1,6 +1,0 @@
-name: LambdaControls
-version: ${version}
-description: A quick Spigot plugin for LambdaControls which allow server admins to disable some features.
-
-main: me.lambdaurora.lambdacontrols.LambdaControlsSpigot
-api-version: 1.13

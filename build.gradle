@@ -1,57 +1,151 @@
 plugins {
-	id 'java-library'
-	id 'maven-publish'
-	id 'com.github.johnrengelman.shadow' version '6.1.0'
-	id 'org.cadixdev.licenser' version '0.5.0'
+    id 'java-library'
+    id 'fabric-loom' version '0.6-SNAPSHOT'
+    id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'org.cadixdev.licenser' version '0.5.0'
 }
 
-allprojects {
-	apply plugin: 'java-library'
+import net.fabricmc.loom.task.RemapJarTask
 
-	group = project.maven_group
-	version = project.mod_version
+group = project.maven_group
+version = "${project.mod_version}+${getMCVersionString()}"
+archivesBaseName = project.archives_base_name + "-fabric"
 
-	// This field defines the Java version your mod target.
-	// The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too.
-	def targetJavaVersion = 8
+// This field defines the Java version your mod target.
+// The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too.
+def targetJavaVersion = 8
 
-	repositories {
-		mavenLocal()
-		mavenCentral()
-		maven { url = 'https://aperlambda.github.io/maven' }
-	}
+def getMCVersionString() {
+    if (project.minecraft_version.matches("\\d\\dw\\d\\d[a-z]")) {
+        return project.minecraft_version
+    }
+    int lastDot = project.minecraft_version.lastIndexOf('.')
+    return project.minecraft_version.substring(0, lastDot)
+}
 
-	dependencies {
-	}
+minecraft {
+}
 
-	java {
-		sourceCompatibility = JavaVersion.toVersion(targetJavaVersion)
-		targetCompatibility = JavaVersion.toVersion(targetJavaVersion)
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url = 'https://aperlambda.github.io/maven' }
+    maven {
+        name = 'CottonMC'
+        url = 'http://server.bbkr.space:8081/artifactory/libs-snapshot'
+    }
+    repositories {
+        maven { url = "https://jitpack.io" }
+    }
+    maven { url "https://maven.shedaniel.me/" }
+}
 
-		withSourcesJar()
-	}
+configurations {
+    shadow
+    api.extendsFrom shadow
+}
 
-	tasks.withType(JavaCompile).configureEach {
-		it.options.encoding = "UTF-8"
+dependencies {
+    //to change the versions see the gradle.properties file
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-		if (JavaVersion.current().isJava9Compatible()) {
-			if (JavaVersion.current().isJava9Compatible()) {
-				it.options.release = targetJavaVersion
-			}
-		}
-	}
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	publishing {
-		repositories {
-			mavenLocal()
-			maven {
-				name = "GithubPackages"
-				url = uri("https://maven.pkg.github.com/LambdAurora/LambdaControls")
-				credentials {
-					username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-					password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
-				}
-			}
-		}
-	}
+    modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
+    modImplementation "com.github.lambdaurora:spruceui:${project.spruceui_version}"
+    include "com.github.lambdaurora:spruceui:${project.spruceui_version}"
+
+    // Compatibility mods
+    modImplementation "com.github.joaoh1:okzoomer:e13183c59b"
+    modImplementation "me.shedaniel:RoughlyEnoughItems:5.10.184"
+
+    shadow "com.electronwill.night-config:core:3.6.3"
+    shadow "com.electronwill.night-config:toml:3.6.3"
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion(targetJavaVersion)
+    targetCompatibility = JavaVersion.toVersion(targetJavaVersion)
+
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+
+    if (JavaVersion.current().isJava9Compatible()) {
+        if (JavaVersion.current().isJava9Compatible()) {
+            it.options.release = targetJavaVersion
+        }
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
+}
+
+license {
+    header file('HEADER')
+    include '**/*.java'
+}
+
+shadowJar {
+    dependsOn jar
+    configurations = [project.configurations.shadow]
+    archiveClassifier.set('dev')
+
+    exclude 'META-INF/maven/**'
+    exclude 'com/google/**'
+    exclude 'javax/**'
+    exclude 'org/**'
+    relocate 'com.electronwill.nightconfig', 'dev.lambdaurora.lambdacontrols.shadow.nightconfig'
+}
+
+task shadowRemapJar(type: RemapJarTask) {
+    dependsOn shadowJar
+
+    input = file("${project.buildDir}/libs/$archivesBaseName-$version-dev.jar")
+    archiveName = "${archivesBaseName}-${version}.jar"
+    addNestedDependencies = true
+}
+
+// configure the maven publication
+publishing {
+    repositories {
+        mavenLocal()
+        maven {
+            name = "GithubPackages"
+            url = uri("https://maven.pkg.github.com/LambdAurora/LambdaControls")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            // add all the jars that should be included when publishing to maven
+            artifact(remapJar) {
+                builtBy remapJar
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+        }
+    }
 }

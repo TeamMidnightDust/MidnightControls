@@ -1,6 +1,0 @@
-# LambdaControls server configuration.
-
-# Gameplay settings
-[gameplay]
-    # Allows front block placing like in Bedrock Edition.
-    front_block_placing = true
