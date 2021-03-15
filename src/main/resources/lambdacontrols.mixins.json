@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "me.lambdaurora.lambdacontrols.client.mixin",
+  "package": "dev.lambdaurora.lambdacontrols.client.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
     "AbstractButtonWidgetAccessor",

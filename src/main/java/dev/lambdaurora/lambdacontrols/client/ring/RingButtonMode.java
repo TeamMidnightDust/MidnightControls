@@ -1,0 +1,77 @@
+/*
+ * Copyright © 2020 LambdAurora <aurora42lambda@gmail.com>
+ *
+ * This file is part of LambdaControls.
+ *
+ * Licensed under the MIT license. For more information,
+ * see the LICENSE file.
+ */
+
+package dev.lambdaurora.lambdacontrols.client.ring;
+
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import org.aperlambda.lambdacommon.utils.Nameable;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Represents the mode of a ring button.
+ *
+ * @author LambdAurora
+ * @version 1.4.0
+ * @since 1.4.0
+ */
+public enum RingButtonMode implements Nameable
+{
+    PRESS("press"),
+    HOLD("hold"),
+    TOGGLE("toggle");
+
+    private final String name;
+    private final Text   text;
+
+    RingButtonMode(@NotNull String name)
+    {
+        this.name = name;
+        this.text = new TranslatableText(this.getTranslationKey());
+    }
+
+    /**
+     * Returns the next ring button mode available.
+     *
+     * @return The next ring button mode.
+     */
+    public @NotNull RingButtonMode next()
+    {
+        RingButtonMode[] v = values();
+        if (v.length == this.ordinal() + 1)
+            return v[0];
+        return v[this.ordinal() + 1];
+    }
+
+    /**
+     * Returns the translation key of this ring button mode.
+     *
+     * @return The translation key of this ring button mode.
+     */
+    public @NotNull String getTranslationKey()
+    {
+        return "lambdacontrols.ring.button_mode." + this.getName();
+    }
+
+    /**
+     * Gets the translated name of this ring button mode.
+     *
+     * @return The translated name of this ring button mode.
+     */
+    public @NotNull Text getTranslatedText()
+    {
+        return this.text;
+    }
+
+    @Override
+    public @NotNull String getName()
+    {
+        return this.name;
+    }
+}

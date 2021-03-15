@@ -17,13 +17,13 @@
   "environment": "client",
   "entrypoints": {
     "main": [
-      "me.lambdaurora.lambdacontrols.LambdaControls"
+      "dev.lambdaurora.lambdacontrols.LambdaControls"
     ],
     "client": [
-      "me.lambdaurora.lambdacontrols.client.LambdaControlsClient"
+      "dev.lambdaurora.lambdacontrols.client.LambdaControlsClient"
     ],
     "modmenu": [
-      "me.lambdaurora.lambdacontrols.client.LambdaControlsModMenu"
+      "dev.lambdaurora.lambdacontrols.client.LambdaControlsModMenu"
     ]
   },
   "mixins": [
