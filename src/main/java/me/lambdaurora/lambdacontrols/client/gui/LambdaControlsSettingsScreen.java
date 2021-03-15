@@ -18,6 +18,7 @@ import me.lambdaurora.spruceui.Position;
 import me.lambdaurora.spruceui.SpruceTexts;
 import me.lambdaurora.spruceui.option.*;
 import me.lambdaurora.spruceui.screen.SpruceScreen;
+import me.lambdaurora.spruceui.widget.AbstractSpruceWidget;
 import me.lambdaurora.spruceui.widget.SpruceLabelWidget;
 import me.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
 import me.lambdaurora.spruceui.widget.container.SpruceOptionListWidget;
@@ -30,6 +31,7 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
@@ -39,6 +41,7 @@ import org.lwjgl.glfw.GLFW;
  * Represents the LambdaControls settings screen.
  */
 public class LambdaControlsSettingsScreen extends SpruceScreen {
+    private static final Text SDL2_GAMEPAD_TOOL = new LiteralText("SDL2 Gamepad Tool").formatted(Formatting.GREEN);
     public static final String GAMEPAD_TOOL_URL = "https://generalarcade.com/gamepadtool/";
     final LambdaControlsClient mod;
     private final Screen parent;
@@ -71,7 +74,6 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
     private final MutableText controllerMappingsUrlText = new LiteralText("(")
             .append(new LiteralText(GAMEPAD_TOOL_URL).formatted(Formatting.GOLD))
             .append("),");
-    private SpruceLabelWidget gamepadToolUrlLabel;
 
     public LambdaControlsSettingsScreen(Screen parent, boolean hideControls) {
         super(new TranslatableText("lambdacontrols.title.settings"));
@@ -273,11 +275,6 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
 
         this.buildTabs();
 
-        this.gamepadToolUrlLabel = new SpruceLabelWidget(Position.of(this.width / 2, this.height - 29 - (5 + this.textRenderer.fontHeight) * 2), this.controllerMappingsUrlText, this.width,
-                label -> Util.getOperatingSystem().open(GAMEPAD_TOOL_URL), true);
-        this.gamepadToolUrlLabel.setTooltip(new TranslatableText("chat.link.open"));
-        this.addChild(this.gamepadToolUrlLabel);
-
         this.addChild(this.resetOption.createWidget(Position.of(this.width / 2 - 155, this.height - 29), 150));
         this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, SpruceTexts.GUI_DONE,
                 btn -> this.client.openScreen(this.parent)));
@@ -286,7 +283,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
     public void buildTabs() {
         SpruceTabbedWidget tabs = new SpruceTabbedWidget(Position.of(0, 24), this.width, this.height - 32 - 24,
                 null,
-                Math.max(100, this.width / 8), 0);
+                Math.max(110, this.width / 8), 0);
         this.addChild(tabs);
 
         tabs.addSeparatorEntry(new TranslatableText("lambdacontrols.menu.separator.general"));
@@ -337,11 +334,38 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
         return new ControllerControlsWidget(Position.origin(), width, height);
     }
 
-    public SpruceOptionListWidget buildControllerTab(int width, int height) {
-        SpruceOptionListWidget list = new SpruceOptionListWidget(Position.origin(), width, height);
+    public AbstractSpruceWidget buildControllerTab(int width, int height) {
+        SpruceContainerWidget root = new SpruceContainerWidget(Position.origin(), width, height);
+
+        SpruceLabelWidget aboutMappings1 = new SpruceLabelWidget(Position.of(width / 2, 2),
+                new TranslatableText("lambdacontrols.controller.mappings.1", SDL2_GAMEPAD_TOOL),
+                width, true);
+
+        SpruceLabelWidget gamepadToolUrlLabel = new SpruceLabelWidget(Position.of(width / 2, aboutMappings1.getHeight() + 4),
+                this.controllerMappingsUrlText, width,
+                label -> Util.getOperatingSystem().open(GAMEPAD_TOOL_URL), true);
+        gamepadToolUrlLabel.setTooltip(new TranslatableText("chat.link.open"));
+
+        SpruceLabelWidget aboutMappings3 = new SpruceLabelWidget(Position.of(width / 2,
+                aboutMappings1.getHeight() + gamepadToolUrlLabel.getHeight() + 6),
+                new TranslatableText("lambdacontrols.controller.mappings.3", Formatting.GREEN.toString(), Formatting.RESET.toString()),
+                width, true);
+
+        int listHeight = height - 8 - aboutMappings1.getHeight() - aboutMappings3.getHeight() - gamepadToolUrlLabel.getHeight();
+        SpruceContainerWidget labels = new SpruceContainerWidget(Position.of(0,
+                listHeight),
+                width, height - listHeight);
+        labels.addChild(aboutMappings1);
+        labels.addChild(gamepadToolUrlLabel);
+        labels.addChild(aboutMappings3);
+
+        SpruceOptionListWidget list = new SpruceOptionListWidget(Position.origin(), width, listHeight);
         list.addSingleOptionEntry(this.controllerOption);
         list.addSingleOptionEntry(this.secondControllerOption);
-        return list;
+
+        root.addChild(list);
+        root.addChild(labels);
+        return root;
     }
 
     public SpruceContainerWidget buildMappingsStringEditorTab(int width, int height) {
@@ -351,7 +375,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
     @Override
     public void renderTitle(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         drawCenteredString(matrices, this.textRenderer, I18n.translate("lambdacontrols.menu.title"), this.width / 2, 8, 16777215);
-        drawCenteredString(matrices, this.textRenderer, I18n.translate("lambdacontrols.controller.mappings.1", Formatting.GREEN.toString(), Formatting.RESET.toString()), this.width / 2, this.height - 29 - (5 + this.textRenderer.fontHeight) * 3, 10526880);
-        drawCenteredString(matrices, this.textRenderer, I18n.translate("lambdacontrols.controller.mappings.3", Formatting.GREEN.toString(), Formatting.RESET.toString()), this.width / 2, this.height - 29 - (5 + this.textRenderer.fontHeight), 10526880);
+//        drawCenteredString(matrices, this.textRenderer, I18n.translate("lambdacontrols.controller.mappings.1", Formatting.GREEN.toString(), Formatting.RESET.toString()), this.width / 2, this.height - 29 - (5 + this.textRenderer.fontHeight) * 3, 10526880);
+//        drawCenteredString(matrices, this.textRenderer, I18n.translate("lambdacontrols.controller.mappings.3", Formatting.GREEN.toString(), Formatting.RESET.toString()), this.width / 2, this.height - 29 - (5 + this.textRenderer.fontHeight), 10526880);
     }
 }

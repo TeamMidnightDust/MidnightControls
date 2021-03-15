@@ -47,7 +47,7 @@ public class ControllerControlsWidget extends SpruceContainerWidget {
         this.addChild(new SpruceButtonWidget(Position.of(this, this.width / 2 - 155, 18), 310, 20,
                 new TranslatableText("lambdacontrols.menu.keyboard_controls"),
                 btn -> this.client.openScreen(new ControlsOptionsScreen(null, this.client.options))));
-        this.bindingsListWidget = new ControlsListWidget(Position.of(this, 0, 43), this.width, this.height - 43 - 43, this);
+        this.bindingsListWidget = new ControlsListWidget(Position.of(this, 0, 43), this.width, this.height - 43 - 35, this);
         this.addChild(this.bindingsListWidget);
         this.addChild(this.resetButton = new SpruceButtonWidget(Position.of(this, this.width / 2 - 155, this.height - 29), 150, 20,
                 SpruceTexts.CONTROLS_RESET_ALL,
@@ -56,7 +56,8 @@ public class ControllerControlsWidget extends SpruceContainerWidget {
 
     @Override
     public void renderWidget(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        drawCenteredText(matrices, this.client.textRenderer, new TranslatableText("lambdacontrols.menu.title.controller_controls"), this.width / 2, 8, 16777215);
+        drawCenteredText(matrices, this.client.textRenderer, new TranslatableText("lambdacontrols.menu.title.controller_controls"),
+                this.getX() + this.width / 2, this.getY() + 4, 16777215);
         this.resetButton.setActive(InputManager.streamBindings().anyMatch(Predicates.not(ButtonBinding::isDefault)));
         super.renderWidget(matrices, mouseX, mouseY, delta);
     }

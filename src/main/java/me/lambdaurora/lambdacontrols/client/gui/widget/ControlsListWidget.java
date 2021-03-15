@@ -21,6 +21,7 @@ import me.lambdaurora.spruceui.widget.SpruceButtonWidget;
 import me.lambdaurora.spruceui.widget.SpruceSeparatorWidget;
 import me.lambdaurora.spruceui.widget.SpruceWidget;
 import me.lambdaurora.spruceui.widget.container.SpruceEntryListWidget;
+import me.lambdaurora.spruceui.widget.container.SpruceParentWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.font.TextRenderer;
@@ -73,7 +74,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         return this.getWidth() / 2 - baseWidth / 2 + 72 - this.maxTextLength;
     }
 
-    public class ButtonBindingEntry extends Entry {
+    public class ButtonBindingEntry extends Entry implements SpruceParentWidget<SpruceWidget> {
         private final List<SpruceWidget> children = new ArrayList<>();
         private @Nullable SpruceWidget focused;
         private final ButtonBinding binding;
@@ -86,7 +87,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
             super(parent);
             this.binding = binding;
             this.bindingName = I18n.translate(this.binding.getTranslationKey());
-            this.editButton = new ControllerButtonWidget(Position.of(this, this.getWidth() - 55 - 110, 0), 110, this.binding, btn -> {
+            this.editButton = new ControllerButtonWidget(Position.of(this, parent.getWidth() / 2 - 8, 0), 110, this.binding, btn -> {
                 gui.focusedBinding = binding;
                 LambdaControlsClient.get().input.beginControlsInput(gui);
             }) {
@@ -95,14 +96,18 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                 }
             };
             this.children.add(editButton);
-            this.resetButton = new SpruceButtonWidget(Position.of(this, this.getWidth() - 50, 0), 50, 20, new TranslatableText("controls.reset"),
+            this.resetButton = new SpruceButtonWidget(Position.of(this,
+                    this.editButton.getPosition().getRelativeX() + this.editButton.getWidth() + 2, 0),
+                    44, 20, new TranslatableText("controls.reset"),
                     btn -> LambdaControlsClient.get().config.setButtonBinding(binding, binding.getDefaultButton())) {
                 protected Optional<Text> getNarrationMessage() {
                     return Optional.of(new TranslatableText("narrator.controls.reset", bindingName));
                 }
             };
             this.children.add(this.resetButton);
-            this.unbindButton = new SpruceButtonWidget(Position.of(this, this.getWidth() - 50, 0), 50, 20, SpruceTexts.GUI_UNBIND,
+            this.unbindButton = new SpruceButtonWidget(Position.of(this,
+                    this.editButton.getPosition().getRelativeX() + this.editButton.getWidth() + 2, 0),
+                    this.resetButton.getWidth(), this.resetButton.getHeight(), SpruceTexts.GUI_UNBIND,
                     btn -> {
                         LambdaControlsClient.get().config.setButtonBinding(binding, UNBOUND);
                         gui.focusedBinding = null;
@@ -113,16 +118,22 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                 }
             };
             this.children.add(this.unbindButton);
+
+            this.position.setRelativeX(4);
+            this.width -= 10;
         }
 
+        @Override
         public List<SpruceWidget> children() {
             return this.children;
         }
 
+        @Override
         public @Nullable SpruceWidget getFocused() {
             return this.focused;
         }
 
+        @Override
         public void setFocused(@Nullable SpruceWidget focused) {
             if (this.focused == focused)
                 return;
@@ -134,21 +145,6 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         @Override
         public int getHeight() {
             return this.children.stream().mapToInt(SpruceWidget::getHeight).reduce(Integer::max).orElse(0) + 4;
-        }
-
-        public Optional<SpruceWidget> hoveredElement(double mouseX, double mouseY) {
-            Iterator<SpruceWidget> it = this.children().iterator();
-
-            SpruceWidget element;
-            do {
-                if (!it.hasNext()) {
-                    return Optional.empty();
-                }
-
-                element = it.next();
-            } while (!element.isMouseOver(mouseX, mouseY));
-
-            return Optional.of(element);
         }
 
         /* Input */
@@ -362,7 +358,6 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
 
         protected Entry(ControlsListWidget parent) {
             this.parent = parent;
-            this.position.setRelativeX(this.parent.getRowLeft());
         }
 
         @Override

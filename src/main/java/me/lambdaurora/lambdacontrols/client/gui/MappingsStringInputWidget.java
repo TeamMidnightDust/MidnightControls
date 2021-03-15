@@ -97,7 +97,7 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
         }
 
         int textFieldWidth = (int) (this.width * (5.0 / 6.0));
-        this.textArea = new SpruceTextAreaWidget(Position.of(this, this.width / 2 - textFieldWidth / 2, 0), this.client.textRenderer, textFieldWidth, this.height - 50, new LiteralText(mappings));
+        this.textArea = new SpruceTextAreaWidget(Position.of(this, this.width / 2 - textFieldWidth / 2, 0), textFieldWidth, this.height - 50, new LiteralText(mappings));
         this.textArea.setText(mappings);
         // Display as many lines as possible
         this.textArea.setDisplayedLines(this.textArea.getInnerHeight() / this.client.textRenderer.fontHeight);

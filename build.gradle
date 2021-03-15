@@ -48,10 +48,12 @@ repositories {
         name = 'CottonMC'
         url = 'http://server.bbkr.space:8081/artifactory/libs-snapshot'
     }
-    repositories {
-        maven { url = "https://jitpack.io" }
+    maven {
+        name = 'Terraformers'
+        url = 'https://maven.terraformersmc.com/releases'
     }
     maven { url "https://maven.shedaniel.me/" }
+    maven { url = "https://jitpack.io" }
 }
 
 configurations {
@@ -68,13 +70,17 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
+    modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
     modImplementation "com.github.lambdaurora:spruceui:${project.spruceui_version}"
     include "com.github.lambdaurora:spruceui:${project.spruceui_version}"
 
     // Compatibility mods
-    modImplementation "com.github.joaoh1:okzoomer:e13183c59b"
-    modImplementation "me.shedaniel:RoughlyEnoughItems:5.10.184"
+    modImplementation("com.github.joaoh1:okzoomer:e13183c59b") {
+        exclude group: 'me.shedaniel.cloth'
+        exclude group: 'io.github.prospector'
+    }
+
+    modImplementation("me.shedaniel:RoughlyEnoughItems:5.10.184")
 
     shadow "com.electronwill.night-config:core:3.6.3"
     shadow "com.electronwill.night-config:toml:3.6.3"
