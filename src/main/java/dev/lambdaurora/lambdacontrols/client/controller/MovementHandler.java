@@ -21,19 +21,17 @@ import org.jetbrains.annotations.NotNull;
  * @version 1.4.0
  * @since 1.4.0
  */
-public final class MovementHandler implements PressAction
-{
-    public static final MovementHandler HANDLER                = new MovementHandler();
-    private             boolean         shouldOverrideMovement = false;
-    private             boolean         pressingForward        = false;
-    private             boolean         pressingBack           = false;
-    private             boolean         pressingLeft           = false;
-    private             boolean         pressingRight          = false;
-    private             float           movementForward        = 0.f;
-    private             float           movementSideways       = 0.f;
+public final class MovementHandler implements PressAction {
+    public static final MovementHandler HANDLER = new MovementHandler();
+    private boolean shouldOverrideMovement = false;
+    private boolean pressingForward = false;
+    private boolean pressingBack = false;
+    private boolean pressingLeft = false;
+    private boolean pressingRight = false;
+    private float movementForward = 0.f;
+    private float movementSideways = 0.f;
 
-    private MovementHandler()
-    {
+    private MovementHandler() {
     }
 
     /**
@@ -41,8 +39,7 @@ public final class MovementHandler implements PressAction
      *
      * @param player The client player.
      */
-    public void applyMovement(@NotNull ClientPlayerEntity player)
-    {
+    public void applyMovement(@NotNull ClientPlayerEntity player) {
         if (!this.shouldOverrideMovement)
             return;
         player.input.pressingForward = this.pressingForward;
@@ -55,8 +52,7 @@ public final class MovementHandler implements PressAction
     }
 
     @Override
-    public boolean press(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action)
-    {
+    public boolean press(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action) {
         if (client.currentScreen != null || client.player == null)
             return this.shouldOverrideMovement = false;
 
@@ -66,10 +62,10 @@ public final class MovementHandler implements PressAction
         else if (button == ButtonBinding.BACK || button == ButtonBinding.RIGHT)
             direction = -1;
 
-        if (direction == 0)
-            return false;
+        if (action.isUnpressed())
+            direction = 0;
 
-        this.shouldOverrideMovement = true;
+        this.shouldOverrideMovement = direction != 0;
 
         value = (float) Math.pow(value, 2);
 
@@ -93,6 +89,6 @@ public final class MovementHandler implements PressAction
                 this.movementSideways *= 0.3D;
         }
 
-        return true;
+        return this.shouldOverrideMovement;
     }
 }

@@ -30,8 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Injects the anti fly drifting feature.
  */
 @Mixin(ClientPlayerEntity.class)
-public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
-{
+public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
     private boolean lambdacontrols_driftingPrevented = false;
 
     @Shadow
@@ -47,14 +46,12 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     @Shadow
     protected abstract boolean isCamera();
 
-    public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile)
-    {
+    public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
         super(world, profile);
     }
 
     @Inject(method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"))
-    public void onMove(MovementType type, Vec3d movement, CallbackInfo ci)
-    {
+    public void onMove(MovementType type, Vec3d movement, CallbackInfo ci) {
         LambdaControlsClient mod = LambdaControlsClient.get();
         if (type == MovementType.SELF) {
             if (this.abilities.flying && (!mod.config.hasFlyDrifting() || !mod.config.hasFlyVerticalDrifting())) {
@@ -71,14 +68,12 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     }
 
     @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/Input;tick(Z)V", shift = At.Shift.AFTER))
-    public void onInputUpdate(CallbackInfo ci)
-    {
+    public void onInputUpdate(CallbackInfo ci) {
         MovementHandler.HANDLER.applyMovement((ClientPlayerEntity) (Object) this);
     }
 
     @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isCamera()Z"))
-    public void onTickMovement(CallbackInfo ci)
-    {
+    public void onTickMovement(CallbackInfo ci) {
         if (this.abilities.flying && this.isCamera()) {
             if (LambdaControlsClient.get().config.hasFlyVerticalDrifting())
                 return;

@@ -11,16 +11,16 @@ package dev.lambdaurora.lambdacontrols.client;
 
 import com.google.common.collect.ImmutableSet;
 import dev.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
-import dev.lambdaurora.lambdacontrols.client.mixin.AdvancementsScreenAccessor;
-import dev.lambdaurora.lambdacontrols.client.mixin.CreativeInventoryScreenAccessor;
-import dev.lambdaurora.lambdacontrols.client.mixin.EntryListWidgetAccessor;
-import dev.lambdaurora.lambdacontrols.client.util.HandledScreenAccessor;
-import dev.lambdaurora.lambdacontrols.client.util.MouseAccessor;
 import dev.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import dev.lambdaurora.lambdacontrols.client.controller.Controller;
 import dev.lambdaurora.lambdacontrols.client.controller.InputManager;
 import dev.lambdaurora.lambdacontrols.client.gui.TouchscreenOverlay;
 import dev.lambdaurora.lambdacontrols.client.gui.widget.ControllerControlsWidget;
+import dev.lambdaurora.lambdacontrols.client.mixin.AdvancementsScreenAccessor;
+import dev.lambdaurora.lambdacontrols.client.mixin.CreativeInventoryScreenAccessor;
+import dev.lambdaurora.lambdacontrols.client.mixin.EntryListWidgetAccessor;
+import dev.lambdaurora.lambdacontrols.client.util.HandledScreenAccessor;
+import dev.lambdaurora.lambdacontrols.client.util.MouseAccessor;
 import me.lambdaurora.spruceui.navigation.NavigationDirection;
 import me.lambdaurora.spruceui.screen.SpruceScreen;
 import me.lambdaurora.spruceui.widget.AbstractSprucePressableButtonWidget;
@@ -193,13 +193,13 @@ public class LambdaInput {
         if (player == null)
             return;
 
-        if (this.targetYaw != 0F || this.targetPitch != 0F) {
+        if (this.targetYaw != 0.f || this.targetPitch != 0.f) {
             float rotationYaw = (float) (player.prevYaw + (this.targetYaw / 0.10) * tickDelta);
             float rotationPitch = (float) (player.prevPitch + (this.targetPitch / 0.10) * tickDelta);
             client.player.yaw = rotationYaw;
-            client.player.pitch = MathHelper.clamp(rotationPitch, -90.F, 90.F);
+            client.player.pitch = MathHelper.clamp(rotationPitch, -90.f, 90.f);
             if (client.player.isRiding()) {
-                client.player.getVehicle().copyPositionAndRotation(client.player);
+                client.player.getVehicle().onPassengerLookAround(client.player);
             }
             client.getTutorialManager().onUpdateMouse(this.targetPitch, this.targetYaw);
         }

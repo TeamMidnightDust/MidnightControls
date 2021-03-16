@@ -224,7 +224,6 @@ public class ButtonBinding implements Nameable {
             return;
         if (this.hasCooldown && state.isPressed()) {
             this.cooldown = 5;
-
         }
         for (int i = this.actions.size() - 1; i >= 0; i--) {
             if (this.actions.get(i).press(client, this, value, state))

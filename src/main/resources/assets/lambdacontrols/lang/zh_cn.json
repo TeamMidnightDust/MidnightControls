@@ -62,7 +62,7 @@
   "lambdacontrols.button.unknown": "未知（%d）",
   "lambdacontrols.controller.connected": "手柄%d已连接。",
   "lambdacontrols.controller.disconnected": "手柄%d已断开。",
-  "lambdacontrols.controller.mappings.1": "请使用%sSDL2 Gamepad Tool%s配置手柄键位映射",
+  "lambdacontrols.controller.mappings.1": "请使用%s配置手柄键位映射",
   "lambdacontrols.controller.mappings.3": "并将键位映射文件放入此路径：`%s.minecraft/config/gamecontrollerdb.txt%s`。",
   "lambdacontrols.controller.mappings.updated": "键位映射已更新！",
   "lambdacontrols.controller_type.default": "默认",
