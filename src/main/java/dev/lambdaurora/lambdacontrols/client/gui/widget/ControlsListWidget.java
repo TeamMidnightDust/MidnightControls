@@ -223,55 +223,6 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
             return result;
         }
 
-       /* @Override
-        public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY, boolean hovering, float delta)
-        {
-        220+32
-            boolean focused = gui.focusedBinding == this.binding;
-            TextRenderer textRenderer = ControlsListWidget.this.client.textRenderer;
-            String bindingName = this.bindingName;
-            float var10002 = (float) (x + 70 - ControlsListWidget.this.field_2733);
-            int var10003 = y + height / 2;
-            textRenderer.draw(matrices, bindingName, var10002, (float) (var10003 - 9 / 2), 16777215);
-            this.resetButton.x = this.unboundButton.x = x + 190;
-            this.resetButton.y = this.unboundButton.y = y;
-            this.resetButton.active = !this.binding.isDefault();
-            if (focused)
-                this.unboundButton.render(matrices, mouseX, mouseY, delta);
-            else
-                this.resetButton.render(matrices, mouseX, mouseY, delta);
-            this.editButton.x = x + 75;
-            this.editButton.y = y;
-            this.editButton.update();
-
-            if (focused) {
-                MutableText text = new LiteralText("> ").formatted(Formatting.WHITE);
-                text.append(this.editButton.getMessage().copy().formatted(Formatting.YELLOW));
-                this.editButton.setMessage(text.append(new LiteralText(" <").formatted(Formatting.WHITE)));
-            } else if (!this.binding.isNotBound() && InputManager.hasDuplicatedBindings(this.binding)) {
-                MutableText text = this.editButton.getMessage().copy();
-                this.editButton.setMessage(text.formatted(Formatting.RED));
-            } else if (this.binding.isNotBound()) {
-                MutableText text = this.editButton.getMessage().copy();
-                this.editButton.setMessage(text.formatted(Formatting.GOLD));
-            }
-
-            this.editButton.render(matrices, mouseX, mouseY, delta);
-        }*/
-
-        /*public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            boolean focused = gui.focusedBinding == this.binding;
-            if (this.editButton.mouseClicked(mouseX, mouseY, button))
-                return true;
-            else
-                return focused ? this.unboundButton.mouseClicked(mouseX, mouseY, button) : this.resetButton.mouseClicked(mouseX, mouseY, button);
-        }
-
-        public boolean mouseReleased(double mouseX, double mouseY, int button) {
-            return this.editButton.mouseReleased(mouseX, mouseY, button) || this.resetButton.mouseReleased(mouseX, mouseY, button)
-                    || this.unboundButton.mouseReleased(mouseX, mouseY, button);
-        }*/
-
         /* Rendering */
 
         @Override
@@ -311,10 +262,11 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
 
         protected CategoryEntry(ControlsListWidget parent, ButtonCategory category) {
             super(parent);
-            this.separatorWidget = new SpruceSeparatorWidget(Position.of(this, 0, 0), this.getWidth(), new LiteralText(category.getTranslatedName())) {
+            this.separatorWidget = new SpruceSeparatorWidget(Position.of(this, 2, 0), this.getWidth() - 4,
+                    new LiteralText(category.getTranslatedName())) {
                 @Override
                 public int getWidth() {
-                    return CategoryEntry.this.getWidth();
+                    return CategoryEntry.this.getWidth() - 4;
                 }
             };
         }
@@ -362,7 +314,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
 
         @Override
         public int getWidth() {
-            return this.parent.getRowWidth();
+            return this.parent.getInnerWidth();
         }
     }
 }

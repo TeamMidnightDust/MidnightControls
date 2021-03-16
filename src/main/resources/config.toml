@@ -17,6 +17,8 @@ debug = false
 [gameplay]
     # Enables fast block placing like in Bedrock Edition.
     fast_block_placing = true
+    # Enables analogic movement if possible.
+    analog_movement = true
     # Fly behaviors
     [gameplay.fly]
         # Enables fly drifting.

@@ -69,7 +69,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents the LambdaControls' input handler.
  *
  * @author LambdAurora
- * @version 1.4.3
+ * @version 1.6.0
  * @since 1.0.0
  */
 public class LambdaInput {

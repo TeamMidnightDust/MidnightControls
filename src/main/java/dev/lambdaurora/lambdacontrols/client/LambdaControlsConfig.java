@@ -40,6 +40,7 @@ public class LambdaControlsConfig {
     private static final boolean DEFAULT_HUD_ENABLE = true;
     private static final HudSide DEFAULT_HUD_SIDE = HudSide.LEFT;
     // Gameplay
+    private static final boolean DEFAULT_ANALOG_MOVEMENT = true;
     private static final boolean DEFAULT_FAST_BLOCK_INTERACTION = true;
     private static final boolean DEFAULT_FLY_DRIFTING = false;
     private static final boolean DEFAULT_FLY_VERTICAL_DRIFTING = true;
@@ -63,6 +64,7 @@ public class LambdaControlsConfig {
     private ControlsMode controlsMode;
     private ControllerType controllerType;
     // Gameplay.
+    private boolean analogMovement;
     private boolean shouldRenderReacharoundOutline;
     private int[] reacharoundOutlineColor;
     // Controller settings
@@ -92,6 +94,7 @@ public class LambdaControlsConfig {
         this.hudEnable = this.config.getOrElse("hud.enable", DEFAULT_HUD_ENABLE);
         this.hudSide = HudSide.byId(this.config.getOrElse("hud.side", DEFAULT_HUD_SIDE.getName())).orElse(DEFAULT_HUD_SIDE);
         // Gameplay
+        this.analogMovement = this.config.getOrElse("gameplay.analog_movement", DEFAULT_ANALOG_MOVEMENT);
         LambdaControlsFeature.FAST_BLOCK_PLACING.setEnabled(this.config.getOrElse("gameplay.fast_block_placing", DEFAULT_FAST_BLOCK_INTERACTION));
         LambdaControlsFeature.HORIZONTAL_REACHAROUND.setEnabled(this.config.getOrElse("gameplay.reacharound.horizontal", DEFAULT_HORIZONTAL_REACHAROUND));
         LambdaControlsFeature.VERTICAL_REACHAROUND.setEnabled(this.config.getOrElse("gameplay.reacharound.vertical", DEFAULT_VERTICAL_REACHAROUND));
@@ -170,6 +173,7 @@ public class LambdaControlsConfig {
         this.setAutoSwitchMode(DEFAULT_AUTO_SWITCH_MODE);
         this.setDebug(DEFAULT_DEBUG);
         // Gameplay
+        this.setAnalogMovement(DEFAULT_ANALOG_MOVEMENT);
         this.setFastBlockPlacing(DEFAULT_FAST_BLOCK_INTERACTION);
         this.setFlyDrifting(DEFAULT_FLY_DRIFTING);
         this.setFlyVerticalDrifting(DEFAULT_FLY_VERTICAL_DRIFTING);
@@ -292,6 +296,22 @@ public class LambdaControlsConfig {
     /*
             Gameplay settings
      */
+
+    /**
+     * Gets whether analog movement is enabled.
+     * @return {@code true} if analog movement is enabled, else {@code false}
+     */
+    public boolean hasAnalogMovement() {
+        return this.analogMovement;
+    }
+
+    /**
+     * Sets whether analog movement is enabled.
+     * @param analogMovement {@code true} if analog movement is enabled, else {@code false}
+     */
+    public void setAnalogMovement(boolean analogMovement) {
+        this.config.set("gameplay.analog_movement", this.analogMovement = analogMovement);
+    }
 
     /**
      * Gets whether fast block placing is enabled or not.

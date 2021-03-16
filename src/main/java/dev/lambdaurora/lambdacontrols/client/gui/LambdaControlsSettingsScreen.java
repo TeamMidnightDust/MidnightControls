@@ -52,25 +52,26 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption mouseSpeedOption;
     private final SpruceOption resetOption;
     // Gameplay options
+    private final SpruceOption analogMovementOption;
     private final SpruceOption autoJumpOption;
     private final SpruceOption fastBlockPlacingOption;
     private final SpruceOption frontBlockPlacingOption;
     private final SpruceOption verticalReacharoundOption;
     private final SpruceOption flyDriftingOption;
     private final SpruceOption flyVerticalDriftingOption;
+    // Appearance options
+    private final SpruceOption controllerTypeOption;
+    private final SpruceOption virtualMouseSkinOption;
+    private final SpruceOption hudEnableOption;
+    private final SpruceOption hudSideOption;
     // Controller options
     private final SpruceOption controllerOption;
     private final SpruceOption secondControllerOption;
-    private final SpruceOption controllerTypeOption;
     private final SpruceOption deadZoneOption;
     private final SpruceOption invertsRightXAxis;
     private final SpruceOption invertsRightYAxis;
     private final SpruceOption unfocusedInputOption;
     private final SpruceOption virtualMouseOption;
-    private final SpruceOption virtualMouseSkinOption;
-    // Hud options
-    private final SpruceOption hudEnableOption;
-    private final SpruceOption hudSideOption;
     private final MutableText controllerMappingsUrlText = new LiteralText("(")
             .append(new LiteralText(GAMEPAD_TOOL_URL).formatted(Formatting.GOLD))
             .append("),");
@@ -91,8 +92,8 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
                     }
                 }, option -> option.getDisplayText(new TranslatableText(this.mod.config.getControlsMode().getTranslationKey())),
                 new TranslatableText("lambdacontrols.tooltip.controls_mode"));
-        this.autoSwitchModeOption = new SpruceBooleanOption("lambdacontrols.menu.auto_switch_mode", this.mod.config::hasAutoSwitchMode,
-                this.mod.config::setAutoSwitchMode, new TranslatableText("lambdacontrols.tooltip.auto_switch_mode"), true);
+        this.autoSwitchModeOption = new SpruceToggleBooleanOption("lambdacontrols.menu.auto_switch_mode", this.mod.config::hasAutoSwitchMode,
+                this.mod.config::setAutoSwitchMode, new TranslatableText("lambdacontrols.tooltip.auto_switch_mode"));
         this.rotationSpeedOption = new SpruceDoubleOption("lambdacontrols.menu.rotation_speed", 0.0, 100.0, 0.5F, this.mod.config::getRotationSpeed,
                 newValue -> {
                     synchronized (this.mod.config) {
@@ -113,6 +114,9 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
             this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
         });
         // Gameplay options
+        this.analogMovementOption = new SpruceToggleBooleanOption("lambdacontrols.menu.analog_movement",
+                this.mod.config::hasAnalogMovement, this.mod.config::setAnalogMovement,
+                new TranslatableText("lambdacontrols.tooltip.analog_movement"));
         this.autoJumpOption = new SpruceToggleBooleanOption("options.autoJump",
                 () -> this.client.options.autoJump,
                 newValue -> this.client.options.autoJump = newValue,
@@ -127,6 +131,21 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
                 this.mod.config::setFlyDrifting, new TranslatableText("lambdacontrols.tooltip.fly_drifting"));
         this.flyVerticalDriftingOption = new SpruceToggleBooleanOption("lambdacontrols.menu.fly_drifting_vertical", this.mod.config::hasFlyVerticalDrifting,
                 this.mod.config::setFlyVerticalDrifting, new TranslatableText("lambdacontrols.tooltip.fly_drifting_vertical"));
+        // Appearance options
+        this.controllerTypeOption = new SpruceCyclingOption("lambdacontrols.menu.controller_type",
+                amount -> this.mod.config.setControllerType(this.mod.config.getControllerType().next()),
+                option -> option.getDisplayText(this.mod.config.getControllerType().getTranslatedText()),
+                new TranslatableText("lambdacontrols.tooltip.controller_type"));
+        this.virtualMouseSkinOption = new SpruceCyclingOption("lambdacontrols.menu.virtual_mouse.skin",
+                amount -> this.mod.config.setVirtualMouseSkin(this.mod.config.getVirtualMouseSkin().next()),
+                option -> option.getDisplayText(this.mod.config.getVirtualMouseSkin().getTranslatedText()),
+                null);
+        this.hudEnableOption = new SpruceToggleBooleanOption("lambdacontrols.menu.hud_enable", this.mod.config::isHudEnabled,
+                this.mod::setHudEnabled, new TranslatableText("lambdacontrols.tooltip.hud_enable"));
+        this.hudSideOption = new SpruceCyclingOption("lambdacontrols.menu.hud_side",
+                amount -> this.mod.config.setHudSide(this.mod.config.getHudSide().next()),
+                option -> option.getDisplayText(this.mod.config.getHudSide().getTranslatedText()),
+                new TranslatableText("lambdacontrols.tooltip.hud_side"));
         // Controller options
         this.controllerOption = new SpruceCyclingOption("lambdacontrols.menu.controller", amount -> {
             int id = this.mod.config.getController().getId();
@@ -160,10 +179,6 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
                 return option.getDisplayText(new LiteralText(controllerName));
         }).orElse(option.getDisplayText(SpruceTexts.OPTIONS_OFF.shallowCopy().formatted(Formatting.RED))),
                 new TranslatableText("lambdacontrols.tooltip.controller2"));
-        this.controllerTypeOption = new SpruceCyclingOption("lambdacontrols.menu.controller_type",
-                amount -> this.mod.config.setControllerType(this.mod.config.getControllerType().next()),
-                option -> option.getDisplayText(this.mod.config.getControllerType().getTranslatedText()),
-                new TranslatableText("lambdacontrols.tooltip.controller_type"));
         this.deadZoneOption = new SpruceDoubleOption("lambdacontrols.menu.dead_zone", 0.05, 1.0, 0.05F, this.mod.config::getDeadZone,
                 newValue -> {
                     synchronized (this.mod.config) {
@@ -173,33 +188,22 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
             String value = String.valueOf(option.get());
             return option.getDisplayText(new LiteralText(value.substring(0, Math.min(value.length(), 5))));
         }, new TranslatableText("lambdacontrols.tooltip.dead_zone"));
-        this.invertsRightXAxis = new SpruceBooleanOption("lambdacontrols.menu.invert_right_x_axis", this.mod.config::doesInvertRightXAxis,
+        this.invertsRightXAxis = new SpruceToggleBooleanOption("lambdacontrols.menu.invert_right_x_axis", this.mod.config::doesInvertRightXAxis,
                 newValue -> {
                     synchronized (this.mod.config) {
                         this.mod.config.setInvertRightXAxis(newValue);
                     }
-                }, null, true);
-        this.invertsRightYAxis = new SpruceBooleanOption("lambdacontrols.menu.invert_right_y_axis", this.mod.config::doesInvertRightYAxis,
+                }, null);
+        this.invertsRightYAxis = new SpruceToggleBooleanOption("lambdacontrols.menu.invert_right_y_axis", this.mod.config::doesInvertRightYAxis,
                 newValue -> {
                     synchronized (this.mod.config) {
                         this.mod.config.setInvertRightYAxis(newValue);
                     }
-                }, null, true);
-        this.unfocusedInputOption = new SpruceBooleanOption("lambdacontrols.menu.unfocused_input", this.mod.config::hasUnfocusedInput,
-                this.mod.config::setUnfocusedInput, new TranslatableText("lambdacontrols.tooltip.unfocused_input"), true);
-        this.virtualMouseOption = new SpruceBooleanOption("lambdacontrols.menu.virtual_mouse", this.mod.config::hasVirtualMouse,
-                this.mod.config::setVirtualMouse, new TranslatableText("lambdacontrols.tooltip.virtual_mouse"), true);
-        this.virtualMouseSkinOption = new SpruceCyclingOption("lambdacontrols.menu.virtual_mouse.skin",
-                amount -> this.mod.config.setVirtualMouseSkin(this.mod.config.getVirtualMouseSkin().next()),
-                option -> option.getDisplayText(this.mod.config.getVirtualMouseSkin().getTranslatedText()),
-                null);
-        // HUD options
-        this.hudEnableOption = new SpruceBooleanOption("lambdacontrols.menu.hud_enable", this.mod.config::isHudEnabled,
-                this.mod::setHudEnabled, new TranslatableText("lambdacontrols.tooltip.hud_enable"), true);
-        this.hudSideOption = new SpruceCyclingOption("lambdacontrols.menu.hud_side",
-                amount -> this.mod.config.setHudSide(this.mod.config.getHudSide().next()),
-                option -> option.getDisplayText(this.mod.config.getHudSide().getTranslatedText()),
-                new TranslatableText("lambdacontrols.tooltip.hud_side"));
+                }, null);
+        this.unfocusedInputOption = new SpruceToggleBooleanOption("lambdacontrols.menu.unfocused_input", this.mod.config::hasUnfocusedInput,
+                this.mod.config::setUnfocusedInput, new TranslatableText("lambdacontrols.tooltip.unfocused_input"));
+        this.virtualMouseOption = new SpruceToggleBooleanOption("lambdacontrols.menu.virtual_mouse", this.mod.config::hasVirtualMouse,
+                this.mod.config::setVirtualMouse, new TranslatableText("lambdacontrols.tooltip.virtual_mouse"));
     }
 
     @Override
@@ -221,57 +225,6 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
     @Override
     protected void init() {
         super.init();
-        /*int buttonHeight = 20;
-        SpruceButtonWidget controlsModeBtn = new SpruceButtonWidget(Position.of(this.width / 2 - 155, 18), this.hideControls ? 310 : 150, buttonHeight,
-                new TranslatableText("lambdacontrols.menu.controls_mode").append(": ").append(new TranslatableText(this.mod.config.getControlsMode().getTranslationKey())),
-                btn -> {
-                    ControlsMode next = this.mod.config.getControlsMode().next();
-                    btn.setMessage(new TranslatableText("lambdacontrols.menu.controls_mode").append(": ").append(new TranslatableText(next.getTranslationKey())));
-                    this.mod.config.setControlsMode(next);
-                    this.mod.config.save();
-
-                    if (this.client.player != null) {
-                        ClientSidePacketRegistry.INSTANCE.sendToServer(LambdaControls.CONTROLS_MODE_CHANNEL, this.mod.makeControlsModeBuffer(next));
-                    }
-                });
-        controlsModeBtn.setTooltip(new TranslatableText("lambdacontrols.tooltip.controls_mode"));
-        this.addChild(controlsModeBtn);
-        if (!this.hideControls)
-            this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, 18, 150, buttonHeight, new TranslatableText("options.controls"),
-                    btn -> {
-                        if (this.mod.config.getControlsMode() == ControlsMode.CONTROLLER)
-                            this.client.openScreen(new ControllerControlsScreen(this, true));
-                        else
-                            this.client.openScreen(new ControlsOptionsScreen(this, this.client.options));
-                    }));
-
-        this.list = new SpruceOptionListWidget(Position.of(this, 0, 43), this.width, this.height - 29 - this.getTextHeight() - 43);
-        // General options
-        this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.general", true, null));
-        this.list.addOptionEntry(this.rotationSpeedOption, this.mouseSpeedOption);
-        this.list.addSingleOptionEntry(this.autoSwitchModeOption);
-        // Gameplay options
-        this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.gameplay", true, null));
-        //this.list.addOptionEntry(this.autoJumpOption, this.fastBlockPlacingOption);
-        this.list.addOptionEntry(this.frontBlockPlacingOption, this.verticalReacharoundOption);
-        this.list.addSingleOptionEntry(this.flyDriftingOption);
-        this.list.addSingleOptionEntry(this.flyVerticalDriftingOption);
-        //this.list.addOptionEntry(Option.SNEAK_TOGGLED, Option.SPRINT_TOGGLED);
-        // Controller options
-        this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.controller", true, null));
-        this.list.addSingleOptionEntry(this.controllerOption);
-        this.list.addSingleOptionEntry(this.secondControllerOption);
-        this.list.addOptionEntry(this.controllerTypeOption, this.deadZoneOption);
-        this.list.addOptionEntry(this.invertsRightXAxis, this.invertsRightYAxis);
-        this.list.addOptionEntry(this.unfocusedInputOption, this.virtualMouseOption);
-        this.list.addSingleOptionEntry(this.virtualMouseSkinOption);
-        this.list.addSingleOptionEntry(ReloadControllerMappingsOption.newOption(null));
-        this.list.addSingleOptionEntry(SpruceSimpleActionOption.of("lambdacontrols.menu.mappings.open_input_str",
-                btn -> this.client.openScreen(new MappingsStringInputScreen(this))));
-        // HUD options
-        this.list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.hud", true, null));
-        this.list.addOptionEntry(this.hudEnableOption, this.hudSideOption);
-        this.addChild(this.list);*/
 
         this.buildTabs();
 
@@ -309,11 +262,15 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
         SpruceOptionListWidget list = new SpruceOptionListWidget(Position.origin(), width, height);
         list.addSingleOptionEntry(this.inputModeOption);
         list.addSingleOptionEntry(this.autoSwitchModeOption);
+        list.addSingleOptionEntry(this.rotationSpeedOption);
+        list.addSingleOptionEntry(this.mouseSpeedOption);
+        list.addSingleOptionEntry(this.virtualMouseOption);
         return list;
     }
 
     public SpruceOptionListWidget buildGameplayTab(int width, int height) {
         SpruceOptionListWidget list = new SpruceOptionListWidget(Position.origin(), width, height);
+        list.addSingleOptionEntry(this.analogMovementOption);
         list.addSingleOptionEntry(this.fastBlockPlacingOption);
         list.addSingleOptionEntry(this.frontBlockPlacingOption);
         list.addSingleOptionEntry(this.verticalReacharoundOption);
@@ -326,6 +283,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
     public SpruceOptionListWidget buildVisualTab(int width, int height) {
         SpruceOptionListWidget list = new SpruceOptionListWidget(Position.origin(), width, height);
         list.addSingleOptionEntry(this.controllerTypeOption);
+        list.addSingleOptionEntry(this.virtualMouseSkinOption);
         list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.hud", true, null));
         list.addSingleOptionEntry(this.hudEnableOption);
         list.addSingleOptionEntry(this.hudSideOption);
@@ -364,6 +322,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
         SpruceOptionListWidget list = new SpruceOptionListWidget(Position.origin(), width, listHeight);
         list.addSingleOptionEntry(this.controllerOption);
         list.addSingleOptionEntry(this.secondControllerOption);
+        list.addSingleOptionEntry(this.unfocusedInputOption);
 
         root.addChild(list);
         root.addChild(labels);

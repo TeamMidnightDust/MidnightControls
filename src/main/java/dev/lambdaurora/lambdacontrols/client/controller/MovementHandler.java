@@ -10,6 +10,7 @@
 package dev.lambdaurora.lambdacontrols.client.controller;
 
 import dev.lambdaurora.lambdacontrols.client.ButtonState;
+import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  * Represents the movement handler.
  *
  * @author LambdAurora
- * @version 1.4.0
+ * @version 1.6.0
  * @since 1.4.0
  */
 public final class MovementHandler implements PressAction {
@@ -67,7 +68,9 @@ public final class MovementHandler implements PressAction {
 
         this.shouldOverrideMovement = direction != 0;
 
-        value = (float) Math.pow(value, 2);
+        if (LambdaControlsClient.get().config.hasAnalogMovement()) {
+            value = (float) Math.pow(value, 2);
+        } else value = 1.f;
 
         if (button == ButtonBinding.FORWARD || button == ButtonBinding.BACK) {
             // Handle forward movement.
