@@ -44,13 +44,11 @@ import static org.lwjgl.BufferUtils.createByteBuffer;
  * @version 1.4.3
  * @since 1.0.0
  */
-public class Controller implements Nameable
-{
+public class Controller implements Nameable {
     private static final Map<Integer, Controller> CONTROLLERS = new HashMap<>();
-    private final        int                      id;
+    private final int id;
 
-    public Controller(int id)
-    {
+    public Controller(int id) {
         this.id = id;
     }
 
@@ -59,8 +57,7 @@ public class Controller implements Nameable
      *
      * @return The identifier of this controller.
      */
-    public int getId()
-    {
+    public int getId() {
         return this.id;
     }
 
@@ -69,8 +66,7 @@ public class Controller implements Nameable
      *
      * @return The controller's GUID.
      */
-    public String getGuid()
-    {
+    public String getGuid() {
         String guid = GLFW.glfwGetJoystickGUID(this.id);
         return guid == null ? "" : guid;
     }
@@ -80,8 +76,7 @@ public class Controller implements Nameable
      *
      * @return True if this controller is connected, else false.
      */
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
         return GLFW.glfwJoystickPresent(this.id);
     }
 
@@ -90,8 +85,7 @@ public class Controller implements Nameable
      *
      * @return True if this controller is a gamepad, else false.
      */
-    public boolean isGamepad()
-    {
+    public boolean isGamepad() {
         return this.isConnected() && GLFW.glfwJoystickIsGamepad(this.id);
     }
 
@@ -101,8 +95,7 @@ public class Controller implements Nameable
      * @return The controller's name.
      */
     @Override
-    public @NotNull String getName()
-    {
+    public @NotNull String getName() {
         String name = this.isGamepad() ? GLFW.glfwGetGamepadName(this.id) : GLFW.glfwGetJoystickName(this.id);
         return name == null ? String.valueOf(this.getId()) : name;
     }
@@ -112,16 +105,14 @@ public class Controller implements Nameable
      *
      * @return The state of the controller input.
      */
-    public GLFWGamepadState getState()
-    {
+    public GLFWGamepadState getState() {
         GLFWGamepadState state = GLFWGamepadState.create();
         if (this.isGamepad())
             GLFW.glfwGetGamepadState(this.id, state);
         return state;
     }
 
-    public static @NotNull Controller byId(int id)
-    {
+    public static @NotNull Controller byId(int id) {
         if (id > GLFW.GLFW_JOYSTICK_LAST) {
             LambdaControlsClient.get().log("Controller '" + id + "' doesn't exist.");
             id = GLFW.GLFW_JOYSTICK_LAST;
@@ -136,8 +127,7 @@ public class Controller implements Nameable
         }
     }
 
-    public static @NotNull Optional<Controller> byGuid(@NotNull String guid)
-    {
+    public static @NotNull Optional<Controller> byGuid(@NotNull String guid) {
         return CONTROLLERS.values().stream().filter(Controller::isConnected)
                 .filter(controller -> controller.getGuid().equals(guid))
                 .max(Comparator.comparingInt(Controller::getId));
@@ -146,13 +136,12 @@ public class Controller implements Nameable
     /**
      * Reads the specified resource and returns the raw data as a ByteBuffer.
      *
-     * @param resource   The resource to read.
+     * @param resource The resource to read.
      * @param bufferSize The initial buffer size.
      * @return The resource data.
      * @throws IOException If an IO error occurs.
      */
-    private static ByteBuffer ioResourceToBuffer(String resource, int bufferSize) throws IOException
-    {
+    private static ByteBuffer ioResourceToBuffer(String resource, int bufferSize) throws IOException {
         ByteBuffer buffer = null;
 
         Path path = Paths.get(resource);
@@ -171,8 +160,7 @@ public class Controller implements Nameable
     /**
      * Updates the controller mappings.
      */
-    public static void updateMappings()
-    {
+    public static void updateMappings() {
         try {
             if (!LambdaControlsClient.MAPPINGS_FILE.exists())
                 return;

@@ -24,37 +24,33 @@ import java.util.Optional;
  * @version 1.5.0
  * @since 1.1.0
  */
-public class LambdaControlsFeature implements Nameable
-{
-    private static final List<LambdaControlsFeature> FEATURES               = new ArrayList<>();
-    public static final  LambdaControlsFeature       FAST_BLOCK_PLACING     = new LambdaControlsFeature("fast_block_placing", true, true);
-    public static final  LambdaControlsFeature       HORIZONTAL_REACHAROUND = new LambdaControlsFeature("horizontal_reacharound", true, false);
-    public static final  LambdaControlsFeature       VERTICAL_REACHAROUND   = new LambdaControlsFeature("vertical_reacharound", true, false);
+public class LambdaControlsFeature implements Nameable {
+    private static final List<LambdaControlsFeature> FEATURES = new ArrayList<>();
+    public static final LambdaControlsFeature FAST_BLOCK_PLACING = new LambdaControlsFeature("fast_block_placing", true, true);
+    public static final LambdaControlsFeature HORIZONTAL_REACHAROUND = new LambdaControlsFeature("horizontal_reacharound", true, false);
+    public static final LambdaControlsFeature VERTICAL_REACHAROUND = new LambdaControlsFeature("vertical_reacharound", true, false);
 
-    private final String  key;
+    private final String key;
     private final boolean defaultAllowed;
-    private       boolean allowed;
+    private boolean allowed;
     private final boolean defaultEnabled;
-    private       boolean enabled;
+    private boolean enabled;
 
-    public LambdaControlsFeature(@NotNull String key, boolean allowed, boolean enabled)
-    {
+    public LambdaControlsFeature(@NotNull String key, boolean allowed, boolean enabled) {
         Objects.requireNonNull(key, "Feature key cannot be null.");
         this.key = key;
         this.setAllowed(this.defaultAllowed = allowed);
         this.setEnabled(this.defaultEnabled = enabled);
     }
 
-    public LambdaControlsFeature(@NotNull String key)
-    {
+    public LambdaControlsFeature(@NotNull String key) {
         this(key, false, false);
     }
 
     /**
      * Allows the feature.
      */
-    public void allow()
-    {
+    public void allow() {
         this.setAllowed(true);
     }
 
@@ -63,8 +59,7 @@ public class LambdaControlsFeature implements Nameable
      *
      * @return True if this feature is allowed, else false.
      */
-    public boolean isAllowed()
-    {
+    public boolean isAllowed() {
         return this.allowed;
     }
 
@@ -73,16 +68,14 @@ public class LambdaControlsFeature implements Nameable
      *
      * @param allowed True if this feature is allowed, else false.
      */
-    public void setAllowed(boolean allowed)
-    {
+    public void setAllowed(boolean allowed) {
         this.allowed = allowed;
     }
 
     /**
      * Resets allowed state to default.
      */
-    public void resetAllowed()
-    {
+    public void resetAllowed() {
         this.setAllowed(this.defaultAllowed);
     }
 
@@ -91,8 +84,7 @@ public class LambdaControlsFeature implements Nameable
      *
      * @return True if this feature is enabled, else false.
      */
-    public boolean isEnabled()
-    {
+    public boolean isEnabled() {
         return this.enabled;
     }
 
@@ -101,8 +93,7 @@ public class LambdaControlsFeature implements Nameable
      *
      * @param enabled True if this feature is enabled, else false.
      */
-    public void setEnabled(boolean enabled)
-    {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
@@ -113,28 +104,24 @@ public class LambdaControlsFeature implements Nameable
      * @see #isAllowed()
      * @see #isEnabled()
      */
-    public boolean isAvailable()
-    {
+    public boolean isAvailable() {
         return this.isAllowed() && this.isEnabled();
     }
 
     /**
      * Resets the feature to its default values.
      */
-    public void reset()
-    {
+    public void reset() {
         this.resetAllowed();
         this.setEnabled(this.defaultEnabled);
     }
 
     @Override
-    public @NotNull String getName()
-    {
+    public @NotNull String getName() {
         return this.key;
     }
 
-    public static @NotNull Optional<LambdaControlsFeature> fromName(@NotNull String key)
-    {
+    public static @NotNull Optional<LambdaControlsFeature> fromName(@NotNull String key) {
         Objects.requireNonNull(key, "Cannot find features with a null name.");
         return FEATURES.parallelStream().filter(feature -> feature.getName().equals(key)).findFirst();
     }
@@ -142,16 +129,14 @@ public class LambdaControlsFeature implements Nameable
     /**
      * Resets all features to their default values.
      */
-    public static void resetAll()
-    {
+    public static void resetAll() {
         FEATURES.parallelStream().forEach(LambdaControlsFeature::reset);
     }
 
     /**
      * Resets all features to allow state.
      */
-    public static void resetAllAllowed()
-    {
+    public static void resetAllAllowed() {
         FEATURES.parallelStream().forEach(LambdaControlsFeature::resetAllowed);
     }
 

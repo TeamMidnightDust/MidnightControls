@@ -23,8 +23,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.1.0
  */
 @FunctionalInterface
-public interface PlayerChangeControlsModeCallback
-{
+public interface PlayerChangeControlsModeCallback {
     Event<PlayerChangeControlsModeCallback> EVENT = EventFactory.createArrayBacked(PlayerChangeControlsModeCallback.class, listeners -> (player, controlsMode) -> {
         for (PlayerChangeControlsModeCallback event : listeners) {
             event.apply(player, controlsMode);

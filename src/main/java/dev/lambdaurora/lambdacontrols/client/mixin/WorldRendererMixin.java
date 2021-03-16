@@ -41,8 +41,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Handles the rendering of the block outline of the reach-around features.
  */
 @Mixin(WorldRenderer.class)
-public abstract class WorldRendererMixin
-{
+public abstract class WorldRendererMixin {
     @Shadow
     @Final
     private MinecraftClient client;
@@ -55,8 +54,7 @@ public abstract class WorldRendererMixin
     private BufferBuilderStorage bufferBuilders;
 
     @Shadow
-    private static void drawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j)
-    {
+    private static void drawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
     }
 
     @Inject(
@@ -69,8 +67,7 @@ public abstract class WorldRendererMixin
             )
     )
     private void onOutlineRender(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer,
-                                 LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci)
-    {
+                                 LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
         if (this.client.crosshairTarget == null || this.client.crosshairTarget.getType() != HitResult.Type.MISS || !LambdaControlsClient.get().config.shouldRenderReacharoundOutline())
             return;
         BlockHitResult result = LambdaControlsClient.get().reacharound.getLastReacharoundResult();

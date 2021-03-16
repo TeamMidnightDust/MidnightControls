@@ -32,8 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Represents the mixin for the class ContainerScreen.
  */
 @Mixin(HandledScreen.class)
-public abstract class HandledScreenMixin implements HandledScreenAccessor
-{
+public abstract class HandledScreenMixin implements HandledScreenAccessor {
     @Accessor("x")
     public abstract int getX();
 
@@ -41,17 +40,16 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor
     public abstract int getY();
 
     @Invoker("getSlotAt")
-    public abstract Slot lambdacontrols_getSlotAt(double posX, double posY);
+    public abstract Slot lambdacontrols$getSlotAt(double posX, double posY);
 
     @Invoker("isClickOutsideBounds")
-    public abstract boolean lambdacontrols_isClickOutsideBounds(double mouseX, double mouseY, int x, int y, int button);
+    public abstract boolean lambdacontrols$isClickOutsideBounds(double mouseX, double mouseY, int x, int y, int button);
 
     @Invoker("onMouseClick")
-    public abstract void lambdacontrols_onMouseClick(@Nullable Slot slot, int slotId, int clickData, SlotActionType actionType);
+    public abstract void lambdacontrols$onMouseClick(@Nullable Slot slot, int slotId, int clickData, SlotActionType actionType);
 
     @Inject(method = "render", at = @At("RETURN"))
-    public void onRender(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci)
-    {
+    public void onRender(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER) {
             MinecraftClient client = MinecraftClient.getInstance();
             int x = 2, y = client.getWindow().getScaledHeight() - 2 - LambdaControlsRenderer.ICON_SIZE;

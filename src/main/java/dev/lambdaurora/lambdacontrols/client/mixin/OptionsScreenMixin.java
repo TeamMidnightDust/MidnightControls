@@ -25,16 +25,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * Injects the new controls settings button.
  */
 @Mixin(OptionsScreen.class)
-public class OptionsScreenMixin extends Screen
-{
-    protected OptionsScreenMixin(Text title)
-    {
+public class OptionsScreenMixin extends Screen {
+    protected OptionsScreenMixin(Text title) {
         super(title);
     }
 
     @Redirect(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/options/OptionsScreen;addButton(Lnet/minecraft/client/gui/widget/AbstractButtonWidget;)Lnet/minecraft/client/gui/widget/AbstractButtonWidget;", ordinal = 7))
-    private AbstractButtonWidget lambdacontrols_onInit(OptionsScreen screen, AbstractButtonWidget btn)
-    {
+    private AbstractButtonWidget lambdacontrols$onInit(OptionsScreen screen, AbstractButtonWidget btn) {
         if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER) {
             return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).getHeight(), btn.getMessage(),
                     b -> this.client.openScreen(new LambdaControlsSettingsScreen(this, false))));

@@ -14,28 +14,23 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.NotNull;
 
-public class DummyRingAction extends RingAction
-{
-    public DummyRingAction(@NotNull Config config)
-    {
+public class DummyRingAction extends RingAction {
+    public DummyRingAction(@NotNull Config config) {
         super(config);
     }
 
     @Override
-    public @NotNull String getName()
-    {
+    public @NotNull String getName() {
         return "dummy";
     }
 
     @Override
-    public void onAction(@NotNull RingButtonMode mode)
-    {
+    public void onAction(@NotNull RingButtonMode mode) {
 
     }
 
     @Override
-    public void drawIcon(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered)
-    {
+    public void drawIcon(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered) {
         drawCenteredString(matrices, textRenderer, this.getName(), x + 25, y + 25 - textRenderer.fontHeight / 2, 0xffffff);
     }
 }

@@ -50,14 +50,12 @@ import static org.lwjgl.glfw.GLFW.*;
  * @version 1.5.0
  * @since 1.2.0
  */
-public class ReiCompat implements CompatHandler
-{
+public class ReiCompat implements CompatHandler {
     private static final Pair<Integer, Integer> INVALID_SLOT = new Pair<>(-1, -1);
-    private static       EntryListWidget        ENTRY_LIST_WIDGET;
+    private static EntryListWidget ENTRY_LIST_WIDGET;
 
     @Override
-    public void handle(@NotNull LambdaControlsClient mod)
-    {
+    public void handle(@NotNull LambdaControlsClient mod) {
         ButtonBinding.builder(new Identifier("rei", "category_back"))
                 .buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
                 .filter((client, binding) -> isViewingScreen(client.currentScreen))
@@ -114,14 +112,12 @@ public class ReiCompat implements CompatHandler
     }
 
     @Override
-    public boolean requireMouseOnScreen(Screen screen)
-    {
+    public boolean requireMouseOnScreen(Screen screen) {
         return isViewingScreen(screen) || screen instanceof PreRecipeViewingScreen;
     }
 
     @Override
-    public @Nullable Pair<Integer, Integer> getSlotAt(@NotNull Screen screen, int mouseX, int mouseY)
-    {
+    public @Nullable Pair<Integer, Integer> getSlotAt(@NotNull Screen screen, int mouseX, int mouseY) {
         Optional<ContainerScreenOverlay> overlay = ScreenHelper.getOptionalOverlay();
         if (overlay.isPresent() && overlay.get().isInside(mouseX, mouseY)) {
             EntryListWidget widget = getEntryListWidget();
@@ -141,8 +137,7 @@ public class ReiCompat implements CompatHandler
         return null;
     }
 
-    private @Nullable Pair<Integer, Integer> getSlotAt(@NotNull Element element, int mouseX, int mouseY, boolean allowEmpty)
-    {
+    private @Nullable Pair<Integer, Integer> getSlotAt(@NotNull Element element, int mouseX, int mouseY, boolean allowEmpty) {
         if (element instanceof EntryWidget) {
             EntryWidget entry = (EntryWidget) element;
             if (entry.containsMouse(mouseX, mouseY)) {
@@ -167,14 +162,12 @@ public class ReiCompat implements CompatHandler
         return null;
     }
 
-    private static boolean isViewingScreen(Screen screen)
-    {
+    private static boolean isViewingScreen(Screen screen) {
         return screen instanceof RecipeViewingScreen || screen instanceof VillagerRecipeViewingScreen;
     }
 
     @Override
-    public boolean handleMenuBack(@NotNull MinecraftClient client, @NotNull Screen screen)
-    {
+    public boolean handleMenuBack(@NotNull MinecraftClient client, @NotNull Screen screen) {
         if (!isViewingScreen(screen))
             return false;
 
@@ -183,8 +176,7 @@ public class ReiCompat implements CompatHandler
         return true;
     }
 
-    private static EntryListWidget getEntryListWidget()
-    {
+    private static EntryListWidget getEntryListWidget() {
         if (ENTRY_LIST_WIDGET == null) {
             ENTRY_LIST_WIDGET = LambdaReflection.getFirstFieldOfType(ContainerScreenOverlay.class, EntryListWidget.class)
                     .map(field -> (EntryListWidget) LambdaReflection.getFieldValue(null, field))
@@ -193,8 +185,7 @@ public class ReiCompat implements CompatHandler
         return ENTRY_LIST_WIDGET;
     }
 
-    private static @Nullable EntryStack getCurrentStack(@NotNull MinecraftClient client)
-    {
+    private static @Nullable EntryStack getCurrentStack(@NotNull MinecraftClient client) {
         double x = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
         double y = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
 
@@ -216,8 +207,7 @@ public class ReiCompat implements CompatHandler
         return getCurrentStack(widget, x, y);
     }
 
-    private static @Nullable EntryStack getCurrentStack(@NotNull Element element, double mouseX, double mouseY)
-    {
+    private static @Nullable EntryStack getCurrentStack(@NotNull Element element, double mouseX, double mouseY) {
         if (element instanceof EntryWidget) {
             EntryWidget entry = (EntryWidget) element;
             if (entry.containsMouse(mouseX, mouseY))
@@ -239,8 +229,7 @@ public class ReiCompat implements CompatHandler
         return null;
     }
 
-    private static PressAction handleShowRecipeUsage(boolean usage)
-    {
+    private static PressAction handleShowRecipeUsage(boolean usage) {
         return (client, button, value, action) -> {
             if (action.isUnpressed())
                 return false;
@@ -263,8 +252,7 @@ public class ReiCompat implements CompatHandler
         };
     }
 
-    private static PressAction handlePage(boolean next)
-    {
+    private static PressAction handlePage(boolean next) {
         return (client, button, value, action) -> {
             if (action == ButtonState.RELEASE)
                 return false;
@@ -293,8 +281,7 @@ public class ReiCompat implements CompatHandler
      * @param next True if the action is to switch to the next tab.
      * @return The handler.
      */
-    private static PressAction handleTab(boolean next)
-    {
+    private static PressAction handleTab(boolean next) {
         return (client, button, value, action) -> {
             if (action != ButtonState.RELEASE)
                 return false;
@@ -319,8 +306,7 @@ public class ReiCompat implements CompatHandler
         };
     }
 
-    private static PressAction handleRecipe(boolean next)
-    {
+    private static PressAction handleRecipe(boolean next) {
         return (client, button, value, action) -> {
             if (action.isUnpressed())
                 return false;
@@ -363,8 +349,7 @@ public class ReiCompat implements CompatHandler
         };
     }
 
-    private static int getNextIndex(int currentIndex, int size, boolean next)
-    {
+    private static int getNextIndex(int currentIndex, int size, boolean next) {
         int nextIndex = currentIndex + (next ? 1 : -1);
         if (nextIndex < 0)
             nextIndex = size - 1;

@@ -25,15 +25,13 @@ import java.util.Optional;
  * @version 1.5.0
  * @since 1.4.0
  */
-public class RingPage extends DrawableHelper
-{
+public class RingPage extends DrawableHelper {
     public static final RingPage DEFAULT = new RingPage("Default");
 
-    public final String       name;
-    private      RingAction[] actions = new RingAction[8];
+    public final String name;
+    private RingAction[] actions = new RingAction[8];
 
-    public RingPage(@NotNull String name)
-    {
+    public RingPage(@NotNull String name) {
         this.name = name;
         for (int i = 0; i < 8; i++) {
             this.actions[i] = null;
@@ -43,15 +41,14 @@ public class RingPage extends DrawableHelper
     /**
      * Renders the ring page.
      *
-     * @param matrices  The matrices.
-     * @param width     The screen width.
-     * @param height    The screen height.
-     * @param mouseX    The mouse X-coordinate.
-     * @param mouseY    The mouse Y-coordinate.
+     * @param matrices The matrices.
+     * @param width The screen width.
+     * @param height The screen height.
+     * @param mouseX The mouse X-coordinate.
+     * @param mouseY The mouse Y-coordinate.
      * @param tickDelta The tick delta.
      */
-    public void render(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int width, int height, int mouseX, int mouseY, float tickDelta)
-    {
+    public void render(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int width, int height, int mouseX, int mouseY, float tickDelta) {
         int centerX = width / 2;
         int centerY = height / 2;
 
@@ -83,8 +80,7 @@ public class RingPage extends DrawableHelper
         }
     }
 
-    private static boolean isHovered(int x, int y, int mouseX, int mouseY)
-    {
+    private static boolean isHovered(int x, int y, int mouseX, int mouseY) {
         return mouseX >= x && mouseY >= y && mouseX <= x + LambdaRing.ELEMENT_SIZE && mouseY <= y + LambdaRing.ELEMENT_SIZE;
     }
 
@@ -94,8 +90,7 @@ public class RingPage extends DrawableHelper
      * @param config The configuration.
      * @return An optional ring page.
      */
-    public static @NotNull Optional<RingPage> parseRingPage(@NotNull Config config)
-    {
+    public static @NotNull Optional<RingPage> parseRingPage(@NotNull Config config) {
         String name = config.get("name");
         if (name == null)
             return Optional.empty();

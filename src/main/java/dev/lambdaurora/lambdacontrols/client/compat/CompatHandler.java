@@ -26,8 +26,7 @@ import org.jetbrains.annotations.Nullable;
  * @version 1.5.0
  * @since 1.1.0
  */
-public interface CompatHandler
-{
+public interface CompatHandler {
     /**
      * Handles compatibility of a mod.
      *
@@ -41,8 +40,7 @@ public interface CompatHandler
      * @param screen The screen.
      * @return True if the mouse is required on the specified screen, else false.
      */
-    default boolean requireMouseOnScreen(Screen screen)
-    {
+    default boolean requireMouseOnScreen(Screen screen) {
         return false;
     }
 
@@ -55,8 +53,7 @@ public interface CompatHandler
      * @return A slot if present, else null.
      * @since 1.5.0
      */
-    default @Nullable Pair<Integer, Integer> getSlotAt(@NotNull Screen screen, int mouseX, int mouseY)
-    {
+    default @Nullable Pair<Integer, Integer> getSlotAt(@NotNull Screen screen, int mouseX, int mouseY) {
         return null;
     }
 
@@ -64,35 +61,32 @@ public interface CompatHandler
      * Returns whether the current slot is a creative slot or not.
      *
      * @param screen The screen.
-     * @param slot   The slot to check.
+     * @param slot The slot to check.
      * @return True if the slot is a creative slot, else false.
      */
-    default boolean isCreativeSlot(@NotNull HandledScreen screen, @NotNull Slot slot)
-    {
+    default boolean isCreativeSlot(@NotNull HandledScreen screen, @NotNull Slot slot) {
         return false;
     }
 
     /**
      * Returns a custom translation key to make custom attack action strings on the HUD.
      *
-     * @param client      The client instance.
+     * @param client The client instance.
      * @param placeResult The last place block result.
      * @return Null if untouched, else a translation key.
      */
-    default String getAttackActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult)
-    {
+    default String getAttackActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult) {
         return null;
     }
 
     /**
      * Returns a custom translation key to make custom use action strings on the HUD.
      *
-     * @param client      The client instance.
+     * @param client The client instance.
      * @param placeResult The last place block result.
      * @return Null if untouched, else a translation key.
      */
-    default String getUseActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult)
-    {
+    default String getUseActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult) {
         return null;
     }
 
@@ -103,8 +97,7 @@ public interface CompatHandler
      * @param screen The screen.
      * @return True if the handle was fired and succeed, else false.
      */
-    default boolean handleMenuBack(@NotNull MinecraftClient client, @NotNull Screen screen)
-    {
+    default boolean handleMenuBack(@NotNull MinecraftClient client, @NotNull Screen screen) {
         return false;
     }
 }

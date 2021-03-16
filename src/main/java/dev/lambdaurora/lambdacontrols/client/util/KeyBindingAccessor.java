@@ -12,17 +12,15 @@ package dev.lambdaurora.lambdacontrols.client.util;
 /**
  * Represents a Minecraft keybinding with extra access.
  */
-public interface KeyBindingAccessor
-{
-    boolean lambdacontrols_press();
+public interface KeyBindingAccessor {
+    boolean lambdacontrols$press();
 
-    boolean lambdacontrols_unpress();
+    boolean lambdacontrols$unpress();
 
-    default boolean lambdacontrols_handlePressState(boolean pressed)
-    {
+    default boolean lambdacontrols_handlePressState(boolean pressed) {
         if (pressed)
-            return this.lambdacontrols_press();
+            return this.lambdacontrols$press();
         else
-            return this.lambdacontrols_unpress();
+            return this.lambdacontrols$unpress();
     }
 }

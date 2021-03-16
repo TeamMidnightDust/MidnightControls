@@ -31,8 +31,7 @@ import java.util.stream.Stream;
  * @version 1.5.0
  * @since 1.1.0
  */
-public class LambdaControlsCompat
-{
+public class LambdaControlsCompat {
     private static final List<CompatHandler> HANDLERS = new ArrayList<>();
 
     /**
@@ -40,8 +39,7 @@ public class LambdaControlsCompat
      *
      * @param mod The mod instance.
      */
-    public static void init(@NotNull LambdaControlsClient mod)
-    {
+    public static void init(@NotNull LambdaControlsClient mod) {
         if (FabricLoader.getInstance().isModLoaded("okzoomer")) {
             mod.log("Adding okzoomer compatibility...");
             HANDLERS.add(new OkZoomerCompat());
@@ -63,8 +61,7 @@ public class LambdaControlsCompat
      *
      * @param handler The compatibility handler to register.
      */
-    public static void registerCompatHandler(@NotNull CompatHandler handler)
-    {
+    public static void registerCompatHandler(@NotNull CompatHandler handler) {
         HANDLERS.add(handler);
     }
 
@@ -73,8 +70,7 @@ public class LambdaControlsCompat
      *
      * @return A stream of compatibility handlers.
      */
-    public static Stream<CompatHandler> streamCompatHandlers()
-    {
+    public static Stream<CompatHandler> streamCompatHandlers() {
         return HANDLERS.stream();
     }
 
@@ -84,8 +80,7 @@ public class LambdaControlsCompat
      * @param screen The screen.
      * @return True if the mouse is requried on the specified screen, else false.
      */
-    public static boolean requireMouseOnScreen(Screen screen)
-    {
+    public static boolean requireMouseOnScreen(Screen screen) {
         return HANDLERS.stream().anyMatch(handler -> handler.requireMouseOnScreen(screen));
     }
 
@@ -97,8 +92,7 @@ public class LambdaControlsCompat
      * @param mouseY The mouse Y-coordinate.
      * @return A slot if present, else null.
      */
-    public static @Nullable Pair<Integer, Integer> getSlotAt(@NotNull Screen screen, int mouseX, int mouseY)
-    {
+    public static @Nullable Pair<Integer, Integer> getSlotAt(@NotNull Screen screen, int mouseX, int mouseY) {
         for (CompatHandler handler : HANDLERS) {
             Pair<Integer, Integer> slot = handler.getSlotAt(screen, mouseX, mouseY);
             if (slot != null)
@@ -110,12 +104,11 @@ public class LambdaControlsCompat
     /**
      * Returns a custom translation key to make custom attack action strings on the HUD.
      *
-     * @param client      The client instance.
+     * @param client The client instance.
      * @param placeResult The last place block result.
      * @return Null if untouched, else a translation key.
      */
-    public static String getAttackActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult)
-    {
+    public static String getAttackActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult) {
         for (CompatHandler handler : HANDLERS) {
             String action = handler.getAttackActionAt(client, placeResult);
             if (action != null) {
@@ -128,12 +121,11 @@ public class LambdaControlsCompat
     /**
      * Returns a custom translation key to make custom use action strings on the HUD.
      *
-     * @param client      The client instance.
+     * @param client The client instance.
      * @param placeResult The last place block result.
      * @return Null if untouched, else a translation key.
      */
-    public static String getUseActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult)
-    {
+    public static String getUseActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult) {
         for (CompatHandler handler : HANDLERS) {
             String action = handler.getUseActionAt(client, placeResult);
             if (action != null) {
@@ -150,8 +142,7 @@ public class LambdaControlsCompat
      * @param screen The screen.
      * @return True if the handle was fired and succeed, else false.
      */
-    public static boolean handleMenuBack(@NotNull MinecraftClient client, @NotNull Screen screen)
-    {
+    public static boolean handleMenuBack(@NotNull MinecraftClient client, @NotNull Screen screen) {
         for (CompatHandler handler : HANDLERS) {
             if (handler.handleMenuBack(client, screen))
                 return true;
@@ -164,8 +155,7 @@ public class LambdaControlsCompat
      *
      * @return True if Roughly Enough Items is present, else false.
      */
-    public static boolean isReiPresent()
-    {
+    public static boolean isReiPresent() {
         return FabricLoader.getInstance().isModLoaded("roughlyenoughitems");
     }
 }

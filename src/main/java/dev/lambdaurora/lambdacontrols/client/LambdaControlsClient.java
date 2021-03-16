@@ -10,24 +10,26 @@
 package dev.lambdaurora.lambdacontrols.client;
 
 import dev.lambdaurora.lambdacontrols.ControlsMode;
+import dev.lambdaurora.lambdacontrols.LambdaControls;
 import dev.lambdaurora.lambdacontrols.LambdaControlsConstants;
 import dev.lambdaurora.lambdacontrols.LambdaControlsFeature;
 import dev.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
+import dev.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
+import dev.lambdaurora.lambdacontrols.client.controller.Controller;
+import dev.lambdaurora.lambdacontrols.client.controller.InputManager;
 import dev.lambdaurora.lambdacontrols.client.gui.LambdaControlsHud;
 import dev.lambdaurora.lambdacontrols.client.gui.TouchscreenOverlay;
 import dev.lambdaurora.lambdacontrols.client.ring.KeyBindingRingAction;
 import dev.lambdaurora.lambdacontrols.client.ring.LambdaRing;
-import dev.lambdaurora.lambdacontrols.LambdaControls;
-import dev.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
-import dev.lambdaurora.lambdacontrols.client.controller.Controller;
-import dev.lambdaurora.lambdacontrols.client.controller.InputManager;
 import me.lambdaurora.spruceui.event.OpenScreenCallback;
 import me.lambdaurora.spruceui.hud.HudManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.InputUtil;
@@ -43,36 +45,34 @@ import java.io.File;
  * Represents the LambdaControls client mod.
  *
  * @author LambdAurora
- * @version 1.5.0
+ * @version 1.6.0
  * @since 1.1.0
  */
-public class LambdaControlsClient extends LambdaControls implements ClientModInitializer
-{
-    private static      LambdaControlsClient INSTANCE;
-    public static final KeyBinding           BINDING_LOOK_UP    = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_up"),
+public class LambdaControlsClient extends LambdaControls implements ClientModInitializer {
+    private static LambdaControlsClient INSTANCE;
+    public static final KeyBinding BINDING_LOOK_UP = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_up"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.movement");
-    public static final KeyBinding           BINDING_LOOK_RIGHT = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_right"),
+    public static final KeyBinding BINDING_LOOK_RIGHT = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_right"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, "key.categories.movement");
-    public static final KeyBinding           BINDING_LOOK_DOWN  = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_down"),
+    public static final KeyBinding BINDING_LOOK_DOWN = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_down"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.movement");
-    public static final KeyBinding           BINDING_LOOK_LEFT  = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_left"),
+    public static final KeyBinding BINDING_LOOK_LEFT = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "look_left"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement");
     /*public static final KeyBinding           BINDING_RING       = InputManager.makeKeyBinding(new Identifier(LambdaControlsConstants.NAMESPACE, "ring"),
             InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.categories.misc");*/
-    public static final Identifier           CONTROLLER_BUTTONS = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/controller_buttons.png");
-    public static final Identifier           CONTROLLER_AXIS    = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/controller_axis.png");
-    public static final Identifier           CURSOR_TEXTURE     = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/cursor.png");
-    public final static File                 MAPPINGS_FILE      = new File("config/gamecontrollerdb.txt");
-    public final        LambdaControlsConfig config             = new LambdaControlsConfig(this);
-    public final        LambdaInput          input              = new LambdaInput(this);
-    public final LambdaRing ring               = new LambdaRing(this);
-    public final        LambdaReacharound    reacharound        = new LambdaReacharound();
+    public static final Identifier CONTROLLER_BUTTONS = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/controller_buttons.png");
+    public static final Identifier CONTROLLER_AXIS = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/controller_axis.png");
+    public static final Identifier CURSOR_TEXTURE = new Identifier(LambdaControlsConstants.NAMESPACE, "textures/gui/cursor.png");
+    public final static File MAPPINGS_FILE = new File("config/gamecontrollerdb.txt");
+    public final LambdaControlsConfig config = new LambdaControlsConfig(this);
+    public final LambdaInput input = new LambdaInput(this);
+    public final LambdaRing ring = new LambdaRing(this);
+    public final LambdaReacharound reacharound = new LambdaReacharound();
     private LambdaControlsHud hud;
     private ControlsMode previousControlsMode;
 
     @Override
-    public void onInitializeClient()
-    {
+    public void onInitializeClient() {
         INSTANCE = this;
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_UP);
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_RIGHT);
@@ -82,13 +82,19 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
 
         this.ring.registerAction("keybinding", KeyBindingRingAction.FACTORY);
 
-        ClientSidePacketRegistry.INSTANCE.register(CONTROLS_MODE_CHANNEL, (context, attachedData) -> context.getTaskQueue()
-                .execute(() -> ClientSidePacketRegistry.INSTANCE.sendToServer(CONTROLS_MODE_CHANNEL, this.makeControlsModeBuffer(this.config.getControlsMode()))));
-        ClientSidePacketRegistry.INSTANCE.register(FEATURE_CHANNEL, (context, attachedData) -> {
-            String name = attachedData.readString(64);
-            boolean allowed = attachedData.readBoolean();
-            LambdaControlsFeature.fromName(name).ifPresent(feature -> context.getTaskQueue().execute(() -> feature.setAllowed(allowed)));
+        ClientPlayNetworking.registerGlobalReceiver(CONTROLS_MODE_CHANNEL, (client, handler, buf, responseSender) -> {
+            responseSender.sendPacket(CONTROLS_MODE_CHANNEL, this.makeControlsModeBuffer(this.config.getControlsMode()));
         });
+        ClientPlayNetworking.registerGlobalReceiver(FEATURE_CHANNEL, (client, handler, buf, responseSender) -> {
+            String name = buf.readString(64);
+            boolean allowed = buf.readBoolean();
+            LambdaControlsFeature.fromName(name).ifPresent(feature -> client.execute(() -> feature.setAllowed(allowed)));
+        });
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            sender.sendPacket(HELLO_CHANNEL, this.makeHello(this.config.getControlsMode()));
+            sender.sendPacket(CONTROLS_MODE_CHANNEL, this.makeControlsModeBuffer(this.config.getControlsMode()));
+        });
+        ClientPlayConnectionEvents.DISCONNECT.register(this::onLeave);
 
         ClientTickEvents.START_CLIENT_TICK.register(this.reacharound::tick);
         ClientTickEvents.END_CLIENT_TICK.register(this::onTick);
@@ -110,8 +116,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
     /**
      * This method is called when Minecraft is initializing.
      */
-    public void onMcInit(@NotNull MinecraftClient client)
-    {
+    public void onMcInit(@NotNull MinecraftClient client) {
         ButtonBinding.init(client.options);
         this.config.load();
         this.hud.setVisible(this.config.isHudEnabled());
@@ -135,10 +140,9 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
     /**
      * This method is called every Minecraft tick.
      *
-     * @param client The client instance.
+     * @param client the client instance
      */
-    public void onTick(@NotNull MinecraftClient client)
-    {
+    public void onTick(@NotNull MinecraftClient client) {
         this.input.tick(client);
         if (this.config.getControlsMode() == ControlsMode.CONTROLLER && (client.isWindowFocused() || this.config.hasUnfocusedInput()))
             this.input.tickController(client);
@@ -148,24 +152,21 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
         }*/
     }
 
-    public void onRender(MinecraftClient client)
-    {
+    public void onRender(MinecraftClient client) {
         this.input.onRender(client.getTickDelta(), client);
     }
 
     /**
      * Called when leaving a server.
      */
-    public void onLeave()
-    {
+    public void onLeave(ClientPlayNetworkHandler handler, MinecraftClient client) {
         LambdaControlsFeature.resetAllAllowed();
     }
 
     /**
      * Switches the controls mode if the auto switch is enabled.
      */
-    public void switchControlsMode()
-    {
+    public void switchControlsMode() {
         if (this.config.hasAutoSwitchMode()) {
             if (this.config.getController().isGamepad()) {
                 this.previousControlsMode = this.config.getControlsMode();
@@ -185,8 +186,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
      *
      * @param enabled True if the HUD is enabled, else false.
      */
-    public void setHudEnabled(boolean enabled)
-    {
+    public void setHudEnabled(boolean enabled) {
         this.config.setHudEnabled(enabled);
         this.hud.setVisible(enabled);
     }
@@ -196,8 +196,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
      *
      * @return The LambdaControls client instance.
      */
-    public static LambdaControlsClient get()
-    {
+    public static LambdaControlsClient get() {
         return INSTANCE;
     }
 }

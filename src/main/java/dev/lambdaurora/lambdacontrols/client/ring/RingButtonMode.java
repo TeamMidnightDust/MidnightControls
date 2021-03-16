@@ -21,17 +21,15 @@ import org.jetbrains.annotations.NotNull;
  * @version 1.4.0
  * @since 1.4.0
  */
-public enum RingButtonMode implements Nameable
-{
+public enum RingButtonMode implements Nameable {
     PRESS("press"),
     HOLD("hold"),
     TOGGLE("toggle");
 
     private final String name;
-    private final Text   text;
+    private final Text text;
 
-    RingButtonMode(@NotNull String name)
-    {
+    RingButtonMode(@NotNull String name) {
         this.name = name;
         this.text = new TranslatableText(this.getTranslationKey());
     }
@@ -41,8 +39,7 @@ public enum RingButtonMode implements Nameable
      *
      * @return The next ring button mode.
      */
-    public @NotNull RingButtonMode next()
-    {
+    public @NotNull RingButtonMode next() {
         RingButtonMode[] v = values();
         if (v.length == this.ordinal() + 1)
             return v[0];
@@ -54,8 +51,7 @@ public enum RingButtonMode implements Nameable
      *
      * @return The translation key of this ring button mode.
      */
-    public @NotNull String getTranslationKey()
-    {
+    public @NotNull String getTranslationKey() {
         return "lambdacontrols.ring.button_mode." + this.getName();
     }
 
@@ -64,14 +60,12 @@ public enum RingButtonMode implements Nameable
      *
      * @return The translated name of this ring button mode.
      */
-    public @NotNull Text getTranslatedText()
-    {
+    public @NotNull Text getTranslatedText() {
         return this.text;
     }
 
     @Override
-    public @NotNull String getName()
-    {
+    public @NotNull String getName() {
         return this.name;
     }
 }

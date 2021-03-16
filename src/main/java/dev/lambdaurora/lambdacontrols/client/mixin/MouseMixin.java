@@ -36,7 +36,7 @@ public abstract class MouseMixin implements MouseAccessor
     private MinecraftClient client;
 
     @Invoker("onCursorPos")
-    public abstract void lambdacontrols_onCursorPos(long window, double x, double y);
+    public abstract void lambdacontrols$onCursorPos(long window, double x, double y);
 
     @Inject(method = "method_1605", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/client/gui/screen/Screen;mouseReleased(DDI)Z"))
     private void onMouseBackButton(boolean[] result, double mouseX, double mouseY, int button, CallbackInfo ci)

@@ -22,14 +22,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Sets the default of the Auto-Jump option to false.
  */
 @Mixin(GameOptions.class)
-public class GameOptionsMixin
-{
+public class GameOptionsMixin {
     @Shadow
     public boolean autoJump;
 
     @Inject(method = "load", at = @At("HEAD"))
-    public void onInit(CallbackInfo ci)
-    {
+    public void onInit(CallbackInfo ci) {
         // Set default value of the Auto-Jump option to false.
         this.autoJump = false;
     }

@@ -25,20 +25,17 @@ import java.util.Optional;
  * @version 1.3.2
  * @since 1.3.2
  */
-public class HQMCompat implements CompatHandler
-{
-    public static final String             GUI_BASE_CLASS_PATH = "hardcorequesting.client.interfaces.GuiBase";
-    private             Optional<Class<?>> guiBaseClass;
+public class HQMCompat implements CompatHandler {
+    public static final String GUI_BASE_CLASS_PATH = "hardcorequesting.client.interfaces.GuiBase";
+    private Optional<Class<?>> guiBaseClass;
 
     @Override
-    public void handle(@NotNull LambdaControlsClient mod)
-    {
+    public void handle(@NotNull LambdaControlsClient mod) {
         this.guiBaseClass = LambdaReflection.getClass(GUI_BASE_CLASS_PATH);
     }
 
     @Override
-    public boolean requireMouseOnScreen(Screen screen)
-    {
+    public boolean requireMouseOnScreen(Screen screen) {
         return this.guiBaseClass.map(clazz -> clazz.isInstance(screen)).orElse(false);
     }
 }

@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(ClientPlayerEntity.class)
 public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
-    private boolean lambdacontrols_driftingPrevented = false;
+    private boolean lambdacontrols$driftingPrevented = false;
 
     @Shadow
     protected abstract boolean hasMovementInput();
@@ -56,13 +56,13 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         if (type == MovementType.SELF) {
             if (this.abilities.flying && (!mod.config.hasFlyDrifting() || !mod.config.hasFlyVerticalDrifting())) {
                 if (!this.hasMovementInput()) {
-                    if (!this.lambdacontrols_driftingPrevented) {
+                    if (!this.lambdacontrols$driftingPrevented) {
                         if (!mod.config.hasFlyDrifting())
                             this.setVelocity(this.getVelocity().multiply(0, 1.0, 0));
                     }
-                    this.lambdacontrols_driftingPrevented = true;
+                    this.lambdacontrols$driftingPrevented = true;
                 } else
-                    this.lambdacontrols_driftingPrevented = false;
+                    this.lambdacontrols$driftingPrevented = false;
             }
         }
     }

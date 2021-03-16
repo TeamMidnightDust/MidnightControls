@@ -22,8 +22,7 @@ import java.util.Map;
  * Represents an accessor of {@link AdvancementsScreen}.
  */
 @Mixin(AdvancementsScreen.class)
-public interface AdvancementsScreenAccessor
-{
+public interface AdvancementsScreenAccessor {
     @Accessor("advancementHandler")
     ClientAdvancementManager getAdvancementManager();
 

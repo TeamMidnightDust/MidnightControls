@@ -22,8 +22,7 @@ import java.util.Optional;
  * @version 1.1.0
  * @since 1.0.0
  */
-public enum ControlsMode implements Nameable
-{
+public enum ControlsMode implements Nameable {
     DEFAULT,
     CONTROLLER,
     TOUCHSCREEN;
@@ -33,8 +32,7 @@ public enum ControlsMode implements Nameable
      *
      * @return The next available controls mode.
      */
-    public ControlsMode next()
-    {
+    public ControlsMode next() {
         ControlsMode[] v = values();
         if (v.length == this.ordinal() + 1)
             return v[0];
@@ -47,14 +45,12 @@ public enum ControlsMode implements Nameable
      * @return The translated key of this controls mode.
      * @since 1.1.0
      */
-    public String getTranslationKey()
-    {
+    public String getTranslationKey() {
         return "lambdacontrols.controls_mode." + this.getName();
     }
 
     @Override
-    public @NotNull String getName()
-    {
+    public @NotNull String getName() {
         return this.name().toLowerCase();
     }
 
@@ -64,8 +60,7 @@ public enum ControlsMode implements Nameable
      * @param id The identifier of the controls mode.
      * @return The controls mode if found, else empty.
      */
-    public static Optional<ControlsMode> byId(@NotNull String id)
-    {
+    public static Optional<ControlsMode> byId(@NotNull String id) {
         return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();
     }
 }

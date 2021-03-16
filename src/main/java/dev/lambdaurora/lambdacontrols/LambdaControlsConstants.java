@@ -18,10 +18,9 @@ import org.aperlambda.lambdacommon.Identifier;
  * @version 1.1.0
  * @since 1.1.0
  */
-public class LambdaControlsConstants
-{
-    public static final String     NAMESPACE             = "lambdacontrols";
+public class LambdaControlsConstants {
+    public static final String NAMESPACE = "lambdacontrols";
     public static final Identifier CONTROLS_MODE_CHANNEL = new Identifier(NAMESPACE, "controls_mode");
-    public static final Identifier FEATURE_CHANNEL       = new Identifier(NAMESPACE, "feature");
-    public static final Identifier HELLO_CHANNEL         = new Identifier(NAMESPACE, "hello");
+    public static final Identifier FEATURE_CHANNEL = new Identifier(NAMESPACE, "feature");
+    public static final Identifier HELLO_CHANNEL = new Identifier(NAMESPACE, "hello");
 }

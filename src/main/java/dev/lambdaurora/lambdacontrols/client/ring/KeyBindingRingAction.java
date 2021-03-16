@@ -21,26 +21,22 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-public class KeyBindingRingAction extends RingAction
-{
-    public static final Factory    FACTORY = new Factory();
-    public final        KeyBinding binding;
+public class KeyBindingRingAction extends RingAction {
+    public static final Factory FACTORY = new Factory();
+    public final KeyBinding binding;
 
-    public KeyBindingRingAction(@NotNull Config config, @NotNull KeyBinding binding)
-    {
+    public KeyBindingRingAction(@NotNull Config config, @NotNull KeyBinding binding) {
         super(config);
         this.binding = binding;
     }
 
     @Override
-    public @NotNull String getName()
-    {
+    public @NotNull String getName() {
         return this.binding.getTranslationKey();
     }
 
     @Override
-    public void onAction(@NotNull RingButtonMode mode)
-    {
+    public void onAction(@NotNull RingButtonMode mode) {
         KeyBindingAccessor accessor = (KeyBindingAccessor) this.binding;
         switch (mode) {
             case PRESS:
@@ -55,22 +51,18 @@ public class KeyBindingRingAction extends RingAction
     }
 
     @Override
-    public void drawIcon(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered)
-    {
+    public void drawIcon(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered) {
         drawCenteredText(matrices, textRenderer, new TranslatableText(this.getName()), x + 25, y + 25 - textRenderer.fontHeight / 2, 0xffffff);
     }
 
-    protected static class Factory implements RingAction.Factory
-    {
+    protected static class Factory implements RingAction.Factory {
         @Override
-        public @NotNull Supplier<RingAction> newFromGui(@NotNull Screen screen)
-        {
+        public @NotNull Supplier<RingAction> newFromGui(@NotNull Screen screen) {
             return () -> null;
         }
 
         @Override
-        public @Nullable RingAction parse(@NotNull Config config)
-        {
+        public @Nullable RingAction parse(@NotNull Config config) {
             return null;
         }
     }

@@ -29,13 +29,11 @@ import java.util.function.Supplier;
  * @version 1.5.0
  * @since 1.4.0
  */
-public abstract class RingAction extends DrawableHelper implements Nameable
-{
-    protected Config  config;
+public abstract class RingAction extends DrawableHelper implements Nameable {
+    protected Config config;
     protected boolean activated = false;
 
-    public RingAction(@NotNull Config config)
-    {
+    public RingAction(@NotNull Config config) {
         this.config = config;
     }
 
@@ -44,8 +42,7 @@ public abstract class RingAction extends DrawableHelper implements Nameable
      *
      * @return The text name.
      */
-    public Text getTextName()
-    {
+    public Text getTextName() {
         return new TranslatableText(this.getName());
     }
 
@@ -54,13 +51,11 @@ public abstract class RingAction extends DrawableHelper implements Nameable
      *
      * @return True if the action is activated, else false.
      */
-    public boolean isActivated()
-    {
+    public boolean isActivated() {
         return this.activated;
     }
 
-    public void activate(@NotNull RingButtonMode mode)
-    {
+    public void activate(@NotNull RingButtonMode mode) {
         this.activated = !this.activated;
 
         this.onAction(mode);
@@ -68,8 +63,7 @@ public abstract class RingAction extends DrawableHelper implements Nameable
 
     public abstract void onAction(@NotNull RingButtonMode mode);
 
-    public void render(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered)
-    {
+    public void render(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered) {
         fill(matrices, x, y, x + LambdaRing.ELEMENT_SIZE, y + LambdaRing.ELEMENT_SIZE, hovered ? 0xbb777777 : 0xbb000000);
         drawIcon(matrices, textRenderer, x, y, hovered);
     }
@@ -82,8 +76,7 @@ public abstract class RingAction extends DrawableHelper implements Nameable
      * @version 1.4.3
      * @since 1.4.3
      */
-    public interface Factory
-    {
+    public interface Factory {
         @NotNull Supplier<RingAction> newFromGui(@NotNull Screen screen);
 
         @Nullable RingAction parse(@NotNull Config config);

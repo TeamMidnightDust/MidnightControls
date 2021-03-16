@@ -16,8 +16,7 @@ package dev.lambdaurora.lambdacontrols.client;
  * @version 1.1.0
  * @since 1.1.0
  */
-public enum ButtonState
-{
+public enum ButtonState {
     NONE(0),
     PRESS(1),
     RELEASE(2),
@@ -25,8 +24,7 @@ public enum ButtonState
 
     public final int id;
 
-    ButtonState(int id)
-    {
+    ButtonState(int id) {
         this.id = id;
     }
 
@@ -35,8 +33,7 @@ public enum ButtonState
      *
      * @return True if this state is a pressed state, else false.
      */
-    public boolean isPressed()
-    {
+    public boolean isPressed() {
         return this == PRESS || this == REPEAT;
     }
 
@@ -45,8 +42,7 @@ public enum ButtonState
      *
      * @return True if this state is an unpressed state, else false.
      */
-    public boolean isUnpressed()
-    {
+    public boolean isUnpressed() {
         return this == RELEASE || this == NONE;
     }
 }

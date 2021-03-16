@@ -9,8 +9,8 @@
 
 package dev.lambdaurora.lambdacontrols.client.gui.widget;
 
-import dev.lambdaurora.lambdacontrols.client.gui.LambdaControlsRenderer;
 import dev.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
+import dev.lambdaurora.lambdacontrols.client.gui.LambdaControlsRenderer;
 import me.lambdaurora.spruceui.Position;
 import me.lambdaurora.spruceui.SpruceTexts;
 import me.lambdaurora.spruceui.widget.AbstractSpruceIconButtonWidget;

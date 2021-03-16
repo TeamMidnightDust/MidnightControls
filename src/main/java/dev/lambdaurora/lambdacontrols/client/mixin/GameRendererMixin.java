@@ -21,15 +21,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GameRenderer.class)
-public class GameRendererMixin
-{
+public class GameRendererMixin {
     @Shadow
     @Final
     private MinecraftClient client;
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Mouse;getX()D"))
-    private void onRender(float tickDelta, long startTime, boolean fullRender, CallbackInfo ci)
-    {
+    private void onRender(float tickDelta, long startTime, boolean fullRender, CallbackInfo ci) {
         if (this.client.currentScreen != null && LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER)
             LambdaControlsClient.get().input.onPreRenderScreen(this.client, this.client.currentScreen);
     }

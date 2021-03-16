@@ -26,37 +26,31 @@ import java.util.List;
  * @version 1.1.0
  * @since 1.1.0
  */
-public class ButtonCategory implements Identifiable
-{
+public class ButtonCategory implements Identifiable {
     private final List<ButtonBinding> bindings = new ArrayList<>();
-    private final Identifier          id;
-    private       int                 priority;
+    private final Identifier id;
+    private int priority;
 
-    public ButtonCategory(@NotNull Identifier id, int priority)
-    {
+    public ButtonCategory(@NotNull Identifier id, int priority) {
         this.id = id;
         this.priority = priority;
     }
 
-    public ButtonCategory(@NotNull Identifier id)
-    {
+    public ButtonCategory(@NotNull Identifier id) {
         this(id, 100);
     }
 
-    public void registerBinding(@NotNull ButtonBinding binding)
-    {
+    public void registerBinding(@NotNull ButtonBinding binding) {
         if (this.bindings.contains(binding))
             throw new IllegalStateException("Cannot register twice a button binding in the same category.");
         this.bindings.add(binding);
     }
 
-    public void registerAllBindings(@NotNull ButtonBinding... bindings)
-    {
+    public void registerAllBindings(@NotNull ButtonBinding... bindings) {
         this.registerAllBindings(Arrays.asList(bindings));
     }
 
-    public void registerAllBindings(@NotNull List<ButtonBinding> bindings)
-    {
+    public void registerAllBindings(@NotNull List<ButtonBinding> bindings) {
         bindings.forEach(this::registerBinding);
     }
 
@@ -65,8 +59,7 @@ public class ButtonCategory implements Identifiable
      *
      * @return The bindings assigned to this category.
      */
-    public @NotNull List<ButtonBinding> getBindings()
-    {
+    public @NotNull List<ButtonBinding> getBindings() {
         return Collections.unmodifiableList(this.bindings);
     }
 
@@ -77,8 +70,7 @@ public class ButtonCategory implements Identifiable
      *
      * @return The translated name.
      */
-    public @NotNull String getTranslatedName()
-    {
+    public @NotNull String getTranslatedName() {
         if (this.id.getNamespace().equals("minecraft"))
             return I18n.translate(this.id.getName());
         else
@@ -91,14 +83,12 @@ public class ButtonCategory implements Identifiable
      *
      * @return The priority of this category.
      */
-    public int getPriority()
-    {
+    public int getPriority() {
         return this.priority;
     }
 
     @Override
-    public @NotNull Identifier getIdentifier()
-    {
+    public @NotNull Identifier getIdentifier() {
         return this.id;
     }
 }

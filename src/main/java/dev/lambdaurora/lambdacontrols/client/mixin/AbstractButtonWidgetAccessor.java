@@ -14,8 +14,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(AbstractButtonWidget.class)
-public interface AbstractButtonWidgetAccessor
-{
+public interface AbstractButtonWidgetAccessor {
     @Accessor("height")
     int getHeight();
 }

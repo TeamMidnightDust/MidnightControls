@@ -25,8 +25,7 @@ import java.util.Optional;
  * @version 1.4.3
  * @since 1.0.0
  */
-public enum ControllerType implements Nameable
-{
+public enum ControllerType implements Nameable {
     DEFAULT(0),
     DUALSHOCK(1),
     SWITCH(2),
@@ -35,17 +34,15 @@ public enum ControllerType implements Nameable
     STEAM(5),
     OUYA(6);
 
-    private final int  id;
+    private final int id;
     private final Text text;
 
-    ControllerType(int id)
-    {
+    ControllerType(int id) {
         this.id = id;
         this.text = new TranslatableText("lambdacontrols.controller_type." + this.getName());
     }
 
-    ControllerType(int id, @NotNull Text text)
-    {
+    ControllerType(int id, @NotNull Text text) {
         this.id = id;
         this.text = text;
     }
@@ -55,8 +52,7 @@ public enum ControllerType implements Nameable
      *
      * @return The controller type's identifier.
      */
-    public int getId()
-    {
+    public int getId() {
         return this.id;
     }
 
@@ -65,8 +61,7 @@ public enum ControllerType implements Nameable
      *
      * @return The next available controller type.
      */
-    public @NotNull ControllerType next()
-    {
+    public @NotNull ControllerType next() {
         ControllerType[] v = values();
         if (v.length == this.ordinal() + 1)
             return v[0];
@@ -78,14 +73,12 @@ public enum ControllerType implements Nameable
      *
      * @return The translated text of this controller type.
      */
-    public @NotNull Text getTranslatedText()
-    {
+    public @NotNull Text getTranslatedText() {
         return this.text;
     }
 
     @Override
-    public @NotNull String getName()
-    {
+    public @NotNull String getName() {
         return this.name().toLowerCase();
     }
 
@@ -95,8 +88,7 @@ public enum ControllerType implements Nameable
      * @param id The identifier of the controller type.
      * @return The controller type if found, else empty.
      */
-    public static @NotNull Optional<ControllerType> byId(@NotNull String id)
-    {
+    public static @NotNull Optional<ControllerType> byId(@NotNull String id) {
         return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();
     }
 }

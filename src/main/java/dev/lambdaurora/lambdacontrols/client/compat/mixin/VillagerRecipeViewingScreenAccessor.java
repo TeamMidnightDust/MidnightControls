@@ -28,8 +28,7 @@ import java.util.Map;
  * @since 1.2.0
  */
 @Mixin(VillagerRecipeViewingScreen.class)
-public interface VillagerRecipeViewingScreenAccessor
-{
+public interface VillagerRecipeViewingScreenAccessor {
     @Accessor(value = "categoryMap", remap = false)
     Map<RecipeCategory<?>, List<RecipeDisplay>> getCategoryMap();
 

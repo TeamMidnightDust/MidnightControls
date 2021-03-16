@@ -9,11 +9,11 @@
 
 package dev.lambdaurora.lambdacontrols.client.gui;
 
-import dev.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
 import dev.lambdaurora.lambdacontrols.ControlsMode;
 import dev.lambdaurora.lambdacontrols.LambdaControlsConstants;
 import dev.lambdaurora.lambdacontrols.client.HudSide;
 import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
+import dev.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
 import dev.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import me.lambdaurora.spruceui.hud.Hud;
 import net.minecraft.client.MinecraftClient;
@@ -35,34 +35,31 @@ import org.jetbrains.annotations.Nullable;
  * @version 1.3.2
  * @since 1.0.0
  */
-public class LambdaControlsHud extends Hud
-{
+public class LambdaControlsHud extends Hud {
     private final LambdaControlsClient mod;
-    private       MinecraftClient      client;
-    private       int                  attackWidth             = 0;
-    private       int                  attackButtonWidth       = 0;
-    private       int                  dropItemWidth           = 0;
-    private       int                  dropItemButtonWidth     = 0;
-    private       int                  inventoryWidth          = 0;
-    private       int                  inventoryButtonWidth    = 0;
-    private       int                  swapHandsWidth          = 0;
-    private       int                  swapHandsButtonWidth    = 0;
-    private       int                  useWidth                = 0;
-    private       int                  useButtonWidth          = 0;
-    private       BlockHitResult       placeHitResult;
-    private       String               attackAction            = "";
-    private       String               placeAction             = "";
-    private       int                  ticksDisplayedCrosshair = 0;
+    private MinecraftClient client;
+    private int attackWidth = 0;
+    private int attackButtonWidth = 0;
+    private int dropItemWidth = 0;
+    private int dropItemButtonWidth = 0;
+    private int inventoryWidth = 0;
+    private int inventoryButtonWidth = 0;
+    private int swapHandsWidth = 0;
+    private int swapHandsButtonWidth = 0;
+    private int useWidth = 0;
+    private int useButtonWidth = 0;
+    private BlockHitResult placeHitResult;
+    private String attackAction = "";
+    private String placeAction = "";
+    private int ticksDisplayedCrosshair = 0;
 
-    public LambdaControlsHud(@NotNull LambdaControlsClient mod)
-    {
+    public LambdaControlsHud(@NotNull LambdaControlsClient mod) {
         super(new Identifier(LambdaControlsConstants.NAMESPACE, "hud/button_indicator"));
         this.mod = mod;
     }
 
     @Override
-    public void init(@NotNull MinecraftClient client, int screenWidth, int screenHeight)
-    {
+    public void init(@NotNull MinecraftClient client, int screenWidth, int screenHeight) {
         super.init(client, screenWidth, screenHeight);
         this.client = client;
         this.inventoryWidth = this.width(ButtonBinding.INVENTORY);
@@ -79,8 +76,7 @@ public class LambdaControlsHud extends Hud
      * Renders the LambdaControls' HUD.
      */
     @Override
-    public void render(MatrixStack matrices, float tickDelta)
-    {
+    public void render(MatrixStack matrices, float tickDelta) {
         if (this.mod.config.getControlsMode() == ControlsMode.CONTROLLER && this.client.currentScreen == null) {
             int y = bottom(2);
             this.renderFirstIcons(matrices, this.mod.config.getHudSide() == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
@@ -103,8 +99,7 @@ public class LambdaControlsHud extends Hud
         }
     }
 
-    public void renderFirstIcons(MatrixStack matrices, int x, int y)
-    {
+    public void renderFirstIcons(MatrixStack matrices, int x, int y) {
         int offset = 2 + this.inventoryWidth + this.inventoryButtonWidth + 4;
         int currentX = this.mod.config.getHudSide() == HudSide.LEFT ? x : x - this.inventoryButtonWidth;
         this.drawButton(matrices, currentX, y, ButtonBinding.INVENTORY, true);
@@ -119,8 +114,7 @@ public class LambdaControlsHud extends Hud
         this.drawButton(matrices, currentX, y, ButtonBinding.DROP_ITEM, !this.client.player.getMainHandStack().isEmpty());
     }
 
-    public void renderSecondIcons(MatrixStack matrices, int x, int y)
-    {
+    public void renderSecondIcons(MatrixStack matrices, int x, int y) {
         int offset;
         int currentX = x;
         if (!this.placeAction.isEmpty()) {
@@ -142,8 +136,7 @@ public class LambdaControlsHud extends Hud
         this.drawButton(matrices, currentX, y, ButtonBinding.ATTACK, this.attackWidth != 0);
     }
 
-    public void renderFirstSection(MatrixStack matrices, int x, int y)
-    {
+    public void renderFirstSection(MatrixStack matrices, int x, int y) {
         int currentX = this.mod.config.getHudSide() == HudSide.LEFT ? x + this.inventoryButtonWidth + 2 : x - this.inventoryButtonWidth - 2 - this.inventoryWidth;
         this.drawTip(matrices, currentX, y, ButtonBinding.INVENTORY, true);
         currentX += this.mod.config.getHudSide() == HudSide.LEFT ? this.inventoryWidth + 4 + this.swapHandsButtonWidth + 2
@@ -158,8 +151,7 @@ public class LambdaControlsHud extends Hud
         this.drawTip(matrices, currentX, y, ButtonBinding.DROP_ITEM, !this.client.player.getMainHandStack().isEmpty());
     }
 
-    public void renderSecondSection(MatrixStack matrices, int x, int y)
-    {
+    public void renderSecondSection(MatrixStack matrices, int x, int y) {
         int currentX = x;
 
         if (!this.placeAction.isEmpty()) {
@@ -181,8 +173,7 @@ public class LambdaControlsHud extends Hud
     }
 
     @Override
-    public void tick()
-    {
+    public void tick() {
         super.tick();
         if (this.mod.config.getControlsMode() == ControlsMode.CONTROLLER) {
             if (this.client.crosshairTarget == null)
@@ -249,41 +240,34 @@ public class LambdaControlsHud extends Hud
     }
 
     @Override
-    public boolean hasTicks()
-    {
+    public boolean hasTicks() {
         return true;
     }
 
-    private int bottom(int y)
-    {
+    private int bottom(int y) {
         return this.client.getWindow().getScaledHeight() - y - LambdaControlsRenderer.ICON_SIZE;
     }
 
-    private int width(@NotNull ButtonBinding binding)
-    {
+    private int width(@NotNull ButtonBinding binding) {
         return this.width(binding.getTranslationKey());
     }
 
-    private int width(@Nullable String text)
-    {
+    private int width(@Nullable String text) {
         if (text == null || text.isEmpty())
             return 0;
         return this.client.textRenderer.getWidth(I18n.translate(text));
     }
 
-    private void drawButton(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, boolean display)
-    {
+    private void drawButton(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, boolean display) {
         if (display)
             LambdaControlsRenderer.drawButton(matrices, x, y, button, this.client);
     }
 
-    private void drawTip(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, boolean display)
-    {
+    private void drawTip(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, boolean display) {
         this.drawTip(matrices, x, y, button.getTranslationKey(), display);
     }
 
-    private void drawTip(MatrixStack matrices, int x, int y, @NotNull String action, boolean display)
-    {
+    private void drawTip(MatrixStack matrices, int x, int y, @NotNull String action, boolean display) {
         if (!display)
             return;
         String translatedAction = I18n.translate(action);

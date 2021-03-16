@@ -22,8 +22,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
  * Represents an accessor to CreativeInventoryScreen.
  */
 @Mixin(CreativeInventoryScreen.class)
-public interface CreativeInventoryScreenAccessor
-{
+public interface CreativeInventoryScreenAccessor {
     /**
      * Gets the selected tab.
      *
@@ -38,7 +37,7 @@ public interface CreativeInventoryScreenAccessor
      * @param group The tab's item group.
      */
     @Invoker("setSelectedTab")
-    void lambdacontrols_setSelectedTab(@NotNull ItemGroup group);
+    void lambdacontrols$setSelectedTab(@NotNull ItemGroup group);
 
     /**
      * Returns whether the slot belongs to the creative inventory or not.
@@ -47,7 +46,7 @@ public interface CreativeInventoryScreenAccessor
      * @return True if the slot is from the creative inventory, else false.
      */
     @Invoker("isCreativeInventorySlot")
-    boolean lambdacontrols_isCreativeInventorySlot(@Nullable Slot slot);
+    boolean lambdacontrols$isCreativeInventorySlot(@Nullable Slot slot);
 
     /**
      * Returns whether the current tab has a scrollbar or not.
@@ -55,5 +54,5 @@ public interface CreativeInventoryScreenAccessor
      * @return True if the current tab has a scrollbar, else false.
      */
     @Invoker("hasScrollbar")
-    boolean lambdacontrols_hasScrollbar();
+    boolean lambdacontrols$hasScrollbar();
 }

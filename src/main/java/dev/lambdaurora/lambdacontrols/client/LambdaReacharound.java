@@ -33,14 +33,12 @@ import org.jetbrains.annotations.Nullable;
  * @version 1.5.0
  * @since 1.3.2
  */
-public class LambdaReacharound
-{
-    private BlockHitResult lastReacharoundResult   = null;
-    private boolean        lastReacharoundVertical = false;
-    private boolean        onSlab                  = false;
+public class LambdaReacharound {
+    private BlockHitResult lastReacharoundResult = null;
+    private boolean lastReacharoundVertical = false;
+    private boolean onSlab = false;
 
-    public void tick(@NotNull MinecraftClient client)
-    {
+    public void tick(@NotNull MinecraftClient client) {
         this.lastReacharoundResult = this.tryVerticalReachAround(client);
         if (this.lastReacharoundResult == null) {
             this.lastReacharoundResult = this.tryHorizontalReachAround(client);
@@ -53,8 +51,7 @@ public class LambdaReacharound
      *
      * @return The last reach around result.
      */
-    public @Nullable BlockHitResult getLastReacharoundResult()
-    {
+    public @Nullable BlockHitResult getLastReacharoundResult() {
         return this.lastReacharoundResult;
     }
 
@@ -63,8 +60,7 @@ public class LambdaReacharound
      *
      * @return True if the reach around is vertical.
      */
-    public boolean isLastReacharoundVertical()
-    {
+    public boolean isLastReacharoundVertical() {
         return this.lastReacharoundVertical;
     }
 
@@ -73,13 +69,11 @@ public class LambdaReacharound
      *
      * @return True if reacharound is available, else false.
      */
-    public boolean isReacharoundAvailable()
-    {
+    public boolean isReacharoundAvailable() {
         return LambdaControlsFeature.HORIZONTAL_REACHAROUND.isAvailable() || LambdaControlsFeature.VERTICAL_REACHAROUND.isAvailable();
     }
 
-    private float getPlayerRange(@NotNull MinecraftClient client)
-    {
+    private float getPlayerRange(@NotNull MinecraftClient client) {
         return client.interactionManager != null ? client.interactionManager.getReachDistance() : 0.f;
     }
 
@@ -89,8 +83,7 @@ public class LambdaReacharound
      * @param client The client instance.
      * @return A block hit result if vertical reach-around is possible, else null.
      */
-    public @Nullable BlockHitResult tryVerticalReachAround(@NotNull MinecraftClient client)
-    {
+    public @Nullable BlockHitResult tryVerticalReachAround(@NotNull MinecraftClient client) {
         if (!LambdaControlsFeature.VERTICAL_REACHAROUND.isAvailable())
             return null;
         if (client.player == null || client.world == null || client.crosshairTarget == null || client.crosshairTarget.getType() != HitResult.Type.MISS
@@ -122,8 +115,7 @@ public class LambdaReacharound
      * @param client The client instance.
      * @return A block hit result if horizontal reach-around is possible.
      */
-    public @Nullable BlockHitResult tryHorizontalReachAround(@NotNull MinecraftClient client)
-    {
+    public @Nullable BlockHitResult tryHorizontalReachAround(@NotNull MinecraftClient client) {
         if (!LambdaControlsFeature.HORIZONTAL_REACHAROUND.isAvailable())
             return null;
 
@@ -156,15 +148,13 @@ public class LambdaReacharound
         return null;
     }
 
-    public @NotNull BlockHitResult withSideForReacharound(@NotNull BlockHitResult result, @Nullable ItemStack stack)
-    {
+    public @NotNull BlockHitResult withSideForReacharound(@NotNull BlockHitResult result, @Nullable ItemStack stack) {
         if (stack == null || stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
             return result;
         return withSideForReacharound(result, Block.getBlockFromItem(stack.getItem()));
     }
 
-    public @NotNull BlockHitResult withSideForReacharound(@NotNull BlockHitResult result, @NotNull Block block)
-    {
+    public @NotNull BlockHitResult withSideForReacharound(@NotNull BlockHitResult result, @NotNull Block block) {
         if (block instanceof SlabBlock) {
             if (this.onSlab) result = result.withSide(Direction.UP);
             else result = result.withSide(Direction.DOWN);

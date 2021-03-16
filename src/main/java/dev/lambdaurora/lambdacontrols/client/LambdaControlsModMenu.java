@@ -20,11 +20,9 @@ import io.github.prospector.modmenu.api.ModMenuApi;
  * @version 1.3.0
  * @since 1.1.0
  */
-public class LambdaControlsModMenu implements ModMenuApi
-{
+public class LambdaControlsModMenu implements ModMenuApi {
     @Override
-    public ConfigScreenFactory<?> getModConfigScreenFactory()
-    {
+    public ConfigScreenFactory<?> getModConfigScreenFactory() {
         return parent -> new LambdaControlsSettingsScreen(parent, false);
     }
 }

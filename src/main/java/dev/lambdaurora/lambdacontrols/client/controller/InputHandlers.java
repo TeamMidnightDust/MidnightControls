@@ -41,14 +41,11 @@ import java.util.stream.Collectors;
  * @version 1.4.3
  * @since 1.1.0
  */
-public class InputHandlers
-{
-    private InputHandlers()
-    {
+public class InputHandlers {
+    private InputHandlers() {
     }
 
-    public static PressAction handleHotbar(boolean next)
-    {
+    public static PressAction handleHotbar(boolean next) {
         return (client, button, value, action) -> {
             if (action == ButtonState.RELEASE)
                 return false;
@@ -68,7 +65,7 @@ public class InputHandlers
                     nextTab = ItemGroup.GROUPS.length - 1;
                 else if (nextTab >= ItemGroup.GROUPS.length)
                     nextTab = 0;
-                inventory.lambdacontrols_setSelectedTab(ItemGroup.GROUPS[nextTab]);
+                inventory.lambdacontrols$setSelectedTab(ItemGroup.GROUPS[nextTab]);
                 return true;
             } else if (client.currentScreen instanceof InventoryScreen) {
                 RecipeBookWidgetAccessor recipeBook = (RecipeBookWidgetAccessor) ((InventoryScreen) client.currentScreen).getRecipeBookWidget();
@@ -84,7 +81,7 @@ public class InputHandlers
                 currentTab.setToggled(false);
                 recipeBook.setCurrentTab(currentTab = tabs.get(nextTab));
                 currentTab.setToggled(true);
-                recipeBook.lambdacontrols_refreshResults(true);
+                recipeBook.lambdacontrols$refreshResults(true);
                 return true;
             } else if (client.currentScreen instanceof AdvancementsScreen) {
                 AdvancementsScreenAccessor screen = (AdvancementsScreenAccessor) client.currentScreen;
@@ -109,8 +106,7 @@ public class InputHandlers
         };
     }
 
-    public static boolean handlePauseGame(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action)
-    {
+    public static boolean handlePauseGame(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action) {
         if (action == ButtonState.PRESS) {
             // If in game, then pause the game.
             if (client.currentScreen == null)
@@ -126,21 +122,19 @@ public class InputHandlers
     /**
      * Handles the screenshot action.
      *
-     * @param client  The client instance.
+     * @param client The client instance.
      * @param binding The binding which fired the action.
-     * @param action  The action done on the binding.
+     * @param action The action done on the binding.
      * @return True if handled, else false.
      */
-    public static boolean handleScreenshot(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action)
-    {
+    public static boolean handleScreenshot(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action) {
         if (action == ButtonState.RELEASE)
             ScreenshotUtils.saveScreenshot(client.runDirectory, client.getWindow().getFramebufferWidth(), client.getWindow().getFramebufferHeight(), client.getFramebuffer(),
                     text -> client.execute(() -> client.inGameHud.getChatHud().addMessage(text)));
         return true;
     }
 
-    public static boolean handleToggleSneak(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action)
-    {
+    public static boolean handleToggleSneak(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action) {
         button.asKeyBinding().ifPresent(binding -> {
             boolean sneakToggled = client.options.sneakToggled;
             if (client.player.abilities.flying && sneakToggled)
@@ -152,8 +146,7 @@ public class InputHandlers
         return true;
     }
 
-    public static PressAction handleInventorySlotPad(int direction)
-    {
+    public static PressAction handleInventorySlotPad(int direction) {
         return (client, binding, value, action) -> {
             if (!(client.currentScreen instanceof HandledScreen && action != ButtonState.RELEASE))
                 return false;
@@ -166,7 +159,7 @@ public class InputHandlers
             double mouseY = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
 
             // Finds the hovered slot.
-            Slot mouseSlot = accessor.lambdacontrols_getSlotAt(mouseX, mouseY);
+            Slot mouseSlot = accessor.lambdacontrols$getSlotAt(mouseX, mouseY);
 
             // Finds the closest slot in the GUI within 14 pixels.
             Optional<Slot> closestSlot = inventory.getScreenHandler().slots.parallelStream()
@@ -224,36 +217,33 @@ public class InputHandlers
     /**
      * Returns always true to the filter.
      *
-     * @param client  The client instance.
+     * @param client The client instance.
      * @param binding The affected binding.
      * @return True.
      */
-    public static boolean always(@NotNull MinecraftClient client, @NotNull ButtonBinding binding)
-    {
+    public static boolean always(@NotNull MinecraftClient client, @NotNull ButtonBinding binding) {
         return true;
     }
 
     /**
      * Returns whether the client is in game or not.
      *
-     * @param client  The client instance.
+     * @param client The client instance.
      * @param binding The affected binding.
      * @return True if the client is in game, else false.
      */
-    public static boolean inGame(@NotNull MinecraftClient client, @NotNull ButtonBinding binding)
-    {
+    public static boolean inGame(@NotNull MinecraftClient client, @NotNull ButtonBinding binding) {
         return client.currentScreen == null;
     }
 
     /**
      * Returns whether the client is in a non-interactive screen (which means require mouse input) or not.
      *
-     * @param client  The client instance.
+     * @param client The client instance.
      * @param binding The affected binding.
      * @return True if the client is in a non-interactive screen, else false.
      */
-    public static boolean inNonInteractiveScreens(@NotNull MinecraftClient client, @NotNull ButtonBinding binding)
-    {
+    public static boolean inNonInteractiveScreens(@NotNull MinecraftClient client, @NotNull ButtonBinding binding) {
         if (client.currentScreen == null)
             return false;
         return !LambdaInput.isScreenInteractive(client.currentScreen);
@@ -262,24 +252,22 @@ public class InputHandlers
     /**
      * Returns whether the client is in an inventory or not.
      *
-     * @param client  The client instance.
+     * @param client The client instance.
      * @param binding The affected binding.
      * @return True if the client is in an inventory, else false.
      */
-    public static boolean inInventory(@NotNull MinecraftClient client, @NotNull ButtonBinding binding)
-    {
+    public static boolean inInventory(@NotNull MinecraftClient client, @NotNull ButtonBinding binding) {
         return client.currentScreen instanceof HandledScreen;
     }
 
     /**
      * Returns whether the client is in the advancements screen or not.
      *
-     * @param client  The client instance.
+     * @param client The client instance.
      * @param binding The affected binding.
      * @return True if the client is in the advancements screen, else false.
      */
-    public static boolean inAdvancements(@NotNull MinecraftClient client, @NotNull ButtonBinding binding)
-    {
+    public static boolean inAdvancements(@NotNull MinecraftClient client, @NotNull ButtonBinding binding) {
         return client.currentScreen instanceof AdvancementsScreen;
     }
 }

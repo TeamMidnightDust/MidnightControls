@@ -18,8 +18,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 import java.util.List;
 
 @Mixin(RecipeBookWidget.class)
-public interface RecipeBookWidgetAccessor
-{
+public interface RecipeBookWidgetAccessor {
     @Accessor("tabButtons")
     List<RecipeGroupButtonWidget> getTabButtons();
 
@@ -30,5 +29,5 @@ public interface RecipeBookWidgetAccessor
     void setCurrentTab(RecipeGroupButtonWidget currentTab);
 
     @Invoker("refreshResults")
-    void lambdacontrols_refreshResults(boolean resetCurrentPage);
+    void lambdacontrols$refreshResults(boolean resetCurrentPage);
 }

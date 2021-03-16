@@ -17,10 +17,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents the touchscreen overlay
  */
-public class TouchscreenOverlay extends Screen
-{
-    public TouchscreenOverlay(@NotNull LambdaControlsClient mod)
-    {
+public class TouchscreenOverlay extends Screen {
+    public TouchscreenOverlay(@NotNull LambdaControlsClient mod) {
         super(new LiteralText("Touchscreen overlay"));
     }
     /*public static final Identifier                 WIDGETS_LOCATION     = new Identifier("lambdacontrols", "textures/gui/widgets.png");

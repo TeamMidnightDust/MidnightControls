@@ -217,7 +217,7 @@ public class LambdaInput {
             this.mouseSpeedX = this.mouseSpeedY = 0.0F;
             INPUT_MANAGER.resetMousePosition(windowWidth, windowHeight);
         } else if (isScreenInteractive(client.currentScreen) && this.config.hasVirtualMouse()) {
-            ((MouseAccessor) client.mouse).lambdacontrols_onCursorPos(client.getWindow().getHandle(), 0, 0);
+            ((MouseAccessor) client.mouse).lambdacontrols$onCursorPos(client.getWindow().getHandle(), 0, 0);
             INPUT_MANAGER.resetMouseTarget(client);
         }
         this.inventoryInteractionCooldown = 5;
@@ -378,13 +378,13 @@ public class LambdaInput {
 
         HandledScreen screen = (HandledScreen) client.currentScreen;
         HandledScreenAccessor accessor = (HandledScreenAccessor) screen;
-        Slot slot = ((HandledScreenAccessor) client.currentScreen).lambdacontrols_getSlotAt(x, y);
+        Slot slot = ((HandledScreenAccessor) client.currentScreen).lambdacontrols$getSlotAt(x, y);
 
         int slotId;
         if (slot == null) {
             if (client.player.inventory.getCursorStack().isEmpty())
                 return false;
-            slotId = accessor.lambdacontrols_isClickOutsideBounds(x, y, accessor.getX(), accessor.getY(), GLFW_MOUSE_BUTTON_1) ? -999 : -1;
+            slotId = accessor.lambdacontrols$isClickOutsideBounds(x, y, accessor.getX(), accessor.getY(), GLFW_MOUSE_BUTTON_1) ? -999 : -1;
         } else {
             slotId = slot.id;
         }
@@ -394,7 +394,7 @@ public class LambdaInput {
         switch (button) {
             case GLFW_GAMEPAD_BUTTON_A:
                 if (screen instanceof CreativeInventoryScreen)
-                    if (((CreativeInventoryScreenAccessor) screen).lambdacontrols_isCreativeInventorySlot(slot))
+                    if (((CreativeInventoryScreenAccessor) screen).lambdacontrols$isCreativeInventorySlot(slot))
                         actionType = SlotActionType.CLONE;
                 if (slot != null && LambdaControlsCompat.streamCompatHandlers().anyMatch(handler -> handler.isCreativeSlot(screen, slot)))
                     actionType = SlotActionType.CLONE;
@@ -409,7 +409,7 @@ public class LambdaInput {
                 return false;
         }
 
-        accessor.lambdacontrols_onMouseClick(slot, slotId, clickData, actionType);
+        accessor.lambdacontrols$onMouseClick(slot, slotId, clickData, actionType);
         return true;
     }
 
@@ -501,7 +501,7 @@ public class LambdaInput {
                 CreativeInventoryScreen screen = (CreativeInventoryScreen) client.currentScreen;
                 CreativeInventoryScreenAccessor accessor = (CreativeInventoryScreenAccessor) screen;
                 // @TODO allow rebinding to left stick
-                if (accessor.lambdacontrols_hasScrollbar() && absValue >= deadZone) {
+                if (accessor.lambdacontrols$hasScrollbar() && absValue >= deadZone) {
                     screen.mouseScrolled(0.0, 0.0, -value);
                 }
                 return;
@@ -655,7 +655,7 @@ public class LambdaInput {
             this.actionGuiCooldown = 2; // Prevent to press too quickly the focused element, so we have to skip 5 ticks.
             return false;
         } else if (element instanceof AlwaysSelectedEntryListWidget) {
-            ((EntryListWidgetAccessor) element).lambdacontrols_moveSelection(right ? EntryListWidget.MoveDirection.UP : EntryListWidget.MoveDirection.DOWN);
+            ((EntryListWidgetAccessor) element).lambdacontrols$moveSelection(right ? EntryListWidget.MoveDirection.UP : EntryListWidget.MoveDirection.DOWN);
             return false;
         } else if (element instanceof ParentElement) {
             ParentElement entryList = (ParentElement) element;

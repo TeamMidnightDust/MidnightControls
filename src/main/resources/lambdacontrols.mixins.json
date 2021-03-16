@@ -6,7 +6,6 @@
     "AbstractButtonWidgetAccessor",
     "AdvancementsScreenAccessor",
     "ClientPlayerEntityMixin",
-    "ClientPlayNetworkHandlerMixin",
     "ControlsOptionsScreenMixin",
     "CreativeInventoryScreenAccessor",
     "EntryListWidgetAccessor",

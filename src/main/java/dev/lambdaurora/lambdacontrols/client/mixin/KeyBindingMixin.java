@@ -15,8 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(KeyBinding.class)
-public class KeyBindingMixin implements KeyBindingAccessor
-{
+public class KeyBindingMixin implements KeyBindingAccessor {
     @Shadow
     private int timesPressed;
 
@@ -24,8 +23,7 @@ public class KeyBindingMixin implements KeyBindingAccessor
     private boolean pressed;
 
     @Override
-    public boolean lambdacontrols_press()
-    {
+    public boolean lambdacontrols$press() {
         boolean oldPressed = this.pressed;
         if (!this.pressed)
             this.pressed = true;
@@ -34,8 +32,7 @@ public class KeyBindingMixin implements KeyBindingAccessor
     }
 
     @Override
-    public boolean lambdacontrols_unpress()
-    {
+    public boolean lambdacontrols$unpress() {
         if (this.pressed) {
             this.pressed = false;
             return true;

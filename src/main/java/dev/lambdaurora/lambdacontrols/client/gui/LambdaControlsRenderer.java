@@ -10,11 +10,11 @@
 package dev.lambdaurora.lambdacontrols.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import dev.lambdaurora.lambdacontrols.client.LambdaInput;
 import dev.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
-import dev.lambdaurora.lambdacontrols.client.util.HandledScreenAccessor;
-import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import dev.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
+import dev.lambdaurora.lambdacontrols.client.util.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
@@ -33,14 +33,12 @@ import org.lwjgl.glfw.GLFW;
  * @version 1.5.0
  * @since 1.2.0
  */
-public class LambdaControlsRenderer
-{
-    public static final  int ICON_SIZE   = 20;
+public class LambdaControlsRenderer {
+    public static final int ICON_SIZE = 20;
     private static final int BUTTON_SIZE = 15;
-    private static final int AXIS_SIZE   = 18;
+    private static final int AXIS_SIZE = 18;
 
-    public static int getButtonSize(int button)
-    {
+    public static int getButtonSize(int button) {
         switch (button) {
             case -1:
                 return 0;
@@ -64,8 +62,7 @@ public class LambdaControlsRenderer
      * @param binding The binding.
      * @return The width.
      */
-    public static int getBindingIconWidth(@NotNull ButtonBinding binding)
-    {
+    public static int getBindingIconWidth(@NotNull ButtonBinding binding) {
         return getBindingIconWidth(binding.getButton());
     }
 
@@ -75,8 +72,7 @@ public class LambdaControlsRenderer
      * @param buttons The buttons.
      * @return The width.
      */
-    public static int getBindingIconWidth(int[] buttons)
-    {
+    public static int getBindingIconWidth(int[] buttons) {
         int width = 0;
         for (int i = 0; i < buttons.length; i++) {
             width += ICON_SIZE;
@@ -87,13 +83,11 @@ public class LambdaControlsRenderer
         return width;
     }
 
-    public static Pair<Integer, Integer> drawButton(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, @NotNull MinecraftClient client)
-    {
+    public static Pair<Integer, Integer> drawButton(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, @NotNull MinecraftClient client) {
         return drawButton(matrices, x, y, button.getButton(), client);
     }
 
-    public static Pair<Integer, Integer> drawButton(MatrixStack matrices, int x, int y, int[] buttons, @NotNull MinecraftClient client)
-    {
+    public static Pair<Integer, Integer> drawButton(MatrixStack matrices, int x, int y, int[] buttons, @NotNull MinecraftClient client) {
         int height = 0;
         int length = 0;
         int currentX = x;
@@ -112,8 +106,7 @@ public class LambdaControlsRenderer
     }
 
     @SuppressWarnings("deprecated")
-    public static int drawButton(MatrixStack matrices, int x, int y, int button, @NotNull MinecraftClient client)
-    {
+    public static int drawButton(MatrixStack matrices, int x, int y, int button, @NotNull MinecraftClient client) {
         boolean second = false;
         if (button == -1)
             return 0;
@@ -204,13 +197,11 @@ public class LambdaControlsRenderer
         return ICON_SIZE;
     }
 
-    public static int drawButtonTip(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull MinecraftClient client)
-    {
+    public static int drawButtonTip(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull MinecraftClient client) {
         return drawButtonTip(matrices, x, y, button.getButton(), button.getTranslationKey(), display, client);
     }
 
-    public static int drawButtonTip(MatrixStack matrices, int x, int y, int[] button, @NotNull String action, boolean display, @NotNull MinecraftClient client)
-    {
+    public static int drawButtonTip(MatrixStack matrices, int x, int y, int[] button, @NotNull String action, boolean display, @NotNull MinecraftClient client) {
         if (display) {
             int buttonWidth = drawButton(matrices, x, y, button, client).key;
 
@@ -223,13 +214,11 @@ public class LambdaControlsRenderer
         return -10;
     }
 
-    private static int getButtonTipWidth(@NotNull String action, @NotNull TextRenderer textRenderer)
-    {
+    private static int getButtonTipWidth(@NotNull String action, @NotNull TextRenderer textRenderer) {
         return 15 + 5 + textRenderer.getWidth(action);
     }
 
-    public static void renderVirtualCursor(@NotNull MatrixStack matrices, @NotNull MinecraftClient client)
-    {
+    public static void renderVirtualCursor(@NotNull MatrixStack matrices, @NotNull MinecraftClient client) {
         if (!LambdaControlsClient.get().config.hasVirtualMouse() || (client.currentScreen == null || LambdaInput.isScreenInteractive(client.currentScreen)))
             return;
 
@@ -243,7 +232,7 @@ public class LambdaControlsRenderer
             int guiLeft = inventoryScreen.getX();
             int guiTop = inventoryScreen.getY();
 
-            Slot slot = inventoryScreen.lambdacontrols_getSlotAt(mouseX, mouseY);
+            Slot slot = inventoryScreen.lambdacontrols$getSlotAt(mouseX, mouseY);
 
             if (slot != null) {
                 mouseX = guiLeft + slot.x;
@@ -273,14 +262,13 @@ public class LambdaControlsRenderer
     /**
      * Draws the virtual cursor.
      *
-     * @param matrices  The matrix stack.
-     * @param x         X coordinate.
-     * @param y         Y coordinate.
+     * @param matrices The matrix stack.
+     * @param x X coordinate.
+     * @param y Y coordinate.
      * @param hoverSlot True if hovering a slot, else false.
-     * @param client    The client instance.
+     * @param client The client instance.
      */
-    public static void drawCursor(@NotNull MatrixStack matrices, int x, int y, boolean hoverSlot, @NotNull MinecraftClient client)
-    {
+    public static void drawCursor(@NotNull MatrixStack matrices, int x, int y, boolean hoverSlot, @NotNull MinecraftClient client) {
         client.getTextureManager().bindTexture(LambdaControlsClient.CURSOR_TEXTURE);
 
         RenderSystem.disableDepthTest();

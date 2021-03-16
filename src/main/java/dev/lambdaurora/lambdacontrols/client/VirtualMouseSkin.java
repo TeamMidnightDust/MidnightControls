@@ -23,18 +23,16 @@ import java.util.Optional;
  * @version 1.4.0
  * @since 1.2.0
  */
-public enum VirtualMouseSkin implements Nameable
-{
+public enum VirtualMouseSkin implements Nameable {
     DEFAULT_LIGHT("default_light"),
     DEFAULT_DARK("default_dark"),
     SECOND_LIGHT("second_light"),
     SECOND_DARK("second_dark");
 
     private final String name;
-    private final Text   text;
+    private final Text text;
 
-    VirtualMouseSkin(String name)
-    {
+    VirtualMouseSkin(String name) {
         this.name = name;
         this.text = new TranslatableText(this.getTranslationKey());
     }
@@ -44,8 +42,7 @@ public enum VirtualMouseSkin implements Nameable
      *
      * @return The next available virtual mouse skin.
      */
-    public @NotNull VirtualMouseSkin next()
-    {
+    public @NotNull VirtualMouseSkin next() {
         VirtualMouseSkin[] v = values();
         if (v.length == this.ordinal() + 1)
             return v[0];
@@ -57,8 +54,7 @@ public enum VirtualMouseSkin implements Nameable
      *
      * @return The virtual mouse skin's translation key.
      */
-    public @NotNull String getTranslationKey()
-    {
+    public @NotNull String getTranslationKey() {
         return "lambdacontrols.virtual_mouse.skin." + this.getName();
     }
 
@@ -67,14 +63,12 @@ public enum VirtualMouseSkin implements Nameable
      *
      * @return The translated text of this virtual mouse skin.
      */
-    public @NotNull Text getTranslatedText()
-    {
+    public @NotNull Text getTranslatedText() {
         return this.text;
     }
 
     @Override
-    public @NotNull String getName()
-    {
+    public @NotNull String getName() {
         return this.name;
     }
 
@@ -84,8 +78,7 @@ public enum VirtualMouseSkin implements Nameable
      * @param id The identifier of the virtual mouse skin.
      * @return The virtual mouse skin if found, else empty.
      */
-    public static @NotNull Optional<VirtualMouseSkin> byId(@NotNull String id)
-    {
+    public static @NotNull Optional<VirtualMouseSkin> byId(@NotNull String id) {
         return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();
     }
 }

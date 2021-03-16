@@ -22,8 +22,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
  * @since 1.5.0
  */
 @Mixin(value = EntryWidget.class, remap = false)
-public interface EntryWidgetAccessor
-{
+public interface EntryWidgetAccessor {
     @Invoker("getCurrentEntry")
     EntryStack lambdacontrols_getCurrentEntry();
 }

@@ -24,8 +24,7 @@ import java.util.List;
  * @since 1.5.0
  */
 @Mixin(value = EntryListWidget.class, remap = false)
-public interface EntryListWidgetAccessor
-{
+public interface EntryListWidgetAccessor {
     @Accessor(value = "entries")
     List<EntryListEntryWidget> getEntries();
 }

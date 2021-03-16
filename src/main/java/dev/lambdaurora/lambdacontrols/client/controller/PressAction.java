@@ -23,8 +23,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.0.0
  */
 @FunctionalInterface
-public interface PressAction
-{
+public interface PressAction {
     PressAction DEFAULT_ACTION = (client, button, value, action) -> {
         if (action == ButtonState.REPEAT || client.currentScreen != null)
             return false;

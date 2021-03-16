@@ -24,15 +24,13 @@ import java.util.Optional;
  * @version 1.4.0
  * @since 1.0.0
  */
-public enum HudSide implements Nameable
-{
+public enum HudSide implements Nameable {
     LEFT,
     RIGHT;
 
     private final Text text;
 
-    HudSide()
-    {
+    HudSide() {
         this.text = new TranslatableText(this.getTranslationKey());
     }
 
@@ -41,8 +39,7 @@ public enum HudSide implements Nameable
      *
      * @return The next available side.
      */
-    public @NotNull HudSide next()
-    {
+    public @NotNull HudSide next() {
         HudSide[] v = values();
         if (v.length == this.ordinal() + 1)
             return v[0];
@@ -54,8 +51,7 @@ public enum HudSide implements Nameable
      *
      * @return The translation key of this hude side.
      */
-    public @NotNull String getTranslationKey()
-    {
+    public @NotNull String getTranslationKey() {
         return "lambdacontrols.hud_side." + this.getName();
     }
 
@@ -64,14 +60,12 @@ public enum HudSide implements Nameable
      *
      * @return The translated text of this hud side.
      */
-    public @NotNull Text getTranslatedText()
-    {
+    public @NotNull Text getTranslatedText() {
         return this.text;
     }
 
     @Override
-    public @NotNull String getName()
-    {
+    public @NotNull String getName() {
         return this.name().toLowerCase();
     }
 
@@ -81,8 +75,7 @@ public enum HudSide implements Nameable
      * @param id The identifier of the hud side.
      * @return The hud side if found, else empty.
      */
-    public static @NotNull Optional<HudSide> byId(@NotNull String id)
-    {
+    public static @NotNull Optional<HudSide> byId(@NotNull String id) {
         return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();
     }
 }

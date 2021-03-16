@@ -12,7 +12,6 @@ package dev.lambdaurora.lambdacontrols.client.util;
 /**
  * Represents mouse's extra access.
  */
-public interface MouseAccessor
-{
-    void lambdacontrols_onCursorPos(long window, double x, double y);
+public interface MouseAccessor {
+    void lambdacontrols$onCursorPos(long window, double x, double y);
 }

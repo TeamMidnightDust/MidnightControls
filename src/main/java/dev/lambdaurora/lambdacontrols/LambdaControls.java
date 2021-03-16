@@ -32,20 +32,18 @@ import java.util.Optional;
  * @version 1.6.0
  * @since 1.0.0
  */
-public class LambdaControls implements ModInitializer
-{
-    private static      LambdaControls INSTANCE;
-    public static final Identifier     CONTROLS_MODE_CHANNEL = new Identifier(LambdaControlsConstants.CONTROLS_MODE_CHANNEL.toString());
-    public static final Identifier     FEATURE_CHANNEL       = new Identifier(LambdaControlsConstants.FEATURE_CHANNEL.toString());
-    public static final Identifier     HELLO_CHANNEL         = new Identifier(LambdaControlsConstants.HELLO_CHANNEL.toString());
+public class LambdaControls implements ModInitializer {
+    private static LambdaControls INSTANCE;
+    public static final Identifier CONTROLS_MODE_CHANNEL = new Identifier(LambdaControlsConstants.CONTROLS_MODE_CHANNEL.toString());
+    public static final Identifier FEATURE_CHANNEL = new Identifier(LambdaControlsConstants.FEATURE_CHANNEL.toString());
+    public static final Identifier HELLO_CHANNEL = new Identifier(LambdaControlsConstants.HELLO_CHANNEL.toString());
 
     public static final TranslatableText NOT_BOUND_TEXT = new TranslatableText("lambdacontrols.not_bound");
 
     public final Logger logger = LogManager.getLogger("LambdaControls");
 
     @Override
-    public void onInitialize()
-    {
+    public void onInitialize() {
         INSTANCE = this;
         this.log("Initializing LambdaControls...");
 
@@ -69,8 +67,7 @@ public class LambdaControls implements ModInitializer
      *
      * @param info The message to print.
      */
-    public void log(String info)
-    {
+    public void log(String info) {
         this.logger.info("[LambdaControls] " + info);
     }
 
@@ -79,8 +76,7 @@ public class LambdaControls implements ModInitializer
      *
      * @param warning The warning to print.
      */
-    public void warn(String warning)
-    {
+    public void warn(String warning) {
         this.logger.info("[LambdaControls] " + warning);
     }
 
@@ -90,8 +86,7 @@ public class LambdaControls implements ModInitializer
      * @param controlsMode The controls mode to send.
      * @return The packet byte buffer.
      */
-    public PacketByteBuf makeControlsModeBuffer(@NotNull ControlsMode controlsMode)
-    {
+    public PacketByteBuf makeControlsModeBuffer(@NotNull ControlsMode controlsMode) {
         Objects.requireNonNull(controlsMode, "Controls mode cannot be null.");
         return new PacketByteBuf(Unpooled.buffer()).writeString(controlsMode.getName(), 32);
     }
@@ -102,16 +97,14 @@ public class LambdaControls implements ModInitializer
      * @param feature The feature data to send.
      * @return The packet byte buffer.
      */
-    public PacketByteBuf makeFeatureBuffer(@NotNull LambdaControlsFeature feature)
-    {
+    public PacketByteBuf makeFeatureBuffer(@NotNull LambdaControlsFeature feature) {
         Objects.requireNonNull(feature, "Feature cannot be null.");
         PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer()).writeString(feature.getName(), 64);
         buffer.writeBoolean(feature.isAllowed());
         return buffer;
     }
 
-    public PacketByteBuf makeHello(@NotNull ControlsMode controlsMode)
-    {
+    public PacketByteBuf makeHello(@NotNull ControlsMode controlsMode) {
         String version = "";
         Optional<ModContainer> container;
         if ((container = FabricLoader.getInstance().getModContainer(LambdaControlsConstants.NAMESPACE)).isPresent()) {
@@ -125,8 +118,7 @@ public class LambdaControls implements ModInitializer
      *
      * @return The LambdaControls instance.
      */
-    public static LambdaControls get()
-    {
+    public static LambdaControls get() {
         return INSTANCE;
     }
 }

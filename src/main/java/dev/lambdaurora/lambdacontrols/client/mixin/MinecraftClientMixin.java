@@ -38,8 +38,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(MinecraftClient.class)
-public abstract class MinecraftClientMixin
-{
+public abstract class MinecraftClientMixin {
     @Shadow
     @Nullable
     public HitResult crosshairTarget;
@@ -63,26 +62,24 @@ public abstract class MinecraftClientMixin
     @Shadow
     private int itemUseCooldown;
 
-    private BlockPos  lambdacontrols_lastTargetPos;
-    private Vec3d     lambdacontrols_lastPos;
-    private Direction lambdacontrols_lastTargetSide;
+    private BlockPos lambdacontrols$lastTargetPos;
+    private Vec3d lambdacontrols$lastPos;
+    private Direction lambdacontrols$lastTargetSide;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void onInit(CallbackInfo ci)
-    {
+    private void onInit(CallbackInfo ci) {
         LambdaControlsClient.get().onMcInit((MinecraftClient) (Object) this);
     }
 
     @Inject(method = "tick", at = @At("HEAD"))
-    private void onStartTick(CallbackInfo ci)
-    {
+    private void onStartTick(CallbackInfo ci) {
         if (this.player == null)
             return;
 
         if (!LambdaControlsFeature.FAST_BLOCK_PLACING.isAvailable())
             return;
-        if (this.lambdacontrols_lastPos == null)
-            this.lambdacontrols_lastPos = this.player.getPos();
+        if (this.lambdacontrols$lastPos == null)
+            this.lambdacontrols$lastPos = this.player.getPos();
 
         int cooldown = this.itemUseCooldown;
         BlockHitResult hitResult;
@@ -91,50 +88,41 @@ public abstract class MinecraftClientMixin
             BlockPos targetPos = hitResult.getBlockPos();
             Direction side = hitResult.getSide();
 
-            boolean sidewaysBlockPlacing = this.lambdacontrols_lastTargetPos == null || !targetPos.equals(this.lambdacontrols_lastTargetPos.offset(this.lambdacontrols_lastTargetSide));
-            boolean backwardsBlockPlacing = this.player.input.movementForward < 0.0f && (this.lambdacontrols_lastTargetPos == null || targetPos.equals(this.lambdacontrols_lastTargetPos.offset(this.lambdacontrols_lastTargetSide)));
+            boolean sidewaysBlockPlacing = this.lambdacontrols$lastTargetPos == null || !targetPos.equals(this.lambdacontrols$lastTargetPos.offset(this.lambdacontrols$lastTargetSide));
+            boolean backwardsBlockPlacing = this.player.input.movementForward < 0.0f && (this.lambdacontrols$lastTargetPos == null || targetPos.equals(this.lambdacontrols$lastTargetPos.offset(this.lambdacontrols$lastTargetSide)));
 
             if (cooldown > 1
-                    && !targetPos.equals(this.lambdacontrols_lastTargetPos)
+                    && !targetPos.equals(this.lambdacontrols$lastTargetPos)
                     && (sidewaysBlockPlacing || backwardsBlockPlacing)) {
                 this.itemUseCooldown = 1;
             }
 
-            this.lambdacontrols_lastTargetPos = targetPos.toImmutable();
-            this.lambdacontrols_lastTargetSide = side;
+            this.lambdacontrols$lastTargetPos = targetPos.toImmutable();
+            this.lambdacontrols$lastTargetSide = side;
         }
         // Removed front placing sprinting as way too cheaty.
-        else if (this.player.isSprinting()) {
+        /*else if (this.player.isSprinting()) {
             hitResult = LambdaControlsClient.get().reacharound.getLastReacharoundResult();
             if (hitResult != null) {
                 if (cooldown > 0)
                     this.itemUseCooldown = 0;
             }
-        }
-        this.lambdacontrols_lastPos = this.player.getPos();
+        }*/
+        this.lambdacontrols$lastPos = this.player.getPos();
     }
 
     @Inject(method = "render", at = @At("HEAD"))
-    private void onRender(boolean fullRender, CallbackInfo ci)
-    {
+    private void onRender(boolean fullRender, CallbackInfo ci) {
         LambdaControlsClient.get().onRender((MinecraftClient) (Object) (this));
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;render(FJZ)V", shift = At.Shift.AFTER))
-    private void renderVirtualCursor(boolean fullRender, CallbackInfo ci)
-    {
+    private void renderVirtualCursor(boolean fullRender, CallbackInfo ci) {
         LambdaControlsRenderer.renderVirtualCursor(new MatrixStack(), (MinecraftClient) (Object) this);
     }
 
-    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V", at = @At("RETURN"))
-    private void onLeave(@Nullable Screen screen, CallbackInfo ci)
-    {
-        LambdaControlsClient.get().onLeave();
-    }
-
     @Inject(method = "doItemUse()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/HitResult;getType()Lnet/minecraft/util/hit/HitResult$Type;"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true)
-    private void onItemUse(CallbackInfo ci, Hand[] hands, int handCount, int handIndex, Hand hand, ItemStack stackInHand)
-    {
+    private void onItemUse(CallbackInfo ci, Hand[] hands, int handCount, int handIndex, Hand hand, ItemStack stackInHand) {
         LambdaControlsClient mod = LambdaControlsClient.get();
         if (!stackInHand.isEmpty() && this.player.pitch > 35.0F && mod.reacharound.isReacharoundAvailable()) {
             if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.MISS && this.player.isOnGround()) {
