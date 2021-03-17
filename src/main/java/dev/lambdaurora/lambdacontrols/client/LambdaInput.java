@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 LambdAurora <aurora42lambda@gmail.com>
+ * Copyright © 2021 LambdAurora <aurora42lambda@gmail.com>
  *
  * This file is part of LambdaControls.
  *
@@ -266,7 +266,7 @@ public class LambdaInput {
             if (i == GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y)
                 value *= -1.0F;
 
-            int state = value > this.config.getDeadZone() ? 1 : (value < -this.config.getDeadZone() ? 2 : 0);
+            int state = value > this.config.getRightDeadZone() ? 1 : (value < -this.config.getRightDeadZone() ? 2 : 0);
             this.handleAxe(client, axis, value, absValue, state);
         }
     }
@@ -433,11 +433,17 @@ public class LambdaInput {
                 });
     }
 
-    private void handleAxe(@NotNull MinecraftClient client, int axis, float value, float absValue, int state) {
-        int asButtonState = value > 0.5F ? 1 : (value < -0.5F ? 2 : 0);
+    private double getDeadZoneValue(int axis) {
+        return (axis == GLFW_GAMEPAD_AXIS_LEFT_X || axis == GLFW_GAMEPAD_AXIS_LEFT_Y) ? this.config.getLeftDeadZone()
+                : this.config.getRightDeadZone();
+    }
 
-        if (axis == GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || axis == GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER || axis == ButtonBinding.controller2Button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) ||
-                axis == ButtonBinding.controller2Button(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER))
+    private void handleAxe(@NotNull MinecraftClient client, int axis, float value, float absValue, int state) {
+        int asButtonState = value > .5f ? 1 : (value < -.5f ? 2 : 0);
+
+        if (axis == GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || axis == GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER
+                || axis == ButtonBinding.controller2Button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER)
+                || axis == ButtonBinding.controller2Button(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER))
             if (asButtonState == 2)
                 asButtonState = 0;
 
@@ -469,8 +475,9 @@ public class LambdaInput {
                 }
             }
 
-            float axisValue = absValue < this.config.getDeadZone() ? 0.f : (float) (absValue - this.config.getDeadZone());
-            axisValue /= (1.0 - this.config.getDeadZone());
+            double deadZone = this.getDeadZoneValue(axis);
+            float axisValue = absValue < deadZone ? 0.f : (float) (absValue - deadZone);
+            axisValue /= (1.0 - deadZone);
             if (currentPlusState)
                 InputManager.BUTTON_VALUES.put(axisAsButton(axis, true), axisValue);
             else
@@ -481,7 +488,7 @@ public class LambdaInput {
                 InputManager.BUTTON_VALUES.put(axisAsButton(axis, false), 0.f);
         }
 
-        double deadZone = this.config.getDeadZone();
+        double deadZone = this.getDeadZoneValue(axis);
 
         if (this.controlsInput != null && this.controlsInput.focusedBinding != null) {
             if (asButtonState != 0 && !this.controlsInput.currentButtons.contains(axisAsButton(axis, asButtonState == 1))) {
@@ -520,8 +527,8 @@ public class LambdaInput {
 
         if (client.currentScreen == null) {
             // Handles the look direction.
-            absValue -= this.config.getDeadZone();
-            this.handleLook(client, axis, (float) (absValue / (1.0 - this.config.getDeadZone())), state);
+            absValue -= this.getDeadZoneValue(axis);
+            this.handleLook(client, axis, (float) (absValue / (1.0 - this.getDeadZoneValue(axis))), state);
         } else {
             boolean allowMouseControl = true;
 
@@ -537,8 +544,8 @@ public class LambdaInput {
                 }
             }
 
-            float movementX = 0.0F;
-            float movementY = 0.0F;
+            float movementX = 0.f;
+            float movementY = 0.f;
 
             if (this.config.isBackButton(axis, false, (value > 0 ? 1 : 2))) {
                 movementY = absValue;
@@ -564,19 +571,22 @@ public class LambdaInput {
                     if (Math.abs(movementX) >= deadZone)
                         this.mouseSpeedX = movementX;
                     else
-                        this.mouseSpeedX = 0.F;
+                        this.mouseSpeedX = 0.f;
 
                     if (Math.abs(movementY) >= deadZone)
                         this.mouseSpeedY = movementY;
                     else
-                        this.mouseSpeedY = 0.F;
+                        this.mouseSpeedY = 0.f;
                 } else {
-                    this.mouseSpeedX = 0.F;
-                    this.mouseSpeedY = 0.F;
+                    this.mouseSpeedX = 0.f;
+                    this.mouseSpeedY = 0.f;
                 }
 
-                if (Math.abs(this.mouseSpeedX) >= .05F || Math.abs(this.mouseSpeedY) >= .05F) {
-                    InputManager.queueMoveMousePosition(this.mouseSpeedX * this.config.getMouseSpeed(), this.mouseSpeedY * this.config.getMouseSpeed());
+                if (Math.abs(this.mouseSpeedX) >= .05f || Math.abs(this.mouseSpeedY) >= .05f) {
+                    InputManager.queueMoveMousePosition(
+                            this.mouseSpeedX * this.config.getMouseSpeed(),
+                            this.mouseSpeedY * this.config.getMouseSpeed()
+                    );
                 }
 
                 this.moveMouseToClosestSlot(client, client.currentScreen);

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 LambdAurora <aurora42lambda@gmail.com>
+ * Copyright © 2021 LambdAurora <aurora42lambda@gmail.com>
  *
  * This file is part of LambdaControls.
  *
@@ -23,7 +23,7 @@ import me.lambdaurora.spruceui.widget.SpruceLabelWidget;
 import me.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
 import me.lambdaurora.spruceui.widget.container.SpruceOptionListWidget;
 import me.lambdaurora.spruceui.widget.container.tabbed.SpruceTabbedWidget;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -67,7 +67,8 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
     // Controller options
     private final SpruceOption controllerOption;
     private final SpruceOption secondControllerOption;
-    private final SpruceOption deadZoneOption;
+    private final SpruceOption rightDeadZoneOption;
+    private final SpruceOption leftDeadZoneOption;
     private final SpruceOption invertsRightXAxis;
     private final SpruceOption invertsRightYAxis;
     private final SpruceOption unfocusedInputOption;
@@ -88,7 +89,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
                     this.mod.config.save();
 
                     if (this.client.player != null) {
-                        ClientSidePacketRegistry.INSTANCE.sendToServer(LambdaControls.CONTROLS_MODE_CHANNEL, this.mod.makeControlsModeBuffer(next));
+                        ClientPlayNetworking.getSender().sendPacket(LambdaControls.CONTROLS_MODE_CHANNEL, this.mod.makeControlsModeBuffer(next));
                     }
                 }, option -> option.getDisplayText(new TranslatableText(this.mod.config.getControlsMode().getTranslationKey())),
                 new TranslatableText("lambdacontrols.tooltip.controls_mode"));
@@ -179,15 +180,26 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
                 return option.getDisplayText(new LiteralText(controllerName));
         }).orElse(option.getDisplayText(SpruceTexts.OPTIONS_OFF.shallowCopy().formatted(Formatting.RED))),
                 new TranslatableText("lambdacontrols.tooltip.controller2"));
-        this.deadZoneOption = new SpruceDoubleOption("lambdacontrols.menu.dead_zone", 0.05, 1.0, 0.05F, this.mod.config::getDeadZone,
+        this.rightDeadZoneOption = new SpruceDoubleOption("lambdacontrols.menu.right_dead_zone", 0.05, 1.0, 0.05f,
+                this.mod.config::getRightDeadZone,
                 newValue -> {
                     synchronized (this.mod.config) {
-                        this.mod.config.setDeadZone(newValue);
+                        this.mod.config.setRightDeadZone(newValue);
                     }
                 }, option -> {
             String value = String.valueOf(option.get());
             return option.getDisplayText(new LiteralText(value.substring(0, Math.min(value.length(), 5))));
-        }, new TranslatableText("lambdacontrols.tooltip.dead_zone"));
+        }, new TranslatableText("lambdacontrols.tooltip.right_dead_zone"));
+        this.leftDeadZoneOption = new SpruceDoubleOption("lambdacontrols.menu.left_dead_zone", 0.05, 1.0, 0.05f,
+                this.mod.config::getLeftDeadZone,
+                newValue -> {
+                    synchronized (this.mod.config) {
+                        this.mod.config.setLeftDeadZone(newValue);
+                    }
+                }, option -> {
+            String value = String.valueOf(option.get());
+            return option.getDisplayText(new LiteralText(value.substring(0, Math.min(value.length(), 5))));
+        }, new TranslatableText("lambdacontrols.tooltip.left_dead_zone"));
         this.invertsRightXAxis = new SpruceToggleBooleanOption("lambdacontrols.menu.invert_right_x_axis", this.mod.config::doesInvertRightXAxis,
                 newValue -> {
                     synchronized (this.mod.config) {
@@ -323,6 +335,9 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
         list.addSingleOptionEntry(this.controllerOption);
         list.addSingleOptionEntry(this.secondControllerOption);
         list.addSingleOptionEntry(this.unfocusedInputOption);
+        list.addOptionEntry(this.invertsRightXAxis, this.invertsRightYAxis);
+        list.addSingleOptionEntry(this.rightDeadZoneOption);
+        list.addSingleOptionEntry(this.leftDeadZoneOption);
 
         root.addChild(list);
         root.addChild(labels);

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 LambdAurora <aurora42lambda@gmail.com>
+ * Copyright © 2021 LambdAurora <aurora42lambda@gmail.com>
  *
  * This file is part of LambdaControls.
  *
@@ -68,7 +68,8 @@ public class LambdaControlsConfig {
     private boolean shouldRenderReacharoundOutline;
     private int[] reacharoundOutlineColor;
     // Controller settings
-    private double deadZone;
+    private double rightDeadZone;
+    private double leftDeadZone;
     private double rotationSpeed;
     private double mouseSpeed;
     private boolean unfocusedInput;
@@ -102,7 +103,8 @@ public class LambdaControlsConfig {
         this.reacharoundOutlineColor = this.config.getOptional("gameplay.reacharound.outline_color").map(hex -> parseColor((String) hex)).orElse(DEFAULT_REACHAROUND_OUTLINE_COLOR);
         // Controller settings.
         this.controllerType = ControllerType.byId(this.config.getOrElse("controller.type", DEFAULT_CONTROLLER_TYPE.getName())).orElse(DEFAULT_CONTROLLER_TYPE);
-        this.deadZone = this.config.getOrElse("controller.dead_zone", DEFAULT_DEAD_ZONE);
+        this.rightDeadZone = this.config.getOrElse("controller.right_dead_zone", DEFAULT_DEAD_ZONE);
+        this.leftDeadZone = this.config.getOrElse("controller.left_dead_zone", DEFAULT_DEAD_ZONE);
         this.rotationSpeed = this.config.getOrElse("controller.rotation_speed", DEFAULT_ROTATION_SPEED);
         this.mouseSpeed = this.config.getOrElse("controller.mouse_speed", DEFAULT_MOUSE_SPEED);
         this.unfocusedInput = this.config.getOrElse("controller.unfocused_input", DEFAULT_UNFOCUSED_INPUT);
@@ -118,7 +120,8 @@ public class LambdaControlsConfig {
      * Saves the configuration.
      */
     public void save() {
-        this.config.set("controller.dead_zone", this.deadZone);
+        this.config.set("controller.right_dead_zone", this.rightDeadZone);
+        this.config.set("controller.left_dead_zone", this.leftDeadZone);
         this.config.set("controller.rotation_speed", this.rotationSpeed);
         this.config.set("controller.mouse_speed", this.mouseSpeed);
         this.config.set("controller.unfocused_input", this.unfocusedInput);
@@ -152,6 +155,7 @@ public class LambdaControlsConfig {
             this.config.remove("gameplay.front_block_placing.outline_color");
         }
 
+        this.renamed("controller.dead_zone", "controller.right_dead_zone");
         this.renamed("controller.controls.tab_left", "controller.controls.tab_back");
         this.renamed("controller.controls.tab_right", "controller.controls.tab_next");
     }
@@ -182,7 +186,8 @@ public class LambdaControlsConfig {
         this.setRenderReacharoundOutline(DEFAULT_REACHAROUND_OUTLINE);
         // Controller
         this.setControllerType(DEFAULT_CONTROLLER_TYPE);
-        this.setDeadZone(DEFAULT_DEAD_ZONE);
+        this.setRightDeadZone(DEFAULT_DEAD_ZONE);
+        this.setLeftDeadZone(DEFAULT_DEAD_ZONE);
         this.setRotationSpeed(DEFAULT_ROTATION_SPEED);
         this.setMouseSpeed(DEFAULT_MOUSE_SPEED);
         this.setUnfocusedInput(DEFAULT_UNFOCUSED_INPUT);
@@ -509,21 +514,39 @@ public class LambdaControlsConfig {
     }
 
     /**
-     * Gets the controller's dead zone from the configuration.
+     * Gets the controller's right dead zone from the configuration.
      *
-     * @return The controller's dead zone value.
+     * @return the controller's right dead zone value
      */
-    public double getDeadZone() {
-        return this.deadZone;
+    public double getRightDeadZone() {
+        return this.rightDeadZone;
     }
 
     /**
-     * Sets the controller's dead zone in the configuration.
+     * Sets the controller's right dead zone in the configuration.
      *
-     * @param deadZone The new controller's dead zone value.
+     * @param deadZone the controller's right dead zone value
      */
-    public void setDeadZone(double deadZone) {
-        this.deadZone = deadZone;
+    public void setRightDeadZone(double deadZone) {
+        this.rightDeadZone = deadZone;
+    }
+
+    /**
+     * Gets the controller's left dead zone from the configuration.
+     *
+     * @return the controller's left dead zone value
+     */
+    public double getLeftDeadZone() {
+        return this.leftDeadZone;
+    }
+
+    /**
+     * Sets the controller's left dead zone in the configuration.
+     *
+     * @param deadZone the controller's left dead zone value
+     */
+    public void setLeftDeadZone(double deadZone) {
+        this.leftDeadZone = deadZone;
     }
 
     /**
