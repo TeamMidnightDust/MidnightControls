@@ -51,6 +51,7 @@ public class LambdaControlsConfig {
     // Controller
     private static final ControllerType DEFAULT_CONTROLLER_TYPE = ControllerType.DEFAULT;
     private static final double DEFAULT_DEAD_ZONE = 0.25;
+    private static final double DEFAULT_MAX_VALUE = 1;
     private static final double DEFAULT_ROTATION_SPEED = 40.0;
     private static final double DEFAULT_MOUSE_SPEED = 25.0;
     private static final boolean DEFAULT_UNFOCUSED_INPUT = false;
@@ -70,6 +71,7 @@ public class LambdaControlsConfig {
     // Controller settings
     private double rightDeadZone;
     private double leftDeadZone;
+    private double[] maxAnalogValues = new double[]{DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE};
     private double rotationSpeed;
     private double mouseSpeed;
     private boolean unfocusedInput;
@@ -100,7 +102,9 @@ public class LambdaControlsConfig {
         LambdaControlsFeature.HORIZONTAL_REACHAROUND.setEnabled(this.config.getOrElse("gameplay.reacharound.horizontal", DEFAULT_HORIZONTAL_REACHAROUND));
         LambdaControlsFeature.VERTICAL_REACHAROUND.setEnabled(this.config.getOrElse("gameplay.reacharound.vertical", DEFAULT_VERTICAL_REACHAROUND));
         this.shouldRenderReacharoundOutline = this.config.getOrElse("gameplay.reacharound.outline", DEFAULT_REACHAROUND_OUTLINE);
-        this.reacharoundOutlineColor = this.config.getOptional("gameplay.reacharound.outline_color").map(hex -> parseColor((String) hex)).orElse(DEFAULT_REACHAROUND_OUTLINE_COLOR);
+        this.reacharoundOutlineColor = this.config.getOptional("gameplay.reacharound.outline_color")
+                .map(hex -> parseColor((String) hex))
+                .orElse(DEFAULT_REACHAROUND_OUTLINE_COLOR);
         // Controller settings.
         this.controllerType = ControllerType.byId(this.config.getOrElse("controller.type", DEFAULT_CONTROLLER_TYPE.getName())).orElse(DEFAULT_CONTROLLER_TYPE);
         this.rightDeadZone = this.config.getOrElse("controller.right_dead_zone", DEFAULT_DEAD_ZONE);
@@ -110,6 +114,10 @@ public class LambdaControlsConfig {
         this.unfocusedInput = this.config.getOrElse("controller.unfocused_input", DEFAULT_UNFOCUSED_INPUT);
         this.virtualMouse = this.config.getOrElse("controller.virtual_mouse", DEFAULT_VIRTUAL_MOUSE);
         this.virtualMouseSkin = VirtualMouseSkin.byId(this.config.getOrElse("controller.virtual_mouse_skin", DEFAULT_VIRTUAL_MOUSE_SKIN.getName())).orElse(DEFAULT_VIRTUAL_MOUSE_SKIN);
+
+        for (int i = 0; i < this.maxAnalogValues.length; i++) {
+            this.maxAnalogValues[i] = this.config.getOrElse("controller.max_value_" + i, DEFAULT_MAX_VALUE);
+        }
         // Controller controls.
         InputManager.loadButtonBindings(this);
 
@@ -126,6 +134,10 @@ public class LambdaControlsConfig {
         this.config.set("controller.mouse_speed", this.mouseSpeed);
         this.config.set("controller.unfocused_input", this.unfocusedInput);
         this.config.set("controller.virtual_mouse", this.virtualMouse);
+
+        for (int i = 0; i < this.maxAnalogValues.length; i++) {
+            this.config.set("controller.max_value_" + i, this.maxAnalogValues[i]);
+        }
         this.config.save();
         this.mod.log("Configuration saved.");
     }
@@ -193,6 +205,8 @@ public class LambdaControlsConfig {
         this.setUnfocusedInput(DEFAULT_UNFOCUSED_INPUT);
         this.setVirtualMouse(DEFAULT_VIRTUAL_MOUSE);
         this.setVirtualMouseSkin(DEFAULT_VIRTUAL_MOUSE_SKIN);
+
+        Arrays.fill(this.maxAnalogValues, DEFAULT_MAX_VALUE);
         // HUD
         this.setHudEnabled(DEFAULT_HUD_ENABLE);
         this.setHudSide(DEFAULT_HUD_SIDE);
@@ -304,6 +318,7 @@ public class LambdaControlsConfig {
 
     /**
      * Gets whether analog movement is enabled.
+     *
      * @return {@code true} if analog movement is enabled, else {@code false}
      */
     public boolean hasAnalogMovement() {
@@ -312,6 +327,7 @@ public class LambdaControlsConfig {
 
     /**
      * Sets whether analog movement is enabled.
+     *
      * @param analogMovement {@code true} if analog movement is enabled, else {@code false}
      */
     public void setAnalogMovement(boolean analogMovement) {
@@ -447,9 +463,9 @@ public class LambdaControlsConfig {
     /**
      * Gets the used controller.
      *
-     * @return The used controller.
+     * @return the controller
      */
-    public @NotNull Controller getController() {
+    public Controller getController() {
         Object raw = this.config.getRaw("controller.id");
         if (raw instanceof Number) {
             return Controller.byId((Integer) raw);
@@ -462,18 +478,18 @@ public class LambdaControlsConfig {
     /**
      * Sets the used controller.
      *
-     * @param controller The used controller.
+     * @param controller the controller
      */
-    public void setController(@NotNull Controller controller) {
+    public void setController(Controller controller) {
         this.config.set("controller.id", controller.getId());
     }
 
     /**
      * Gets the second controller (for Joy-Con supports).
      *
-     * @return The second controller.
+     * @return the second controller
      */
-    public @NotNull Optional<Controller> getSecondController() {
+    public Optional<Controller> getSecondController() {
         Object raw = this.config.getRaw("controller.id2");
         if (raw instanceof Number) {
             if ((int) raw == -1)
@@ -488,7 +504,7 @@ public class LambdaControlsConfig {
     /**
      * Sets the second controller.
      *
-     * @param controller The second controller.
+     * @param controller the second controller
      */
     public void setSecondController(@Nullable Controller controller) {
         this.config.set("controller.id2", controller == null ? -1 : controller.getId());
@@ -692,6 +708,17 @@ public class LambdaControlsConfig {
      */
     public double getRightYAxisSign() {
         return this.doesInvertRightYAxis() ? -1.0 : 1.0;
+    }
+
+    public double getAxisMaxValue(int axis) {
+        if (axis >= this.maxAnalogValues.length)
+            return DEFAULT_MAX_VALUE;
+        return this.maxAnalogValues[axis];
+    }
+
+    public void setAxisMaxValue(int axis, double value) {
+        if (axis < this.maxAnalogValues.length)
+            this.maxAnalogValues[axis] = value;
     }
 
     /**

@@ -80,12 +80,12 @@ public class LambdaInput {
     private boolean ignoreNextARelease = false;
     private double targetYaw = 0.0;
     private double targetPitch = 0.0;
-    private float prevXAxis = 0.F;
-    private float prevYAxis = 0.F;
+    private float prevXAxis = 0.f;
+    private float prevYAxis = 0.f;
     private int targetMouseX = 0;
     private int targetMouseY = 0;
-    private float mouseSpeedX = 0.F;
-    private float mouseSpeedY = 0.F;
+    private float mouseSpeedX = 0.f;
+    private float mouseSpeedY = 0.f;
     private int inventoryInteractionCooldown = 0;
 
     private ControllerControlsWidget controlsInput = null;
@@ -478,6 +478,8 @@ public class LambdaInput {
             double deadZone = this.getDeadZoneValue(axis);
             float axisValue = absValue < deadZone ? 0.f : (float) (absValue - deadZone);
             axisValue /= (1.0 - deadZone);
+
+            axisValue = (float) Math.min(axisValue / this.config.getAxisMaxValue(axis), 1);
             if (currentPlusState)
                 InputManager.BUTTON_VALUES.put(axisAsButton(axis, true), axisValue);
             else
@@ -525,10 +527,12 @@ public class LambdaInput {
             }
         }
 
+        absValue -= deadZone;
+        absValue /= (1.0 - deadZone);
+        absValue = (float) MathHelper.clamp(absValue / this.config.getAxisMaxValue(axis), 0.f, 1.f);
         if (client.currentScreen == null) {
             // Handles the look direction.
-            absValue -= this.getDeadZoneValue(axis);
-            this.handleLook(client, axis, (float) (absValue / (1.0 - this.getDeadZoneValue(axis))), state);
+            this.handleLook(client, axis, absValue, state);
         } else {
             boolean allowMouseControl = true;
 
@@ -558,7 +562,7 @@ public class LambdaInput {
             }
 
             if (client.currentScreen != null && allowMouseControl) {
-                boolean moving = Math.abs(movementY) >= deadZone || Math.abs(movementX) >= deadZone;
+                boolean moving = movementY != 0 || movementX != 0;
                 if (moving) {
                 /*
                     Updates the target mouse position when the initial movement stick movement is detected.
@@ -568,15 +572,8 @@ public class LambdaInput {
                         INPUT_MANAGER.resetMouseTarget(client);
                     }
 
-                    if (Math.abs(movementX) >= deadZone)
-                        this.mouseSpeedX = movementX;
-                    else
-                        this.mouseSpeedX = 0.f;
-
-                    if (Math.abs(movementY) >= deadZone)
-                        this.mouseSpeedY = movementY;
-                    else
-                        this.mouseSpeedY = 0.f;
+                    this.mouseSpeedX = movementX;
+                    this.mouseSpeedY = movementY;
                 } else {
                     this.mouseSpeedX = 0.f;
                     this.mouseSpeedY = 0.f;
