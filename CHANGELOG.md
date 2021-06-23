@@ -128,4 +128,8 @@ This update also has a backport 1.14.4 version ([#9](https://github.com/LambdAur
 - Dropped entirely Touchscreen Input Mode.
 - Dropped Roughly Enough Items compatibility.
 
+### 1.7.1
+
+- Fix crash at startup.
+
 [SpruceUI]: https://github.com/LambdAurora/SpruceUI

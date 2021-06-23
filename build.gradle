@@ -154,6 +154,7 @@ task shadowRemapJar(type: RemapJarTask) {
     input.set(file("${project.buildDir}/libs/$archivesBaseName-$version-dev.jar"))
     archiveFileName = "${archivesBaseName}-${version}.jar"
     addNestedDependencies.set(true)
+    remapAccessWidener.set(true)
 }
 build.dependsOn(shadowRemapJar)
 
