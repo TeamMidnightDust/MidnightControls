@@ -123,7 +123,7 @@ This update also has a backport 1.14.4 version ([#9](https://github.com/LambdAur
 ## 1.7.0
 
 - Updated to 1.17.
- Small improvements to the codebase thanks to Java 16.
+- Small improvements to the codebase thanks to Java 16.
 - Fix controller bindings not being saved ([#31](https://github.com/LambdAurora/LambdaControls/issues/31), [#55](https://github.com/LambdAurora/LambdaControls/issues/55)).
 - Dropped entirely Touchscreen Input Mode.
 - Dropped Roughly Enough Items compatibility.
