@@ -11,14 +11,13 @@ package dev.lambdaurora.lambdacontrols.client.gui.widget;
 
 import dev.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import dev.lambdaurora.lambdacontrols.client.gui.LambdaControlsRenderer;
-import me.lambdaurora.spruceui.Position;
-import me.lambdaurora.spruceui.SpruceTexts;
-import me.lambdaurora.spruceui.widget.AbstractSpruceIconButtonWidget;
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.SpruceTexts;
+import dev.lambdaurora.spruceui.widget.AbstractSpruceIconButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -52,8 +51,8 @@ public class ControllerButtonWidget extends AbstractSpruceIconButtonWidget {
         if (this.binding.getButton().length > 1) {
             x += (this.width / 2 - this.iconWidth / 2) - 4;
         }
-        Pair<Integer, Integer> size = LambdaControlsRenderer.drawButton(matrices, x, this.getY(), this.binding, MinecraftClient.getInstance());
-        this.iconWidth = size.key;
-        return size.value;
+        var size = LambdaControlsRenderer.drawButton(matrices, x, this.getY(), this.binding, MinecraftClient.getInstance());
+        this.iconWidth = size.length();
+        return size.height();
     }
 }

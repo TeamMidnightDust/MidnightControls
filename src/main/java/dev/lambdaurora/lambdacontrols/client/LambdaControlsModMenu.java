@@ -9,15 +9,15 @@
 
 package dev.lambdaurora.lambdacontrols.client;
 
+import com.terraformersmc.modmenu.api.ConfigScreenFactory;
+import com.terraformersmc.modmenu.api.ModMenuApi;
 import dev.lambdaurora.lambdacontrols.client.gui.LambdaControlsSettingsScreen;
-import io.github.prospector.modmenu.api.ConfigScreenFactory;
-import io.github.prospector.modmenu.api.ModMenuApi;
 
 /**
  * Represents the API implementation of ModMenu for LambdaControls.
  *
  * @author LambdAurora
- * @version 1.3.0
+ * @version 1.7.0
  * @since 1.1.0
  */
 public class LambdaControlsModMenu implements ModMenuApi {

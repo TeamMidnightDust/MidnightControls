@@ -11,35 +11,14 @@ package dev.lambdaurora.lambdacontrols.client.compat;
 
 import dev.lambdaurora.lambdacontrols.client.ButtonState;
 import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
-import dev.lambdaurora.lambdacontrols.client.compat.mixin.EntryListWidgetAccessor;
-import dev.lambdaurora.lambdacontrols.client.compat.mixin.EntryWidgetAccessor;
-import dev.lambdaurora.lambdacontrols.client.compat.mixin.RecipeViewingScreenAccessor;
-import dev.lambdaurora.lambdacontrols.client.compat.mixin.VillagerRecipeViewingScreenAccessor;
 import dev.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import dev.lambdaurora.lambdacontrols.client.controller.InputHandlers;
 import dev.lambdaurora.lambdacontrols.client.controller.PressAction;
-import me.shedaniel.rei.api.*;
-import me.shedaniel.rei.gui.ContainerScreenOverlay;
-import me.shedaniel.rei.gui.PreRecipeViewingScreen;
-import me.shedaniel.rei.gui.RecipeViewingScreen;
-import me.shedaniel.rei.gui.VillagerRecipeViewingScreen;
-import me.shedaniel.rei.gui.widget.EntryListEntryWidget;
-import me.shedaniel.rei.gui.widget.EntryListWidget;
-import me.shedaniel.rei.gui.widget.EntryWidget;
-import me.shedaniel.rei.gui.widget.WidgetWithBounds;
-import me.shedaniel.rei.impl.ScreenHelper;
-import me.shedaniel.rei.impl.widgets.ButtonWidget;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.Identifier;
-import org.aperlambda.lambdacommon.utils.LambdaReflection;
-import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Optional;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -47,12 +26,11 @@ import static org.lwjgl.glfw.GLFW.*;
  * Represents a compatibility handler for REI.
  *
  * @author LambdAurora
- * @version 1.5.0
+ * @version 1.7.0
  * @since 1.2.0
  */
 public class ReiCompat implements CompatHandler {
-    private static final Pair<Integer, Integer> INVALID_SLOT = new Pair<>(-1, -1);
-    private static EntryListWidget ENTRY_LIST_WIDGET;
+    //private static EntryListWidget ENTRY_LIST_WIDGET;
 
     @Override
     public void handle(@NotNull LambdaControlsClient mod) {
@@ -113,57 +91,57 @@ public class ReiCompat implements CompatHandler {
 
     @Override
     public boolean requireMouseOnScreen(Screen screen) {
-        return isViewingScreen(screen) || screen instanceof PreRecipeViewingScreen;
+        return isViewingScreen(screen) /*|| screen instanceof PreRecipeViewingScreen*/;
     }
 
     @Override
-    public @Nullable Pair<Integer, Integer> getSlotAt(@NotNull Screen screen, int mouseX, int mouseY) {
-        Optional<ContainerScreenOverlay> overlay = ScreenHelper.getOptionalOverlay();
+    public @Nullable SlotPos getSlotAt(@NotNull Screen screen, int mouseX, int mouseY) {
+        /*var overlay = ScreenHelper.getOptionalOverlay();
         if (overlay.isPresent() && overlay.get().isInside(mouseX, mouseY)) {
-            EntryListWidget widget = getEntryListWidget();
+            var widget = getEntryListWidget();
             if (widget == null)
                 return null;
 
-            Pair<Integer, Integer> slot = this.getSlotAt(widget, mouseX, mouseY, false);
+            var slot = this.getSlotAt(widget, mouseX, mouseY, false);
             if (slot != null && slot != INVALID_SLOT)
                 return slot;
         } else if (isViewingScreen(screen)) {
-            for (Element element : screen.children()) {
-                Pair<Integer, Integer> slot = this.getSlotAt(element, mouseX, mouseY, true);
+            for (var element : screen.children()) {
+                var slot = this.getSlotAt(element, mouseX, mouseY, true);
                 if (slot != null && slot != INVALID_SLOT)
                     return slot;
             }
-        }
+        }*/
         return null;
     }
 
-    private @Nullable Pair<Integer, Integer> getSlotAt(@NotNull Element element, int mouseX, int mouseY, boolean allowEmpty) {
-        if (element instanceof EntryWidget) {
-            EntryWidget entry = (EntryWidget) element;
+    /*private @Nullable SlotPos getSlotAt(@NotNull Element element, int mouseX, int mouseY, boolean allowEmpty) {
+        if (element instanceof EntryWidget entry) {
             if (entry.containsMouse(mouseX, mouseY)) {
                 if (!allowEmpty && entry.entries().isEmpty())
                     return INVALID_SLOT;
-                return Pair.of(entry.getBounds().getX() + 1, entry.getBounds().getY() + 1);
+                return new SlotPos(entry.getBounds().getX() + 1, entry.getBounds().getY() + 1);
             }
         } else if (element instanceof EntryListWidget) {
             List<EntryListEntryWidget> entries = ((EntryListWidgetAccessor) element).getEntries();
             for (EntryListEntryWidget entry : entries) {
-                Pair<Integer, Integer> slot = this.getSlotAt(entry, mouseX, mouseY, allowEmpty);
+                var slot = this.getSlotAt(entry, mouseX, mouseY, allowEmpty);
                 if (slot != null && slot != INVALID_SLOT)
                     return slot;
             }
-        } else if (!(element instanceof ButtonWidget) && element instanceof WidgetWithBounds) {
-            for (Element child : ((WidgetWithBounds) element).children()) {
-                Pair<Integer, Integer> slot = this.getSlotAt(child, mouseX, mouseY, allowEmpty);
+        } else if (!(element instanceof ButtonWidget) && element instanceof WidgetWithBounds widgetWithBounds) {
+            for (var child : widgetWithBounds.children()) {
+                var slot = this.getSlotAt(child, mouseX, mouseY, allowEmpty);
                 if (slot != null && slot != INVALID_SLOT)
                     return slot;
             }
         }
         return null;
-    }
+    }*/
 
     private static boolean isViewingScreen(Screen screen) {
-        return screen instanceof RecipeViewingScreen || screen instanceof VillagerRecipeViewingScreen;
+        return true;
+        //return screen instanceof DefaultDisplayViewingScreen || screen instanceof CompositeDisplayViewingScreen;
     }
 
     @Override
@@ -171,12 +149,12 @@ public class ReiCompat implements CompatHandler {
         if (!isViewingScreen(screen))
             return false;
 
-        MinecraftClient.getInstance().openScreen(REIHelper.getInstance().getPreviousContainerScreen());
-        ScreenHelper.getLastOverlay().init();
+        /*MinecraftClient.getInstance().openScreen(REIRuntimeImpl.getInstance().getPreviousContainerScreen());
+        ScreenHelper.getLastOverlay().init();*/
         return true;
     }
 
-    private static EntryListWidget getEntryListWidget() {
+    /*private static EntryListWidget getEntryListWidget() {
         if (ENTRY_LIST_WIDGET == null) {
             ENTRY_LIST_WIDGET = LambdaReflection.getFirstFieldOfType(ContainerScreenOverlay.class, EntryListWidget.class)
                     .map(field -> (EntryListWidget) LambdaReflection.getFieldValue(null, field))
@@ -190,17 +168,17 @@ public class ReiCompat implements CompatHandler {
         double y = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
 
         if (isViewingScreen(client.currentScreen)) {
-            for (Element element : client.currentScreen.children()) {
-                EntryStack stack = getCurrentStack(element, x, y);
+            for (var element : client.currentScreen.children()) {
+                var stack = getCurrentStack(element, x, y);
                 if (stack != null)
                     return stack;
             }
         }
 
-        Optional<ContainerScreenOverlay> overlay = ScreenHelper.getOptionalOverlay();
+        var overlay = ScreenHelper.getOptionalOverlay();
         if (!overlay.isPresent())
             return RecipeHelper.getInstance().getScreenFocusedStack(client.currentScreen);
-        EntryListWidget widget = getEntryListWidget();
+        var widget = getEntryListWidget();
         if (widget == null)
             return RecipeHelper.getInstance().getScreenFocusedStack(client.currentScreen);
 
@@ -208,33 +186,32 @@ public class ReiCompat implements CompatHandler {
     }
 
     private static @Nullable EntryStack getCurrentStack(@NotNull Element element, double mouseX, double mouseY) {
-        if (element instanceof EntryWidget) {
-            EntryWidget entry = (EntryWidget) element;
+        if (element instanceof EntryWidget entry) {
             if (entry.containsMouse(mouseX, mouseY))
                 return ((EntryWidgetAccessor) entry).lambdacontrols_getCurrentEntry();
         } else if (element instanceof EntryListWidget) {
-            List<EntryListEntryWidget> entries = ((EntryListWidgetAccessor) element).getEntries();
+            var entries = ((EntryListWidgetAccessor) element).getEntries();
             for (EntryListEntryWidget entry : entries) {
                 if (entry.containsMouse(mouseX, mouseY)) {
                     return ((EntryWidgetAccessor) entry).lambdacontrols_getCurrentEntry();
                 }
             }
-        } else if (!(element instanceof ButtonWidget) && element instanceof WidgetWithBounds) {
-            for (Element child : ((WidgetWithBounds) element).children()) {
-                EntryStack stack = getCurrentStack(child, mouseX, mouseY);
+        } else if (!(element instanceof ButtonWidget) && element instanceof WidgetWithBounds widgetWithBounds) {
+            for (var child : widgetWithBounds.children()) {
+                var stack = getCurrentStack(child, mouseX, mouseY);
                 if (stack != null)
                     return stack;
             }
         }
         return null;
-    }
+    }*/
 
     private static PressAction handleShowRecipeUsage(boolean usage) {
         return (client, button, value, action) -> {
             if (action.isUnpressed())
                 return false;
 
-            EntryStack stack = RecipeHelper.getInstance().getScreenFocusedStack(client.currentScreen);
+            /*EntryStack stack = RecipeHelper.getInstance().getScreenFocusedStack(client.currentScreen);
             if (stack == null) {
                 stack = getCurrentStack(client);
             }
@@ -246,7 +223,7 @@ public class ReiCompat implements CompatHandler {
                 } else {
                     return ClientHelper.getInstance().openView(ClientHelper.ViewSearchBuilder.builder().addRecipesFor(stack).setOutputNotice(stack).fillPreferredOpenedCategory());
                 }
-            }
+            }*/
 
             return false;
         };
@@ -257,11 +234,11 @@ public class ReiCompat implements CompatHandler {
             if (action == ButtonState.RELEASE)
                 return false;
 
-            Optional<ContainerScreenOverlay> overlay = ScreenHelper.getOptionalOverlay();
+            /*Optional<ContainerScreenOverlay> overlay = ScreenHelper.getOptionalOverlay();
             if (!overlay.isPresent())
                 return false;
 
-            EntryListWidget widget = getEntryListWidget();
+            var widget = getEntryListWidget();
             if (widget == null)
                 return false;
 
@@ -269,7 +246,7 @@ public class ReiCompat implements CompatHandler {
                 widget.nextPage();
             else
                 widget.previousPage();
-            widget.updateEntriesPosition();
+            widget.updateEntriesPosition();*/
 
             return true;
         };
@@ -286,14 +263,14 @@ public class ReiCompat implements CompatHandler {
             if (action != ButtonState.RELEASE)
                 return false;
 
-            if (client.currentScreen instanceof RecipeViewingScreen) {
+            /*if (client.currentScreen instanceof DefaultDisplayViewingScreen) {
                 RecipeViewingScreenAccessor screen = (RecipeViewingScreenAccessor) client.currentScreen;
                 if (next)
                     screen.getCategoryNext().onClick();
                 else
                     screen.getCategoryBack().onClick();
                 return true;
-            } else if (client.currentScreen instanceof VillagerRecipeViewingScreen) {
+            } else if (client.currentScreen instanceof CompositeDisplayViewingScreen) {
                 VillagerRecipeViewingScreenAccessor screen = (VillagerRecipeViewingScreenAccessor) client.currentScreen;
                 List<RecipeCategory<?>> categories = screen.getCategories();
                 int currentTab = screen.getSelectedCategoryIndex();
@@ -301,7 +278,7 @@ public class ReiCompat implements CompatHandler {
                 screen.setSelectedRecipeIndex(0);
                 screen.lambdacontrols_init();
                 return true;
-            }
+            }*/
             return false;
         };
     }
@@ -311,15 +288,13 @@ public class ReiCompat implements CompatHandler {
             if (action.isUnpressed())
                 return false;
 
-            if (client.currentScreen instanceof RecipeViewingScreen) {
-                RecipeViewingScreenAccessor screen = (RecipeViewingScreenAccessor) client.currentScreen;
+            /*if (client.currentScreen instanceof RecipeViewingScreenAccessor screen) {
                 if (next)
                     screen.getRecipeNext().onClick();
                 else
                     screen.getRecipeBack().onClick();
                 return true;
-            } else if (client.currentScreen instanceof VillagerRecipeViewingScreen) {
-                VillagerRecipeViewingScreenAccessor screen = (VillagerRecipeViewingScreenAccessor) client.currentScreen;
+            } else if (client.currentScreen instanceof VillagerRecipeViewingScreenAccessor screen) {
                 List<RecipeCategory<?>> categories = screen.getCategories();
                 int currentTab = screen.getSelectedCategoryIndex();
                 List<RecipeDisplay> recipes = screen.getCategoryMap().get(categories.get(currentTab));
@@ -343,7 +318,7 @@ public class ReiCompat implements CompatHandler {
                 screen.lambdacontrols_init();
 
                 return true;
-            }
+            }*/
 
             return false;
         };

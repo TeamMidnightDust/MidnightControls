@@ -31,6 +31,6 @@ public class DummyRingAction extends RingAction {
 
     @Override
     public void drawIcon(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered) {
-        drawCenteredString(matrices, textRenderer, this.getName(), x + 25, y + 25 - textRenderer.fontHeight / 2, 0xffffff);
+        drawCenteredText(matrices, textRenderer, this.getName(), x + 25, y + 25 - textRenderer.fontHeight / 2, 0xffffff);
     }
 }

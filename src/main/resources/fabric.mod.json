@@ -3,12 +3,12 @@
   "id": "lambdacontrols",
   "name": "LambdaControls",
   "version": "${version}",
-  "description": "Adds better controls: controller and touchscreen support.",
+  "description": "Adds better controls, and controller support.",
   "authors": [
     "LambdAurora"
   ],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/lambdacontrols",
+    "homepage": "https://modrinth.com/mod/lambdacontrols",
     "sources": "https://github.com/LambdAurora/LambdaControls.git",
     "issues": "https://github.com/LambdAurora/LambdaControls/issues"
   },
@@ -26,23 +26,22 @@
       "dev.lambdaurora.lambdacontrols.client.LambdaControlsModMenu"
     ]
   },
+  "accessWidener": "lambdacontrols.accesswidener",
   "mixins": [
     "lambdacontrols.mixins.json",
     "lambdacontrols_compat.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.11.1",
-    "fabric": ">=0.29.3",
-    "minecraft": ">=1.16.2",
-    "spruceui": ">=1.6.3"
+    "fabricloader": ">=0.11.3",
+    "fabric": ">=0.36.0",
+    "minecraft": ">=1.7",
+    "spruceui": ">=3.1.0"
   },
   "recommends": {
     "modmenu": ">=1.12.2"
   },
   "suggests": {
-    "flamingo": "*",
-    "roughlyenoughitems": ">=4.5.5",
-    "okzoomer": ">=4.0.0"
+    "flamingo": "*"
   },
   "breaks": {
     "modmenu": "<1.12.2",

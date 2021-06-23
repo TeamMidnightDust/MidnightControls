@@ -12,11 +12,11 @@ package dev.lambdaurora.lambdacontrols.client.gui.widget;
 import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import dev.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import dev.lambdaurora.lambdacontrols.client.controller.InputManager;
-import me.lambdaurora.spruceui.Position;
-import me.lambdaurora.spruceui.SpruceTexts;
-import me.lambdaurora.spruceui.widget.SpruceButtonWidget;
-import me.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
-import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.SpruceTexts;
+import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
+import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
+import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.function.Predicates;
@@ -60,5 +60,11 @@ public class ControllerControlsWidget extends SpruceContainerWidget {
                 this.getX() + this.width / 2, this.getY() + 4, 16777215);
         this.resetButton.setActive(InputManager.streamBindings().anyMatch(Predicates.not(ButtonBinding::isDefault)));
         super.renderWidget(matrices, mouseX, mouseY, delta);
+    }
+
+    public void finishBindingEdit(int... buttons) {
+        if (this.focusedBinding == null) return;
+        this.mod.config.setButtonBinding(this.focusedBinding, buttons);
+        this.focusedBinding = null;
     }
 }

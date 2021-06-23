@@ -10,8 +10,8 @@
 package dev.lambdaurora.lambdacontrols.client.gui;
 
 import dev.lambdaurora.lambdacontrols.client.controller.Controller;
-import me.lambdaurora.spruceui.option.SpruceSimpleActionOption;
-import me.lambdaurora.spruceui.widget.SpruceButtonWidget;
+import dev.lambdaurora.spruceui.option.SpruceSimpleActionOption;
+import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.LiteralText;
@@ -28,7 +28,7 @@ public class ReloadControllerMappingsOption {
 
     public static SpruceSimpleActionOption newOption(@Nullable Consumer<SpruceButtonWidget> before) {
         return SpruceSimpleActionOption.of(KEY, btn -> {
-            MinecraftClient client = MinecraftClient.getInstance();
+            var client = MinecraftClient.getInstance();
             if (before != null)
                 before.accept(btn);
             Controller.updateMappings();

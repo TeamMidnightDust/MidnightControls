@@ -12,14 +12,14 @@ package dev.lambdaurora.lambdacontrols.client.controller;
 import dev.lambdaurora.lambdacontrols.client.ButtonState;
 import dev.lambdaurora.lambdacontrols.client.util.KeyBindingAccessor;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.StickyKeyBinding;
+import net.minecraft.client.option.StickyKeyBinding;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a press action callback.
  *
  * @author LambdAurora
- * @version 1.4.3
+ * @version 1.7.0
  * @since 1.0.0
  */
 @FunctionalInterface
@@ -31,7 +31,7 @@ public interface PressAction {
             if (binding instanceof StickyKeyBinding)
                 binding.setPressed(button.pressed);
             else
-                ((KeyBindingAccessor) binding).lambdacontrols_handlePressState(button.isButtonDown());
+                ((KeyBindingAccessor) binding).lambdacontrols$handlePressState(button.isButtonDown());
         });
         return true;
     };
@@ -39,8 +39,8 @@ public interface PressAction {
     /**
      * Handles when there is a press action.
      *
-     * @param client The client instance.
-     * @param action The action done.
+     * @param client the client instance
+     * @param action the action done
      */
     boolean press(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action);
 }

@@ -29,7 +29,7 @@ import java.util.List;
 public class ButtonCategory implements Identifiable {
     private final List<ButtonBinding> bindings = new ArrayList<>();
     private final Identifier id;
-    private int priority;
+    private final int priority;
 
     public ButtonCategory(@NotNull Identifier id, int priority) {
         this.id = id;
@@ -57,7 +57,7 @@ public class ButtonCategory implements Identifiable {
     /**
      * Gets the bindings assigned to this category.
      *
-     * @return The bindings assigned to this category.
+     * @return the bindings assigned to this category
      */
     public @NotNull List<ButtonBinding> getBindings() {
         return Collections.unmodifiableList(this.bindings);
@@ -68,7 +68,7 @@ public class ButtonCategory implements Identifiable {
      * <p>
      * The translation key should be `modid.identifier_name`.
      *
-     * @return The translated name.
+     * @return the translated name
      */
     public @NotNull String getTranslatedName() {
         if (this.id.getNamespace().equals("minecraft"))
@@ -81,7 +81,7 @@ public class ButtonCategory implements Identifiable {
      * Gets the priority display of this category.
      * It will defines in which order the categories will display on the controls screen.
      *
-     * @return The priority of this category.
+     * @return the priority of this category
      */
     public int getPriority() {
         return this.priority;

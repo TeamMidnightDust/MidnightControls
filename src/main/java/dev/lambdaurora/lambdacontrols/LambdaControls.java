@@ -12,7 +12,7 @@ package dev.lambdaurora.lambdacontrols;
 import dev.lambdaurora.lambdacontrols.event.PlayerChangeControlsModeCallback;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.network.PacketByteBuf;
@@ -29,7 +29,7 @@ import java.util.Optional;
  * Represents the LambdaControls mod.
  *
  * @author LambdAurora
- * @version 1.6.0
+ * @version 1.7.0
  * @since 1.0.0
  */
 public class LambdaControls implements ModInitializer {
@@ -47,25 +47,25 @@ public class LambdaControls implements ModInitializer {
         INSTANCE = this;
         this.log("Initializing LambdaControls...");
 
-        ServerSidePacketRegistry.INSTANCE.register(HELLO_CHANNEL,
-                (context, attachedData) -> {
-                    String version = attachedData.readString(32);
-                    ControlsMode.byId(attachedData.readString(32))
-                            .ifPresent(controlsMode -> context.getTaskQueue()
-                                    .execute(() -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.getPlayer(), controlsMode)));
-                    context.getTaskQueue().execute(() ->
-                            ServerSidePacketRegistry.INSTANCE.sendToPlayer(context.getPlayer(), FEATURE_CHANNEL, this.makeFeatureBuffer(LambdaControlsFeature.HORIZONTAL_REACHAROUND)));
-                });
-        ServerSidePacketRegistry.INSTANCE.register(CONTROLS_MODE_CHANNEL,
-                (context, attachedData) -> ControlsMode.byId(attachedData.readString(32))
-                        .ifPresent(controlsMode -> context.getTaskQueue()
-                                .execute(() -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.getPlayer(), controlsMode))));
+        ServerPlayNetworking.registerGlobalReceiver(HELLO_CHANNEL, (server, player, handler, buf, responseSender) -> {
+            String version = buf.readString(32);
+            ControlsMode.byId(buf.readString(32))
+                    .ifPresent(controlsMode -> server
+                            .execute(() -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(player, controlsMode)));
+            server.execute(() -> {
+                ServerPlayNetworking.send(player, FEATURE_CHANNEL, this.makeFeatureBuffer(LambdaControlsFeature.HORIZONTAL_REACHAROUND));
+            });
+        });
+        ServerPlayNetworking.registerGlobalReceiver(CONTROLS_MODE_CHANNEL,
+                (server, player, handler, buf, responseSender) -> ControlsMode.byId(buf.readString(32))
+                        .ifPresent(controlsMode -> server
+                                .execute(() -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(player, controlsMode))));
     }
 
     /**
      * Prints a message to the terminal.
      *
-     * @param info The message to print.
+     * @param info the message to print
      */
     public void log(String info) {
         this.logger.info("[LambdaControls] " + info);
@@ -74,7 +74,7 @@ public class LambdaControls implements ModInitializer {
     /**
      * Prints a warning to the terminal.
      *
-     * @param warning The warning to print.
+     * @param warning the warning to print
      */
     public void warn(String warning) {
         this.logger.info("[LambdaControls] " + warning);
@@ -83,8 +83,8 @@ public class LambdaControls implements ModInitializer {
     /**
      * Returns a packet byte buffer made for the lambdacontrols:controls_mode plugin message.
      *
-     * @param controlsMode The controls mode to send.
-     * @return The packet byte buffer.
+     * @param controlsMode the controls mode to send
+     * @return the packet byte buffer
      */
     public PacketByteBuf makeControlsModeBuffer(@NotNull ControlsMode controlsMode) {
         Objects.requireNonNull(controlsMode, "Controls mode cannot be null.");
@@ -94,18 +94,23 @@ public class LambdaControls implements ModInitializer {
     /**
      * Returns a packet byte buffer made for the lambdacontrols:feature plugin message.
      *
-     * @param feature The feature data to send.
-     * @return The packet byte buffer.
+     * @param features the features data to send
+     * @return the packet byte buffer
      */
-    public PacketByteBuf makeFeatureBuffer(@NotNull LambdaControlsFeature feature) {
-        Objects.requireNonNull(feature, "Feature cannot be null.");
-        PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer()).writeString(feature.getName(), 64);
-        buffer.writeBoolean(feature.isAllowed());
+    public PacketByteBuf makeFeatureBuffer(LambdaControlsFeature... features) {
+        if (features.length == 0)
+            throw new IllegalArgumentException("At least one feature must be provided.");
+        var buffer = new PacketByteBuf(Unpooled.buffer());
+        buffer.writeVarInt(features.length);
+        for (var feature : features) {
+            buffer.writeString(feature.getName(), 64);
+            buffer.writeBoolean(feature.isAllowed());
+        }
         return buffer;
     }
 
     public PacketByteBuf makeHello(@NotNull ControlsMode controlsMode) {
-        String version = "";
+        var version = "";
         Optional<ModContainer> container;
         if ((container = FabricLoader.getInstance().getModContainer(LambdaControlsConstants.NAMESPACE)).isPresent()) {
             version = container.get().getMetadata().getVersion().getFriendlyString();
@@ -116,7 +121,7 @@ public class LambdaControls implements ModInitializer {
     /**
      * Gets the LambdaControls instance.
      *
-     * @return The LambdaControls instance.
+     * @return the LambdaControls instance
      */
     public static LambdaControls get() {
         return INSTANCE;

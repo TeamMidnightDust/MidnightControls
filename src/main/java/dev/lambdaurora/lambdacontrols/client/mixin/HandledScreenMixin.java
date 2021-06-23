@@ -51,7 +51,7 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
     @Inject(method = "render", at = @At("RETURN"))
     public void onRender(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER) {
-            MinecraftClient client = MinecraftClient.getInstance();
+            var client = MinecraftClient.getInstance();
             int x = 2, y = client.getWindow().getScaledHeight() - 2 - LambdaControlsRenderer.ICON_SIZE;
 
             x = LambdaControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_A}, "lambdacontrols.action.pickup_all", true, client) + 2;

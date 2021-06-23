@@ -41,12 +41,12 @@ public class RingPage extends DrawableHelper {
     /**
      * Renders the ring page.
      *
-     * @param matrices The matrices.
-     * @param width The screen width.
-     * @param height The screen height.
-     * @param mouseX The mouse X-coordinate.
-     * @param mouseY The mouse Y-coordinate.
-     * @param tickDelta The tick delta.
+     * @param matrices the matrices
+     * @param width the screen width
+     * @param height the screen height
+     * @param mouseX the mouse X-coordinate
+     * @param mouseY the mouse Y-coordinate
+     * @param tickDelta the tick delta
      */
     public void render(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int width, int height, int mouseX, int mouseY, float tickDelta) {
         int centerX = width / 2;
@@ -57,7 +57,7 @@ public class RingPage extends DrawableHelper {
         int y = centerY - offset;
         int x = centerX - offset;
         for (int i = 0; i < 3; i++) {
-            RingAction ringAction = this.actions[i];
+            var ringAction = this.actions[i];
             if (ringAction != null)
                 ringAction.render(matrices, textRenderer, x, y, isHovered(x, y, mouseX, mouseY));
             x += 55;
@@ -65,7 +65,7 @@ public class RingPage extends DrawableHelper {
         y += 55;
         x = centerX - offset;
         for (int i = 3; i < 5; i++) {
-            RingAction ringAction = this.actions[i];
+            var ringAction = this.actions[i];
             if (ringAction != null)
                 ringAction.render(matrices, textRenderer, x, y, isHovered(x, y, mouseX, mouseY));
             x += 55 * 2;
@@ -73,7 +73,7 @@ public class RingPage extends DrawableHelper {
         y += 55;
         x = centerX - offset;
         for (int i = 5; i < 8; i++) {
-            RingAction ringAction = this.actions[i];
+            var ringAction = this.actions[i];
             if (ringAction != null)
                 ringAction.render(matrices, textRenderer, x, y, isHovered(x, y, mouseX, mouseY));
             x += 55;
@@ -87,15 +87,15 @@ public class RingPage extends DrawableHelper {
     /**
      * Tries to parse a ring page configuration.
      *
-     * @param config The configuration.
-     * @return An optional ring page.
+     * @param config the configuration
+     * @return an optional ring page
      */
     public static @NotNull Optional<RingPage> parseRingPage(@NotNull Config config) {
         String name = config.get("name");
         if (name == null)
             return Optional.empty();
 
-        RingPage page = new RingPage(name);
+        var page = new RingPage(name);
 
         List<Config> actionConfigs = config.get("actions");
 

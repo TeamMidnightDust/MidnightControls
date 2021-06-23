@@ -11,10 +11,10 @@ package dev.lambdaurora.lambdacontrols.client.gui;
 
 import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import dev.lambdaurora.lambdacontrols.client.controller.Controller;
-import me.lambdaurora.spruceui.Position;
-import me.lambdaurora.spruceui.option.SpruceOption;
-import me.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
-import me.lambdaurora.spruceui.widget.text.SpruceTextAreaWidget;
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.option.SpruceOption;
+import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
+import dev.lambdaurora.spruceui.widget.text.SpruceTextAreaWidget;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
@@ -27,7 +27,7 @@ import java.nio.file.Files;
  * Represents the controller mappings file editor screen.
  *
  * @author LambdAurora
- * @version 1.4.3
+ * @version 1.7.0
  * @since 1.4.3
  */
 public class MappingsStringInputWidget extends SpruceContainerWidget {
@@ -59,7 +59,7 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
         if (this.textArea != null) {
             this.mappings = this.textArea.getText();
             try {
-                FileWriter fw = new FileWriter(LambdaControlsClient.MAPPINGS_FILE, false);
+                var fw = new FileWriter(LambdaControlsClient.MAPPINGS_FILE, false);
                 fw.write(this.mappings);
                 fw.close();
             } catch (IOException e) {
@@ -76,7 +76,7 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
             this.mappings = this.textArea.getText();
         }
 
-        String mappings = "";
+        var mappings = "";
 
         if (this.mappings != null)
             mappings = this.mappings;

@@ -21,7 +21,6 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -144,8 +143,8 @@ public class LambdaControlsConfig {
 
     public void checkAndFix() {
         InputManager.streamBindings().forEach(binding -> {
-            String path = "controller.controls." + binding.getName();
-            Object raw = this.config.getRaw(path);
+            var path = "controller.controls." + binding.getName();
+            var raw = this.config.getRaw(path);
             if (raw instanceof Number) {
                 this.mod.warn("Invalid data at \"" + path + "\", fixing...");
                 this.config.set(path, String.valueOf(raw));
@@ -175,7 +174,7 @@ public class LambdaControlsConfig {
     private void renamed(String oldPath, String newPath) {
         if (!this.config.contains(oldPath))
             return;
-        Object raw = this.config.getRaw(oldPath);
+        var raw = this.config.getRaw(oldPath);
         this.config.remove(oldPath);
         this.config.set(newPath, raw);
     }
@@ -218,7 +217,7 @@ public class LambdaControlsConfig {
     /**
      * Gets the controls mode from the configuration.
      *
-     * @return The controls mode.
+     * @return the controls mode
      */
     public @NotNull ControlsMode getControlsMode() {
         return this.controlsMode;
@@ -227,7 +226,7 @@ public class LambdaControlsConfig {
     /**
      * Sets the controls mode in the configuration.
      *
-     * @param controlsMode The controls mode.
+     * @param controlsMode the controls mode
      */
     public void setControlsMode(@NotNull ControlsMode controlsMode) {
         this.controlsMode = controlsMode;
@@ -237,7 +236,7 @@ public class LambdaControlsConfig {
     /**
      * Returns whether the auto switch mode is enabled or not.
      *
-     * @return True if the auto switch mode is enabled, else false.
+     * @return true if the auto switch mode is enabled, else false
      */
     public boolean hasAutoSwitchMode() {
         return this.config.getOrElse("auto_switch_mode", DEFAULT_AUTO_SWITCH_MODE);
@@ -246,7 +245,7 @@ public class LambdaControlsConfig {
     /**
      * Sets whether the auto switch mode is enabled or not.
      *
-     * @param autoSwitchMode True if the auto switch mode is enabled, else false.
+     * @param autoSwitchMode true if the auto switch mode is enabled, else false
      */
     public void setAutoSwitchMode(boolean autoSwitchMode) {
         this.config.set("auto_switch_mode", autoSwitchMode);
@@ -255,7 +254,7 @@ public class LambdaControlsConfig {
     /**
      * Returns whether the mod has debug enabled or not.
      *
-     * @return True if debug is enabled, else false.
+     * @return true if debug is enabled, else false
      */
     public boolean hasDebug() {
         return this.config.getOrElse("debug", DEFAULT_DEBUG);
@@ -264,7 +263,7 @@ public class LambdaControlsConfig {
     /**
      * Sets whether the mod has debug enabled or not.
      *
-     * @param debug True if debug is enabled, else false.
+     * @param debug true if debug is enabled, else false
      */
     protected void setDebug(boolean debug) {
         this.config.set("debug", debug);
@@ -277,7 +276,7 @@ public class LambdaControlsConfig {
     /**
      * Returns whether the HUD is enabled.
      *
-     * @return True if the HUD is enabled, else false.
+     * @return true if the HUD is enabled, else false
      */
     public boolean isHudEnabled() {
         return this.hudEnable;
@@ -286,7 +285,7 @@ public class LambdaControlsConfig {
     /**
      * Sets whether the HUD is enabled.
      *
-     * @param enable True if the HUD is enabled, else false.
+     * @param enable true if the HUD is enabled, else false
      */
     public void setHudEnabled(boolean enable) {
         this.hudEnable = enable;
@@ -296,7 +295,7 @@ public class LambdaControlsConfig {
     /**
      * Gets the HUD side from the configuration.
      *
-     * @return The HUD side.
+     * @return the HUD side
      */
     public @NotNull HudSide getHudSide() {
         return this.hudSide;
@@ -305,7 +304,7 @@ public class LambdaControlsConfig {
     /**
      * Sets the HUD side in the configuration.
      *
-     * @param hudSide The HUD side.
+     * @param hudSide the HUD side
      */
     public void setHudSide(@NotNull HudSide hudSide) {
         this.hudSide = hudSide;
@@ -337,7 +336,7 @@ public class LambdaControlsConfig {
     /**
      * Gets whether fast block placing is enabled or not.
      *
-     * @return True if fast block placing is enabled, else false.
+     * @return true if fast block placing is enabled, else false
      */
     public boolean hasFastBlockPlacing() {
         return LambdaControlsFeature.FAST_BLOCK_PLACING.isEnabled();
@@ -346,7 +345,7 @@ public class LambdaControlsConfig {
     /**
      * Sets whether fast block placing is enabled or not.
      *
-     * @param enable True if fast block placing is enabled, else false.
+     * @param enable true if fast block placing is enabled, else false
      */
     public void setFastBlockPlacing(boolean enable) {
         LambdaControlsFeature.FAST_BLOCK_PLACING.setEnabled(enable);
@@ -356,7 +355,7 @@ public class LambdaControlsConfig {
     /**
      * Returns whether fly drifting is enabled or not.
      *
-     * @return True if fly drifting is enabled, else false.
+     * @return true if fly drifting is enabled, else false
      */
     public boolean hasFlyDrifting() {
         return this.config.getOrElse("gameplay.fly.drifting", DEFAULT_FLY_DRIFTING);
@@ -365,7 +364,7 @@ public class LambdaControlsConfig {
     /**
      * Sets whether fly drifting is enabled or not.
      *
-     * @param flyDrifting True if fly drifting is enabled, else false.
+     * @param flyDrifting true if fly drifting is enabled, else false
      */
     public void setFlyDrifting(boolean flyDrifting) {
         this.config.set("gameplay.fly.drifting", flyDrifting);
@@ -374,7 +373,7 @@ public class LambdaControlsConfig {
     /**
      * Returns whether vertical fly drifting is enabled or not.
      *
-     * @return True if vertical fly drifting is enabled, else false.
+     * @return true if vertical fly drifting is enabled, else false
      */
     public boolean hasFlyVerticalDrifting() {
         return this.config.getOrElse("gameplay.fly.vertical_drifting", DEFAULT_FLY_VERTICAL_DRIFTING);
@@ -383,7 +382,7 @@ public class LambdaControlsConfig {
     /**
      * Sets whether vertical fly drifting is enabled or not.
      *
-     * @param flyDrifting True if vertical fly drifting is enabled, else false.
+     * @param flyDrifting true if vertical fly drifting is enabled, else false
      */
     public void setFlyVerticalDrifting(boolean flyDrifting) {
         this.config.set("gameplay.fly.vertical_drifting", flyDrifting);
@@ -392,7 +391,7 @@ public class LambdaControlsConfig {
     /**
      * Returns whether front block placing is enabled or not.
      *
-     * @return True if front block placing is enabled, else false.
+     * @return true if front block placing is enabled, else false
      */
     public boolean hasFrontBlockPlacing() {
         return LambdaControlsFeature.HORIZONTAL_REACHAROUND.isEnabled();
@@ -401,7 +400,7 @@ public class LambdaControlsConfig {
     /**
      * Sets whether front block placing is enabled or not.
      *
-     * @param enable True if front block placing is enabled, else false.
+     * @param enable true if front block placing is enabled, else false
      */
     public void setFrontBlockPlacing(boolean enable) {
         LambdaControlsFeature.HORIZONTAL_REACHAROUND.setEnabled(enable);
@@ -411,7 +410,7 @@ public class LambdaControlsConfig {
     /**
      * Returns whether vertical reacharound is enabled or not.
      *
-     * @return True if vertical reacharound is enabled, else false.
+     * @return true if vertical reacharound is enabled, else false
      */
     public boolean hasVerticalReacharound() {
         return LambdaControlsFeature.VERTICAL_REACHAROUND.isEnabled();
@@ -420,7 +419,7 @@ public class LambdaControlsConfig {
     /**
      * Sets whether vertical reacharound is enabled or not.
      *
-     * @param enable True if vertical reacharound is enabled, else false.
+     * @param enable true if vertical reacharound is enabled, else false
      */
     public void setVerticalReacharound(boolean enable) {
         LambdaControlsFeature.VERTICAL_REACHAROUND.setEnabled(enable);
@@ -430,7 +429,7 @@ public class LambdaControlsConfig {
     /**
      * Returns whether front block placing outline is enabled or not.
      *
-     * @return True if front block placing outline is enabled, else false.
+     * @return true if front block placing outline is enabled, else false
      */
     public boolean shouldRenderReacharoundOutline() {
         return this.shouldRenderReacharoundOutline;
@@ -439,7 +438,7 @@ public class LambdaControlsConfig {
     /**
      * Sets whether front block placing outline is enabled or not.
      *
-     * @param render True if front block placing outline is enabled, else false.
+     * @param render true if front block placing outline is enabled, else false
      */
     public void setRenderReacharoundOutline(boolean render) {
         this.config.set("gameplay.reacharound.outline", this.shouldRenderReacharoundOutline = render);
@@ -450,7 +449,7 @@ public class LambdaControlsConfig {
      * <p>
      * The integer array has 4 elements: red, green, blue and alpha.
      *
-     * @return The color as a RGBA integer array.
+     * @return the color as a RGBA integer array
      */
     public int[] getReacharoundOutlineColor() {
         return this.reacharoundOutlineColor;
@@ -466,7 +465,7 @@ public class LambdaControlsConfig {
      * @return the controller
      */
     public Controller getController() {
-        Object raw = this.config.getRaw("controller.id");
+        var raw = this.config.getRaw("controller.id");
         if (raw instanceof Number) {
             return Controller.byId((Integer) raw);
         } else if (raw instanceof String) {
@@ -481,7 +480,7 @@ public class LambdaControlsConfig {
      * @param controller the controller
      */
     public void setController(Controller controller) {
-        this.config.set("controller.id", controller.getId());
+        this.config.set("controller.id", controller.id());
     }
 
     /**
@@ -490,7 +489,7 @@ public class LambdaControlsConfig {
      * @return the second controller
      */
     public Optional<Controller> getSecondController() {
-        Object raw = this.config.getRaw("controller.id2");
+        var raw = this.config.getRaw("controller.id2");
         if (raw instanceof Number) {
             if ((int) raw == -1)
                 return Optional.empty();
@@ -507,13 +506,13 @@ public class LambdaControlsConfig {
      * @param controller the second controller
      */
     public void setSecondController(@Nullable Controller controller) {
-        this.config.set("controller.id2", controller == null ? -1 : controller.getId());
+        this.config.set("controller.id2", controller == null ? -1 : controller.id());
     }
 
     /**
      * Gets the controller's type.
      *
-     * @return The controller's type.
+     * @return the controller's type
      */
     public @NotNull ControllerType getControllerType() {
         return this.controllerType;
@@ -522,7 +521,7 @@ public class LambdaControlsConfig {
     /**
      * Sets the controller's type.
      *
-     * @param controllerType The controller's type.
+     * @param controllerType the controller's type
      */
     public void setControllerType(@NotNull ControllerType controllerType) {
         this.controllerType = controllerType;
@@ -568,7 +567,7 @@ public class LambdaControlsConfig {
     /**
      * Gets the controller's rotation speed.
      *
-     * @return The rotation speed.
+     * @return the rotation speed
      */
     public double getRotationSpeed() {
         return this.rotationSpeed;
@@ -577,7 +576,7 @@ public class LambdaControlsConfig {
     /**
      * Sets the controller's rotation speed.
      *
-     * @param rotationSpeed The rotation speed.
+     * @param rotationSpeed the rotation speed
      */
     public void setRotationSpeed(double rotationSpeed) {
         this.rotationSpeed = rotationSpeed;
@@ -586,7 +585,7 @@ public class LambdaControlsConfig {
     /**
      * Gets the controller's mouse speed.
      *
-     * @return The mouse speed.
+     * @return the mouse speed
      */
     public double getMouseSpeed() {
         return this.mouseSpeed;
@@ -595,7 +594,7 @@ public class LambdaControlsConfig {
     /**
      * Sets the controller's mouse speed.
      *
-     * @param mouseSpeed The mouse speed.
+     * @param mouseSpeed the mouse speed
      */
     public void setMouseSpeed(double mouseSpeed) {
         this.mouseSpeed = mouseSpeed;
@@ -604,7 +603,7 @@ public class LambdaControlsConfig {
     /**
      * Returns whether the right X axis is inverted or not.
      *
-     * @return True if the right X axis is inverted, else false.
+     * @return true if the right X axis is inverted, else false
      */
     public boolean doesInvertRightXAxis() {
         return this.config.getOrElse("controller.invert_right_x_axis", false);
@@ -613,7 +612,7 @@ public class LambdaControlsConfig {
     /**
      * Sets whether the right X axis is inverted or not.
      *
-     * @param invert True if the right X axis is inverted, else false.
+     * @param invert true if the right X axis is inverted, else false
      */
     public void setInvertRightXAxis(boolean invert) {
         this.config.set("controller.invert_right_x_axis", invert);
@@ -622,7 +621,7 @@ public class LambdaControlsConfig {
     /**
      * Returns whether the right Y axis is inverted or not.
      *
-     * @return True if the right Y axis is inverted, else false.
+     * @return true if the right Y axis is inverted, else false
      */
     public boolean doesInvertRightYAxis() {
         return this.config.getOrElse("controller.invert_right_y_axis", false);
@@ -631,7 +630,7 @@ public class LambdaControlsConfig {
     /**
      * Sets whether the right Y axis is inverted or not.
      *
-     * @param invert True if the right Y axis is inverted, else false.
+     * @param invert true if the right Y axis is inverted, else false
      */
     public void setInvertRightYAxis(boolean invert) {
         this.config.set("controller.invert_right_y_axis", invert);
@@ -640,7 +639,7 @@ public class LambdaControlsConfig {
     /**
      * Returns whether unfocused controller input is allowed or not.
      *
-     * @return True if unfocused controller input is allowed, else false.
+     * @return true if unfocused controller input is allowed, else false
      */
     public boolean hasUnfocusedInput() {
         return this.unfocusedInput;
@@ -649,7 +648,7 @@ public class LambdaControlsConfig {
     /**
      * Sets whether unfocused controller input is allowed or not.
      *
-     * @param unfocusedInput True if unfocused controller input is allowed, else false.
+     * @param unfocusedInput true if unfocused controller input is allowed, else false
      */
     public void setUnfocusedInput(boolean unfocusedInput) {
         this.unfocusedInput = unfocusedInput;
@@ -658,7 +657,7 @@ public class LambdaControlsConfig {
     /**
      * Returns whether the mouse is virtual or not.
      *
-     * @return True if the mouse is virtual, else false.
+     * @return true if the mouse is virtual, else false
      */
     public boolean hasVirtualMouse() {
         return this.virtualMouse;
@@ -667,7 +666,7 @@ public class LambdaControlsConfig {
     /**
      * Sets whether the mouse is virtual or not.
      *
-     * @param virtualMouse True if the mouse is virtual, else false.
+     * @param virtualMouse true if the mouse is virtual, else false
      */
     public void setVirtualMouse(boolean virtualMouse) {
         this.virtualMouse = virtualMouse;
@@ -676,7 +675,7 @@ public class LambdaControlsConfig {
     /**
      * Gets the virtual mouse skin.
      *
-     * @return The virtual mouse skin.
+     * @return the virtual mouse skin
      */
     public VirtualMouseSkin getVirtualMouseSkin() {
         return this.virtualMouseSkin;
@@ -685,7 +684,7 @@ public class LambdaControlsConfig {
     /**
      * Sets the virtual mouse skin.
      *
-     * @param skin The virtual mouse skin.
+     * @param skin the virtual mouse skin
      */
     public void setVirtualMouseSkin(VirtualMouseSkin skin) {
         this.virtualMouseSkin = skin;
@@ -695,7 +694,7 @@ public class LambdaControlsConfig {
     /**
      * Gets the right X axis sign.
      *
-     * @return The right X axis sign.
+     * @return the right X axis sign
      */
     public double getRightXAxisSign() {
         return this.doesInvertRightXAxis() ? -1.0 : 1.0;
@@ -704,7 +703,7 @@ public class LambdaControlsConfig {
     /**
      * Gets the right Y axis sign.
      *
-     * @return The right Y axis sign.
+     * @return the right Y axis sign
      */
     public double getRightYAxisSign() {
         return this.doesInvertRightYAxis() ? -1.0 : 1.0;
@@ -724,16 +723,16 @@ public class LambdaControlsConfig {
     /**
      * Loads the button binding from configuration.
      *
-     * @param button The button binding.
+     * @param button the button binding
      */
     public void loadButtonBinding(@NotNull ButtonBinding button) {
         button.setButton(button.getDefaultButton());
-        String code = this.config.getOrElse("controller.controls." + button.getName(), button.getButtonCode());
+        var code = this.config.getOrElse("controller.controls." + button.getName(), button.getButtonCode());
 
-        Matcher matcher = BUTTON_BINDING_PATTERN.matcher(code);
+        var matcher = BUTTON_BINDING_PATTERN.matcher(code);
 
         try {
-            int[] buttons = new int[1];
+            var buttons = new int[1];
             int count = 0;
             while (matcher.find()) {
                 count++;
@@ -768,8 +767,8 @@ public class LambdaControlsConfig {
     /**
      * Sets the button binding in configuration.
      *
-     * @param binding The button binding.
-     * @param button The button.
+     * @param binding the button binding
+     * @param button the button
      */
     public void setButtonBinding(@NotNull ButtonBinding binding, int[] button) {
         binding.setButton(button);
@@ -803,8 +802,8 @@ public class LambdaControlsConfig {
     /**
      * Returns whether the specified axis is an axis used for movements.
      *
-     * @param axis The axis index.
-     * @return True if the axis is used for movements, else false.
+     * @param axis the axis index
+     * @return true if the axis is used for movements, else false
      */
     public boolean isMovementAxis(int axis) {
         return axis == GLFW_GAMEPAD_AXIS_LEFT_Y || axis == GLFW_GAMEPAD_AXIS_LEFT_X;
@@ -813,27 +812,25 @@ public class LambdaControlsConfig {
     /**
      * Parses a color from a hexadecimal color string.
      *
-     * @param hex The hexadecimal color.
-     * @return The color instance, null if invalid.
+     * @param hex the hexadecimal color
+     * @return the color instance, null if invalid
      */
     private static int[] parseColor(String hex) {
         hex = hex.replace("#", "");
-        switch (hex.length()) {
-            case 6:
-                return new int[]{
-                        Integer.valueOf(hex.substring(0, 2), 16),
-                        Integer.valueOf(hex.substring(2, 4), 16),
-                        Integer.valueOf(hex.substring(4, 6), 16),
-                        255
-                };
-            case 8:
-                return new int[]{
-                        Integer.valueOf(hex.substring(0, 2), 16),
-                        Integer.valueOf(hex.substring(2, 4), 16),
-                        Integer.valueOf(hex.substring(4, 6), 16),
-                        Integer.valueOf(hex.substring(6, 8), 16)
-                };
-        }
-        return null;
+        return switch (hex.length()) {
+            case 6 -> new int[]{
+                    Integer.valueOf(hex.substring(0, 2), 16),
+                    Integer.valueOf(hex.substring(2, 4), 16),
+                    Integer.valueOf(hex.substring(4, 6), 16),
+                    255
+            };
+            case 8 -> new int[]{
+                    Integer.valueOf(hex.substring(0, 2), 16),
+                    Integer.valueOf(hex.substring(2, 4), 16),
+                    Integer.valueOf(hex.substring(4, 6), 16),
+                    Integer.valueOf(hex.substring(6, 8), 16)
+            };
+            default -> null;
+        };
     }
 }

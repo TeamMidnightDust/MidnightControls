@@ -15,10 +15,9 @@ import dev.lambdaurora.lambdacontrols.client.HudSide;
 import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import dev.lambdaurora.lambdacontrols.client.compat.LambdaControlsCompat;
 import dev.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
-import me.lambdaurora.spruceui.hud.Hud;
+import dev.lambdaurora.spruceui.hud.Hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -32,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  * Represents the LambdaControls HUD.
  *
  * @author LambdAurora
- * @version 1.3.2
+ * @version 1.7.0
  * @since 1.0.0
  */
 public class LambdaControlsHud extends Hud {
@@ -87,8 +86,8 @@ public class LambdaControlsHud extends Hud {
 
         if (this.mod.reacharound.isLastReacharoundVertical()) {
             // Render crosshair indicator.
-            Window window = this.client.getWindow();
-            String text = "[  ]";
+            var window = this.client.getWindow();
+            var text = "[  ]";
 
             float scale = Math.min(5, this.ticksDisplayedCrosshair + tickDelta) / 5F;
             scale *= scale;
@@ -203,7 +202,7 @@ public class LambdaControlsHud extends Hud {
                 this.ticksDisplayedCrosshair = 0;
             }
 
-            String customAttackAction = LambdaControlsCompat.getAttackActionAt(this.client, this.placeHitResult);
+            var customAttackAction = LambdaControlsCompat.getAttackActionAt(this.client, this.placeHitResult);
             if (customAttackAction != null) {
                 this.attackAction = customAttackAction;
                 this.attackWidth = this.width(customAttackAction);
@@ -225,7 +224,7 @@ public class LambdaControlsHud extends Hud {
                 }
             }
 
-            String customUseAction = LambdaControlsCompat.getUseActionAt(this.client, this.placeHitResult);
+            var customUseAction = LambdaControlsCompat.getUseActionAt(this.client, this.placeHitResult);
             if (customUseAction != null)
                 placeAction = customUseAction;
 
@@ -270,7 +269,7 @@ public class LambdaControlsHud extends Hud {
     private void drawTip(MatrixStack matrices, int x, int y, @NotNull String action, boolean display) {
         if (!display)
             return;
-        String translatedAction = I18n.translate(action);
+        var translatedAction = I18n.translate(action);
         int textY = (LambdaControlsRenderer.ICON_SIZE / 2 - this.client.textRenderer.fontHeight / 2) + 1;
         this.client.textRenderer.draw(matrices, translatedAction, (float) x, (float) (y + textY), 14737632);
     }

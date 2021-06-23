@@ -37,10 +37,10 @@ public enum HudSide implements Nameable {
     /**
      * Returns the next side available.
      *
-     * @return The next available side.
+     * @return the next available side
      */
     public @NotNull HudSide next() {
-        HudSide[] v = values();
+        var v = values();
         if (v.length == this.ordinal() + 1)
             return v[0];
         return v[this.ordinal() + 1];
@@ -49,7 +49,7 @@ public enum HudSide implements Nameable {
     /**
      * Returns the translation key of this hud side.
      *
-     * @return The translation key of this hude side.
+     * @return the translation key of this hude side
      */
     public @NotNull String getTranslationKey() {
         return "lambdacontrols.hud_side." + this.getName();
@@ -58,7 +58,7 @@ public enum HudSide implements Nameable {
     /**
      * Gets the translated text of this hud side.
      *
-     * @return The translated text of this hud side.
+     * @return the translated text of this hud side
      */
     public @NotNull Text getTranslatedText() {
         return this.text;
@@ -72,8 +72,8 @@ public enum HudSide implements Nameable {
     /**
      * Gets the hud side from its identifier.
      *
-     * @param id The identifier of the hud side.
-     * @return The hud side if found, else empty.
+     * @param id the identifier of the hud side
+     * @return the hud side if found, else empty
      */
     public static @NotNull Optional<HudSide> byId(@NotNull String id) {
         return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();

@@ -13,22 +13,20 @@ import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import dev.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import dev.lambdaurora.lambdacontrols.client.controller.ButtonCategory;
 import dev.lambdaurora.lambdacontrols.client.controller.InputManager;
-import me.lambdaurora.spruceui.Position;
-import me.lambdaurora.spruceui.SpruceTexts;
-import me.lambdaurora.spruceui.navigation.NavigationDirection;
-import me.lambdaurora.spruceui.navigation.NavigationUtils;
-import me.lambdaurora.spruceui.widget.SpruceButtonWidget;
-import me.lambdaurora.spruceui.widget.SpruceSeparatorWidget;
-import me.lambdaurora.spruceui.widget.SpruceWidget;
-import me.lambdaurora.spruceui.widget.container.SpruceEntryListWidget;
-import me.lambdaurora.spruceui.widget.container.SpruceParentWidget;
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.SpruceTexts;
+import dev.lambdaurora.spruceui.navigation.NavigationDirection;
+import dev.lambdaurora.spruceui.navigation.NavigationUtils;
+import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
+import dev.lambdaurora.spruceui.widget.SpruceSeparatorWidget;
+import dev.lambdaurora.spruceui.widget.SpruceWidget;
+import dev.lambdaurora.spruceui.widget.container.SpruceEntryListWidget;
+import dev.lambdaurora.spruceui.widget.container.SpruceParentWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
@@ -36,7 +34,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Represents a control list widget.
@@ -91,8 +91,9 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                 gui.focusedBinding = binding;
                 LambdaControlsClient.get().input.beginControlsInput(gui);
             }) {
-                protected Optional<Text> getNarrationMessage() {
-                    return Optional.of(binding.isNotBound() ? new TranslatableText("narrator.controls.unbound", bindingName) : new TranslatableText("narrator.controls.bound", bindingName, super.getNarrationMessage()));
+                protected Text getNarrationMessage() {
+                    return binding.isNotBound() ? new TranslatableText("narrator.controls.unbound", bindingName)
+                            : new TranslatableText("narrator.controls.bound", bindingName, super.getNarrationMessage());
                 }
             };
             this.children.add(editButton);
@@ -100,8 +101,8 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                     this.editButton.getPosition().getRelativeX() + this.editButton.getWidth() + 2, 0),
                     44, 20, new TranslatableText("controls.reset"),
                     btn -> LambdaControlsClient.get().config.setButtonBinding(binding, binding.getDefaultButton())) {
-                protected Optional<Text> getNarrationMessage() {
-                    return Optional.of(new TranslatableText("narrator.controls.reset", bindingName));
+                protected Text getNarrationMessage() {
+                    return new TranslatableText("narrator.controls.reset", bindingName);
                 }
             };
             this.children.add(this.resetButton);
@@ -113,8 +114,8 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                         gui.focusedBinding = null;
                         LambdaControlsClient.get().input.beginControlsInput(null);
                     }) {
-                protected Optional<Text> getNarrationMessage() {
-                    return Optional.of(new TranslatableText("lambdacontrols.narrator.unbound", bindingName));
+                protected Text getNarrationMessage() {
+                    return new TranslatableText("lambdacontrols.narrator.unbound", bindingName);
                 }
             };
             this.children.add(this.unbindButton);
@@ -151,7 +152,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
 
         @Override
         protected boolean onMouseClick(double mouseX, double mouseY, int button) {
-            Iterator<SpruceWidget> it = this.children().iterator();
+            var it = this.children().iterator();
 
             SpruceWidget element;
             do {
@@ -229,12 +230,11 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         protected void renderWidget(MatrixStack matrices, int mouseX, int mouseY, float delta) {
             boolean focused = gui.focusedBinding == this.binding;
 
-            TextRenderer textRenderer = ControlsListWidget.this.client.textRenderer;
-            String bindingName = this.bindingName;
+            var textRenderer = ControlsListWidget.this.client.textRenderer;
             int height = this.getHeight();
             //float textX = (float) (this.getX() + 70 - ControlsListWidget.this.maxTextLength);
             int textY = this.getY() + height / 2;
-            textRenderer.draw(matrices, bindingName, this.getX(), (float) (textY - 9 / 2), 16777215);
+            textRenderer.draw(matrices, this.bindingName, this.getX(), (float) (textY - 9 / 2), 16777215);
 
             this.resetButton.setVisible(!focused);
             this.unbindButton.setVisible(focused);
@@ -242,14 +242,14 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
 
             this.editButton.update();
             if (focused) {
-                MutableText text = new LiteralText("> ").formatted(Formatting.WHITE);
+                var text = new LiteralText("> ").formatted(Formatting.WHITE);
                 text.append(this.editButton.getMessage().copy().formatted(Formatting.YELLOW));
                 this.editButton.setMessage(text.append(new LiteralText(" <").formatted(Formatting.WHITE)));
             } else if (!this.binding.isNotBound() && InputManager.hasDuplicatedBindings(this.binding)) {
-                MutableText text = this.editButton.getMessage().copy();
+                var text = this.editButton.getMessage().copy();
                 this.editButton.setMessage(text.formatted(Formatting.RED));
             } else if (this.binding.isNotBound()) {
-                MutableText text = this.editButton.getMessage().copy();
+                var text = this.editButton.getMessage().copy();
                 this.editButton.setMessage(text.formatted(Formatting.GOLD));
             }
 

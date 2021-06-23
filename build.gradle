@@ -1,59 +1,67 @@
-buildscript {
-    dependencies {
-        constraints {
-            ["asm", "asm-util", "asm-tree", "asm-analysis"].each {
-                classpath("org.ow2.asm:$it") {
-                    version { require("9.1") }
-                    because("Fabric's TinyRemapper requires ASM 9")
-                }
-            }
-        }
-    }
-}
-
 plugins {
-    id 'fabric-loom' version '0.6-SNAPSHOT'
+    id 'fabric-loom' version '0.9.+'
     id 'java-library'
     id 'maven-publish'
-    id 'com.github.johnrengelman.shadow' version '6.1.0'
-    id 'org.cadixdev.licenser' version '0.5.0'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'org.cadixdev.licenser' version '0.6.1'
+    id 'com.modrinth.minotaur' version '1.2.+'
 }
 
 import net.fabricmc.loom.task.RemapJarTask
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
+import com.modrinth.minotaur.TaskModrinthUpload
+import com.modrinth.minotaur.request.VersionType
+import com.modrinth.minotaur.responses.ResponseError
+import org.apache.http.client.config.CookieSpecs
+import org.apache.http.client.config.RequestConfig
+import org.apache.http.client.entity.EntityBuilder
+import org.apache.http.client.methods.HttpPatch
+import org.apache.http.entity.ContentType
+import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.util.EntityUtils
 
 group = project.maven_group
 version = "${project.mod_version}+${getMCVersionString()}"
-archivesBaseName = project.archives_base_name + "-fabric"
+archivesBaseName = project.archives_base_name
 
 // This field defines the Java version your mod target.
-// The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too.
-def targetJavaVersion = 8
+def targetJavaVersion = 16
 
-def getMCVersionString() {
-    if (project.minecraft_version.matches("\\d\\dw\\d\\d[a-z]")) {
+boolean isMCVersionNonRelease() {
+    return project.minecraft_version.matches('^\\d\\dw\\d\\d[a-z]$')
+            || project.minecraft_version.matches('\\d+\\.\\d+-(pre|rc)(\\d+)')
+}
+
+String getMCVersionString() {
+    if (isMCVersionNonRelease()) {
         return project.minecraft_version
     }
-    int lastDot = project.minecraft_version.lastIndexOf('.')
-    return project.minecraft_version.substring(0, lastDot)
+    def version = project.minecraft_version.split('\\.')
+    return version[0] + '.' + version[1]
 }
 
 minecraft {
+    accessWidener file('src/main/resources/lambdacontrols.accesswidener')
 }
 
 repositories {
     mavenLocal()
     mavenCentral()
-    maven { url = 'https://aperlambda.github.io/maven' }
+    maven { url 'https://aperlambda.github.io/maven' }
     maven {
-        name = 'CottonMC'
-        url = 'http://server.bbkr.space:8081/artifactory/libs-snapshot'
+        name 'Gegy'
+        url 'https://maven.gegy.dev'
     }
     maven {
-        name = 'Terraformers'
-        url = 'https://maven.terraformersmc.com/releases'
+        name 'CottonMC'
+        url 'https://server.bbkr.space:8081/artifactory/libs-snapshot'
     }
-    maven { url "https://maven.shedaniel.me/" }
-    maven { url = "https://jitpack.io" }
+    maven {
+        name 'Terraformers'
+        url 'https://maven.terraformersmc.com/releases'
+    }
+    maven { url 'https://maven.shedaniel.me/' }
 }
 
 configurations {
@@ -70,20 +78,19 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+    modImplementation "dev.lambdaurora:spruceui:${project.spruceui_version}"
+    include "dev.lambdaurora:spruceui:${project.spruceui_version}"
+
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-    modImplementation "com.github.lambdaurora:spruceui:${project.spruceui_version}"
-    include "com.github.lambdaurora:spruceui:${project.spruceui_version}"
 
     // Compatibility mods
-    modImplementation("com.github.joaoh1:okzoomer:e13183c59b") {
+    /*modImplementation("com.github.joaoh1:okzoomer:e13183c59b") {
         exclude group: 'me.shedaniel.cloth'
         exclude group: 'io.github.prospector'
-    }
+    }*/
 
-    modImplementation("me.shedaniel:RoughlyEnoughItems:5.10.184")
-
-    shadow "com.electronwill.night-config:core:3.6.3"
-    shadow "com.electronwill.night-config:toml:3.6.3"
+    shadow 'com.electronwill.night-config:core:3.6.3'
+    shadow 'com.electronwill.night-config:toml:3.6.3'
 }
 
 java {
@@ -94,25 +101,21 @@ java {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.encoding = "UTF-8"
+    it.options.encoding = 'UTF-8'
 
-    if (JavaVersion.current().isJava9Compatible()) {
-        if (JavaVersion.current().isJava9Compatible()) {
-            it.options.release = targetJavaVersion
-        }
-    }
+    it.options.release.set(targetJavaVersion)
 }
 
 processResources {
-    inputs.property "version", project.version
+    inputs.property 'version', project.version
 
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version
+    filesMatching('fabric.mod.json') {
+        expand 'version': project.version
     }
 }
 
 jar {
-    from("LICENSE") {
+    from('LICENSE') {
         rename { "${it}_${project.archivesBaseName}" }
     }
 }
@@ -133,37 +136,118 @@ shadowJar {
     exclude 'org/**'
     relocate 'com.electronwill.nightconfig', 'dev.lambdaurora.lambdacontrols.shadow.nightconfig'
 }
+remapJar.dependsOn(shadowJar)
 
 task shadowRemapJar(type: RemapJarTask) {
     dependsOn shadowJar
 
-    input = file("${project.buildDir}/libs/$archivesBaseName-$version-dev.jar")
-    archiveName = "${archivesBaseName}-${version}.jar"
-    addNestedDependencies = true
+    input.set(file("${project.buildDir}/libs/$archivesBaseName-$version-dev.jar"))
+    archiveFileName = "${archivesBaseName}-${version}.jar"
+    addNestedDependencies.set(true)
+}
+build.dependsOn(shadowRemapJar)
+
+task publishModrinth(type: TaskModrinthUpload) {
+    dependsOn(build)
+    onlyIf {
+        System.getenv('MODRINTH_TOKEN')
+    }
+
+    token = System.getenv('MODRINTH_TOKEN')
+    projectId = project.modrinth_id
+    versionNumber = version
+    versionName = "LambdaControls ${project.mod_version} (${getMCVersionString()})"
+    uploadFile = shadowRemapJar
+    addGameVersion((String) project.minecraft_version)
+    addLoader('fabric')
+    versionType = isMCVersionNonRelease() ? VersionType.BETA : VersionType.RELEASE
+
+    // Changelog fetching
+    def changelogText = file('CHANGELOG.md').text
+    def regexVersion = ((String) project.mod_version).replaceAll('\\.', /\\./).replaceAll('\\+', '\\+')
+    def changelogRegex = ~"###? ${regexVersion}\\n\\n(( *- .+\\n)+)"
+    def matcher = changelogText =~ changelogRegex
+    matcher.find()
+
+    changelog = matcher.group(1)
+
+    // Readme
+    doFirst {
+        final def client = HttpClientBuilder.create().setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES).build()).build()
+        final def patch = new HttpPatch((String) (apiURL + '/v1/mod/' + projectId))
+        patch.addHeader("Authorization", token)
+
+        var json = new JsonObject()
+        json.addProperty("body", parseReadme())
+        patch.setEntity(EntityBuilder.create()
+                .setText(json.toString())
+                .setContentType(ContentType.APPLICATION_JSON)
+                .build())
+
+        final def response = client.execute(patch)
+        final int status = response.getStatusLine().getStatusCode()
+
+        final def gson = new GsonBuilder().create()
+        if (status == 200) {
+            project.getLogger().lifecycle("Successfully updated readme to ${projectId}.")
+        } else {
+            errorInfo = gson.fromJson(EntityUtils.toString(response.getEntity()), ResponseError.class)
+            project.getLogger().error("Upload failed! Status: ${status} Error: ${errorInfo.getError()} Reason: ${errorInfo.getDescription()}")
+            throw new GradleException("Upload failed! Status: ${status} Reason: ${errorInfo.getDescription()}")
+        }
+    }
 }
 
 // configure the maven publication
 publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact(shadowRemapJar) {
+                builtBy shadowRemapJar
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+
+            pom {
+                name = 'LambdaControls'
+                description = 'Adds better controls, and controller support.'
+            }
+
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+                configurations.shadow.allDependencies.each {
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                    dependencyNode.appendNode('scope', 'compile')
+                }
+            }
+        }
+    }
+
     repositories {
         mavenLocal()
         maven {
-            name = "GithubPackages"
-            url = uri("https://maven.pkg.github.com/LambdAurora/LambdaControls")
+            name "GithubPackages"
+            url uri("https://maven.pkg.github.com/LambdAurora/LambdaControls")
             credentials {
                 username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
                 password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
             }
         }
-    }
-
-    publications {
-        mavenJava(MavenPublication) {
-            // add all the jars that should be included when publishing to maven
-            artifact(remapJar) {
-                builtBy remapJar
-            }
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
+        def lambdacontrolsMaven = System.getenv('LAMBDACONTROLS_MAVEN')
+        if (lambdacontrolsMaven) {
+            maven {
+                name 'LambdaControlsMaven'
+                url uri(lambdacontrolsMaven)
+                credentials {
+                    username = project.findProperty('gpr.user') ?: System.getenv('MAVEN_USERNAME')
+                    password = project.findProperty('gpr.key') ?: System.getenv('MAVEN_PASSWORD')
+                }
             }
         }
     }

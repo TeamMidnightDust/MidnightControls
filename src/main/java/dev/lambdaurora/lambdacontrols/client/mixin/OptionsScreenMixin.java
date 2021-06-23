@@ -12,9 +12,11 @@ package dev.lambdaurora.lambdacontrols.client.mixin;
 import dev.lambdaurora.lambdacontrols.ControlsMode;
 import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import dev.lambdaurora.lambdacontrols.client.gui.LambdaControlsSettingsScreen;
+import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.options.OptionsScreen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.gui.screen.option.OptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,13 +32,22 @@ public class OptionsScreenMixin extends Screen {
         super(title);
     }
 
-    @Redirect(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/options/OptionsScreen;addButton(Lnet/minecraft/client/gui/widget/AbstractButtonWidget;)Lnet/minecraft/client/gui/widget/AbstractButtonWidget;", ordinal = 7))
-    private AbstractButtonWidget lambdacontrols$onInit(OptionsScreen screen, AbstractButtonWidget btn) {
-        if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER) {
-            return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).getHeight(), btn.getMessage(),
+    @SuppressWarnings("unchecked")
+    @Redirect(
+            method = "init",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/screen/option/OptionsScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;",
+                    ordinal = 7
+            )
+    )
+    private <T extends Element & Drawable & Selectable> T lambdacontrols$onInit(OptionsScreen screen, T element) {
+        if (LambdaControlsClient.get().config.getControlsMode() == ControlsMode.CONTROLLER && element instanceof ButtonWidget btn) {
+            return (T) this.addDrawableChild(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((ClickableWidgetAccessor) btn).getHeight(),
+                    btn.getMessage(),
                     b -> this.client.openScreen(new LambdaControlsSettingsScreen(this, false))));
         } else {
-            return this.addButton(btn);
+            return this.addDrawableChild(element);
         }
     }
 }

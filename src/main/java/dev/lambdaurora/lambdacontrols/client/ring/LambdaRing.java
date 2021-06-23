@@ -11,25 +11,25 @@ package dev.lambdaurora.lambdacontrols.client.ring;
 
 import com.electronwill.nightconfig.core.Config;
 import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a key binding ring.
  *
  * @author LambdAurora
- * @version 1.5.0
+ * @version 1.7.0
  * @since 1.4.0
  */
 public final class LambdaRing {
     public static final int ELEMENT_SIZE = 50;
 
-    private final Object2ObjectMap<String, RingAction.Factory> actionFactories = new Object2ObjectOpenHashMap<>();
+    private final Map<String, RingAction.Factory> actionFactories = new Object2ObjectOpenHashMap<>();
     private final List<RingPage> pages = new ArrayList<>(Collections.singletonList(RingPage.DEFAULT));
     private final LambdaControlsClient mod;
     private int currentPage = 0;
@@ -49,13 +49,13 @@ public final class LambdaRing {
     /**
      * Loads the ring from configuration.
      *
-     * @param config The configuration.
+     * @param config the configuration
      */
     public void load(@NotNull Config config) {
         List<Config> configPages = config.get("ring.pages");
         if (configPages != null) {
             this.pages.clear();
-            for (Config configPage : configPages) {
+            for (var configPage : configPages) {
                 RingPage.parseRingPage(configPage).ifPresent(this.pages::add);
             }
         }

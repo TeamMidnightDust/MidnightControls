@@ -16,7 +16,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.hit.BlockHitResult;
 import org.aperlambda.lambdacommon.utils.LambdaReflection;
-import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,17 +36,17 @@ public class LambdaControlsCompat {
     /**
      * Initializes compatibility with other mods if needed.
      *
-     * @param mod The mod instance.
+     * @param mod the mod instance
      */
     public static void init(@NotNull LambdaControlsClient mod) {
-        if (FabricLoader.getInstance().isModLoaded("okzoomer")) {
+        /*if (FabricLoader.getInstance().isModLoaded("okzoomer")) {
             mod.log("Adding okzoomer compatibility...");
             HANDLERS.add(new OkZoomerCompat());
         }
         if (isReiPresent()) {
             mod.log("Adding REI compatiblity...");
             HANDLERS.add(new ReiCompat());
-        }
+        }*/
         if (FabricLoader.getInstance().isModLoaded("hardcorequesting") && LambdaReflection.doesClassExist(HQMCompat.GUI_BASE_CLASS_PATH)) {
             mod.log("Adding HQM compatibility...");
             HANDLERS.add(new HQMCompat());
@@ -59,7 +58,7 @@ public class LambdaControlsCompat {
     /**
      * Registers a new compatibility handler.
      *
-     * @param handler The compatibility handler to register.
+     * @param handler the compatibility handler to register
      */
     public static void registerCompatHandler(@NotNull CompatHandler handler) {
         HANDLERS.add(handler);
@@ -68,7 +67,7 @@ public class LambdaControlsCompat {
     /**
      * Streams through compatibility handlers.
      *
-     * @return A stream of compatibility handlers.
+     * @return a stream of compatibility handlers
      */
     public static Stream<CompatHandler> streamCompatHandlers() {
         return HANDLERS.stream();
@@ -77,8 +76,8 @@ public class LambdaControlsCompat {
     /**
      * Returns whether the mouse is required on the specified screen.
      *
-     * @param screen The screen.
-     * @return True if the mouse is requried on the specified screen, else false.
+     * @param screen the screen
+     * @return true if the mouse is requried on the specified screen, else false
      */
     public static boolean requireMouseOnScreen(Screen screen) {
         return HANDLERS.stream().anyMatch(handler -> handler.requireMouseOnScreen(screen));
@@ -87,14 +86,14 @@ public class LambdaControlsCompat {
     /**
      * Returns a slot at the specified location if possible.
      *
-     * @param screen The screen.
-     * @param mouseX The mouse X-coordinate.
-     * @param mouseY The mouse Y-coordinate.
-     * @return A slot if present, else null.
+     * @param screen the screen
+     * @param mouseX the mouse X-coordinate
+     * @param mouseY the mouse Y-coordinate
+     * @return a slot if present, else null
      */
-    public static @Nullable Pair<Integer, Integer> getSlotAt(@NotNull Screen screen, int mouseX, int mouseY) {
-        for (CompatHandler handler : HANDLERS) {
-            Pair<Integer, Integer> slot = handler.getSlotAt(screen, mouseX, mouseY);
+    public static @Nullable CompatHandler.SlotPos getSlotAt(@NotNull Screen screen, int mouseX, int mouseY) {
+        for (var handler : HANDLERS) {
+            var slot = handler.getSlotAt(screen, mouseX, mouseY);
             if (slot != null)
                 return slot;
         }
@@ -104,9 +103,9 @@ public class LambdaControlsCompat {
     /**
      * Returns a custom translation key to make custom attack action strings on the HUD.
      *
-     * @param client The client instance.
-     * @param placeResult The last place block result.
-     * @return Null if untouched, else a translation key.
+     * @param client the client instance
+     * @param placeResult the last place block result
+     * @return null if untouched, else a translation key
      */
     public static String getAttackActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult) {
         for (CompatHandler handler : HANDLERS) {
@@ -121,9 +120,9 @@ public class LambdaControlsCompat {
     /**
      * Returns a custom translation key to make custom use action strings on the HUD.
      *
-     * @param client The client instance.
-     * @param placeResult The last place block result.
-     * @return Null if untouched, else a translation key.
+     * @param client the client instance
+     * @param placeResult the last place block result
+     * @return null if untouched, else a translation key
      */
     public static String getUseActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult) {
         for (CompatHandler handler : HANDLERS) {
@@ -138,9 +137,9 @@ public class LambdaControlsCompat {
     /**
      * Handles the menu back button.
      *
-     * @param client The client instance.
-     * @param screen The screen.
-     * @return True if the handle was fired and succeed, else false.
+     * @param client the client instance
+     * @param screen the screen
+     * @return true if the handle was fired and succeed, else false
      */
     public static boolean handleMenuBack(@NotNull MinecraftClient client, @NotNull Screen screen) {
         for (CompatHandler handler : HANDLERS) {
@@ -153,7 +152,7 @@ public class LambdaControlsCompat {
     /**
      * Returns whether Roughly Enough Items is present.
      *
-     * @return True if Roughly Enough Items is present, else false.
+     * @return true if Roughly Enough Items is present, else false
      */
     public static boolean isReiPresent() {
         return FabricLoader.getInstance().isModLoaded("roughlyenoughitems");

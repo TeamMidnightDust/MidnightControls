@@ -1,11 +1,13 @@
 # LambdaControls
 
-![Java 8](https://img.shields.io/badge/language-Java%208-9B599A.svg?style=flat-square)
+<!-- modrinth_exclude.start -->
+![Java 16](https://img.shields.io/badge/language-Java%2016-9B599A.svg?style=flat-square) <!-- modrinth_exclude.end -->
 [![GitHub license](https://img.shields.io/github/license/LambdAurora/LambdaControls?style=flat-square)](https://raw.githubusercontent.com/LambdAurora/LambdaControls/master/LICENSE)
 ![Environment: Client](https://img.shields.io/badge/environment-client-1976d2?style=flat-square)
-[![Mod loader: Fabric]][fabric]
+[![Mod loader: Fabric]][fabric] <!-- modrinth_exclude.start -->
 ![Version](https://img.shields.io/github/v/tag/LambdAurora/LambdaControls?label=version&style=flat-square)
 [![CurseForge](http://cf.way2muchnoise.eu/title/354231.svg)](https://www.curseforge.com/minecraft/mc-mods/lambdacontrols)
+<!-- modrinth_exclude.end -->
 
 A Fabric Minecraft mod which adds better controls, reach-around and controller support.
 
@@ -45,9 +47,11 @@ This mod also adds controller support.
 ![controller_controls]
 ![controller_options]
 
+<!-- modrinth_exclude.start -->
 ## Build
 
-Just do `./gradlew shadowRemapJar` and everything should build just fine!
+Just do `./gradlew build` and everything should build just fine!
+<!-- modrinth_exclude.end -->
 
 [controller_controls]: images/controller_controls.png
 [controller_options]: images/controller_options.png

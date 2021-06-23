@@ -2,12 +2,8 @@
   "required": true,
   "package": "dev.lambdaurora.lambdacontrols.client.compat.mixin",
   "plugin": "dev.lambdaurora.lambdacontrols.client.compat.LambdaControlsMixinPlugin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_16",
   "client": [
-    "EntryListWidgetAccessor",
-    "EntryWidgetAccessor",
-    "RecipeViewingScreenAccessor",
-    "VillagerRecipeViewingScreenAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

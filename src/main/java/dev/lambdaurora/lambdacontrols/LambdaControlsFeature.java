@@ -57,7 +57,7 @@ public class LambdaControlsFeature implements Nameable {
     /**
      * Returns whether this feature is allowed.
      *
-     * @return True if this feature is allowed, else false.
+     * @return {@code true} if this feature is allowed, else {@code false}
      */
     public boolean isAllowed() {
         return this.allowed;
@@ -66,7 +66,7 @@ public class LambdaControlsFeature implements Nameable {
     /**
      * Sets whether this feature is allowed.
      *
-     * @param allowed True if this feature is allowed, else false.
+     * @param allowed {@code true} if this feature is allowed, else {@code false}
      */
     public void setAllowed(boolean allowed) {
         this.allowed = allowed;
@@ -82,7 +82,7 @@ public class LambdaControlsFeature implements Nameable {
     /**
      * Returns whether this feature is enabled.
      *
-     * @return True if this feature is enabled, else false.
+     * @return {@code true} if this feature is enabled, else {@code false}
      */
     public boolean isEnabled() {
         return this.enabled;
@@ -91,7 +91,7 @@ public class LambdaControlsFeature implements Nameable {
     /**
      * Returns whether this feature is enabled.
      *
-     * @param enabled True if this feature is enabled, else false.
+     * @param enabled {@code true} if this feature is enabled, else {@code false}
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
@@ -100,7 +100,7 @@ public class LambdaControlsFeature implements Nameable {
     /**
      * Returns whether this feature is available or not.
      *
-     * @return True if this feature is available, else false.
+     * @return {@code true} if this feature is available, else {@code false}
      * @see #isAllowed()
      * @see #isEnabled()
      */

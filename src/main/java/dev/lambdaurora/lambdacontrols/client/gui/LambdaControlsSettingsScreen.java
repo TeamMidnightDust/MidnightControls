@@ -9,21 +9,20 @@
 
 package dev.lambdaurora.lambdacontrols.client.gui;
 
-import dev.lambdaurora.lambdacontrols.ControlsMode;
 import dev.lambdaurora.lambdacontrols.LambdaControls;
 import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import dev.lambdaurora.lambdacontrols.client.LambdaControlsConfig;
 import dev.lambdaurora.lambdacontrols.client.controller.Controller;
 import dev.lambdaurora.lambdacontrols.client.gui.widget.ControllerControlsWidget;
-import me.lambdaurora.spruceui.Position;
-import me.lambdaurora.spruceui.SpruceTexts;
-import me.lambdaurora.spruceui.option.*;
-import me.lambdaurora.spruceui.screen.SpruceScreen;
-import me.lambdaurora.spruceui.widget.AbstractSpruceWidget;
-import me.lambdaurora.spruceui.widget.SpruceLabelWidget;
-import me.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
-import me.lambdaurora.spruceui.widget.container.SpruceOptionListWidget;
-import me.lambdaurora.spruceui.widget.container.tabbed.SpruceTabbedWidget;
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.SpruceTexts;
+import dev.lambdaurora.spruceui.option.*;
+import dev.lambdaurora.spruceui.screen.SpruceScreen;
+import dev.lambdaurora.spruceui.widget.AbstractSpruceWidget;
+import dev.lambdaurora.spruceui.widget.SpruceLabelWidget;
+import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
+import dev.lambdaurora.spruceui.widget.container.SpruceOptionListWidget;
+import dev.lambdaurora.spruceui.widget.container.tabbed.SpruceTabbedWidget;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -71,7 +70,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption controllerOption =
             new SpruceCyclingOption("lambdacontrols.menu.controller",
                     amount -> {
-                        int id = this.config.getController().getId();
+                        int id = this.config.getController().id();
                         id += amount;
                         if (id > GLFW.GLFW_JOYSTICK_LAST)
                             id = GLFW.GLFW_JOYSTICK_1;
@@ -79,8 +78,8 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
                         this.config.setController(Controller.byId(id));
                     },
                     option -> {
-                        Controller controller = this.config.getController();
-                        String controllerName = controller.getName();
+                        var controller = this.config.getController();
+                        var controllerName = controller.getName();
                         if (!controller.isConnected())
                             return option.getDisplayText(new LiteralText(controllerName).formatted(Formatting.RED));
                         else if (!controller.isGamepad())
@@ -90,7 +89,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
                     }, null);
     private final SpruceOption secondControllerOption = new SpruceCyclingOption("lambdacontrols.menu.controller2",
             amount -> {
-                int id = this.config.getSecondController().map(Controller::getId).orElse(-1);
+                int id = this.config.getSecondController().map(Controller::id).orElse(-1);
                 id += amount;
                 if (id > GLFW.GLFW_JOYSTICK_LAST)
                     id = -1;
@@ -98,7 +97,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
                 this.config.setSecondController(id == -1 ? null : Controller.byId(id));
             },
             option -> this.config.getSecondController().map(controller -> {
-                String controllerName = controller.getName();
+                var controllerName = controller.getName();
                 if (!controller.isConnected())
                     return option.getDisplayText(new LiteralText(controllerName).formatted(Formatting.RED));
                 else if (!controller.isGamepad())
@@ -152,7 +151,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
         // General options
         this.inputModeOption = new SpruceCyclingOption("lambdacontrols.menu.controls_mode",
                 amount -> {
-                    ControlsMode next = this.config.getControlsMode().next();
+                    var next = this.config.getControlsMode().next();
                     this.config.setControlsMode(next);
                     this.config.save();
 
@@ -181,7 +180,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
                 new TranslatableText("lambdacontrols.tooltip.mouse_speed"));
         this.resetOption = SpruceSimpleActionOption.reset(btn -> {
             this.config.reset();
-            MinecraftClient client = MinecraftClient.getInstance();
+            var client = MinecraftClient.getInstance();
             this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
         });
         // Gameplay options
@@ -225,7 +224,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
                         this.config.setRightDeadZone(newValue);
                     }
                 }, option -> {
-            String value = String.valueOf(option.get());
+            var value = String.valueOf(option.get());
             return option.getDisplayText(new LiteralText(value.substring(0, Math.min(value.length(), 5))));
         }, new TranslatableText("lambdacontrols.tooltip.right_dead_zone"));
         this.leftDeadZoneOption = new SpruceDoubleOption("lambdacontrols.menu.left_dead_zone", 0.05, 1.0, .05f,
@@ -235,7 +234,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
                         this.config.setLeftDeadZone(newValue);
                     }
                 }, option -> {
-            String value = String.valueOf(option.get());
+            var value = String.valueOf(option.get());
             return option.getDisplayText(new LiteralText(value.substring(0, Math.min(value.length(), 5))));
         }, new TranslatableText("lambdacontrols.tooltip.left_dead_zone"));
         this.invertsRightXAxis = new SpruceToggleBooleanOption("lambdacontrols.menu.invert_right_x_axis", this.config::doesInvertRightXAxis,
@@ -278,16 +277,16 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
 
         this.buildTabs();
 
-        this.addChild(this.resetOption.createWidget(Position.of(this.width / 2 - 155, this.height - 29), 150));
-        this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, SpruceTexts.GUI_DONE,
+        this.addDrawableChild(this.resetOption.createWidget(Position.of(this.width / 2 - 155, this.height - 29), 150));
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, SpruceTexts.GUI_DONE,
                 btn -> this.client.openScreen(this.parent)));
     }
 
     public void buildTabs() {
-        SpruceTabbedWidget tabs = new SpruceTabbedWidget(Position.of(0, 24), this.width, this.height - 32 - 24,
+        var tabs = new SpruceTabbedWidget(Position.of(0, 24), this.width, this.height - 32 - 24,
                 null,
                 Math.max(116, this.width / 8), 0);
-        this.addChild(tabs);
+        this.addDrawableChild(tabs);
 
         tabs.addSeparatorEntry(new TranslatableText("lambdacontrols.menu.separator.general"));
         tabs.addTabEntry(new TranslatableText("lambdacontrols.menu.title.general"), null,
@@ -309,7 +308,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
     }
 
     public SpruceOptionListWidget buildGeneralTab(int width, int height) {
-        SpruceOptionListWidget list = new SpruceOptionListWidget(Position.origin(), width, height);
+        var list = new SpruceOptionListWidget(Position.origin(), width, height);
         list.addSingleOptionEntry(this.inputModeOption);
         list.addSingleOptionEntry(this.autoSwitchModeOption);
         list.addSingleOptionEntry(this.rotationSpeedOption);
@@ -319,7 +318,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
     }
 
     public SpruceOptionListWidget buildGameplayTab(int width, int height) {
-        SpruceOptionListWidget list = new SpruceOptionListWidget(Position.origin(), width, height);
+        var list = new SpruceOptionListWidget(Position.origin(), width, height);
         list.addSingleOptionEntry(this.analogMovementOption);
         list.addSingleOptionEntry(this.fastBlockPlacingOption);
         list.addSingleOptionEntry(this.frontBlockPlacingOption);
@@ -331,7 +330,7 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
     }
 
     public SpruceOptionListWidget buildVisualTab(int width, int height) {
-        SpruceOptionListWidget list = new SpruceOptionListWidget(Position.origin(), width, height);
+        var list = new SpruceOptionListWidget(Position.origin(), width, height);
         list.addSingleOptionEntry(this.controllerTypeOption);
         list.addSingleOptionEntry(this.virtualMouseSkinOption);
         list.addSingleOptionEntry(new SpruceSeparatorOption("lambdacontrols.menu.title.hud", true, null));
@@ -345,38 +344,38 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
     }
 
     public AbstractSpruceWidget buildControllerTab(int width, int height) {
-        SpruceContainerWidget root = new SpruceContainerWidget(Position.origin(), width, height);
+        var root = new SpruceContainerWidget(Position.origin(), width, height);
 
-        SpruceLabelWidget aboutMappings1 = new SpruceLabelWidget(Position.of(0, 2),
+        var aboutMappings1 = new SpruceLabelWidget(Position.of(0, 2),
                 new TranslatableText("lambdacontrols.controller.mappings.1", SDL2_GAMEPAD_TOOL),
                 width, true);
 
-        SpruceLabelWidget gamepadToolUrlLabel = new SpruceLabelWidget(Position.of(0, aboutMappings1.getHeight() + 4),
+        var gamepadToolUrlLabel = new SpruceLabelWidget(Position.of(0, aboutMappings1.getHeight() + 4),
                 this.controllerMappingsUrlText, width,
                 label -> Util.getOperatingSystem().open(GAMEPAD_TOOL_URL), true);
         gamepadToolUrlLabel.setTooltip(new TranslatableText("chat.link.open"));
 
-        SpruceLabelWidget aboutMappings3 = new SpruceLabelWidget(Position.of(0,
+        var aboutMappings3 = new SpruceLabelWidget(Position.of(0,
                 aboutMappings1.getHeight() + gamepadToolUrlLabel.getHeight() + 6),
                 new TranslatableText("lambdacontrols.controller.mappings.3", Formatting.GREEN.toString(), Formatting.RESET.toString()),
                 width, true);
 
         int listHeight = height - 8 - aboutMappings1.getHeight() - aboutMappings3.getHeight() - gamepadToolUrlLabel.getHeight();
-        SpruceContainerWidget labels = new SpruceContainerWidget(Position.of(0,
+        var labels = new SpruceContainerWidget(Position.of(0,
                 listHeight),
                 width, height - listHeight);
         labels.addChild(aboutMappings1);
         labels.addChild(gamepadToolUrlLabel);
         labels.addChild(aboutMappings3);
 
-        SpruceOptionListWidget list = new SpruceOptionListWidget(Position.origin(), width, listHeight);
+        var list = new SpruceOptionListWidget(Position.origin(), width, listHeight);
         list.addSingleOptionEntry(this.controllerOption);
         list.addSingleOptionEntry(this.secondControllerOption);
         list.addSingleOptionEntry(this.unfocusedInputOption);
         list.addOptionEntry(this.invertsRightXAxis, this.invertsRightYAxis);
         list.addSingleOptionEntry(this.rightDeadZoneOption);
         list.addSingleOptionEntry(this.leftDeadZoneOption);
-        for (SpruceOption option : this.maxAnalogValueOptions) {
+        for (var option : this.maxAnalogValueOptions) {
             list.addSingleOptionEntry(option);
         }
 
@@ -391,6 +390,6 @@ public class LambdaControlsSettingsScreen extends SpruceScreen {
 
     @Override
     public void renderTitle(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        drawCenteredString(matrices, this.textRenderer, I18n.translate("lambdacontrols.menu.title"), this.width / 2, 8, 16777215);
+        drawCenteredText(matrices, this.textRenderer, I18n.translate("lambdacontrols.menu.title"), this.width / 2, 8, 16777215);
     }
 }

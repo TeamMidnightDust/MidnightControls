@@ -10,12 +10,15 @@
 package dev.lambdaurora.lambdacontrols.client.mixin;
 
 import dev.lambdaurora.lambdacontrols.client.gui.LambdaControlsSettingsScreen;
+import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
-import net.minecraft.client.gui.screen.options.GameOptionsScreen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
+import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.gui.widget.CyclingButtonWidget;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,12 +34,25 @@ public class ControlsOptionsScreenMixin extends GameOptionsScreen {
         super(parent, gameOptions, text);
     }
 
-    @Redirect(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/options/ControlsOptionsScreen;addButton(Lnet/minecraft/client/gui/widget/AbstractButtonWidget;)Lnet/minecraft/client/gui/widget/AbstractButtonWidget;", ordinal = 1))
-    private AbstractButtonWidget onInit(ControlsOptionsScreen screen, AbstractButtonWidget btn) {
+    @SuppressWarnings("unchecked")
+    @Redirect(
+            method = "init",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/screen/option/ControlsOptionsScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;",
+                    ordinal = 1
+            )
+    )
+    private <T extends Element & Drawable & Selectable, R extends Element & Drawable & Selectable> R onInit(ControlsOptionsScreen screen, T element) {
         /*if (this.parent instanceof ControllerControlsWidget)
             return this.addButton(btn);
         else*/
-        return this.addButton(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((AbstractButtonWidgetAccessor) btn).getHeight(), new TranslatableText("menu.options"),
-                b -> this.client.openScreen(new LambdaControlsSettingsScreen(this, true))));
+        if (element instanceof CyclingButtonWidget btn) {
+            return (R) this.addDrawableChild(new ButtonWidget(btn.x, btn.y, btn.getWidth(), ((ClickableWidgetAccessor) btn).getHeight(),
+                    new TranslatableText("menu.options"),
+                    b -> this.client.openScreen(new LambdaControlsSettingsScreen(this, true))));
+        } else {
+            return (R) this.addDrawableChild(element);
+        }
     }
 }

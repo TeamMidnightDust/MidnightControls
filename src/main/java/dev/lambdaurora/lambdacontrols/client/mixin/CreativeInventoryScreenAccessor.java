@@ -26,7 +26,7 @@ public interface CreativeInventoryScreenAccessor {
     /**
      * Gets the selected tab.
      *
-     * @return The selected tab index.
+     * @return the selected tab index
      */
     @Accessor("selectedTab")
     int getSelectedTab();
@@ -34,7 +34,7 @@ public interface CreativeInventoryScreenAccessor {
     /**
      * Sets the selected tab.
      *
-     * @param group The tab's item group.
+     * @param group the tab's item group
      */
     @Invoker("setSelectedTab")
     void lambdacontrols$setSelectedTab(@NotNull ItemGroup group);
@@ -42,8 +42,8 @@ public interface CreativeInventoryScreenAccessor {
     /**
      * Returns whether the slot belongs to the creative inventory or not.
      *
-     * @param slot The slot to check.
-     * @return True if the slot is from the creative inventory, else false.
+     * @param slot the slot to check
+     * @return true if the slot is from the creative inventory, else false
      */
     @Invoker("isCreativeInventorySlot")
     boolean lambdacontrols$isCreativeInventorySlot(@Nullable Slot slot);
@@ -51,7 +51,7 @@ public interface CreativeInventoryScreenAccessor {
     /**
      * Returns whether the current tab has a scrollbar or not.
      *
-     * @return True if the current tab has a scrollbar, else false.
+     * @return true if the current tab has a scrollbar, else false
      */
     @Invoker("hasScrollbar")
     boolean lambdacontrols$hasScrollbar();

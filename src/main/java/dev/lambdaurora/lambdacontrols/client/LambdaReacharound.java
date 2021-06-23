@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Represents the reach-around API of LambdaControls.
  *
- * @version 1.5.0
+ * @version 1.7.0
  * @since 1.3.2
  */
 public class LambdaReacharound {
@@ -49,7 +49,7 @@ public class LambdaReacharound {
     /**
      * Returns the last reach around result.
      *
-     * @return The last reach around result.
+     * @return the last reach around result
      */
     public @Nullable BlockHitResult getLastReacharoundResult() {
         return this.lastReacharoundResult;
@@ -58,7 +58,7 @@ public class LambdaReacharound {
     /**
      * Returns whether the last reach around is vertical.
      *
-     * @return True if the reach around is vertical.
+     * @return {@code true} if the reach around is vertical
      */
     public boolean isLastReacharoundVertical() {
         return this.lastReacharoundVertical;
@@ -67,7 +67,7 @@ public class LambdaReacharound {
     /**
      * Returns whether reacharound is available or not.
      *
-     * @return True if reacharound is available, else false.
+     * @return {@code true} if reacharound is available, else {@code false}
      */
     public boolean isReacharoundAvailable() {
         return LambdaControlsFeature.HORIZONTAL_REACHAROUND.isAvailable() || LambdaControlsFeature.VERTICAL_REACHAROUND.isAvailable();
@@ -80,22 +80,22 @@ public class LambdaReacharound {
     /**
      * Returns a nullable block hit result if vertical reach-around is possible.
      *
-     * @param client The client instance.
-     * @return A block hit result if vertical reach-around is possible, else null.
+     * @param client the client instance
+     * @return a block hit result if vertical reach-around is possible, else {@code null}
      */
     public @Nullable BlockHitResult tryVerticalReachAround(@NotNull MinecraftClient client) {
         if (!LambdaControlsFeature.VERTICAL_REACHAROUND.isAvailable())
             return null;
         if (client.player == null || client.world == null || client.crosshairTarget == null || client.crosshairTarget.getType() != HitResult.Type.MISS
-                || !client.player.isOnGround() || client.player.pitch < 80.0F
+                || !client.player.isOnGround() || client.player.getPitch(0.f) < 80.0F
                 || client.player.isRiding())
             return null;
 
         Vec3d pos = client.player.getCameraPosVec(1.0F);
         Vec3d rotationVec = client.player.getRotationVec(1.0F);
         float range = getPlayerRange(client);
-        Vec3d rayVec = pos.add(rotationVec.x * range, rotationVec.y * range, rotationVec.z * range).add(0, 0.75, 0);
-        BlockHitResult result = client.world.raycast(new RaycastContext(pos, rayVec, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, client.player));
+        var rayVec = pos.add(rotationVec.x * range, rotationVec.y * range, rotationVec.z * range).add(0, 0.75, 0);
+        var result = client.world.raycast(new RaycastContext(pos, rayVec, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, client.player));
 
         if (result.getType() == HitResult.Type.BLOCK) {
             BlockPos blockPos = result.getBlockPos().down();
@@ -112,33 +112,34 @@ public class LambdaReacharound {
     /**
      * Returns a nullable block hit result if horizontal reach-around is possible.
      *
-     * @param client The client instance.
-     * @return A block hit result if horizontal reach-around is possible.
+     * @param client the client instance
+     * @return a block hit result if horizontal reach-around is possible
      */
     public @Nullable BlockHitResult tryHorizontalReachAround(@NotNull MinecraftClient client) {
         if (!LambdaControlsFeature.HORIZONTAL_REACHAROUND.isAvailable())
             return null;
 
-        if (client.player != null && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.MISS && client.player.isOnGround() && client.player.pitch > 35.0F) {
+        if (client.player != null && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.MISS
+                && client.player.isOnGround() && client.player.getPitch(0.f) > 35.f) {
             if (client.player.isRiding())
                 return null;
-            BlockPos playerPos = client.player.getBlockPos().down();
+            var playerPos = client.player.getBlockPos().down();
             if (client.player.getY() - playerPos.getY() - 1.0 >= 0.25) {
                 playerPos = playerPos.up();
                 this.onSlab = true;
             } else {
                 this.onSlab = false;
             }
-            BlockPos targetPos = new BlockPos(client.crosshairTarget.getPos()).subtract(playerPos);
-            BlockPos vector = new BlockPos(MathHelper.clamp(targetPos.getX(), -1, 1), 0, MathHelper.clamp(targetPos.getZ(), -1, 1));
-            BlockPos blockPos = playerPos.add(vector);
+            var targetPos = new BlockPos(client.crosshairTarget.getPos()).subtract(playerPos);
+            var vector = new BlockPos.Mutable(MathHelper.clamp(targetPos.getX(), -1, 1), 0, MathHelper.clamp(targetPos.getZ(), -1, 1));
+            var blockPos = playerPos.add(vector);
 
-            Direction direction = client.player.getHorizontalFacing();
+            var direction = client.player.getHorizontalFacing();
 
-            BlockState state = client.world.getBlockState(blockPos);
+            var state = client.world.getBlockState(blockPos);
             if (!state.isAir())
                 return null;
-            BlockState adjacentBlockState = client.world.getBlockState(blockPos.offset(direction.getOpposite()));
+            var adjacentBlockState = client.world.getBlockState(blockPos.offset(direction.getOpposite()));
             if (adjacentBlockState.isAir() || adjacentBlockState.getBlock() instanceof FluidBlock || (vector.getX() == 0 && vector.getZ() == 0)) {
                 return null;
             }

@@ -13,7 +13,6 @@ import dev.lambdaurora.lambdacontrols.LambdaControlsFeature;
 import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import dev.lambdaurora.lambdacontrols.client.gui.LambdaControlsRenderer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.GameRenderer;
@@ -83,10 +82,10 @@ public abstract class MinecraftClientMixin {
 
         int cooldown = this.itemUseCooldown;
         BlockHitResult hitResult;
-        if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.BLOCK && this.player.abilities.flying) {
+        if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.BLOCK && this.player.getAbilities().flying) {
             hitResult = (BlockHitResult) this.crosshairTarget;
-            BlockPos targetPos = hitResult.getBlockPos();
-            Direction side = hitResult.getSide();
+            var targetPos = hitResult.getBlockPos();
+            var side = hitResult.getSide();
 
             boolean sidewaysBlockPlacing = this.lambdacontrols$lastTargetPos == null || !targetPos.equals(this.lambdacontrols$lastTargetPos.offset(this.lambdacontrols$lastTargetSide));
             boolean backwardsBlockPlacing = this.player.input.movementForward < 0.0f && (this.lambdacontrols$lastTargetPos == null || targetPos.equals(this.lambdacontrols$lastTargetPos.offset(this.lambdacontrols$lastTargetSide)));
@@ -123,11 +122,11 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "doItemUse()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/HitResult;getType()Lnet/minecraft/util/hit/HitResult$Type;"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true)
     private void onItemUse(CallbackInfo ci, Hand[] hands, int handCount, int handIndex, Hand hand, ItemStack stackInHand) {
-        LambdaControlsClient mod = LambdaControlsClient.get();
-        if (!stackInHand.isEmpty() && this.player.pitch > 35.0F && mod.reacharound.isReacharoundAvailable()) {
+        var mod = LambdaControlsClient.get();
+        if (!stackInHand.isEmpty() && this.player.getPitch(0.f) > 35.0F && mod.reacharound.isReacharoundAvailable()) {
             if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.MISS && this.player.isOnGround()) {
                 if (!stackInHand.isEmpty() && stackInHand.getItem() instanceof BlockItem) {
-                    BlockHitResult hitResult = mod.reacharound.getLastReacharoundResult();
+                    var hitResult = mod.reacharound.getLastReacharoundResult();
 
                     if (hitResult == null)
                         return;
@@ -135,7 +134,7 @@ public abstract class MinecraftClientMixin {
                     hitResult = mod.reacharound.withSideForReacharound(hitResult, stackInHand);
 
                     int previousStackCount = stackInHand.getCount();
-                    ActionResult result = this.interactionManager.interactBlock(this.player, this.world, hand, hitResult);
+                    var result = this.interactionManager.interactBlock(this.player, this.world, hand, hitResult);
                     if (result.isAccepted()) {
                         if (result.shouldSwingHand()) {
                             this.player.swingHand(hand);

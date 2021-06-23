@@ -14,12 +14,13 @@ import dev.lambdaurora.lambdacontrols.client.ButtonState;
 import dev.lambdaurora.lambdacontrols.client.LambdaControlsClient;
 import dev.lambdaurora.lambdacontrols.client.LambdaControlsConfig;
 import dev.lambdaurora.lambdacontrols.client.util.MouseAccessor;
+import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.Identifier;
-import org.aperlambda.lambdacommon.utils.Pair;
 import org.aperlambda.lambdacommon.utils.function.PairPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -33,15 +34,15 @@ import java.util.stream.Stream;
  * Represents an input manager for controllers.
  *
  * @author LambdAurora
- * @version 1.4.0
+ * @version 1.7.0
  * @since 1.1.0
  */
 public class InputManager {
     public static final InputManager INPUT_MANAGER = new InputManager();
     private static final List<ButtonBinding> BINDINGS = new ArrayList<>();
     private static final List<ButtonCategory> CATEGORIES = new ArrayList<>();
-    public static final Map<Integer, ButtonState> STATES = new HashMap<>();
-    public static final Map<Integer, Float> BUTTON_VALUES = new HashMap<>();
+    public static final Int2ObjectMap<ButtonState> STATES = new Int2ObjectOpenHashMap<>();
+    public static final Int2FloatMap BUTTON_VALUES = new Int2FloatOpenHashMap();
     private int prevTargetMouseX = 0;
     private int prevTargetMouseY = 0;
     private int targetMouseX = 0;
@@ -64,7 +65,7 @@ public class InputManager {
     /**
      * Updates the mouse position. Should only be called on pre render of a screen.
      *
-     * @param client The client instance.
+     * @param client the client instance
      */
     public void updateMousePosition(@NotNull MinecraftClient client) {
         Objects.requireNonNull(client, "Client instance cannot be null.");
@@ -80,8 +81,8 @@ public class InputManager {
     /**
      * Resets the mouse position.
      *
-     * @param windowWidth The window width.
-     * @param windowHeight The window height.
+     * @param windowWidth the window width
+     * @param windowHeight the window height
      */
     public void resetMousePosition(int windowWidth, int windowHeight) {
         this.targetMouseX = this.prevTargetMouseX = (int) (windowWidth / 2.F);
@@ -98,8 +99,8 @@ public class InputManager {
     /**
      * Returns whether the specified binding is registered or not.
      *
-     * @param binding The binding to check.
-     * @return True if the binding is registered, else false.
+     * @param binding the binding to check
+     * @return true if the binding is registered, else false
      */
     public static boolean hasBinding(@NotNull ButtonBinding binding) {
         return BINDINGS.contains(binding);
@@ -108,8 +109,8 @@ public class InputManager {
     /**
      * Returns whether the specified binding is registered or not.
      *
-     * @param name The name of the binding to check.
-     * @return True if the binding is registered, else false.
+     * @param name the name of the binding to check
+     * @return true if the binding is registered, else false
      */
     public static boolean hasBinding(@NotNull String name) {
         return BINDINGS.parallelStream().map(ButtonBinding::getName).anyMatch(binding -> binding.equalsIgnoreCase(name));
@@ -118,8 +119,8 @@ public class InputManager {
     /**
      * Returns whether the specified binding is registered or not.
      *
-     * @param identifier The identifier of the binding to check.
-     * @return True if the binding is registered, else false.
+     * @param identifier the identifier of the binding to check
+     * @return true if the binding is registered, else false
      */
     public static boolean hasBinding(@NotNull Identifier identifier) {
         return hasBinding(identifier.getNamespace() + "." + identifier.getName());
@@ -128,8 +129,8 @@ public class InputManager {
     /**
      * Registers a button binding.
      *
-     * @param binding The binding to register.
-     * @return The registered binding.
+     * @param binding the binding to register
+     * @return the registered binding
      */
     public static @NotNull ButtonBinding registerBinding(@NotNull ButtonBinding binding) {
         if (hasBinding(binding))
@@ -159,7 +160,8 @@ public class InputManager {
      */
     public static void sortBindings() {
         synchronized (BINDINGS) {
-            List<ButtonBinding> sorted = BINDINGS.stream().sorted(Collections.reverseOrder(Comparator.comparingInt(binding -> binding.getButton().length)))
+            var sorted = BINDINGS.stream()
+                    .sorted(Collections.reverseOrder(Comparator.comparingInt(binding -> binding.getButton().length)))
                     .collect(Collectors.toList());
             BINDINGS.clear();
             BINDINGS.addAll(sorted);
@@ -169,8 +171,8 @@ public class InputManager {
     /**
      * Registers a category of button bindings.
      *
-     * @param category The category to register.
-     * @return The registered category.
+     * @param category the category to register
+     * @return the registered category
      */
     public static ButtonCategory registerCategory(@NotNull ButtonCategory category) {
         CATEGORIES.add(category);
@@ -186,7 +188,7 @@ public class InputManager {
     }
 
     protected static ButtonCategory registerDefaultCategory(@NotNull String key, @NotNull Consumer<ButtonCategory> keyAdder) {
-        ButtonCategory category = registerCategory(new Identifier("minecraft", key), CATEGORIES.size());
+        var category = registerCategory(new Identifier("minecraft", key), CATEGORIES.size());
         keyAdder.accept(category);
         return category;
     }
@@ -194,23 +196,23 @@ public class InputManager {
     /**
      * Loads the button bindings from configuration.
      *
-     * @param config The configuration instance.
+     * @param config the configuration instance
      */
     public static void loadButtonBindings(@NotNull LambdaControlsConfig config) {
-        List<ButtonBinding> queue = new ArrayList<>(BINDINGS);
+        var queue = new ArrayList<>(BINDINGS);
         queue.forEach(config::loadButtonBinding);
     }
 
     /**
      * Returns the binding state.
      *
-     * @param binding The binding.
-     * @return The current state of the binding.
+     * @param binding the binding
+     * @return the current state of the binding
      */
     public static @NotNull ButtonState getBindingState(@NotNull ButtonBinding binding) {
-        ButtonState state = ButtonState.REPEAT;
+        var state = ButtonState.REPEAT;
         for (int btn : binding.getButton()) {
-            ButtonState btnState = InputManager.STATES.getOrDefault(btn, ButtonState.NONE);
+            var btnState = InputManager.STATES.getOrDefault(btn, ButtonState.NONE);
             if (btnState == ButtonState.PRESS)
                 state = ButtonState.PRESS;
             else if (btnState == ButtonState.RELEASE) {
@@ -243,8 +245,8 @@ public class InputManager {
     /**
      * Returns whether the button has duplicated bindings.
      *
-     * @param button The button to check.
-     * @return True if the button has duplicated bindings, else false.
+     * @param button the button to check
+     * @return true if the button has duplicated bindings, else false
      */
     public static boolean hasDuplicatedBindings(int[] button) {
         return BINDINGS.parallelStream().filter(binding -> areButtonsEquivalent(binding.getButton(), button)).count() > 1;
@@ -253,8 +255,8 @@ public class InputManager {
     /**
      * Returns whether the button has duplicated bindings.
      *
-     * @param binding The binding to check.
-     * @return True if the button has duplicated bindings, else false.
+     * @param binding the binding to check
+     * @return true if the button has duplicated bindings, else false
      */
     public static boolean hasDuplicatedBindings(ButtonBinding binding) {
         return BINDINGS.parallelStream().filter(other -> areButtonsEquivalent(other.getButton(), binding.getButton()) && other.filter.equals(binding.filter)).count() > 1;
@@ -263,9 +265,9 @@ public class InputManager {
     /**
      * Returns whether the specified buttons are equivalent or not.
      *
-     * @param buttons1 First set of buttons.
-     * @param buttons2 Second set of buttons.
-     * @return True if the two sets of buttons are equivalent, else false.
+     * @param buttons1 first set of buttons
+     * @param buttons2 second set of buttons
+     * @return true if the two sets of buttons are equivalent, else false
      */
     public static boolean areButtonsEquivalent(int[] buttons1, int[] buttons2) {
         if (buttons1.length != buttons2.length)
@@ -285,9 +287,9 @@ public class InputManager {
     /**
      * Returns whether the button set contains the specified button or not.
      *
-     * @param buttons The button set.
-     * @param button The button to check.
-     * @return True if the button set contains the specified button, else false.
+     * @param buttons the button set
+     * @param button the button to check
+     * @return true if the button set contains the specified button, else false
      */
     public static boolean containsButton(int[] buttons, int button) {
         return Arrays.stream(buttons).anyMatch(btn -> btn == button);
@@ -297,19 +299,21 @@ public class InputManager {
      * Updates the button states.
      */
     public static void updateStates() {
-        STATES.forEach((btn, state) -> {
-            if (state == ButtonState.PRESS)
-                STATES.put(btn, ButtonState.REPEAT);
-            else if (state == ButtonState.RELEASE)
-                STATES.put(btn, ButtonState.NONE);
-        });
+        for (var entry : STATES.int2ObjectEntrySet()) {
+            if (entry.getValue() == ButtonState.PRESS)
+                STATES.put(entry.getIntKey(), ButtonState.REPEAT);
+            else if (entry.getValue() == ButtonState.RELEASE)
+                STATES.put(entry.getIntKey(), ButtonState.NONE);
+        }
     }
 
     public static void updateBindings(@NotNull MinecraftClient client) {
-        List<Integer> skipButtons = new ArrayList<>();
-        Map<ButtonBinding, Pair<ButtonState, Float>> states = new HashMap<>();
-        for (ButtonBinding binding : BINDINGS) {
-            ButtonState state = binding.isAvailable(client) ? getBindingState(binding) : ButtonState.NONE;
+        var skipButtons = new IntArrayList();
+        record ButtonStateValue(ButtonState state, float value) {
+        }
+        var states = new Object2ObjectOpenHashMap<ButtonBinding, ButtonStateValue>();
+        for (var binding : BINDINGS) {
+            var state = binding.isAvailable(client) ? getBindingState(binding) : ButtonState.NONE;
             if (skipButtons.stream().anyMatch(btn -> containsButton(binding.getButton(), btn))) {
                 if (binding.pressed)
                     state = ButtonState.RELEASE;
@@ -328,12 +332,12 @@ public class InputManager {
 
             float value = getBindingValue(binding, state);
 
-            states.put(binding, Pair.of(state, value));
+            states.put(binding, new ButtonStateValue(state, value));
         }
 
         states.forEach((binding, state) -> {
-            if (state.key != ButtonState.NONE) {
-                binding.handle(client, state.value, state.key);
+            if (state.state() != ButtonState.NONE) {
+                binding.handle(client, state.value(), state.state());
             }
         });
     }
@@ -358,11 +362,11 @@ public class InputManager {
     /**
      * Returns a new key binding instance.
      *
-     * @param id The identifier of the key binding.
-     * @param type The type.
-     * @param code The code.
-     * @param category The category of the key binding.
-     * @return The key binding.
+     * @param id the identifier of the key binding
+     * @param type the type
+     * @param code the code
+     * @param category the category of the key binding
+     * @return the key binding
      * @see #makeKeyBinding(Identifier, InputUtil.Type, int, String)
      */
     public static @NotNull KeyBinding makeKeyBinding(@NotNull net.minecraft.util.Identifier id, InputUtil.Type type, int code, @NotNull String category) {
@@ -372,11 +376,11 @@ public class InputManager {
     /**
      * Returns a new key binding instance.
      *
-     * @param id The identifier of the key binding.
-     * @param type The type.
-     * @param code The code.
-     * @param category The category of the key binding.
-     * @return The key binding.
+     * @param id the identifier of the key binding
+     * @param type the type
+     * @param code the code
+     * @param category the category of the key binding
+     * @return the key binding
      * @see #makeKeyBinding(net.minecraft.util.Identifier, InputUtil.Type, int, String)
      */
     public static @NotNull KeyBinding makeKeyBinding(@NotNull Identifier id, InputUtil.Type type, int code, @NotNull String category) {

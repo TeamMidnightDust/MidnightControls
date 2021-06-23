@@ -40,7 +40,7 @@ public abstract class RingAction extends DrawableHelper implements Nameable {
     /**
      * Gets the text name of the ring action.
      *
-     * @return The text name.
+     * @return the text name
      */
     public Text getTextName() {
         return new TranslatableText(this.getName());
@@ -49,7 +49,7 @@ public abstract class RingAction extends DrawableHelper implements Nameable {
     /**
      * Returns whether the action is activated or not.
      *
-     * @return True if the action is activated, else false.
+     * @return true if the action is activated, else false
      */
     public boolean isActivated() {
         return this.activated;

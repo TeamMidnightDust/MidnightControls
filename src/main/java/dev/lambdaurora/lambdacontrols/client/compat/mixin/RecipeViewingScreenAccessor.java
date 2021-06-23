@@ -9,21 +9,16 @@
 
 package dev.lambdaurora.lambdacontrols.client.compat.mixin;
 
-import me.shedaniel.rei.api.widgets.Button;
-import me.shedaniel.rei.gui.RecipeViewingScreen;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
-
 /**
  * Represents an accessor to REI's RecipeViewingScreen.
  *
  * @author LambdAurora
- * @version 1.5.0
+ * @version 1.7.0
  * @since 1.2.0
  */
-@Mixin(value = RecipeViewingScreen.class, remap = false)
+//@Mixin(value = DefaultDisplayViewingScreen.class, remap = false)
 public interface RecipeViewingScreenAccessor {
-    @Accessor("categoryBack")
+    /*@Accessor("categoryBack")
     Button getCategoryBack();
 
     @Accessor("categoryNext")
@@ -33,5 +28,5 @@ public interface RecipeViewingScreenAccessor {
     Button getRecipeBack();
 
     @Accessor("recipeNext")
-    Button getRecipeNext();
+    Button getRecipeNext();*/
 }

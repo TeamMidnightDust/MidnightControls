@@ -26,7 +26,7 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 [Fabric](https://fabricmc.net/) is the mod loader and the software which allows Gradle to setup the workspace.
 
-### Java 8
+### Java 16
 
 Java is the main language used to make LambdaControls alive.
 Knowing how to code in Java is necessary if you contribute to the code.
@@ -47,7 +47,7 @@ As it is a Minecraft mod you should know a bit how Minecraft works and how moddi
 
 Git is the control version software we use for LambdaControls, please know how to use it if you consider contributing to the code.
 
-Git commits should be and must be signed.
+Git commits should be signed.
 
 ## How can I contribute?
 
@@ -55,17 +55,17 @@ Git commits should be and must be signed.
 
 #### Before submitting a bug report
 
-- Check if you can reproduce it on other platforms, on multiple web browsers.
+- Check if you can reproduce it on other platforms.
 - Perform a search to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
 
 #### How do I submit a bug report?
 
-Go in the issues tab in GitHub and read the [bug report guide](https://github.com/LambdAurora/LambdaControls/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)
+Go in the issues tab in GitHub and read the [bug report guide](https://github.com/LambdAurora/LambdaControls/blob/1.17/.github/ISSUE_TEMPLATE/bug_report.md)
 
 ### Suggesting enhancements
 
 Enhancement suggestions are tracked as [GitHub issues](https://github.com/LambdAurora/LambdaControls/issues).
-Check out the [feature request](https://github.com/LambdAurora/LambdaControls/blob/master/.github/ISSUE_TEMPLATE/feature_request.md) guide.
+Check out the [feature request](https://github.com/LambdAurora/LambdaControls/blob/1.17/.github/ISSUE_TEMPLATE/feature_request.md) guide.
 
 ### Do pull requests
 
@@ -81,21 +81,16 @@ Feel free to pull request!
 ### Git commit messages
 
 * Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
-* Consider starting the commit message with an emote, emotes for your commit can be found at the [gitmoji guide](https://gitmoji.carloscuesta.me/).
 * (Not for the message) Don't forget to sign the commit. 
 
 ### Naming convention
 
-Names in the code should be explicit and always in `snake_case`, `camelCase` will not be allowed.
+Names in the code should be explicit and always in `camelCase`, `snake_case` will not be allowed.
 `PascalCase` can be used for class name.
-
-We chose `snake_case` because it is more accessible for everyone: for people who don't speak English as their native language it is more easy to see the words when they are separated,
-it also allows the correct use of screen reader on the code with `snake_case` due to the absence of upper case characters.
 
 ### Brace placement
 
-Every braces should be at the end of the line of function declaration, etc...
-The only exception is class declarations: braces must be on the next line.
+Every braces should be at the end of the line of function declaration, etc.
 
 ### Quick note for users of the Intellij IDEA IDE
 

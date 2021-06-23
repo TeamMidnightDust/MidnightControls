@@ -10,7 +10,7 @@
 package dev.lambdaurora.lambdacontrols.client.mixin;
 
 import dev.lambdaurora.lambdacontrols.client.util.KeyBindingAccessor;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 

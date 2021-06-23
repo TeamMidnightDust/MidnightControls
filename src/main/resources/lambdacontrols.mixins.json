@@ -1,9 +1,9 @@
 {
   "required": true,
   "package": "dev.lambdaurora.lambdacontrols.client.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_16",
   "client": [
-    "AbstractButtonWidgetAccessor",
+    "ClickableWidgetAccessor",
     "AdvancementsScreenAccessor",
     "ClientPlayerEntityMixin",
     "ControlsOptionsScreenMixin",

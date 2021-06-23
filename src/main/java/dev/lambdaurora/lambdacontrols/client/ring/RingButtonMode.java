@@ -37,10 +37,10 @@ public enum RingButtonMode implements Nameable {
     /**
      * Returns the next ring button mode available.
      *
-     * @return The next ring button mode.
+     * @return the next ring button mode
      */
     public @NotNull RingButtonMode next() {
-        RingButtonMode[] v = values();
+        var v = values();
         if (v.length == this.ordinal() + 1)
             return v[0];
         return v[this.ordinal() + 1];
@@ -49,7 +49,7 @@ public enum RingButtonMode implements Nameable {
     /**
      * Returns the translation key of this ring button mode.
      *
-     * @return The translation key of this ring button mode.
+     * @return the translation key of this ring button mode
      */
     public @NotNull String getTranslationKey() {
         return "lambdacontrols.ring.button_mode." + this.getName();
@@ -58,7 +58,7 @@ public enum RingButtonMode implements Nameable {
     /**
      * Gets the translated name of this ring button mode.
      *
-     * @return The translated name of this ring button mode.
+     * @return the translated name of this ring button mode
      */
     public @NotNull Text getTranslatedText() {
         return this.text;

@@ -17,7 +17,7 @@ public interface KeyBindingAccessor {
 
     boolean lambdacontrols$unpress();
 
-    default boolean lambdacontrols_handlePressState(boolean pressed) {
+    default boolean lambdacontrols$handlePressState(boolean pressed) {
         if (pressed)
             return this.lambdacontrols$press();
         else

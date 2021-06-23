@@ -52,9 +52,9 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @Inject(method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"))
     public void onMove(MovementType type, Vec3d movement, CallbackInfo ci) {
-        LambdaControlsClient mod = LambdaControlsClient.get();
+        var mod = LambdaControlsClient.get();
         if (type == MovementType.SELF) {
-            if (this.abilities.flying && (!mod.config.hasFlyDrifting() || !mod.config.hasFlyVerticalDrifting())) {
+            if (this.getAbilities().flying && (!mod.config.hasFlyDrifting() || !mod.config.hasFlyVerticalDrifting())) {
                 if (!this.hasMovementInput()) {
                     if (!this.lambdacontrols$driftingPrevented) {
                         if (!mod.config.hasFlyDrifting())
@@ -74,7 +74,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isCamera()Z"))
     public void onTickMovement(CallbackInfo ci) {
-        if (this.abilities.flying && this.isCamera()) {
+        if (this.getAbilities().flying && this.isCamera()) {
             if (LambdaControlsClient.get().config.hasFlyVerticalDrifting())
                 return;
             int moving = 0;

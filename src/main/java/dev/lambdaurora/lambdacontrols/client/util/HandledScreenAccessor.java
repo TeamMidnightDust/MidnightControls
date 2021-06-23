@@ -20,35 +20,35 @@ public interface HandledScreenAccessor {
     /**
      * Gets the left coordinate of the GUI.
      *
-     * @return The left coordinate of the GUI.
+     * @return the left coordinate of the GUI
      */
     int getX();
 
     /**
      * Gets the top coordinate of the GUI.
      *
-     * @return The top coordinate of the GUI.
+     * @return the top coordinate of the GUI
      */
     int getY();
 
     /**
      * Gets the slot at position.
      *
-     * @param pos_x The X position to check.
-     * @param pos_y The Y position to check.
-     * @return The slot at the specified position.
+     * @param posX the X position to check
+     * @param posY the Y position to check
+     * @return the slot at the specified position
      */
-    Slot lambdacontrols$getSlotAt(double pos_x, double pos_y);
+    Slot lambdacontrols$getSlotAt(double posX, double posY);
 
     boolean lambdacontrols$isClickOutsideBounds(double mouseX, double mouseY, int x, int y, int button);
 
     /**
      * Handles a mouse click on the specified slot.
      *
-     * @param slot The slot instance.
-     * @param slotId The slot id.
-     * @param clickData The click data.
-     * @param actionType The action type.
+     * @param slot the slot instance
+     * @param slotId the slot id
+     * @param clickData the click data
+     * @param actionType the action type
      */
     void lambdacontrols$onMouseClick(@Nullable Slot slot, int slotId, int clickData, SlotActionType actionType);
 }

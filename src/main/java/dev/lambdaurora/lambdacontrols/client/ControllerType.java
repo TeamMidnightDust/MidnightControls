@@ -50,7 +50,7 @@ public enum ControllerType implements Nameable {
     /**
      * Returns the controller type's identifier.
      *
-     * @return The controller type's identifier.
+     * @return the controller type's identifier
      */
     public int getId() {
         return this.id;
@@ -59,10 +59,10 @@ public enum ControllerType implements Nameable {
     /**
      * Returns the next controller type available.
      *
-     * @return The next available controller type.
+     * @return the next available controller type
      */
     public @NotNull ControllerType next() {
-        ControllerType[] v = values();
+        var v = values();
         if (v.length == this.ordinal() + 1)
             return v[0];
         return v[this.ordinal() + 1];
@@ -71,7 +71,7 @@ public enum ControllerType implements Nameable {
     /**
      * Gets the translated text of this controller type.
      *
-     * @return The translated text of this controller type.
+     * @return the translated text of this controller type
      */
     public @NotNull Text getTranslatedText() {
         return this.text;
@@ -85,8 +85,8 @@ public enum ControllerType implements Nameable {
     /**
      * Gets the controller type from its identifier.
      *
-     * @param id The identifier of the controller type.
-     * @return The controller type if found, else empty.
+     * @param id the identifier of the controller type
+     * @return the controller type if found, else empty
      */
     public static @NotNull Optional<ControllerType> byId(@NotNull String id) {
         return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();

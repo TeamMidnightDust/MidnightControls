@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.0.0
+## 1.0.0
 
 :tada: First release! :tada: 
 
@@ -12,11 +12,11 @@
 - Added key bindings for look around.
 - And more!
 
-### v1.0.1
+### 1.0.1
 
 - Fixed tutorial toast to look around not affected by camera movement done with a controller. ([#2](https://github.com/LambdAurora/LambdaControls/issues/2))
 
-### v1.0.2 (Unofficial)
+### 1.0.2 (Unofficial)
 
 This update was never pushed but was aiming to fix [#4](https://github.com/LambdAurora/LambdaControls/issues/4).
 
@@ -24,7 +24,7 @@ This update was never pushed but was aiming to fix [#4](https://github.com/Lambd
 - Fixed broken chat arrow keys.
 - Optimized a little bit the button indicator. (need more work)
 
-## v1.1.0 - Chording update
+## 1.1.0 - Chording update
 
 This update also has a backport 1.14.4 version ([#9](https://github.com/LambdAurora/LambdaControls/issues/9)).
 
@@ -46,9 +46,9 @@ This update also has a backport 1.14.4 version ([#9](https://github.com/LambdAur
 - HUD side affects button indicators now.
 - Added support for Advancements tabs.
 
-### v1.1.1
+### 1.1.1
 
-## v1.2.0-1.3.0
+## 1.2.0-1.3.0
 
 - Improved rotation algorithm ([#11](https://github.com/LambdAurora/LambdaControls/issues/11)).
 - Added virtual mouse.
@@ -60,21 +60,21 @@ This update also has a backport 1.14.4 version ([#9](https://github.com/LambdAur
 - And more!
 - v1.3.0 specific: Updated to Minecraft 1.16.1
 
-### v1.3.1
+### 1.3.1
 
 - Fixed broken inventory interactions ([#13](https://github.com/LambdAurora/LambdaControls/issues/13))
 - Fixed virtual mouse preventing continuous attack (thus making breaking blocks impossible).
 - Added support for [ModUpdater](https://gitea.thebrokenrail.com/TheBrokenRail/ModUpdater) hopefully.
 - Updated [SpruceUI](https://github.com/LambdAurora/SpruceUI) to 1.5.2.
 
-### v1.3.2
+### 1.3.2
 
 - Added vertical reacharound.
 - Added more API for compatibility handlers.
 - Improved reacharound API.
 - Improved [REI](https://www.curseforge.com/minecraft/mc-mods/roughly-enough-items) compatibility.
 
-## v1.4.0
+## 1.4.0
 
  - Added analog movements ([#10](https://github.com/LambdAurora/LambdaControls/issues/10)).
  - Improved Ok Zoomer compability.
@@ -90,11 +90,11 @@ This update also has a backport 1.14.4 version ([#9](https://github.com/LambdAur
      - Will allow for better compability with other mods.
      - Might be interesting for keyboard users too.
 
-### v1.4.1
+### 1.4.1
 
  - Fixed crash with [REI](https://www.curseforge.com/minecraft/mc-mods/roughly-enough-items).
  
-## v1.5.0
+## 1.5.0
 
  - Added mappings string editor screen.
  - Added Simplified Chinese translations ([#18](https://github.com/LambdAurora/LambdaControls/pull/18)).
@@ -104,9 +104,28 @@ This update also has a backport 1.14.4 version ([#9](https://github.com/LambdAur
  - Respect toggle setting in Accessibility screen.
  - Tweaked rotation speeds.
  - Updated to Minecraft 1.16.2.
- - Updated [SpruceUI](https://github.com/LambdAurora/SpruceUI) to 1.6.4.
+ - Updated [SpruceUI] to 1.6.4.
  - Overhauled REI compatibility.
  - Improved horizontal reach-around.
  - Fixed crashes with Ok Zoomer.
  - Fixed crashes with key unbinding.
  - More WIP on keybind ring.
+
+## 1.6.0
+
+- Reworked entirely the settings screen.
+- Added independent stick dead zones. ([#32](https://github.com/LambdAurora/LambdaControls/issues/32))
+- Added max values range. ([#41](https://github.com/LambdAurora/LambdaControls/issues/41))
+- Updated [SpruceUI] and fix related crashes due to incompatible versions ([#40](https://github.com/LambdAurora/LambdaControls/issues/40), [#48](https://github.com/LambdAurora/LambdaControls/issues/48)).
+- Fix boat control issues ([#37](https://github.com/LambdAurora/LambdaControls/issues/37)).
+- Fix incompatibilities with mods using night-config. Now shadowing properly night-config. ([#33](https://github.com/LambdAurora/LambdaControls/issues/33), [#39](https://github.com/LambdAurora/LambdaControls/issues/39))
+
+## 1.7.0
+
+- Updated to 1.17.
+ Small improvements to the codebase thanks to Java 16.
+- Fix controller bindings not being saved ([#31](https://github.com/LambdAurora/LambdaControls/issues/31), [#55](https://github.com/LambdAurora/LambdaControls/issues/55)).
+- Dropped entirely Touchscreen Input Mode.
+- Dropped Roughly Enough Items compatibility.
+
+[SpruceUI]: https://github.com/LambdAurora/SpruceUI

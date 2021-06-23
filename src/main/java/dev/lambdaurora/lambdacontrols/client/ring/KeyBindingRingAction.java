@@ -13,7 +13,7 @@ import com.electronwill.nightconfig.core.Config;
 import dev.lambdaurora.lambdacontrols.client.util.KeyBindingAccessor;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.NotNull;
@@ -39,14 +39,11 @@ public class KeyBindingRingAction extends RingAction {
     public void onAction(@NotNull RingButtonMode mode) {
         KeyBindingAccessor accessor = (KeyBindingAccessor) this.binding;
         switch (mode) {
-            case PRESS:
-            case HOLD:
-                accessor.lambdacontrols_handlePressState(this.activated);
-                break;
-            case TOGGLE:
-                accessor.lambdacontrols_handlePressState(!this.binding.isPressed());
+            case PRESS, HOLD -> accessor.lambdacontrols$handlePressState(this.activated);
+            case TOGGLE -> {
+                accessor.lambdacontrols$handlePressState(!this.binding.isPressed());
                 this.activated = !this.binding.isPressed();
-                break;
+            }
         }
     }
 

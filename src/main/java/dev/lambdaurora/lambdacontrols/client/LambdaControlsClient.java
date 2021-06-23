@@ -18,11 +18,9 @@ import dev.lambdaurora.lambdacontrols.client.controller.ButtonBinding;
 import dev.lambdaurora.lambdacontrols.client.controller.Controller;
 import dev.lambdaurora.lambdacontrols.client.controller.InputManager;
 import dev.lambdaurora.lambdacontrols.client.gui.LambdaControlsHud;
-import dev.lambdaurora.lambdacontrols.client.gui.TouchscreenOverlay;
 import dev.lambdaurora.lambdacontrols.client.ring.KeyBindingRingAction;
 import dev.lambdaurora.lambdacontrols.client.ring.LambdaRing;
-import me.lambdaurora.spruceui.event.OpenScreenCallback;
-import me.lambdaurora.spruceui.hud.HudManager;
+import dev.lambdaurora.spruceui.hud.HudManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -30,7 +28,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.LiteralText;
@@ -45,7 +43,7 @@ import java.io.File;
  * Represents the LambdaControls client mod.
  *
  * @author LambdAurora
- * @version 1.6.0
+ * @version 1.7.0
  * @since 1.1.0
  */
 public class LambdaControlsClient extends LambdaControls implements ClientModInitializer {
@@ -86,9 +84,12 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
             responseSender.sendPacket(CONTROLS_MODE_CHANNEL, this.makeControlsModeBuffer(this.config.getControlsMode()));
         });
         ClientPlayNetworking.registerGlobalReceiver(FEATURE_CHANNEL, (client, handler, buf, responseSender) -> {
-            String name = buf.readString(64);
-            boolean allowed = buf.readBoolean();
-            LambdaControlsFeature.fromName(name).ifPresent(feature -> client.execute(() -> feature.setAllowed(allowed)));
+            int features = buf.readVarInt();
+            for (int i = 0; i < features; i++) {
+                var name = buf.readString(64);
+                boolean allowed = buf.readBoolean();
+                LambdaControlsFeature.fromName(name).ifPresent(feature -> client.execute(() -> feature.setAllowed(allowed)));
+            }
         });
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             sender.sendPacket(HELLO_CHANNEL, this.makeHello(this.config.getControlsMode()));
@@ -99,7 +100,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
         ClientTickEvents.START_CLIENT_TICK.register(this.reacharound::tick);
         ClientTickEvents.END_CLIENT_TICK.register(this::onTick);
 
-        OpenScreenCallback.EVENT.register((client, screen) -> {
+        /*OpenScreenCallback.EVENT.register((client, screen) -> {
             if (screen == null && this.config.getControlsMode() == ControlsMode.TOUCHSCREEN) {
                 screen = new TouchscreenOverlay(this);
                 screen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
@@ -108,7 +109,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
             } else if (screen != null) {
                 this.input.onScreenOpen(client, client.getWindow().getWidth(), client.getWindow().getHeight());
             }
-        });
+        });*/
 
         HudManager.register(this.hud = new LambdaControlsHud(this));
     }
@@ -123,7 +124,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
         Controller.updateMappings();
         GLFW.glfwSetJoystickCallback((jid, event) -> {
             if (event == GLFW.GLFW_CONNECTED) {
-                Controller controller = Controller.byId(jid);
+                var controller = Controller.byId(jid);
                 client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, new TranslatableText("lambdacontrols.controller.connected", jid),
                         new LiteralText(controller.getName())));
             } else if (event == GLFW.GLFW_DISCONNECTED) {
@@ -184,7 +185,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
     /**
      * Sets whether the HUD is enabled or not.
      *
-     * @param enabled True if the HUD is enabled, else false.
+     * @param enabled true if the HUD is enabled, else false
      */
     public void setHudEnabled(boolean enabled) {
         this.config.setHudEnabled(enabled);
@@ -194,7 +195,7 @@ public class LambdaControlsClient extends LambdaControls implements ClientModIni
     /**
      * Gets the LambdaControls client instance.
      *
-     * @return The LambdaControls client instance.
+     * @return the LambdaControls client instance
      */
     public static LambdaControlsClient get() {
         return INSTANCE;
