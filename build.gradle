@@ -41,6 +41,16 @@ String getMCVersionString() {
     return version[0] + '.' + version[1]
 }
 
+String parseReadme() {
+    def excludeRegex = /(?m)<!-- modrinth_exclude\.start -->(.|\n)*?<!-- modrinth_exclude\.end -->/
+    def linkRegex = /!\[([A-z_ ]+)]\((images\/[A-z.\/_]+)\)/
+
+    def readme = (String) file('README.md').text
+    readme = readme.replaceAll(excludeRegex, '')
+    readme = readme.replaceAll(linkRegex, '![$1](https://raw.githubusercontent.com/LambdAurora/LambdaControls/1.17/$2)')
+    return readme
+}
+
 minecraft {
     accessWidener file('src/main/resources/lambdacontrols.accesswidener')
 }
