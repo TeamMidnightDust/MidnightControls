@@ -94,6 +94,7 @@ repositories {
         }
     }
     maven { url 'https://maven.shedaniel.me/' }
+    maven { url 'https://jitpack.io' }
 }
 
 configurations {
@@ -116,10 +117,10 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
     // Compatibility mods
-    /*modImplementation("com.github.joaoh1:okzoomer:e13183c59b") {
-        exclude group: 'me.shedaniel.cloth'
-        exclude group: 'io.github.prospector'
-    }*/
+    modImplementation("com.github.EnnuiL:okzoomer:e6a801b1a3") {
+        exclude group: 'com.terraformersmc'
+        exclude group: 'dev.lambdaurora'
+    }
 
     shadow 'com.electronwill.night-config:core:3.6.3'
     shadow 'com.electronwill.night-config:toml:3.6.3'

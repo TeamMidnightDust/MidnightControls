@@ -39,11 +39,11 @@ public class LambdaControlsCompat {
      * @param mod the mod instance
      */
     public static void init(@NotNull LambdaControlsClient mod) {
-        /*if (FabricLoader.getInstance().isModLoaded("okzoomer")) {
+        if (FabricLoader.getInstance().isModLoaded("okzoomer")) {
             mod.log("Adding okzoomer compatibility...");
             HANDLERS.add(new OkZoomerCompat());
         }
-        if (isReiPresent()) {
+        /*if (isReiPresent()) {
             mod.log("Adding REI compatiblity...");
             HANDLERS.add(new ReiCompat());
         }*/
