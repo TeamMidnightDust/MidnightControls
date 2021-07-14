@@ -41,6 +41,24 @@ String getMCVersionString() {
     return version[0] + '.' + version[1]
 }
 
+String getTerraformersMCMaven() {
+    def terraformersUrl = 'https://maven.terraformersmc.com/'
+    if (pingUrl(terraformersUrl))
+        return terraformersUrl
+    else
+        return 'https://maven.kotlindiscord.com/repository/terraformers/'
+}
+
+boolean pingUrl(String address) {
+    try {
+        def conn = (HttpURLConnection) new URL(address).openConnection()
+        int responseCode = conn.getResponseCode()
+        return (200 <= responseCode && responseCode <= 399)
+    } catch (IOException ignored) {
+        return false
+    }
+}
+
 String parseReadme() {
     def excludeRegex = /(?m)<!-- modrinth_exclude\.start -->(.|\n)*?<!-- modrinth_exclude\.end -->/
     def linkRegex = /!\[([A-z_ ]+)]\((images\/[A-z.\/_]+)\)/
@@ -65,11 +83,15 @@ repositories {
     }
     maven {
         name 'CottonMC'
-        url 'https://server.bbkr.space:8081/artifactory/libs-snapshot'
+        url 'https://server.bbkr.space/artifactory/libs-snapshot'
     }
     maven {
-        name 'Terraformers'
-        url 'https://maven.terraformersmc.com/releases'
+        name 'TerraformersMC'
+        url getTerraformersMCMaven()
+        content {
+            includeGroup 'dev.emi'
+            includeGroup 'com.terraformersmc'
+        }
     }
     maven { url 'https://maven.shedaniel.me/' }
 }
@@ -178,9 +200,19 @@ task publishModrinth(type: TaskModrinthUpload) {
     def regexVersion = ((String) project.mod_version).replaceAll('\\.', /\\./).replaceAll('\\+', '\\+')
     def changelogRegex = ~"###? ${regexVersion}\\n\\n(( *- .+\\n)+)"
     def matcher = changelogText =~ changelogRegex
-    matcher.find()
 
-    changelog = matcher.group(1)
+    if (matcher.find()) {
+        changelog = matcher.group(1)
+
+        def changelogLines = changelogText.split('\n')
+        def linkRefRegex = ~'^\\[([A-z0-9 _\\-/+.]+)]: '
+        for (int i = changelogLines.length - 1; i > 0; i--) {
+            def line = changelogLines[i]
+            if ((line =~ linkRefRegex).find())
+                changelog += '\n' + line
+            else break
+        }
+    }
 
     // Readme
     doFirst {
@@ -243,8 +275,8 @@ publishing {
     repositories {
         mavenLocal()
         maven {
-            name "GithubPackages"
-            url uri("https://maven.pkg.github.com/LambdAurora/LambdaControls")
+            name 'GithubPackages'
+            url uri('https://maven.pkg.github.com/LambdAurora/LambdaControls')
             credentials {
                 username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
                 password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
