@@ -2,7 +2,7 @@
 
 :tada: First of all, thanks for taking time to contribute! :tada:
 
-The following is a set of guidelines for contributing to midnightcontrols. 
+The following is a set of guidelines for contributing to MidnightControls.
 Feel free to propose changes to this document in a pull request.
 
 **Table of Contents**
@@ -18,7 +18,7 @@ Feel free to propose changes to this document in a pull request.
 ## Code of Conduct
 
 This project and everyone participating in it is governed by the [Code of Conduct](https://github.com/LambdAurora/midnightcontrols/blob/master/CODE_OF_CONDUCT.md).
-By participating, you are expected to uphold this code. Please report unacceptable behavior at [aurora42lambda@gmail.com](mailto:aurora42lambda@gmail.com).
+By participating, you are expected to uphold this code. Please report unacceptable behavior at [motschen@midnightdust.eu](mailto:motschen@midnightdust.eu).
 
 ## What should I know before I get started?
 
@@ -26,9 +26,9 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 [Fabric](https://fabricmc.net/) is the mod loader and the software which allows Gradle to setup the workspace.
 
-### Java 16
+### Java 17
 
-Java is the main language used to make midnightcontrols alive.
+Java is the main language used to make MidnightControls alive.
 Knowing how to code in Java is necessary if you contribute to the code.
 
 ### Minecraft
@@ -60,12 +60,12 @@ Git commits should be signed.
 
 #### How do I submit a bug report?
 
-Go in the issues tab in GitHub and read the [bug report guide](https://github.com/LambdAurora/midnightcontrols/blob/1.17/.github/ISSUE_TEMPLATE/bug_report.md)
+Go in the issues tab in GitHub and read the [bug report guide](https://github.com/TeamMidnightDust/MidnightControls/blob/1.18/.github/ISSUE_TEMPLATE/bug_report.md)
 
 ### Suggesting enhancements
 
-Enhancement suggestions are tracked as [GitHub issues](https://github.com/LambdAurora/midnightcontrols/issues).
-Check out the [feature request](https://github.com/LambdAurora/midnightcontrols/blob/1.17/.github/ISSUE_TEMPLATE/feature_request.md) guide.
+Enhancement suggestions are tracked as [GitHub issues](https://github.com/TeamMidnightDust/MidnightControls/issues).
+Check out the [feature request](https://github.com/TeamMidnightDust/MidnightControls/blob/1.17/.github/ISSUE_TEMPLATE/feature_request.md) guide.
 
 ### Do pull requests
 
