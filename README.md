@@ -10,7 +10,7 @@
 <!-- modrinth_exclude.end -->
 
 A Fabric Minecraft mod which adds better controls, reach-around and controller support.  
-Forked from [LambdaControls](https://github.com/LambdAurora/LambdaControls) by the amazing [LambdaAurora](https://github.com/LambdAurora)
+Forked from [LambdaControls](https://github.com/LambdAurora/LambdaControls) by the amazing [LambdaAurora](https://github.com/LambdAurora), which was sadly discontinued
 
 ## What's this mod?
 
