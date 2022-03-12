@@ -1,15 +1,16 @@
-# midnightcontrols
+# MidnightControls
 
 <!-- modrinth_exclude.start -->
-![Java 16](https://img.shields.io/badge/language-Java%2016-9B599A.svg?style=flat-square) <!-- modrinth_exclude.end -->
-[![GitHub license](https://img.shields.io/github/license/LambdAurora/midnightcontrols?style=flat-square)](https://raw.githubusercontent.com/LambdAurora/midnightcontrols/master/LICENSE)
+![Java 16](https://img.shields.io/badge/language-Java%2017-9B599A.svg?style=flat-square) <!-- modrinth_exclude.end -->
+[![GitHub license](https://img.shields.io/github/license/TeamMidnightDust/MidnightControls?style=flat-square)](https://raw.githubusercontent.com/TeamMidnightDust/MidnightControls/master/LICENSE)
 ![Environment: Client](https://img.shields.io/badge/environment-client-1976d2?style=flat-square)
 [![Mod loader: Fabric]][fabric] <!-- modrinth_exclude.start -->
-![Version](https://img.shields.io/github/v/tag/LambdAurora/midnightcontrols?label=version&style=flat-square)
-[![CurseForge](http://cf.way2muchnoise.eu/title/354231.svg)](https://www.curseforge.com/minecraft/mc-mods/midnightcontrols)
+![Version](https://img.shields.io/github/v/tag/TeamMidnightDust/MidnightControls?label=version&style=flat-square)
+[![CurseForge](http://cf.way2muchnoise.eu/title/354231.svg)](https://www.curseforge.com/minecraft/mc-mods/lambdacontrols)
 <!-- modrinth_exclude.end -->
 
-A Fabric Minecraft mod which adds better controls, reach-around and controller support.
+A Fabric Minecraft mod which adds better controls, reach-around and controller support.  
+Forked from [LambdaControls](https://github.com/LambdAurora/LambdaControls) by the amazing [LambdaAurora](https://github.com/LambdAurora)
 
 ## What's this mod?
 
