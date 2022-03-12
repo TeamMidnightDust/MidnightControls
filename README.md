@@ -38,9 +38,11 @@ This mod also adds controller support.
 ## 🎮 Supported Controllers:
 
 - Dualshock controllers
+- Dualsense controllers
 - Xbox controllers
 - Switch Pro controllers
 - Joycons
+- Steam controller and Steam Deck (WIP)
 - And many more!
 
 ## Screenshots
