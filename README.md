@@ -1,12 +1,12 @@
-# LambdaControls
+# midnightcontrols
 
 <!-- modrinth_exclude.start -->
 ![Java 16](https://img.shields.io/badge/language-Java%2016-9B599A.svg?style=flat-square) <!-- modrinth_exclude.end -->
-[![GitHub license](https://img.shields.io/github/license/LambdAurora/LambdaControls?style=flat-square)](https://raw.githubusercontent.com/LambdAurora/LambdaControls/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/LambdAurora/midnightcontrols?style=flat-square)](https://raw.githubusercontent.com/LambdAurora/midnightcontrols/master/LICENSE)
 ![Environment: Client](https://img.shields.io/badge/environment-client-1976d2?style=flat-square)
 [![Mod loader: Fabric]][fabric] <!-- modrinth_exclude.start -->
-![Version](https://img.shields.io/github/v/tag/LambdAurora/LambdaControls?label=version&style=flat-square)
-[![CurseForge](http://cf.way2muchnoise.eu/title/354231.svg)](https://www.curseforge.com/minecraft/mc-mods/lambdacontrols)
+![Version](https://img.shields.io/github/v/tag/LambdAurora/midnightcontrols?label=version&style=flat-square)
+[![CurseForge](http://cf.way2muchnoise.eu/title/354231.svg)](https://www.curseforge.com/minecraft/mc-mods/midnightcontrols)
 <!-- modrinth_exclude.end -->
 
 A Fabric Minecraft mod which adds better controls, reach-around and controller support.

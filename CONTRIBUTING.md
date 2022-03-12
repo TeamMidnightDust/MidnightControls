@@ -1,8 +1,8 @@
-# Contributing to LambdaControls
+# Contributing to midnightcontrols
 
 :tada: First of all, thanks for taking time to contribute! :tada:
 
-The following is a set of guidelines for contributing to LambdaControls. 
+The following is a set of guidelines for contributing to midnightcontrols. 
 Feel free to propose changes to this document in a pull request.
 
 **Table of Contents**
@@ -17,7 +17,7 @@ Feel free to propose changes to this document in a pull request.
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [Code of Conduct](https://github.com/LambdAurora/LambdaControls/blob/master/CODE_OF_CONDUCT.md).
+This project and everyone participating in it is governed by the [Code of Conduct](https://github.com/LambdAurora/midnightcontrols/blob/master/CODE_OF_CONDUCT.md).
 By participating, you are expected to uphold this code. Please report unacceptable behavior at [aurora42lambda@gmail.com](mailto:aurora42lambda@gmail.com).
 
 ## What should I know before I get started?
@@ -28,7 +28,7 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 ### Java 16
 
-Java is the main language used to make LambdaControls alive.
+Java is the main language used to make midnightcontrols alive.
 Knowing how to code in Java is necessary if you contribute to the code.
 
 ### Minecraft
@@ -45,7 +45,7 @@ As it is a Minecraft mod you should know a bit how Minecraft works and how moddi
 
 ### Git
 
-Git is the control version software we use for LambdaControls, please know how to use it if you consider contributing to the code.
+Git is the control version software we use for midnightcontrols, please know how to use it if you consider contributing to the code.
 
 Git commits should be signed.
 
@@ -60,16 +60,16 @@ Git commits should be signed.
 
 #### How do I submit a bug report?
 
-Go in the issues tab in GitHub and read the [bug report guide](https://github.com/LambdAurora/LambdaControls/blob/1.17/.github/ISSUE_TEMPLATE/bug_report.md)
+Go in the issues tab in GitHub and read the [bug report guide](https://github.com/LambdAurora/midnightcontrols/blob/1.17/.github/ISSUE_TEMPLATE/bug_report.md)
 
 ### Suggesting enhancements
 
-Enhancement suggestions are tracked as [GitHub issues](https://github.com/LambdAurora/LambdaControls/issues).
-Check out the [feature request](https://github.com/LambdAurora/LambdaControls/blob/1.17/.github/ISSUE_TEMPLATE/feature_request.md) guide.
+Enhancement suggestions are tracked as [GitHub issues](https://github.com/LambdAurora/midnightcontrols/issues).
+Check out the [feature request](https://github.com/LambdAurora/midnightcontrols/blob/1.17/.github/ISSUE_TEMPLATE/feature_request.md) guide.
 
 ### Do pull requests
 
-You can help LambdaControls by writing code and submit it with pull requests.
+You can help midnightcontrols by writing code and submit it with pull requests.
 
 Pull requests will be accepted if they follow the [styleguide](#styleguides), if they are useful, etc...
 We can refuse a pull request if the commits are not signed, so don't forget to [sign them](https://help.github.com/en/articles/signing-commits)!

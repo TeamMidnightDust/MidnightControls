@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "dev.lambdaurora.midnightcontrols.client.compat.mixin",
+  "plugin": "eu.midnightdust.midnightcontrols.client.compat.MidnightControlsMixinPlugin",
+  "compatibilityLevel": "JAVA_16",
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

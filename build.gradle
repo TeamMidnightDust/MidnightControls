@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.9.+'
+    id 'fabric-loom' version '0.11-SNAPSHOT'
     id 'java-library'
     id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
@@ -26,7 +26,7 @@ version = "${project.mod_version}+${getMCVersionString()}"
 archivesBaseName = project.archives_base_name
 
 // This field defines the Java version your mod target.
-def targetJavaVersion = 16
+def targetJavaVersion = 17
 
 boolean isMCVersionNonRelease() {
     return project.minecraft_version.matches('^\\d\\dw\\d\\d[a-z]$')
@@ -65,13 +65,10 @@ String parseReadme() {
 
     def readme = (String) file('README.md').text
     readme = readme.replaceAll(excludeRegex, '')
-    readme = readme.replaceAll(linkRegex, '![$1](https://raw.githubusercontent.com/LambdAurora/LambdaControls/1.17/$2)')
+    readme = readme.replaceAll(linkRegex, '![$1](https://raw.githubusercontent.com/LambdAurora/midnightcontrols/1.17/$2)')
     return readme
 }
 
-minecraft {
-    accessWidener file('src/main/resources/lambdacontrols.accesswidener')
-}
 
 repositories {
     mavenLocal()
@@ -93,8 +90,10 @@ repositories {
             includeGroup 'com.terraformersmc'
         }
     }
+    maven { url 'https://maven.kosmx.dev' }
     maven { url 'https://maven.shedaniel.me/' }
     maven { url 'https://jitpack.io' }
+    maven { url "https://api.modrinth.com/maven" }
 }
 
 configurations {
@@ -113,6 +112,11 @@ dependencies {
 
     modImplementation "dev.lambdaurora:spruceui:${project.spruceui_version}"
     include "dev.lambdaurora:spruceui:${project.spruceui_version}"
+    api('org.aperlambda:lambdajcommon:1.8.1') {
+        exclude group: 'com.google.code.gson'
+        exclude group: 'com.google.guava'
+    }
+    include 'org.aperlambda:lambdajcommon:1.8.1'
 
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
@@ -121,9 +125,17 @@ dependencies {
         exclude group: 'com.terraformersmc'
         exclude group: 'dev.lambdaurora'
     }
+    modImplementation "maven.modrinth:emotecraft:${project.emotecraft_version}"
+    modImplementation "io.github.kosmx:bendy-lib:${project.bendylib_version}"
+
+    modImplementation "maven.modrinth:midnightlib:${project.midnightlib_version}"
+    include "maven.modrinth:midnightlib:${project.midnightlib_version}"
 
     shadow 'com.electronwill.night-config:core:3.6.3'
     shadow 'com.electronwill.night-config:toml:3.6.3'
+}
+loom {
+    accessWidenerPath = file("src/main/resources/midnightcontrols.accesswidener")
 }
 
 java {
@@ -158,29 +170,6 @@ license {
     include '**/*.java'
 }
 
-shadowJar {
-    dependsOn jar
-    configurations = [project.configurations.shadow]
-    archiveClassifier.set('dev')
-
-    exclude 'META-INF/maven/**'
-    exclude 'com/google/**'
-    exclude 'javax/**'
-    exclude 'org/**'
-    relocate 'com.electronwill.nightconfig', 'dev.lambdaurora.lambdacontrols.shadow.nightconfig'
-}
-remapJar.dependsOn(shadowJar)
-
-task shadowRemapJar(type: RemapJarTask) {
-    dependsOn shadowJar
-
-    input.set(file("${project.buildDir}/libs/$archivesBaseName-$version-dev.jar"))
-    archiveFileName = "${archivesBaseName}-${version}.jar"
-    addNestedDependencies.set(true)
-    remapAccessWidener.set(true)
-}
-build.dependsOn(shadowRemapJar)
-
 task publishModrinth(type: TaskModrinthUpload) {
     dependsOn(build)
     onlyIf {
@@ -190,8 +179,7 @@ task publishModrinth(type: TaskModrinthUpload) {
     token = System.getenv('MODRINTH_TOKEN')
     projectId = project.modrinth_id
     versionNumber = version
-    versionName = "LambdaControls ${project.mod_version} (${getMCVersionString()})"
-    uploadFile = shadowRemapJar
+    versionName = "midnightcontrols ${project.mod_version} (${getMCVersionString()})"
     addGameVersion((String) project.minecraft_version)
     addLoader('fabric')
     versionType = isMCVersionNonRelease() ? VersionType.BETA : VersionType.RELEASE
@@ -246,15 +234,12 @@ task publishModrinth(type: TaskModrinthUpload) {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact(shadowRemapJar) {
-                builtBy shadowRemapJar
-            }
             artifact(sourcesJar) {
                 builtBy remapSourcesJar
             }
 
             pom {
-                name = 'LambdaControls'
+                name = 'midnightcontrols'
                 description = 'Adds better controls, and controller support.'
             }
 
@@ -277,17 +262,17 @@ publishing {
         mavenLocal()
         maven {
             name 'GithubPackages'
-            url uri('https://maven.pkg.github.com/LambdAurora/LambdaControls')
+            url uri('https://maven.pkg.github.com/LambdAurora/midnightcontrols')
             credentials {
                 username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
                 password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
             }
         }
-        def lambdacontrolsMaven = System.getenv('LAMBDACONTROLS_MAVEN')
-        if (lambdacontrolsMaven) {
+        def midnightcontrolsMaven = System.getenv('midnightcontrols_MAVEN')
+        if (midnightcontrolsMaven) {
             maven {
-                name 'LambdaControlsMaven'
-                url uri(lambdacontrolsMaven)
+                name 'midnightcontrolsMaven'
+                url uri(midnightcontrolsMaven)
                 credentials {
                     username = project.findProperty('gpr.user') ?: System.getenv('MAVEN_USERNAME')
                     password = project.findProperty('gpr.key') ?: System.getenv('MAVEN_PASSWORD')

@@ -1,35 +1,36 @@
 {
   "schemaVersion": 1,
-  "id": "lambdacontrols",
-  "name": "LambdaControls",
+  "id": "midnightcontrols",
+  "name": "MidnightControls",
   "version": "${version}",
   "description": "Adds better controls, and controller support.",
   "authors": [
-    "LambdAurora"
+    "LambdAurora",
+    "Motschen"
   ],
   "contact": {
-    "homepage": "https://modrinth.com/mod/lambdacontrols",
-    "sources": "https://github.com/LambdAurora/LambdaControls.git",
-    "issues": "https://github.com/LambdAurora/LambdaControls/issues"
+    "homepage": "https://modrinth.com/mod/midnightcontrols",
+    "sources": "https://github.com/LambdAurora/midnightcontrols.git",
+    "issues": "https://github.com/LambdAurora/midnightcontrols/issues"
   },
   "license": "MIT",
-  "icon": "assets/lambdacontrols/icon.png",
+  "icon": "assets/midnightcontrols/icon.png",
   "environment": "client",
   "entrypoints": {
     "main": [
-      "dev.lambdaurora.lambdacontrols.LambdaControls"
+      "eu.midnightdust.midnightcontrols.MidnightControls"
     ],
     "client": [
-      "dev.lambdaurora.lambdacontrols.client.LambdaControlsClient"
+      "eu.midnightdust.midnightcontrols.client.MidnightControlsClient"
     ],
     "modmenu": [
-      "dev.lambdaurora.lambdacontrols.client.LambdaControlsModMenu"
+      "eu.midnightdust.midnightcontrols.client.MidnightControlsModMenu"
     ]
   },
-  "accessWidener": "lambdacontrols.accesswidener",
+  "accessWidener": "midnightcontrols.accesswidener",
   "mixins": [
-    "lambdacontrols.mixins.json",
-    "lambdacontrols_compat.mixins.json"
+    "midnightcontrols.mixins.json",
+    "midnightcontrols_compat.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.11.3",
@@ -45,13 +46,8 @@
     "flamingo": "*"
   },
   "breaks": {
+    "lambdacontrols": "*",
     "modmenu": "<1.12.2",
     "optifabric": "*"
-  },
-  "custom": {
-    "modupdater": {
-      "strategy": "curseforge",
-      "projectID": 354231
-    }
   }
 }

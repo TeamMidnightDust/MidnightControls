@@ -8,4 +8,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'lambdacontrols'
+rootProject.name = 'midnightcontrols'

@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "package": "eu.midnightdust.midnightcontrols.client.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "client": [
+    "ClickableWidgetAccessor",
+    "AdvancementsScreenAccessor",
+    "ClientPlayerEntityMixin",
+    "ControlsOptionsScreenMixin",
+    "CreativeInventoryScreenAccessor",
+    "EntryListWidgetAccessor",
+    "GameOptionsMixin",
+    "GameRendererMixin",
+    "HandledScreenMixin",
+    "KeyBindingMixin",
+    "MinecraftClientMixin",
+    "MouseMixin",
+    "RecipeBookWidgetAccessor",
+    "WorldRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
