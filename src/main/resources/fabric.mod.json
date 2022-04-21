@@ -9,9 +9,9 @@
     "Motschen"
   ],
   "contact": {
-    "homepage": "https://modrinth.com/mod/midnightcontrols",
-    "sources": "https://github.com/LambdAurora/midnightcontrols.git",
-    "issues": "https://github.com/LambdAurora/midnightcontrols/issues"
+    "homepage": "https://github.com/TeamMidnightDust/MidnightControls",
+    "sources": "https://github.com/TeamMidnightDust/MidnightControls.git",
+    "issues": "https://github.com/TeamMidnightDust/MidnightControls/issues"
   },
   "license": "MIT",
   "icon": "assets/midnightcontrols/icon.png",
