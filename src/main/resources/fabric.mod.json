@@ -3,10 +3,19 @@
   "id": "midnightcontrols",
   "name": "MidnightControls",
   "version": "${version}",
-  "description": "Adds better controls, and controller support.",
+  "description": "Adds controller support and enhanced controls overall.",
   "authors": [
     "LambdAurora",
     "Motschen"
+  ],
+  "contributors": [
+    "akemin-dayo",
+    "FlashyReese",
+    "Hambaka",
+    "joaoh1",
+    "DioEgizio",
+    "EnnuiL",
+    "egeesin"
   ],
   "contact": {
     "homepage": "https://modrinth.com/mod/midnightcontrols",

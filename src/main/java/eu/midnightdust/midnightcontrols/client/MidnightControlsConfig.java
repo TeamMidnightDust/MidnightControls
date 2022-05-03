@@ -31,11 +31,10 @@ import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
 public class MidnightControlsConfig extends MidnightConfig {
     // General
     @Entry public static ControlsMode controlsMode = ControlsMode.DEFAULT;
-    @Entry public static boolean autoSwitchMode = false;
+    @Entry public static boolean autoSwitchMode = true;
     @Entry public static boolean debug = false;
     // HUD
     @Entry public static boolean hudEnable = true;
-    @Entry public static boolean hudAlwaysShow = true; // Enabled by default so that users migrating from LambdaControls will have a consistent experience.
     @Entry public static HudSide hudSide = HudSide.LEFT;
     // Gameplay
     @Entry public static boolean analogMovement = true;
@@ -58,18 +57,11 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry public static boolean unfocusedInput = false;
     @Entry public static boolean virtualMouse = false;
     @Entry public static VirtualMouseSkin virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
-//    @Entry public static List<Pages> ringPages = new ArrayList<String>();
-//    @Entry public static double maxAnalog1 = 1;
-//    @Entry public static double maxAnalog2 = 1;
-//    @Entry public static double maxAnalog3 = 1;
-//    @Entry public static double maxAnalog4 = 1;
     @Entry public static Object controllerID = 0;
     @Entry public static Object secondControllerID = -1;
     @Entry public static Map<String, String> BINDINGS = Map.of();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
-    // Gameplay.
-    // Controller settings
     @Entry public static double[] maxAnalogValues = new double[]{DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE};
 
     /**

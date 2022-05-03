@@ -72,7 +72,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption controllerTypeOption;
     private final SpruceOption virtualMouseSkinOption;
     private final SpruceOption hudEnableOption;
-    private final SpruceOption hudAlwaysShowOption;
     private final SpruceOption hudSideOption;
     // Controller options
     private final SpruceOption controllerOption =
@@ -213,8 +212,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                 null);
         this.hudEnableOption = new SpruceToggleBooleanOption("midnightcontrols.menu.hud_enable", () -> MidnightControlsConfig.hudEnable,
                 this.mod::setHudEnabled, new TranslatableText("midnightcontrols.tooltip.hud_enable"));
-        this.hudAlwaysShowOption = new SpruceToggleBooleanOption("midnightcontrols.menu.hud_always_show", () -> MidnightControlsConfig.hudAlwaysShow,
-                value -> MidnightControlsConfig.hudAlwaysShow = value, new TranslatableText("midnightcontrols.tooltip.hud_always_show"));
         this.hudSideOption = new SpruceCyclingOption("midnightcontrols.menu.hud_side",
                 amount -> MidnightControlsConfig.hudSide = MidnightControlsConfig.hudSide.next(),
                 option -> option.getDisplayText(MidnightControlsConfig.hudSide.getTranslatedText()),
@@ -261,6 +258,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     @Override
     protected void init() {
         super.init();
+        Controller.updateMappings();
 
         this.buildTabs();
 
@@ -323,7 +321,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         list.addSingleOptionEntry(this.virtualMouseSkinOption);
         list.addSingleOptionEntry(new SpruceSeparatorOption("midnightcontrols.menu.title.hud", true, null));
         list.addSingleOptionEntry(this.hudEnableOption);
-        list.addSingleOptionEntry(this.hudAlwaysShowOption);
         list.addSingleOptionEntry(this.hudSideOption);
         return list;
     }
