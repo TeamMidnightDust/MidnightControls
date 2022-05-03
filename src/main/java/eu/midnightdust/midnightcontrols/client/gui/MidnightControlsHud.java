@@ -78,12 +78,14 @@ public class MidnightControlsHud extends Hud {
      */
     @Override
     public void render(MatrixStack matrices, float tickDelta) {
-        if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.currentScreen == null && MidnightControlsConfig.getController().isConnected() && MidnightControlsConfig.getController().isGamepad()) {
-            int y = bottom(2);
-            this.renderFirstIcons(matrices, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
-            this.renderSecondIcons(matrices, MidnightControlsConfig.hudSide == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);
-            this.renderFirstSection(matrices, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
-            this.renderSecondSection(matrices, MidnightControlsConfig.hudSide == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);
+        if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.currentScreen == null) {
+            if (MidnightControlsConfig.hudAlwaysShow || (MidnightControlsConfig.getController().isConnected() && MidnightControlsConfig.getController().isGamepad())) {
+                int y = bottom(2);
+                this.renderFirstIcons(matrices, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
+                this.renderSecondIcons(matrices, MidnightControlsConfig.hudSide == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);
+                this.renderFirstSection(matrices, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
+                this.renderSecondSection(matrices, MidnightControlsConfig.hudSide == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);
+            }
         }
 
         if (this.mod.reacharound.isLastReacharoundVertical()) {

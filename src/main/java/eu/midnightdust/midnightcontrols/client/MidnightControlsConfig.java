@@ -35,14 +35,15 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry public static boolean debug = false;
     // HUD
     @Entry public static boolean hudEnable = true;
+    @Entry public static boolean hudAlwaysShow = true; // Enabled by default so that users migrating from LambdaControls will have a consistent experience.
     @Entry public static HudSide hudSide = HudSide.LEFT;
     // Gameplay
     @Entry public static boolean analogMovement = true;
-    @Entry public static boolean fastBlockPlacing = true;
-    @Entry public static boolean flyDrifting = false;
-    @Entry public static boolean verticalFlyDrifting = true;
-    @Entry public static boolean horizontalReacharound = false;
-    @Entry public static boolean verticalReacharound = false;
+    @Entry public static boolean fastBlockPlacing = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
+    @Entry public static boolean flyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers. It can also conflict with some other mods.
+    @Entry public static boolean verticalFlyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers.
+    @Entry public static boolean horizontalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
+    @Entry public static boolean verticalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
     @Entry public static boolean shouldRenderReacharoundOutline = true;
     @Entry public static int[] reacharoundOutlineColor = new int[]{255, 255, 255, 102};
     // Controller
