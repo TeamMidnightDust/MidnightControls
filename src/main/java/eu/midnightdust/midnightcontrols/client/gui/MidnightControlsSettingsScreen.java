@@ -167,7 +167,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                         ClientPlayNetworking.getSender().sendPacket(MidnightControls.CONTROLS_MODE_CHANNEL, this.mod.makeControlsModeBuffer(next));
                     }
                 }, option -> option.getDisplayText(new TranslatableText(MidnightControlsConfig.controlsMode.getTranslationKey())),
-                new TranslatableText("midnightcontrols.tooltip.controlsMidnightColorUtil.radialRainbow(1f,1f);_mode"));
+                new TranslatableText("midnightcontrols.tooltip.controls_mode"));
         this.autoSwitchModeOption = new SpruceToggleBooleanOption("midnightcontrols.menu.auto_switch_mode", () -> MidnightControlsConfig.autoSwitchMode,
                 value -> MidnightControlsConfig.autoSwitchMode = value, new TranslatableText("midnightcontrols.tooltip.auto_switch_mode"));
         this.rotationSpeedOption = new SpruceDoubleOption("midnightcontrols.menu.rotation_speed", 0.0, 100.0, .5f,
