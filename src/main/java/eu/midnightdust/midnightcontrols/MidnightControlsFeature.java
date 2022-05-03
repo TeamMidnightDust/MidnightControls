@@ -99,6 +99,15 @@ public class MidnightControlsFeature implements Nameable {
     }
 
     /**
+     * Refreshes the enabled values from the config.
+     */
+    public static void refreshEnabled() {
+        MidnightControlsFeature.VERTICAL_REACHAROUND.setEnabled(MidnightControlsConfig.verticalReacharound);
+        MidnightControlsFeature.FAST_BLOCK_PLACING.setEnabled(MidnightControlsConfig.fastBlockPlacing);
+        MidnightControlsFeature.HORIZONTAL_REACHAROUND.setEnabled(MidnightControlsConfig.horizontalReacharound);
+    }
+
+    /**
      * Returns whether this feature is available or not.
      *
      * @return {@code true} if this feature is available, else {@code false}

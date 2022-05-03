@@ -11,6 +11,7 @@ package eu.midnightdust.midnightcontrols.client;
 
 import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.midnightcontrols.ControlsMode;
+import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
@@ -87,6 +88,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     public static void save() {
         MidnightControlsConfig.write("midnightcontrols");
         MidnightControlsClient.get().log("Configuration saved.");
+        MidnightControlsFeature.refreshEnabled();
     }
     /**
      * Gets the used controller.
