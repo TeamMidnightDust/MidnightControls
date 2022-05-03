@@ -104,8 +104,11 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
     // Compatibility mods
-    modImplementation("maven.modrinth:ok-zoomer:${project.ok_zoomer_version}")
-    modImplementation "io.github.ennuil:LibZoomer:${project.libzoomer_version}"
+
+    // Ok Zoomer and LibZoomer are temporarily disabled for the time being, as we are currently using Reflection at runtime instead in OkZoomerCompat due to there being two major, completely incompatible API versions.
+    // modImplementation("maven.modrinth:ok-zoomer:${project.ok_zoomer_version}")
+    // modImplementation "io.github.ennuil:LibZoomer:${project.libzoomer_version}"
+
     modImplementation "org.quiltmc:quilt-json5:1.0.0"
     modImplementation("me.shedaniel:RoughlyEnoughItems-runtime-fabric:${project.rei_version}")
     modImplementation "maven.modrinth:emotecraft:${project.emotecraft_version}"
