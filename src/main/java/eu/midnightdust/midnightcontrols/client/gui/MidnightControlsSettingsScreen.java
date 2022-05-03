@@ -9,6 +9,10 @@
 
 package eu.midnightdust.midnightcontrols.client.gui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import dev.lambdaurora.spruceui.background.Background;
+import dev.lambdaurora.spruceui.widget.SpruceWidget;
+import eu.midnightdust.lib.util.MidnightColorUtil;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
@@ -27,6 +31,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.render.*;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
@@ -35,7 +40,10 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.Matrix4f;
 import org.lwjgl.glfw.GLFW;
+
+import java.awt.*;
 
 /**
  * Represents the midnightcontrols settings screen.
@@ -158,7 +166,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                         ClientPlayNetworking.getSender().sendPacket(MidnightControls.CONTROLS_MODE_CHANNEL, this.mod.makeControlsModeBuffer(next));
                     }
                 }, option -> option.getDisplayText(new TranslatableText(MidnightControlsConfig.controlsMode.getTranslationKey())),
-                new TranslatableText("midnightcontrols.tooltip.controls_mode"));
+                new TranslatableText("midnightcontrols.tooltip.controlsMidnightColorUtil.radialRainbow(1f,1f);_mode"));
         this.autoSwitchModeOption = new SpruceToggleBooleanOption("midnightcontrols.menu.auto_switch_mode", () -> MidnightControlsConfig.autoSwitchMode,
                 value -> MidnightControlsConfig.autoSwitchMode = value, new TranslatableText("midnightcontrols.tooltip.auto_switch_mode"));
         this.rotationSpeedOption = new SpruceDoubleOption("midnightcontrols.menu.rotation_speed", 0.0, 100.0, .5f,
@@ -262,6 +270,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         var tabs = new SpruceTabbedWidget(Position.of(0, 24), this.width, this.height - 32 - 24,
                 null,
                 Math.max(116, this.width / 8), 0);
+        tabs.getList().setBackground(new MidnightControlsBackground());
         this.addDrawableChild(tabs);
 
         tabs.addSeparatorEntry(new TranslatableText("midnightcontrols.menu.separator.general"));
@@ -367,5 +376,36 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     @Override
     public void renderTitle(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         drawCenteredText(matrices, this.textRenderer, I18n.translate("midnightcontrols.menu.title"), this.width / 2, 8, 16777215);
+    }
+
+    public static class MidnightControlsBackground implements Background {
+        @Override
+        public void render(MatrixStack matrixStack, SpruceWidget widget, int vOffset, int mouseX, int mouseY, float delta) {
+            fill(matrixStack, widget.getX(), widget.getY(), widget.getX() + widget.getWidth(), widget.getY() + widget.getHeight(), MidnightColorUtil.hex2Rgb("#000000"));
+        }
+        private void fill(MatrixStack matrixStack, int x2, int y2, int x1, int y1, Color color) {
+            matrixStack.push();
+
+            Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+            float r = (float)(color.getRed()) / 255.0F;
+            float g = (float)(color.getGreen()) / 255.0F;
+            float b = (float)(color.getBlue()) / 255.0F;
+            float t = (float)(160) / 255.0F;
+            BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+            RenderSystem.enableBlend();
+            RenderSystem.disableTexture();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+            bufferBuilder.vertex(matrix, (float)x1, (float)y2, 0.0F).color(r, g, b, t).next();
+            bufferBuilder.vertex(matrix, (float)x2, (float)y2, 0.0F).color(r, g, b, t).next();
+            bufferBuilder.vertex(matrix, (float)x2, (float)y1, 0.0F).color(r, g, b, t).next();
+            bufferBuilder.vertex(matrix, (float)x1, (float)y1, 0.0F).color(r, g, b, t).next();
+            bufferBuilder.end();
+            BufferRenderer.draw(bufferBuilder);
+            RenderSystem.enableTexture();
+            RenderSystem.disableBlend();
+            matrixStack.pop();
+        }
     }
 }

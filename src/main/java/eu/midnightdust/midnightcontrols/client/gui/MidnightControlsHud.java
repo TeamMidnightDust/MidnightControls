@@ -14,6 +14,7 @@ import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.HudSide;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
+import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import dev.lambdaurora.spruceui.hud.Hud;
@@ -77,7 +78,7 @@ public class MidnightControlsHud extends Hud {
      */
     @Override
     public void render(MatrixStack matrices, float tickDelta) {
-        if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.currentScreen == null) {
+        if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.currentScreen == null && MidnightControlsConfig.getController().isConnected() && MidnightControlsConfig.getController().isGamepad()) {
             int y = bottom(2);
             this.renderFirstIcons(matrices, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
             this.renderSecondIcons(matrices, MidnightControlsConfig.hudSide == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);

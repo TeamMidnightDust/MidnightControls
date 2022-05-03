@@ -13,9 +13,7 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import io.github.kosmx.emotes.arch.gui.screen.ingame.FastChosseScreen;
 import io.github.kosmx.emotes.main.network.ClientEmotePlay;
-import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
 
 /**
  * Represents a compatibility handler for Emotecraft.

@@ -11,15 +11,39 @@ package eu.midnightdust.midnightcontrols.client.compat;
 
 import eu.midnightdust.midnightcontrols.client.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+import eu.midnightdust.midnightcontrols.client.compat.mixin.EntryListWidgetAccessor;
+import eu.midnightdust.midnightcontrols.client.compat.mixin.EntryWidgetAccessor;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.InputHandlers;
 import eu.midnightdust.midnightcontrols.client.controller.PressAction;
+import me.shedaniel.rei.RoughlyEnoughItemsCoreClient;
+import me.shedaniel.rei.impl.client.ClientHelperImpl;
+import me.shedaniel.rei.impl.client.REIRuntimeImpl;
+import me.shedaniel.rei.impl.client.gui.ScreenOverlayImpl;
+import me.shedaniel.rei.impl.client.gui.screen.CompositeDisplayViewingScreen;
+import me.shedaniel.rei.impl.client.gui.screen.DefaultDisplayViewingScreen;
+import me.shedaniel.rei.impl.client.gui.widget.EntryListEntryWidget;
+import me.shedaniel.rei.impl.client.gui.widget.EntryWidget;
+import me.shedaniel.rei.impl.client.registry.screen.ScreenRegistryImpl;
+import me.shedaniel.rei.impl.common.entry.AbstractEntryStack;
+import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
+import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
+import org.aperlambda.lambdacommon.utils.LambdaReflection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Optional;
+
+import static eu.midnightdust.midnightcontrols.client.compat.CompatHandler.SlotPos.INVALID_SLOT;
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
@@ -30,11 +54,11 @@ import static org.lwjgl.glfw.GLFW.*;
  * @since 1.2.0
  */
 public class ReiCompat implements CompatHandler {
-    //private static EntryListWidget ENTRY_LIST_WIDGET;
+    private static EntryListWidget ENTRY_LIST_WIDGET;
 
     @Override
     public void handle(@NotNull MidnightControlsClient mod) {
-        ButtonBinding.builder(new Identifier("rei", "category_back"))
+        /*ButtonBinding.builder(new Identifier("rei", "category_back"))
                 .buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
                 .filter((client, binding) -> isViewingScreen(client.currentScreen))
                 .action(handleTab(false))
@@ -87,38 +111,40 @@ public class ReiCompat implements CompatHandler {
                 .action(handleShowRecipeUsage(false))
                 .cooldown(true)
                 .register();
+         */
     }
+    /*
 
     @Override
     public boolean requireMouseOnScreen(Screen screen) {
-        return isViewingScreen(screen) /*|| screen instanceof PreRecipeViewingScreen*/;
+        return isViewingScreen(screen);
     }
 
     @Override
-    public @Nullable SlotPos getSlotAt(@NotNull Screen screen, int mouseX, int mouseY) {
-        /*var overlay = ScreenHelper.getOptionalOverlay();
-        if (overlay.isPresent() && overlay.get().isInside(mouseX, mouseY)) {
-            var widget = getEntryListWidget();
+    public @Nullable CompatHandler.SlotPos getSlotAt(@NotNull Screen screen, int mouseX, int mouseY) {
+
+        ScreenOverlayImpl overlay = ScreenOverlayImpl.getInstance();
+        if (overlay.isInside(mouseX, mouseY)) {
+            EntryListWidget widget = getEntryListWidget();
             if (widget == null)
                 return null;
 
-            var slot = this.getSlotAt(widget, mouseX, mouseY, false);
-            if (slot != null && slot != INVALID_SLOT)
-                return slot;
+            return this.getSlotAt(widget, mouseX, mouseY, false);
         } else if (isViewingScreen(screen)) {
-            for (var element : screen.children()) {
+            for (Element element : screen.children()) {
                 var slot = this.getSlotAt(element, mouseX, mouseY, true);
-                if (slot != null && slot != INVALID_SLOT)
+                if (slot != null)
                     return slot;
             }
-        }*/
+        }
         return null;
     }
 
-    /*private @Nullable SlotPos getSlotAt(@NotNull Element element, int mouseX, int mouseY, boolean allowEmpty) {
-        if (element instanceof EntryWidget entry) {
+    private @Nullable CompatHandler.SlotPos getSlotAt(@NotNull Element element, int mouseX, int mouseY, boolean allowEmpty) {
+        if (element instanceof EntryWidget) {
+            EntryWidget entry = (EntryWidget) element;
             if (entry.containsMouse(mouseX, mouseY)) {
-                if (!allowEmpty && entry.entries().isEmpty())
+                if (!allowEmpty && entry.getEntries().isEmpty())
                     return INVALID_SLOT;
                 return new SlotPos(entry.getBounds().getX() + 1, entry.getBounds().getY() + 1);
             }
@@ -137,11 +163,10 @@ public class ReiCompat implements CompatHandler {
             }
         }
         return null;
-    }*/
+    }
 
     private static boolean isViewingScreen(Screen screen) {
-        return true;
-        //return screen instanceof DefaultDisplayViewingScreen || screen instanceof CompositeDisplayViewingScreen;
+        return screen instanceof DefaultDisplayViewingScreen || screen instanceof CompositeDisplayViewingScreen;
     }
 
     @Override
@@ -149,12 +174,12 @@ public class ReiCompat implements CompatHandler {
         if (!isViewingScreen(screen))
             return false;
 
-        /*MinecraftClient.getInstance().openScreen(REIRuntimeImpl.getInstance().getPreviousContainerScreen());
-        ScreenHelper.getLastOverlay().init();*/
+        MinecraftClient.getInstance().setScreen(REIRuntimeImpl.getInstance().getPreviousContainerScreen());
+        REIRuntimeImpl.getInstance().getLastOverlay().init();
         return true;
     }
 
-    /*private static EntryListWidget getEntryListWidget() {
+    private static EntryListWidget getEntryListWidget() {
         if (ENTRY_LIST_WIDGET == null) {
             ENTRY_LIST_WIDGET = LambdaReflection.getFirstFieldOfType(ContainerScreenOverlay.class, EntryListWidget.class)
                     .map(field -> (EntryListWidget) LambdaReflection.getFieldValue(null, field))
@@ -163,55 +188,56 @@ public class ReiCompat implements CompatHandler {
         return ENTRY_LIST_WIDGET;
     }
 
-    private static @Nullable EntryStack getCurrentStack(@NotNull MinecraftClient client) {
+    private static @Nullable AbstractEntryStack getCurrentStack(@NotNull MinecraftClient client) {
         double x = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
         double y = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
 
         if (isViewingScreen(client.currentScreen)) {
-            for (var element : client.currentScreen.children()) {
-                var stack = getCurrentStack(element, x, y);
+            for (Element element : client.currentScreen.children()) {
+                EntryStack stack = getCurrentStack(element, x, y);
                 if (stack != null)
                     return stack;
             }
         }
 
-        var overlay = ScreenHelper.getOptionalOverlay();
+        Optional<ContainerScreenOverlay> overlay = REIRuntimeImpl.getInstance().getOverlay(false,false);
         if (!overlay.isPresent())
             return RecipeHelper.getInstance().getScreenFocusedStack(client.currentScreen);
-        var widget = getEntryListWidget();
+        EntryListWidget widget = getEntryListWidget();
         if (widget == null)
-            return RecipeHelper.getInstance().getScreenFocusedStack(client.currentScreen);
+            return ScreenOverlayImpl.getInstance().getInstance().getOverlayMenu()..getScreenFocusedStack(client.currentScreen);
 
         return getCurrentStack(widget, x, y);
     }
 
     private static @Nullable EntryStack getCurrentStack(@NotNull Element element, double mouseX, double mouseY) {
-        if (element instanceof EntryWidget entry) {
+        if (element instanceof EntryWidget) {
+            EntryWidget entry = (EntryWidget) element;
             if (entry.containsMouse(mouseX, mouseY))
-                return ((EntryWidgetAccessor) entry).midnightcontrols_getCurrentEntry();
+                return ((EntryWidgetAccessor) entry).lambdacontrols_getCurrentEntry();
         } else if (element instanceof EntryListWidget) {
-            var entries = ((EntryListWidgetAccessor) element).getEntries();
+            List<EntryListEntryWidget> entries = ((EntryListWidgetAccessor) element).getEntries();
             for (EntryListEntryWidget entry : entries) {
                 if (entry.containsMouse(mouseX, mouseY)) {
-                    return ((EntryWidgetAccessor) entry).midnightcontrols_getCurrentEntry();
+                    return ((EntryWidgetAccessor) entry).lambdacontrols_getCurrentEntry();
                 }
             }
-        } else if (!(element instanceof ButtonWidget) && element instanceof WidgetWithBounds widgetWithBounds) {
-            for (var child : widgetWithBounds.children()) {
-                var stack = getCurrentStack(child, mouseX, mouseY);
+        } else if (!(element instanceof ButtonWidget) && element instanceof WidgetWithBounds) {
+            for (Element child : ((WidgetWithBounds) element).children()) {
+                EntryStack stack = getCurrentStack(child, mouseX, mouseY);
                 if (stack != null)
                     return stack;
             }
         }
         return null;
-    }*/
+    }
 
     private static PressAction handleShowRecipeUsage(boolean usage) {
         return (client, button, value, action) -> {
             if (action.isUnpressed())
                 return false;
 
-            /*EntryStack stack = RecipeHelper.getInstance().getScreenFocusedStack(client.currentScreen);
+            EntryStack stack = RecipeHelper.getInstance().getScreenFocusedStack(client.currentScreen);
             if (stack == null) {
                 stack = getCurrentStack(client);
             }
@@ -223,7 +249,7 @@ public class ReiCompat implements CompatHandler {
                 } else {
                     return ClientHelper.getInstance().openView(ClientHelper.ViewSearchBuilder.builder().addRecipesFor(stack).setOutputNotice(stack).fillPreferredOpenedCategory());
                 }
-            }*/
+            }
 
             return false;
         };
@@ -234,11 +260,11 @@ public class ReiCompat implements CompatHandler {
             if (action == ButtonState.RELEASE)
                 return false;
 
-            /*Optional<ContainerScreenOverlay> overlay = ScreenHelper.getOptionalOverlay();
+            Optional<ContainerScreenOverlay> overlay = ScreenHelper.getOptionalOverlay();
             if (!overlay.isPresent())
                 return false;
 
-            var widget = getEntryListWidget();
+            EntryListWidget widget = getEntryListWidget();
             if (widget == null)
                 return false;
 
@@ -246,7 +272,7 @@ public class ReiCompat implements CompatHandler {
                 widget.nextPage();
             else
                 widget.previousPage();
-            widget.updateEntriesPosition();*/
+            widget.updateEntriesPosition();
 
             return true;
         };
@@ -258,27 +284,28 @@ public class ReiCompat implements CompatHandler {
      * @param next True if the action is to switch to the next tab.
      * @return The handler.
      */
+    /*
     private static PressAction handleTab(boolean next) {
         return (client, button, value, action) -> {
             if (action != ButtonState.RELEASE)
                 return false;
 
-            /*if (client.currentScreen instanceof DefaultDisplayViewingScreen) {
+            if (client.currentScreen instanceof RecipeViewingScreen) {
                 RecipeViewingScreenAccessor screen = (RecipeViewingScreenAccessor) client.currentScreen;
                 if (next)
                     screen.getCategoryNext().onClick();
                 else
                     screen.getCategoryBack().onClick();
                 return true;
-            } else if (client.currentScreen instanceof CompositeDisplayViewingScreen) {
+            } else if (client.currentScreen instanceof VillagerRecipeViewingScreen) {
                 VillagerRecipeViewingScreenAccessor screen = (VillagerRecipeViewingScreenAccessor) client.currentScreen;
                 List<RecipeCategory<?>> categories = screen.getCategories();
                 int currentTab = screen.getSelectedCategoryIndex();
                 screen.setSelectedCategoryIndex(getNextIndex(currentTab, categories.size(), next));
                 screen.setSelectedRecipeIndex(0);
-                screen.midnightcontrols_init();
+                screen.lambdacontrols_init();
                 return true;
-            }*/
+            }
             return false;
         };
     }
@@ -288,13 +315,15 @@ public class ReiCompat implements CompatHandler {
             if (action.isUnpressed())
                 return false;
 
-            /*if (client.currentScreen instanceof RecipeViewingScreenAccessor screen) {
+            if (client.currentScreen instanceof RecipeViewingScreen) {
+                RecipeViewingScreenAccessor screen = (RecipeViewingScreenAccessor) client.currentScreen;
                 if (next)
                     screen.getRecipeNext().onClick();
                 else
                     screen.getRecipeBack().onClick();
                 return true;
-            } else if (client.currentScreen instanceof VillagerRecipeViewingScreenAccessor screen) {
+            } else if (client.currentScreen instanceof VillagerRecipeViewingScreen) {
+                VillagerRecipeViewingScreenAccessor screen = (VillagerRecipeViewingScreenAccessor) client.currentScreen;
                 List<RecipeCategory<?>> categories = screen.getCategories();
                 int currentTab = screen.getSelectedCategoryIndex();
                 List<RecipeDisplay> recipes = screen.getCategoryMap().get(categories.get(currentTab));
@@ -315,10 +344,10 @@ public class ReiCompat implements CompatHandler {
                 }
 
                 screen.setSelectedRecipeIndex(nextRecipe);
-                screen.midnightcontrols_init();
+                screen.lambdacontrols_init();
 
                 return true;
-            }*/
+            }
 
             return false;
         };
@@ -332,4 +361,5 @@ public class ReiCompat implements CompatHandler {
             nextIndex = 0;
         return nextIndex;
     }
+     */
 }

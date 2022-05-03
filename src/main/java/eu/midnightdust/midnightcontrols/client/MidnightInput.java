@@ -70,7 +70,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class MidnightInput {
     private static final Map<Integer, Integer> BUTTON_COOLDOWNS = new HashMap<>();
     // Cooldowns
-    private int actionGuiCooldown = 0;
+    public int actionGuiCooldown = 0;
     private boolean ignoreNextARelease = false;
     private double targetYaw = 0.0;
     private double targetPitch = 0.0;

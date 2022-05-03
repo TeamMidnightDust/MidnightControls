@@ -13,7 +13,7 @@ package eu.midnightdust.midnightcontrols;
 import net.minecraft.util.Identifier;
 
 /**
- * Represents the constants used by midnightcontrols.
+ * Represents the constants used by MidnightControls.
  *
  * @author LambdAurora
  * @version 1.1.0

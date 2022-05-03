@@ -36,7 +36,7 @@ public class MidnightControlsMixinPlugin implements IMixinConfigPlugin {
     }
 
     private void putConditionalMixin(@NotNull String path, boolean condition) {
-        this.conditionalMixins.put("me.lambdaurora.midnightcontrols.client.compat.mixin." + path, condition);
+        this.conditionalMixins.put("eu.midnightdust.midnightcontrols.client.compat.mixin." + path, condition);
     }
 
     @Override

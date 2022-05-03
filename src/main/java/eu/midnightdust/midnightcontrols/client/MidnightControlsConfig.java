@@ -46,7 +46,6 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry public static int[] reacharoundOutlineColor = new int[]{255, 255, 255, 102};
     // Controller
     @Entry public static ControllerType controllerType = ControllerType.DEFAULT;
-    //private static final double DEFAULT_DEAD_ZONE = 0.25;
     @Entry public static double rightDeadZone = 0.25;
     @Entry public static double leftDeadZone = 0.25;
     @Entry public static boolean invertRightYAxis = false;
@@ -124,7 +123,7 @@ public class MidnightControlsConfig extends MidnightConfig {
         if (raw instanceof Number) {
             if (((Number) raw).intValue() == -1)
                 return Optional.empty();
-            return Optional.of(Controller.byId((Integer) raw));
+            return Optional.of(Controller.byId(((Number) raw).intValue()));
         } else if (raw instanceof String) {
             return Optional.of(Controller.byGuid((String) raw).orElse(Controller.byId(GLFW.GLFW_JOYSTICK_1)));
         }

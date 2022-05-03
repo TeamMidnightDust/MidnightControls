@@ -9,8 +9,8 @@
     "Motschen"
   ],
   "contact": {
-    "homepage": "https://github.com/TeamMidnightDust/MidnightControls",
-    "sources": "https://github.com/TeamMidnightDust/MidnightControls.git",
+    "homepage": "https://modrinth.com/mod/midnightcontrols",
+    "sources": "https://github.com/TeamMidnightDust/MidnightControls",
     "issues": "https://github.com/TeamMidnightDust/MidnightControls/issues"
   },
   "license": "MIT",
@@ -37,17 +37,16 @@
     "fabric": ">=0.36.0",
     "minecraft": ">=1.17",
     "spruceui": ">=3.2.0",
-    "java": ">=16"
+    "java": ">=17"
   },
   "recommends": {
     "modmenu": ">=1.12.2"
   },
   "suggests": {
-    "flamingo": "*"
+    "quilt_loader": "*"
   },
   "breaks": {
     "lambdacontrols": "*",
-    "modmenu": "<1.12.2",
-    "optifabric": "*"
+    "modmenu": "<1.12.2"
   }
 }

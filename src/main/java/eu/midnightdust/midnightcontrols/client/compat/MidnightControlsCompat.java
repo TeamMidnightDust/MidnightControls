@@ -31,7 +31,7 @@ import java.util.stream.Stream;
  * @since 1.1.0
  */
 public class MidnightControlsCompat {
-    private static final List<CompatHandler> HANDLERS = new ArrayList<>();
+    public static final List<CompatHandler> HANDLERS = new ArrayList<>();
 
     /**
      * Initializes compatibility with other mods if needed.

@@ -26,10 +26,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Represents the midnightcontrols mod.
+ * Represents the MidnightControls mod.
  *
- * @author LambdAurora
- * @version 1.7.0
+ * @author LambdAurora & Motschen
+ * @version 1.8.0
  * @since 1.0.0
  */
 public class MidnightControls implements ModInitializer {
@@ -40,12 +40,12 @@ public class MidnightControls implements ModInitializer {
 
     public static final TranslatableText NOT_BOUND_TEXT = new TranslatableText("midnightcontrols.not_bound");
 
-    public final Logger logger = LogManager.getLogger("midnightcontrols");
+    public final Logger logger = LogManager.getLogger("MidnightControls");
 
     @Override
     public void onInitialize() {
         INSTANCE = this;
-        this.log("Initializing midnightcontrols...");
+        this.log("Initializing MidnightControls...");
 
         ServerPlayNetworking.registerGlobalReceiver(HELLO_CHANNEL, (server, player, handler, buf, responseSender) -> {
             String version = buf.readString(32);
@@ -68,7 +68,7 @@ public class MidnightControls implements ModInitializer {
      * @param info the message to print
      */
     public void log(String info) {
-        this.logger.info("[midnightcontrols] " + info);
+        this.logger.info("[MidnightControls] " + info);
     }
 
     /**
@@ -77,7 +77,7 @@ public class MidnightControls implements ModInitializer {
      * @param warning the warning to print
      */
     public void warn(String warning) {
-        this.logger.info("[midnightcontrols] " + warning);
+        this.logger.info("[MidnightControls] " + warning);
     }
 
     /**
@@ -119,9 +119,9 @@ public class MidnightControls implements ModInitializer {
     }
 
     /**
-     * Gets the midnightcontrols instance.
+     * Gets the MidnightControls instance.
      *
-     * @return the midnightcontrols instance
+     * @return the MidnightControls instance
      */
     public static MidnightControls get() {
         return INSTANCE;
