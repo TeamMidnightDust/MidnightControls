@@ -31,6 +31,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
@@ -312,7 +313,7 @@ public class MidnightInput {
             }
 
             if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
-                if (client.currentScreen != null) {
+                if (client.currentScreen != null && client.currentScreen.getClass() != TitleScreen.class) {
                     if (!MidnightControlsCompat.handleMenuBack(client, client.currentScreen))
                         if (!this.tryGoBack(client.currentScreen))
                             client.currentScreen.onClose();

@@ -23,7 +23,8 @@ import org.lwjgl.glfw.GLFWGamepadState;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -145,9 +146,23 @@ public record Controller(int id) implements Nameable {
      */
     public static void updateMappings() {
         try {
+            MidnightControlsClient.get().log("Updating controller mappings...");
+            File databaseFile = new File("config/gamecontrollerdatabase.txt");
+            try {
+                BufferedInputStream in = new BufferedInputStream(new URL("https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt").openStream());
+
+                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(databaseFile));
+                byte[] dataBuffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                    out.write(dataBuffer, 0, bytesRead);
+                }
+                out.close();
+            } catch (Exception ignored) {/* Just continue when internet connection is not available */}
+            var database = ioResourceToBuffer(databaseFile.getPath(), 1024);
+            GLFW.glfwUpdateGamepadMappings(database);
             if (!MidnightControlsClient.MAPPINGS_FILE.exists())
                 return;
-            MidnightControlsClient.get().log("Updating controller mappings...");
             var buffer = ioResourceToBuffer(MidnightControlsClient.MAPPINGS_FILE.getPath(), 1024);
             GLFW.glfwUpdateGamepadMappings(buffer);
         } catch (IOException e) {

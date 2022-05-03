@@ -64,7 +64,7 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
     public static final Identifier CONTROLLER_EXPANDED = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_expanded.png");
     public static final Identifier CONTROLLER_AXIS = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_axis.png");
     public static final Identifier CURSOR_TEXTURE = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/cursor.png");
-    public final static File MAPPINGS_FILE = new File("config/gamecontrollerdb.txt");
+    public final static File MAPPINGS_FILE = new File("config/gamecontrollercustommappings.txt");
     public final MidnightInput input = new MidnightInput();
     public final MidnightRing ring = new MidnightRing(this);
     public final MidnightReacharound reacharound = new MidnightReacharound();

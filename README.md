@@ -5,7 +5,7 @@
 [![GitHub license](https://img.shields.io/github/license/TeamMidnightDust/MidnightControls?style=flat-square)](https://raw.githubusercontent.com/TeamMidnightDust/MidnightControls/master/LICENSE)
 ![Environment: Client](https://img.shields.io/badge/environment-client-1976d2?style=flat-square)
 [![Mod loader: Quilt/Fabric]][quilt] <!-- modrinth_exclude.start -->
-![Version](https://img.shields.io/github/v/tag/TeamMidnightDust/MidnightControls?label=version&style=flat-square)
+[![Version](https://img.shields.io/github/v/tag/TeamMidnightDust/MidnightControls?label=version&style=flat-square)](https://github.com/TeamMidnightDust/MidnightControls/releases)
 [![CurseForge](http://cf.way2muchnoise.eu/title/354231.svg)](https://www.curseforge.com/minecraft/mc-mods/midnightcontrols)
 <!-- modrinth_exclude.end -->
 
