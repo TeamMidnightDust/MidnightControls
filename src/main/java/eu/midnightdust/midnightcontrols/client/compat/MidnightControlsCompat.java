@@ -40,7 +40,7 @@ public class MidnightControlsCompat {
      */
     public static void init(@NotNull MidnightControlsClient mod) {
         if (FabricLoader.getInstance().isModLoaded("okzoomer")) {
-            mod.log("Adding okzoomer compatibility...");
+            mod.log("Adding Ok Zoomer compatibility...");
             HANDLERS.add(new OkZoomerCompat());
         }
         /*if (isReiPresent()) {
