@@ -35,6 +35,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry public static boolean debug = false;
     // HUD
     @Entry public static boolean hudEnable = true;
+    @Entry public static boolean hudAlwaysShow = true; // Enabled by default so that users migrating from LambdaControls will have a consistent experience.
     @Entry public static HudSide hudSide = HudSide.LEFT;
     // Gameplay
     @Entry public static boolean analogMovement = true;
