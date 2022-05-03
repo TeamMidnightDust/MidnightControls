@@ -258,7 +258,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     @Override
     protected void init() {
         super.init();
-        Controller.updateMappings();
 
         this.buildTabs();
 
