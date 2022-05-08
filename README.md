@@ -6,7 +6,7 @@
 ![Environment: Client](https://img.shields.io/badge/environment-client-1976d2?style=flat-square)
 [![Mod loader: Quilt/Fabric]][quilt] <!-- modrinth_exclude.start -->
 [![Version](https://img.shields.io/github/v/tag/TeamMidnightDust/MidnightControls?label=version&style=flat-square)](https://github.com/TeamMidnightDust/MidnightControls/releases)
-[![CurseForge](http://cf.way2muchnoise.eu/title/354231.svg)](https://www.curseforge.com/minecraft/mc-mods/midnightcontrols)
+[![CurseForge](http://cf.way2muchnoise.eu/title/621768.svg)](https://www.curseforge.com/minecraft/mc-mods/midnightcontrols)
 <!-- modrinth_exclude.end -->
 
 A Fabric Minecraft mod which adds better controls, reach-around and controller support.  

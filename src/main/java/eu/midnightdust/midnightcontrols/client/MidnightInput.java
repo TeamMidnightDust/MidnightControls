@@ -38,7 +38,6 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
-import net.minecraft.client.gui.screen.pack.PackScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
@@ -704,7 +703,7 @@ public class MidnightInput {
     }
 
     public static boolean isScreenInteractive(@NotNull Screen screen) {
-        return !(screen instanceof AdvancementsScreen || screen instanceof HandledScreen || screen instanceof PackScreen
+        return !(screen instanceof HandledScreen || MidnightControlsConfig.mouseScreens.stream().anyMatch(a -> screen.getClass().toString().contains(a))
                 || (screen instanceof SpruceScreen && ((SpruceScreen) screen).requiresCursor())
                 || MidnightControlsCompat.requireMouseOnScreen(screen));
     }

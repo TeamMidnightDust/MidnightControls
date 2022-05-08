@@ -59,6 +59,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry public static VirtualMouseSkin virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
     @Entry public static Object controllerID = 0;
     @Entry public static Object secondControllerID = -1;
+    @Entry public static List<String> mouseScreens = List.of("me.jellysquid.mods.sodium.client.gui","net.coderbot.iris.gui","net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen");
     @Entry public static Map<String, String> BINDINGS = Map.of();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
