@@ -94,7 +94,7 @@ public class OkZoomerCompat implements CompatHandler {
 
             okZoomerAreExtraKeyBindsEnabledMethodNameString = "areExtraKeyBindsEnabled";
         } else {
-            // If both of the above checks fail, then the version of the Ok Zoomer API that the user is trying to use is too new.
+            // If all of the above checks fail, then the version of the Ok Zoomer API that the user is trying to use is too new.
             MidnightControlsClient.get().warn("The version of Ok Zoomer that you are currently using is too new, and is not yet supported by MidnightControls!");
             return;
         }
