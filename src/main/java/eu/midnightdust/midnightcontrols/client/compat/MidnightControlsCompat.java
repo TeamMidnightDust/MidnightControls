@@ -39,7 +39,9 @@ public class MidnightControlsCompat {
      * @param mod the mod instance
      */
     public static void init(@NotNull MidnightControlsClient mod) {
-        if (FabricLoader.getInstance().isModLoaded("okzoomer")) {
+        // "okzoomer" is the mod ID used by Fabric-compatible versions of Ok Zoomer. (5.0.0-beta.6 and below.)
+        // "ok_zoomer" is the mod ID used by Quilt-exclusive versions of Ok Zoomer. (5.0.0-beta.7 and above.)
+        if (FabricLoader.getInstance().isModLoaded("okzoomer") || FabricLoader.getInstance().isModLoaded("ok_zoomer")) {
             mod.log("Adding Ok Zoomer compatibility...");
             HANDLERS.add(new OkZoomerCompat());
         }

@@ -71,7 +71,7 @@ public class OkZoomerCompat implements CompatHandler {
             okZoomerAreExtraKeyBindsEnabledMethodNameString = "areExtraKeybindsEnabled";
         } else if (LambdaReflection.doesClassExist("io.github.ennuil.okzoomer.key_binds.ZoomKeyBinds")) {
             // https://github.com/EnnuiL/OkZoomer/blob/5.0.0-beta.6+1.18.2/src/main/java/io/github/ennuil/okzoomer/key_binds/ZoomKeyBinds.java
-            MidnightControlsClient.get().log("Ok Zoomer version 5.0.0-beta.4 or above detected!");
+            MidnightControlsClient.get().log("Ok Zoomer version 5.0.0-beta.6, 5.0.0-beta.5, or 5.0.0-beta.4 detected!");
 
             okZoomerZoomKeybindsClassString = "io.github.ennuil.okzoomer.key_binds.ZoomKeyBinds";
 
@@ -81,8 +81,20 @@ public class OkZoomerCompat implements CompatHandler {
             okZoomerResetZoomKeyFieldString = "RESET_ZOOM_KEY";
 
             okZoomerAreExtraKeyBindsEnabledMethodNameString = "areExtraKeyBindsEnabled";
+        } else if (LambdaReflection.doesClassExist("io.github.ennuil.ok_zoomer.key_binds.ZoomKeyBinds")) {
+            // https://github.com/EnnuiL/OkZoomer/blob/5.0.0-beta.7+1.18.2/src/main/java/io/github/ennuil/ok_zoomer/key_binds/ZoomKeyBinds.java
+            MidnightControlsClient.get().log("Ok Zoomer version 5.0.0-beta.7 (Quilt) or above detected!");
+
+            okZoomerZoomKeybindsClassString = "io.github.ennuil.ok_zoomer.key_binds.ZoomKeyBinds";
+
+            okZoomerZoomKeyFieldString = "ZOOM_KEY";
+            okZoomerIncreaseZoomKeyFieldString = "INCREASE_ZOOM_KEY";
+            okZoomerDecreaseZoomKeyFieldString = "DECREASE_ZOOM_KEY";
+            okZoomerResetZoomKeyFieldString = "RESET_ZOOM_KEY";
+
+            okZoomerAreExtraKeyBindsEnabledMethodNameString = "areExtraKeyBindsEnabled";
         } else {
-            // If both of the above checks fail, then the version of the Ok Zoomer API that the user is trying to use is too new.
+            // If all of the above checks fail, then the version of the Ok Zoomer API that the user is trying to use is too new.
             MidnightControlsClient.get().warn("The version of Ok Zoomer that you are currently using is too new, and is not yet supported by MidnightControls!");
             return;
         }
