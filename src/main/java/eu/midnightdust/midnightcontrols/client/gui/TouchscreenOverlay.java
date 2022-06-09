@@ -22,7 +22,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -52,7 +52,7 @@ public class TouchscreenOverlay extends Screen {
 
     public TouchscreenOverlay(@NotNull MidnightControlsClient mod)
     {
-        super(new LiteralText("Touchscreen overlay"));
+        super(Text.literal("Touchscreen overlay"));
         this.mod = mod;
         this.passEvents = true;
     }

@@ -10,7 +10,6 @@
 package eu.midnightdust.midnightcontrols.client;
 
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +33,7 @@ public enum VirtualMouseSkin implements Nameable {
 
     VirtualMouseSkin(String name) {
         this.name = name;
-        this.text = new TranslatableText(this.getTranslationKey());
+        this.text = Text.translatable(this.getTranslationKey());
     }
 
     /**

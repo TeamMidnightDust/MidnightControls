@@ -16,7 +16,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,7 +38,7 @@ public class MidnightControls implements ModInitializer {
     public static final Identifier FEATURE_CHANNEL = new Identifier(MidnightControlsConstants.FEATURE_CHANNEL.toString());
     public static final Identifier HELLO_CHANNEL = new Identifier(MidnightControlsConstants.HELLO_CHANNEL.toString());
 
-    public static final TranslatableText NOT_BOUND_TEXT = new TranslatableText("midnightcontrols.not_bound");
+    public static final Text NOT_BOUND_TEXT = Text.translatable("midnightcontrols.not_bound");
 
     public final Logger logger = LogManager.getLogger("MidnightControls");
 

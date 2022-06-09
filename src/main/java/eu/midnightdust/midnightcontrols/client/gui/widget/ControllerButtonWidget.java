@@ -16,7 +16,6 @@ import dev.lambdaurora.spruceui.SpruceTexts;
 import dev.lambdaurora.spruceui.widget.AbstractSpruceIconButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,13 +34,13 @@ public class ControllerButtonWidget extends AbstractSpruceIconButtonWidget {
     public void update() {
         int length = binding.getButton().length;
         this.setMessage(this.binding.isNotBound() ? SpruceTexts.NOT_BOUND.copy() :
-                (length > 0 ? ButtonBinding.getLocalizedButtonName(binding.getButton()[0]) : new LiteralText("<>")));
+                (length > 0 ? ButtonBinding.getLocalizedButtonName(binding.getButton()[0]) : Text.literal("<>")));
     }
 
     @Override
     public Text getMessage() {
         if (this.binding.getButton().length > 1)
-            return LiteralText.EMPTY;
+            return Text.empty();
         return super.getMessage();
     }
 

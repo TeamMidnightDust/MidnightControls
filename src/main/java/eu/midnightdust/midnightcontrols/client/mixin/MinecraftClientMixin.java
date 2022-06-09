@@ -138,7 +138,7 @@ public abstract class MinecraftClientMixin {
                     hitResult = mod.reacharound.withSideForReacharound(hitResult, stackInHand);
 
                     int previousStackCount = stackInHand.getCount();
-                    var result = this.interactionManager.interactBlock(this.player, this.world, hand, hitResult);
+                    var result = this.interactionManager.interactBlock(this.player, hand, hitResult);
                     if (result.isAccepted()) {
                         if (result.shouldSwingHand()) {
                             this.player.swingHand(hand);

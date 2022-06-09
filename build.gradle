@@ -111,7 +111,7 @@ dependencies {
 
     modImplementation "org.quiltmc:quilt-json5:1.0.0"
     //modImplementation "maven.modrinth:sodium:${project.sodium_version}"
-    modImplementation("me.shedaniel:RoughlyEnoughItems-runtime-fabric:${project.rei_version}")
+    //modImplementation("maven.modrinth:emi:${project.emi_version}")
     modImplementation "maven.modrinth:emotecraft:${project.emotecraft_version}"
     modImplementation "io.github.kosmx:bendy-lib:${project.bendylib_version}"
 

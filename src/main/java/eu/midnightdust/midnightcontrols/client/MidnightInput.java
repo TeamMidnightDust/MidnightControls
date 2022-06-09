@@ -27,6 +27,7 @@ import dev.lambdaurora.spruceui.widget.AbstractSprucePressableButtonWidget;
 import dev.lambdaurora.spruceui.widget.SpruceElement;
 import dev.lambdaurora.spruceui.widget.SpruceLabelWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceParentWidget;
+import net.fabricmc.fabric.impl.item.group.CreativeGuiExtensions;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
@@ -45,7 +46,7 @@ import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -53,10 +54,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -71,7 +69,7 @@ public class MidnightInput {
     private static final Map<Integer, Integer> BUTTON_COOLDOWNS = new HashMap<>();
     // Cooldowns
     public int actionGuiCooldown = 0;
-    private boolean ignoreNextARelease = false;
+    public boolean ignoreNextARelease = false;
     private double targetYaw = 0.0;
     private double targetPitch = 0.0;
     private float prevXAxis = 0.f;
@@ -80,7 +78,7 @@ public class MidnightInput {
     private int targetMouseY = 0;
     private float mouseSpeedX = 0.f;
     private float mouseSpeedY = 0.f;
-    private int inventoryInteractionCooldown = 0;
+    public int inventoryInteractionCooldown = 0;
 
     private ControllerControlsWidget controlsInput = null;
 
@@ -315,7 +313,7 @@ public class MidnightInput {
                 if (client.currentScreen != null && client.currentScreen.getClass() != TitleScreen.class) {
                     if (!MidnightControlsCompat.handleMenuBack(client, client.currentScreen))
                         if (!this.tryGoBack(client.currentScreen))
-                            client.currentScreen.onClose();
+                            client.currentScreen.close();
                     return;
                 }
             }
@@ -323,6 +321,9 @@ public class MidnightInput {
 
         if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null && !isScreenInteractive(client.currentScreen)
                 && this.actionGuiCooldown == 0) {
+            if (client.currentScreen instanceof CreativeInventoryScreen creativeScreen && ((HandledScreenAccessor) creativeScreen).midnightcontrols$getSlotAt(
+                    client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth(),
+                    client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight()) != null) return;
             if (!this.ignoreNextARelease) {
                 double mouseX = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
                 double mouseY = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
@@ -347,58 +348,57 @@ public class MidnightInput {
      * @return {@code true} if an inventory interaction was done
      */
     private boolean handleInventory(@NotNull MinecraftClient client, int button) {
-        if (!(client.currentScreen instanceof HandledScreen))
-            return false;
-
-        if (client.interactionManager == null || client.player == null)
-            return false;
-
-        if (this.inventoryInteractionCooldown > 0)
-            return true;
-
-        if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
-            client.player.closeHandledScreen();
-            return true;
-        }
-
-        double x = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
-        double y = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
-
-        var screen = (HandledScreen) client.currentScreen;
-        var accessor = (HandledScreenAccessor) screen;
-        Slot slot = ((HandledScreenAccessor) client.currentScreen).midnightcontrols$getSlotAt(x, y);
-
-        int slotId;
-        if (slot == null) {
-            if (client.player.currentScreenHandler.getCursorStack().isEmpty())
-                return false;
-            slotId = accessor.midnightcontrols$isClickOutsideBounds(x, y, accessor.getX(), accessor.getY(), GLFW_MOUSE_BUTTON_1) ? -999 : -1;
-        } else {
-            slotId = slot.id;
-        }
-
-        var actionType = SlotActionType.PICKUP;
-        int clickData = GLFW.GLFW_MOUSE_BUTTON_1;
-        switch (button) {
-            case GLFW_GAMEPAD_BUTTON_A:
-                if (screen instanceof CreativeInventoryScreen)
-                    if (((CreativeInventoryScreenAccessor) screen).midnightcontrols$isCreativeInventorySlot(slot))
-                        actionType = SlotActionType.CLONE;
-                if (slot != null && MidnightControlsCompat.streamCompatHandlers().anyMatch(handler -> handler.isCreativeSlot(screen, slot)))
-                    actionType = SlotActionType.CLONE;
-                break;
-            case GLFW.GLFW_GAMEPAD_BUTTON_X:
-                clickData = GLFW_MOUSE_BUTTON_2;
-                break;
-            case GLFW.GLFW_GAMEPAD_BUTTON_Y:
-                actionType = SlotActionType.QUICK_MOVE;
-                break;
-            default:
-                return false;
-        }
-
-        accessor.midnightcontrols$onMouseClick(slot, slotId, clickData, actionType);
-        return true;
+//        if (!(client.currentScreen instanceof HandledScreen screen))
+//            return false;
+//
+//        if (client.interactionManager == null || client.player == null)
+//            return false;
+//
+//        if (this.inventoryInteractionCooldown > 0)
+//            return true;
+//
+//        if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
+//            client.player.closeHandledScreen();
+//            return true;
+//        }
+//
+//        double x = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
+//        double y = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
+//
+//        var accessor = (HandledScreenAccessor) screen;
+//        Slot slot = ((HandledScreenAccessor) client.currentScreen).midnightcontrols$getSlotAt(x, y);
+//
+//        int slotId;
+//        if (slot == null) {
+//            if (client.player.currentScreenHandler.getCursorStack().isEmpty())
+//                return false;
+//            slotId = accessor.midnightcontrols$isClickOutsideBounds(x, y, accessor.getX(), accessor.getY(), GLFW_MOUSE_BUTTON_1) ? -999 : -1;
+//        } else {
+//            slotId = slot.id;
+//        }
+//
+//        var actionType = SlotActionType.PICKUP;
+//        int clickData = GLFW.GLFW_MOUSE_BUTTON_1;
+//        switch (button) {
+//            case GLFW_GAMEPAD_BUTTON_A:
+//                if (screen instanceof CreativeInventoryScreen)
+//                    if (((CreativeInventoryScreenAccessor) screen).midnightcontrols$isCreativeInventorySlot(slot))
+//                        actionType = SlotActionType.CLONE;
+//                if (slot != null && MidnightControlsCompat.streamCompatHandlers().anyMatch(handler -> handler.isCreativeSlot(screen, slot)))
+//                    actionType = SlotActionType.CLONE;
+//                break;
+//            case GLFW.GLFW_GAMEPAD_BUTTON_X:
+//                clickData = GLFW_MOUSE_BUTTON_2;
+//                break;
+//            case GLFW.GLFW_GAMEPAD_BUTTON_Y:
+//                actionType = SlotActionType.QUICK_MOVE;
+//                break;
+//            default:
+//                return false;
+//        }
+//
+//        accessor.midnightcontrols$onMouseClick(slot, slotId, clickData, actionType);
+        return false;
     }
 
     /**
@@ -411,9 +411,9 @@ public class MidnightInput {
         var set = ImmutableSet.of("gui.back", "gui.done", "gui.cancel", "gui.toTitle", "gui.toMenu");
         return screen.children().stream().filter(element -> element instanceof PressableWidget)
                 .map(element -> (PressableWidget) element)
-                .filter(element -> element.getMessage() instanceof TranslatableText)
+                .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
                 .anyMatch(element -> {
-                    if (set.stream().anyMatch(key -> key.equals(((TranslatableText) element.getMessage()).getKey()))) {
+                    if (set.stream().anyMatch(key -> element.getMessage().getContent().toString().equals(key))) {
                         element.onPress();
                         return true;
                     }
@@ -511,6 +511,17 @@ public class MidnightInput {
                 }
                 return;
             }
+        } else if (client.currentScreen != null) {
+            if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y && absValue >= deadZone) {
+                client.currentScreen.children().stream().filter(element -> element instanceof EntryListWidget)
+                        .map(element -> (EntryListWidget<?>) element)
+                        .filter(element -> element.getType().isFocused())
+                        .anyMatch(element -> {
+                            element.mouseScrolled(0.0, 0.0, -value);
+                            return true;
+                        });
+                return;
+            }
         }
 
         absValue -= deadZone;
@@ -593,7 +604,7 @@ public class MidnightInput {
             labelWidget.onPress();
             return true;
         } else if (focused instanceof WorldListWidget list) {
-            list.getSelectedAsOptional().ifPresent(WorldListWidget.Entry::play);
+            list.getSelectedAsOptional().ifPresent(WorldListWidget.WorldEntry::play);
             return true;
         } else if (focused instanceof MultiplayerServerListWidget list) {
             var entry = list.getSelectedOrNull();
