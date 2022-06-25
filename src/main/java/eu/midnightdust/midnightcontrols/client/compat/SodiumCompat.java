@@ -2,6 +2,7 @@ package eu.midnightdust.midnightcontrols.client.compat;
 
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.compat.mixin.SodiumOptionsGUIAccessor;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
@@ -24,7 +25,7 @@ public class SodiumCompat {
             InputManager.INPUT_MANAGER.targetMouseX = (int) (client.getWindow().getScaleFactor() * dimensions.getCenterX());
             InputManager.INPUT_MANAGER.targetMouseY = (int) (client.getWindow().getScaleFactor() * dimensions.getCenterY());
             MidnightControlsClient.get().input.actionGuiCooldown = 5;
-            MidnightControls.get().log(i+" "+accessor.getControls().size()+" | " + dimensions.getCenterX() + " " + dimensions.getCenterY());
+            if (MidnightControlsConfig.debug) MidnightControls.get().log(i+" "+accessor.getControls().size()+" | " + dimensions.getCenterX() + " " + dimensions.getCenterY());
         }
     }
     public static void handleTabs(Screen screen, boolean direction) {
@@ -33,7 +34,7 @@ public class SodiumCompat {
             final int max = accessor.getPages().size()-1;
             int i = accessor.getPages().indexOf(accessor.getCurrentPage());
             i = (direction ? ((max > i) ? ++i : 0) : (i > 0 ? --i : max));
-            MidnightControls.get().log(""+i);
+            if (MidnightControlsConfig.debug) MidnightControls.get().log(""+i);
             optionsGUI.setPage(accessor.getPages().get(i));
         }
     }

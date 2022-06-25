@@ -110,7 +110,7 @@ dependencies {
     // modImplementation "io.github.ennuil:LibZoomer:${project.libzoomer_version}"
 
     modImplementation "org.quiltmc:quilt-json5:1.0.0"
-    modImplementation "maven.modrinth:sodium:${project.sodium_version}"
+    modApi "maven.modrinth:sodium:${project.sodium_version}"
     //modImplementation("maven.modrinth:emi:${project.emi_version}")
     modImplementation "maven.modrinth:emotecraft:${project.emotecraft_version}"
     modImplementation "io.github.kosmx:bendy-lib:${project.bendylib_version}"

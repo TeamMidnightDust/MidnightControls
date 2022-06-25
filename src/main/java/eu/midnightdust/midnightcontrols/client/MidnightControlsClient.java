@@ -64,8 +64,8 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.movement");
     public static final KeyBinding BINDING_LOOK_LEFT = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "look_left"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement");
-    public static final KeyBinding           BINDING_RING       = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "ring"),
-            InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.categories.misc");
+    public static final KeyBinding BINDING_RING = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "ring"),
+            InputUtil.Type.MOUSE, 0, "key.categories.misc");
     public static final Identifier CONTROLLER_BUTTONS = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_buttons.png");
     public static final Identifier CONTROLLER_EXPANDED = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_expanded.png");
     public static final Identifier CONTROLLER_AXIS = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_axis.png");
@@ -188,9 +188,9 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && (client.isWindowFocused() || MidnightControlsConfig.unfocusedInput))
             this.input.tickController(client);
 
-        if (BINDING_RING.wasPressed()) {
-            client.setScreen(new RingScreen());
-        }
+//        if (BINDING_RING.wasPressed()) {
+//            client.setScreen(new RingScreen());
+//        }
     }
     public void onRender(MinecraftClient client) {
         this.input.onRender(client.getTickDelta(), client);
