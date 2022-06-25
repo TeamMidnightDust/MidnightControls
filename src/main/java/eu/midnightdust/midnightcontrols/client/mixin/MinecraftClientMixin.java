@@ -55,10 +55,6 @@ public abstract class MinecraftClientMixin {
     public ClientPlayerInteractionManager interactionManager;
 
     @Shadow
-    @Nullable
-    public ClientWorld world;
-
-    @Shadow
     @Final
     public GameRenderer gameRenderer;
 
@@ -104,18 +100,26 @@ public abstract class MinecraftClientMixin {
             this.midnightcontrols$lastTargetSide = side;
         }
         // Removed front placing sprinting as way too cheaty.
-        /*else if (this.player.isSprinting()) {
-            hitResult = midnightcontrolsClient.get().reacharound.getLastReacharoundResult();
+        else if (this.player.isSprinting()) {
+            hitResult = MidnightControlsClient.get().reacharound.getLastReacharoundResult();
             if (hitResult != null) {
                 if (cooldown > 0)
                     this.itemUseCooldown = 0;
             }
-        }*/
+        }
         this.midnightcontrols$lastPos = this.player.getPos();
     }
-
+    // Applied three times for smooth camera turning even on low FPS
+    @Inject(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Recorder;startTick()V", shift = At.Shift.AFTER))
+    private void onPreRender(CallbackInfo ci) {
+        MidnightControlsClient.get().onRender((MinecraftClient) (Object) (this));
+    }
     @Inject(method = "render", at = @At("HEAD"))
-    private void onRender(boolean fullRender, CallbackInfo ci) {
+    private void onRender(CallbackInfo ci) {
+        MidnightControlsClient.get().onRender((MinecraftClient) (Object) (this));
+    }
+    @Inject(method = "render", at = @At("TAIL"))
+    private void onPostRender(CallbackInfo ci) {
         MidnightControlsClient.get().onRender((MinecraftClient) (Object) (this));
     }
 

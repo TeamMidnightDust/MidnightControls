@@ -28,7 +28,7 @@ public class KeyBindingMixin implements KeyBindingAccessor {
         if (!this.pressed)
             this.pressed = true;
         ++this.timesPressed;
-        return oldPressed != this.pressed;
+        return !oldPressed;
     }
 
     @Override

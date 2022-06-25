@@ -42,10 +42,10 @@ public class InputManager {
     private static final List<ButtonCategory> CATEGORIES = new ArrayList<>();
     public static final Int2ObjectMap<ButtonState> STATES = new Int2ObjectOpenHashMap<>();
     public static final Int2FloatMap BUTTON_VALUES = new Int2FloatOpenHashMap();
-    private int prevTargetMouseX = 0;
-    private int prevTargetMouseY = 0;
-    private int targetMouseX = 0;
-    private int targetMouseY = 0;
+    public int prevTargetMouseX = 0;
+    public int prevTargetMouseY = 0;
+    public int targetMouseX = 0;
+    public int targetMouseY = 0;
 
     protected InputManager() {
     }

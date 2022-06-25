@@ -17,6 +17,7 @@ import dev.lambdaurora.spruceui.Position;
 import dev.lambdaurora.spruceui.SpruceTexts;
 import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
+import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsSettingsScreen;
 import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -49,6 +50,7 @@ public class ControllerControlsWidget extends SpruceContainerWidget {
                 Text.translatable("midnightcontrols.menu.keyboard_controls"),
                 btn -> this.client.setScreen(new ControlsOptionsScreen(null, this.client.options))));
         this.bindingsListWidget = new ControlsListWidget(Position.of(this, 0, 43), this.width, this.height - 43 - 35, this);
+        this.bindingsListWidget.setBackground(new MidnightControlsSettingsScreen.MidnightControlsBackground(130));
         this.addChild(this.bindingsListWidget);
         this.addChild(this.resetButton = new SpruceButtonWidget(Position.of(this, this.width / 2 - 155, this.height - 29), 150, 20,
                 SpruceTexts.CONTROLS_RESET_ALL,

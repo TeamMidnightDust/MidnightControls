@@ -46,10 +46,10 @@ public class RingScreen extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        /*if (midnightcontrolsClient.BINDING_RING.matchesMouse(button)) {
-            this.onClose();
+        if (mod.ring.getCurrentPage().onClick(client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight(), (int) mouseX, (int) mouseY)) {
+            this.close();
             return true;
-        }*/
+        }
         return false;
     }
 }

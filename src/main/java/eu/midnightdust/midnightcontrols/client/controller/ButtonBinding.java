@@ -13,6 +13,7 @@ import eu.midnightdust.midnightcontrols.client.ButtonState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.aperlambda.lambdacommon.utils.function.PairPredicate;
@@ -75,9 +76,9 @@ public class ButtonBinding {
     public static final ButtonBinding SPRINT = new Builder("sprint").buttons(GLFW_GAMEPAD_BUTTON_LEFT_THUMB).onlyInGame().register();
     public static final ButtonBinding SWAP_HANDS = new Builder("swap_hands").buttons(GLFW_GAMEPAD_BUTTON_X).onlyInGame().cooldown().register();
     public static final ButtonBinding TAB_LEFT = new Builder("tab_back").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
-            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements)).cooldown().register();
+            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((client, binding) -> client.currentScreen != null && client.currentScreen.getClass().toString().contains("sodium"))).cooldown().register();
     public static final ButtonBinding TAB_RIGHT = new Builder("tab_next").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
-            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements)).cooldown().register();
+            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((client, binding) -> client.currentScreen != null && client.currentScreen.getClass().toString().contains("sodium"))).cooldown().register();
     public static final ButtonBinding PAGE_LEFT = new Builder("page_back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
             .action(InputHandlers.handlePage(false)).filter(InputHandlers::inInventory).cooldown().register();
     public static final ButtonBinding PAGE_RIGHT = new Builder("page_next").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
@@ -248,7 +249,7 @@ public class ButtonBinding {
      * @return the translation key
      */
     public @NotNull String getTranslationKey() {
-        return "midnightcontrols.action." + this.getName();
+        return I18n.hasTranslation("midnightcontrols.action." + this.getName()) ? "midnightcontrols.action." + this.getName() : this.getName();
     }
 
     public @NotNull Text getText() {
@@ -440,7 +441,7 @@ public class ButtonBinding {
         }
 
         public Builder(@NotNull Identifier identifier) {
-            this(identifier.getNamespace() + "." + identifier.getNamespace());
+            this(identifier.getNamespace() + "." + identifier.getPath());
         }
 
         /**

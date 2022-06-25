@@ -60,6 +60,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption resetOption;
     // Gameplay options
     private final SpruceOption analogMovementOption;
+    private final SpruceOption doubleTapToSprintOption;
     private final SpruceOption autoJumpOption;
     private final SpruceOption fastBlockPlacingOption;
     private final SpruceOption frontBlockPlacingOption;
@@ -177,7 +178,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                 Text.translatable("midnightcontrols.tooltip.mouse_speed"));
         this.resetOption = SpruceSimpleActionOption.reset(btn -> {
             // TODO
-            MidnightControlsConfig.init("midnightcontrols", MidnightControlsConfig.class);
+            MidnightControlsConfig.reset();
             var client = MinecraftClient.getInstance();
             this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
         });
@@ -185,6 +186,9 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         this.analogMovementOption = new SpruceToggleBooleanOption("midnightcontrols.menu.analog_movement",
                 () -> MidnightControlsConfig.analogMovement, value -> MidnightControlsConfig.analogMovement = value,
                 Text.translatable("midnightcontrols.tooltip.analog_movement"));
+        this.doubleTapToSprintOption = new SpruceToggleBooleanOption("midnightcontrols.menu.double_tap_to_sprint",
+                () -> MidnightControlsConfig.doubleTapToSprint, value -> MidnightControlsConfig.doubleTapToSprint = value,
+                Text.translatable("midnightcontrols.tooltip.double_tap_to_sprint"));
         this.autoJumpOption = new SpruceToggleBooleanOption("options.autoJump",
                 () -> this.client.options.getAutoJump().getValue(),
                 newValue -> this.client.options.getAutoJump().setValue(newValue),
@@ -292,6 +296,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
 
     public SpruceOptionListWidget buildGeneralTab(int width, int height) {
         var list = new SpruceOptionListWidget(Position.origin(), width, height);
+        list.setBackground(new MidnightControlsBackground(130));
         list.addSingleOptionEntry(this.inputModeOption);
         list.addSingleOptionEntry(this.autoSwitchModeOption);
         list.addSingleOptionEntry(this.rotationSpeedOption);
@@ -302,18 +307,21 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
 
     public SpruceOptionListWidget buildGameplayTab(int width, int height) {
         var list = new SpruceOptionListWidget(Position.origin(), width, height);
+        list.setBackground(new MidnightControlsBackground(130));
         list.addSingleOptionEntry(this.analogMovementOption);
-        list.addSingleOptionEntry(this.fastBlockPlacingOption);
-        list.addSingleOptionEntry(this.frontBlockPlacingOption);
-        list.addSingleOptionEntry(this.verticalReacharoundOption);
-        list.addSingleOptionEntry(this.flyDriftingOption);
-        list.addSingleOptionEntry(this.flyVerticalDriftingOption);
+        list.addSingleOptionEntry(this.doubleTapToSprintOption);
+        if (MidnightControls.isExtrasLoaded) list.addSingleOptionEntry(this.fastBlockPlacingOption);
+        if (MidnightControls.isExtrasLoaded) list.addSingleOptionEntry(this.frontBlockPlacingOption);
+        if (MidnightControls.isExtrasLoaded) list.addSingleOptionEntry(this.verticalReacharoundOption);
+        if (MidnightControls.isExtrasLoaded) list.addSingleOptionEntry(this.flyDriftingOption);
+        if (MidnightControls.isExtrasLoaded) list.addSingleOptionEntry(this.flyVerticalDriftingOption);
         list.addSingleOptionEntry(this.autoJumpOption);
         return list;
     }
 
     public SpruceOptionListWidget buildVisualTab(int width, int height) {
         var list = new SpruceOptionListWidget(Position.origin(), width, height);
+        list.setBackground(new MidnightControlsBackground(130));
         list.addSingleOptionEntry(this.controllerTypeOption);
         list.addSingleOptionEntry(this.virtualMouseSkinOption);
         list.addSingleOptionEntry(new SpruceSeparatorOption("midnightcontrols.menu.title.hud", true, null));
@@ -352,6 +360,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         labels.addChild(aboutMappings3);
 
         var list = new SpruceOptionListWidget(Position.origin(), width, listHeight);
+        list.setBackground(new MidnightControlsBackground(130));
         list.addSingleOptionEntry(this.controllerOption);
         list.addSingleOptionEntry(this.secondControllerOption);
         list.addSingleOptionEntry(this.unfocusedInputOption);
@@ -377,6 +386,11 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     }
 
     public static class MidnightControlsBackground implements Background {
+        private int transparency = 160;
+        public MidnightControlsBackground() {}
+        public MidnightControlsBackground(int transparency) {
+            this.transparency = transparency;
+        }
         @Override
         public void render(MatrixStack matrixStack, SpruceWidget widget, int vOffset, int mouseX, int mouseY, float delta) {
             fill(matrixStack, widget.getX(), widget.getY(), widget.getX() + widget.getWidth(), widget.getY() + widget.getHeight(), MidnightColorUtil.hex2Rgb("#000000"));
@@ -388,7 +402,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             float r = (float)(color.getRed()) / 255.0F;
             float g = (float)(color.getGreen()) / 255.0F;
             float b = (float)(color.getBlue()) / 255.0F;
-            float t = (float)(160) / 255.0F;
+            float t = (float)(transparency) / 255.0F;
             BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
             RenderSystem.enableBlend();
             RenderSystem.disableTexture();

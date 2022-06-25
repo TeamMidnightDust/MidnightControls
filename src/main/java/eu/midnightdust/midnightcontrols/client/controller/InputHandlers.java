@@ -13,11 +13,13 @@ import eu.midnightdust.midnightcontrols.client.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
+import eu.midnightdust.midnightcontrols.client.compat.SodiumCompat;
 import eu.midnightdust.midnightcontrols.client.mixin.AdvancementsScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.RecipeBookWidgetAccessor;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import net.fabricmc.fabric.impl.item.group.CreativeGuiExtensions;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
@@ -64,7 +66,7 @@ public class InputHandlers {
                     client.player.getInventory().selectedSlot = client.player.getInventory().selectedSlot == 0 ? 8 : client.player.getInventory().selectedSlot - 1;
                 return true;
             } else if (client.currentScreen instanceof CreativeInventoryScreenAccessor inventory) {
-                int currentTab = inventory.getSelectedTab();
+                int currentTab = CreativeInventoryScreenAccessor.getSelectedTab();
                 int nextTab = currentTab + (next ? 1 : -1);
                 if (nextTab < 0)
                     nextTab = ItemGroup.GROUPS.length - 1;
@@ -105,7 +107,7 @@ public class InputHandlers {
                     }
                 }
                 return true;
-            }
+            } else if (FabricLoader.getInstance().isModLoaded("sodium")) SodiumCompat.handleTabs(client.currentScreen, next);
             return false;
         };
     }

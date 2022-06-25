@@ -10,6 +10,8 @@
 package eu.midnightdust.midnightcontrols.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import eu.midnightdust.midnightcontrols.MidnightControls;
+import eu.midnightdust.midnightcontrols.client.ControllerType;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
@@ -106,7 +108,7 @@ public class MidnightControlsRenderer {
             second = true;
         }
 
-        int controllerType = MidnightControlsConfig.controllerType.getId();
+        int controllerType = MidnightControlsConfig.controllerType == ControllerType.DEFAULT ? MidnightControlsConfig.matchControllerToType().getId() : MidnightControlsConfig.controllerType.getId();
         boolean axis = false;
         int buttonOffset = button * 15;
         switch (button) {

@@ -16,10 +16,13 @@ import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
+import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsHud;
+import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
+import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingRegistryImplAccessor;
 import eu.midnightdust.midnightcontrols.client.ring.KeyBindingRingAction;
 import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
 import dev.lambdaurora.spruceui.hud.HudManager;
@@ -51,6 +54,7 @@ import java.io.File;
  * @since 1.1.0
  */
 public class MidnightControlsClient extends MidnightControls implements ClientModInitializer {
+    public static boolean lateInitDone = false;
     private static MidnightControlsClient INSTANCE;
     public static final KeyBinding BINDING_LOOK_UP = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "look_up"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.movement");
@@ -60,8 +64,8 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.movement");
     public static final KeyBinding BINDING_LOOK_LEFT = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "look_left"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement");
-    /*public static final KeyBinding           BINDING_RING       = InputManager.makeKeyBinding(new Identifier(midnightcontrolsConstants.NAMESPACE, "ring"),
-            InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.categories.misc");*/
+    public static final KeyBinding           BINDING_RING       = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "ring"),
+            InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.categories.misc");
     public static final Identifier CONTROLLER_BUTTONS = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_buttons.png");
     public static final Identifier CONTROLLER_EXPANDED = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_expanded.png");
     public static final Identifier CONTROLLER_AXIS = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_axis.png");
@@ -83,10 +87,10 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         //KeyBindingHelper.registerKeyBinding(BINDING_RING);
 
         this.ring.registerAction("keybinding", KeyBindingRingAction.FACTORY);
+        this.ring.load();
 
-        ClientPlayNetworking.registerGlobalReceiver(CONTROLS_MODE_CHANNEL, (client, handler, buf, responseSender) -> {
-            responseSender.sendPacket(CONTROLS_MODE_CHANNEL, this.makeControlsModeBuffer(MidnightControlsConfig.controlsMode));
-        });
+        ClientPlayNetworking.registerGlobalReceiver(CONTROLS_MODE_CHANNEL, (client, handler, buf, responseSender) ->
+                responseSender.sendPacket(CONTROLS_MODE_CHANNEL, this.makeControlsModeBuffer(MidnightControlsConfig.controlsMode)));
         ClientPlayNetworking.registerGlobalReceiver(FEATURE_CHANNEL, (client, handler, buf, responseSender) -> {
             int features = buf.readVarInt();
             for (int i = 0; i < features; i++) {
@@ -102,23 +106,22 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         ClientPlayConnectionEvents.DISCONNECT.register(this::onLeave);
 
         ClientTickEvents.START_CLIENT_TICK.register(this.reacharound::tick);
-        ClientTickEvents.END_CLIENT_TICK.register(this::onTick);
+        ClientTickEvents.START_CLIENT_TICK.register(this::onTick);
 
         OpenScreenCallback.EVENT.register((client, screen) -> {
-//            if (screen == null && MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN) {
-//                screen = new TouchscreenOverlay(this);
-//                screen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
-//                client.skipGameRender = false;
-//                client.currentScreen = screen;
-//            } else if (screen != null) {
+            if (screen == null && MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN) {
+                screen = new TouchscreenOverlay(this);
+                screen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
+                client.skipGameRender = false;
+                client.currentScreen = screen;
+            } else if (screen != null) {
                 this.input.onScreenOpen(client, client.getWindow().getWidth(), client.getWindow().getHeight());
-            //}
+            }
         });
 
         HudManager.register(this.hud = new MidnightControlsHud(this));
-        FabricLoader.getInstance().getModContainer("midnightcontrols").ifPresent(modContainer -> {
-            ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","bedrock"), modContainer, ResourcePackActivationType.NORMAL);
-        });
+        FabricLoader.getInstance().getModContainer("midnightcontrols").ifPresent(modContainer ->
+                ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","bedrock"), modContainer, ResourcePackActivationType.NORMAL));
     }
 
     /**
@@ -144,6 +147,35 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
 
         MidnightControlsCompat.init(this);
     }
+    ButtonCategory category;
+    /**
+     * This method is called to initialize keybindings
+     */
+    public void initKeybindings() {
+        if (lateInitDone) return;
+        if (KeyBindingRegistryImplAccessor.getModdedKeyBindings() == null || KeyBindingRegistryImplAccessor.getModdedKeyBindings().isEmpty()) return;
+        for (int i = 0; i < KeyBindingRegistryImplAccessor.getModdedKeyBindings().size(); ++i) {
+            KeyBinding keyBinding = KeyBindingRegistryImplAccessor.getModdedKeyBindings().get(i);
+            if (!keyBinding.getTranslationKey().contains("midnightcontrols")) {
+                category = null;
+                InputManager.streamCategories().forEach(buttonCategory -> {
+                    if (buttonCategory.getIdentifier().equals(new org.aperlambda.lambdacommon.Identifier("minecraft", keyBinding.getCategory())))
+                        category = buttonCategory;
+                });
+                if (category == null) {
+                    category = new ButtonCategory(new org.aperlambda.lambdacommon.Identifier("minecraft", keyBinding.getCategory()));
+                    InputManager.registerCategory(category);
+                }
+                ButtonBinding buttonBinding = new ButtonBinding.Builder(keyBinding.getTranslationKey()).category(category).linkKeybind(keyBinding).register();
+                if (MidnightControlsConfig.debug) {
+                    logger.info(keyBinding.getTranslationKey());
+                    logger.info(buttonBinding);
+                }
+            }
+        }
+        InputManager.loadButtonBindings();
+        lateInitDone = true;
+    }
 
     /**
      * This method is called every Minecraft tick.
@@ -151,15 +183,15 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
      * @param client the client instance
      */
     public void onTick(@NotNull MinecraftClient client) {
+        this.initKeybindings();
         this.input.tick(client);
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && (client.isWindowFocused() || MidnightControlsConfig.unfocusedInput))
             this.input.tickController(client);
 
-        /*if (BINDING_RING.wasPressed()) {
-            client.openScreen(new RingScreen());
-        }*/
+        if (BINDING_RING.wasPressed()) {
+            client.setScreen(new RingScreen());
+        }
     }
-
     public void onRender(MinecraftClient client) {
         this.input.onRender(client.getTickDelta(), client);
     }

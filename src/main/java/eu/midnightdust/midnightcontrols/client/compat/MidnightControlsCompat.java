@@ -53,10 +53,6 @@ public class MidnightControlsCompat {
             mod.log("Adding HQM compatibility...");
             HANDLERS.add(new HQMCompat());
         }
-        if (FabricLoader.getInstance().isModLoaded("emotecraft")) {
-            mod.log("Adding Emotecraft compatibility...");
-            HANDLERS.add(new EmotecraftCompat());
-        }
         HANDLERS.forEach(handler -> handler.handle(mod));
         InputManager.loadButtonBindings();
     }

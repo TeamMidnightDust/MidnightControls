@@ -53,6 +53,7 @@ public class MidnightControlsHud extends Hud {
     private String attackAction = "";
     private String placeAction = "";
     private int ticksDisplayedCrosshair = 0;
+    private static float scale = 1f;
 
     public MidnightControlsHud(@NotNull MidnightControlsClient mod) {
         super(new Identifier(MidnightControlsConstants.NAMESPACE, "hud/button_indicator"));
@@ -71,7 +72,11 @@ public class MidnightControlsHud extends Hud {
         this.dropItemButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.DROP_ITEM);
         this.attackButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.ATTACK);
         this.useButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.USE);
+        if (client.options.getGuiScale().getValue() >= 4) {
+            scale = 0.75f * (client.options.getGuiScale().getValue() -3);
+        } else scale = 1f;
     }
+
 
     /**
      * Renders the midnightcontrols' HUD.
@@ -80,10 +85,12 @@ public class MidnightControlsHud extends Hud {
     public void render(MatrixStack matrices, float tickDelta) {
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.currentScreen == null) {
             int y = bottom(2);
-            this.renderFirstIcons(matrices, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
-            this.renderSecondIcons(matrices, MidnightControlsConfig.hudSide == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);
-            this.renderFirstSection(matrices, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
-            this.renderSecondSection(matrices, MidnightControlsConfig.hudSide == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);
+            if (scale != 1f) matrices.scale(scale,scale,scale);
+            this.renderFirstIcons(matrices, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : (int) ((client.getWindow().getScaledWidth() - 2) * (1 / scale)), y);
+            this.renderSecondIcons(matrices, MidnightControlsConfig.hudSide == HudSide.RIGHT ? 2 : (int) ((client.getWindow().getScaledWidth() - 2) * (1 / scale)), y);
+            this.renderFirstSection(matrices, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : (int) ((client.getWindow().getScaledWidth() - 2) * (1 / scale)), y);
+            this.renderSecondSection(matrices, MidnightControlsConfig.hudSide == HudSide.RIGHT ? 2 : (int) ((client.getWindow().getScaledWidth() - 2) * (1 / scale)), y);
+            if (scale != 1f) matrices.scale(1,1,1);
         }
 
         if (this.mod.reacharound.isLastReacharoundVertical()) {
@@ -246,7 +253,7 @@ public class MidnightControlsHud extends Hud {
     }
 
     private int bottom(int y) {
-        return this.client.getWindow().getScaledHeight() - y - MidnightControlsRenderer.ICON_SIZE;
+        return (int) ((this.client.getWindow().getScaledHeight() * (1/scale)) - y - MidnightControlsRenderer.ICON_SIZE);
     }
 
     private int width(@NotNull ButtonBinding binding) {

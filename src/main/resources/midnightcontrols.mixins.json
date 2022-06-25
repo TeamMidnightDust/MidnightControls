@@ -16,7 +16,8 @@
     "MinecraftClientMixin",
     "MouseMixin",
     "RecipeBookWidgetAccessor",
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "KeyBindingRegistryImplAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

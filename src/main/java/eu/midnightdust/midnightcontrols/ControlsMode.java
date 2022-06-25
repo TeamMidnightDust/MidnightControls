@@ -24,7 +24,8 @@ import java.util.Optional;
  */
 public enum ControlsMode implements Nameable {
     DEFAULT,
-    CONTROLLER;
+    CONTROLLER,
+    TOUCHSCREEN;
 
     /**
      * Returns the next controls mode available.
