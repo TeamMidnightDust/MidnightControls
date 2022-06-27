@@ -83,6 +83,7 @@ public class MidnightControlsHud extends Hud {
      */
     @Override
     public void render(MatrixStack matrices, float tickDelta) {
+        if (this.client == null) return;
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.currentScreen == null) {
             int y = bottom(2);
             if (scale != 1f) matrices.scale(scale,scale,scale);

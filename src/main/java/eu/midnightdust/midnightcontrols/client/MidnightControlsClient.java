@@ -65,7 +65,7 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
     public static final KeyBinding BINDING_LOOK_LEFT = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "look_left"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement");
     public static final KeyBinding BINDING_RING = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "ring"),
-            InputUtil.Type.MOUSE, 0, "key.categories.misc");
+            InputUtil.Type.KEYSYM, InputUtil.UNKNOWN_KEY.getCode(), "key.categories.misc");
     public static final Identifier CONTROLLER_BUTTONS = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_buttons.png");
     public static final Identifier CONTROLLER_EXPANDED = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_expanded.png");
     public static final Identifier CONTROLLER_AXIS = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_axis.png");
