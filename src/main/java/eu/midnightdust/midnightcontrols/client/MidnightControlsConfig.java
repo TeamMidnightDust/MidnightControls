@@ -52,7 +52,8 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(name = "midnightcontrols.menu.invert_right_y_axis") public static boolean invertRightYAxis = false;
     @Entry(name = "midnightcontrols.menu.invert_right_x_axis") public static boolean invertRightXAxis = false;
     public static double DEFAULT_MAX_VALUE = 1;
-    @Entry(name = "midnightcontrols.menu.right_dead_zone") public static double rotationSpeed = 40.0;
+    @Entry(name = "midnightcontrols.menu.rotation_speed") public static double rotationSpeed = 40.0; //used for x axis, name kept for compatability
+    @Entry(name = "midnightcontrols.menu.y_axis_rotation_speed") public static double yAxisRotationSpeed = 40.0;
     @Entry(name = "midnightcontrols.menu.mouse_speed") public static double mouseSpeed = 25.0;
     @Entry(name = "midnightcontrols.menu.unfocused_input") public static boolean unfocusedInput = false;
     @Entry(name = "midnightcontrols.menu.virtual_mouse") public static boolean virtualMouse = false;
@@ -274,6 +275,7 @@ public class MidnightControlsConfig extends MidnightConfig {
         invertRightXAxis = false;
         DEFAULT_MAX_VALUE = 1;
         rotationSpeed = 40.0;
+        yAxisRotationSpeed = 40.0;
         mouseSpeed = 25.0;
         unfocusedInput = false;
         virtualMouse = false;

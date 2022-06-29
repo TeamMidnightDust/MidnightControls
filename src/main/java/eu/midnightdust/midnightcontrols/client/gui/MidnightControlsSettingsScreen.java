@@ -55,6 +55,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption inputModeOption;
     private final SpruceOption autoSwitchModeOption;
     private final SpruceOption rotationSpeedOption;
+    private final SpruceOption yAxisRotationSpeedOption;
     private final SpruceOption mouseSpeedOption;
     private final SpruceOption virtualMouseOption;
     private final SpruceOption resetOption;
@@ -172,6 +173,10 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                 () -> MidnightControlsConfig.rotationSpeed,
                 value -> MidnightControlsConfig.rotationSpeed = value, option -> option.getDisplayText(Text.literal(String.valueOf(option.get()))),
                 Text.translatable("midnightcontrols.tooltip.rotation_speed"));
+        this.yAxisRotationSpeedOption = new SpruceDoubleOption("midnightcontrols.menu.y_axis_rotation_speed", 0.0, 100.0, .5f,
+                () -> MidnightControlsConfig.yAxisRotationSpeed,
+                value -> MidnightControlsConfig.yAxisRotationSpeed = value, option -> option.getDisplayText(Text.literal(String.valueOf(option.get()))),
+                Text.translatable("midnightcontrols.tooltip.y_axis_rotation_speed"));
         this.mouseSpeedOption = new SpruceDoubleOption("midnightcontrols.menu.mouse_speed", 0.0, 150.0, .5f,
                 () -> MidnightControlsConfig.mouseSpeed,
                 value -> MidnightControlsConfig.mouseSpeed = value, option -> option.getDisplayText(Text.literal(String.valueOf(option.get()))),
@@ -300,6 +305,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         list.addSingleOptionEntry(this.inputModeOption);
         list.addSingleOptionEntry(this.autoSwitchModeOption);
         list.addSingleOptionEntry(this.rotationSpeedOption);
+        list.addSingleOptionEntry(this.yAxisRotationSpeedOption);
         list.addSingleOptionEntry(this.mouseSpeedOption);
         list.addSingleOptionEntry(this.virtualMouseOption);
         return list;
