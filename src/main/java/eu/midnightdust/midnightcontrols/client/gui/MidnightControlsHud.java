@@ -72,8 +72,8 @@ public class MidnightControlsHud extends Hud {
         this.dropItemButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.DROP_ITEM);
         this.attackButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.ATTACK);
         this.useButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.USE);
-        if (client.options.getGuiScale().getValue() >= 4) {
-            scale = 0.75f * (client.options.getGuiScale().getValue() -3);
+        if (client.getWindow().getScaleFactor() >= 4) {
+            scale = (float) (0.75f * (client.getWindow().getScaleFactor()-3));
         } else scale = 1f;
     }
 

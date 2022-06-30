@@ -156,7 +156,7 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         if (KeyBindingRegistryImplAccessor.getModdedKeyBindings() == null || KeyBindingRegistryImplAccessor.getModdedKeyBindings().isEmpty()) return;
         for (int i = 0; i < KeyBindingRegistryImplAccessor.getModdedKeyBindings().size(); ++i) {
             KeyBinding keyBinding = KeyBindingRegistryImplAccessor.getModdedKeyBindings().get(i);
-            if (!keyBinding.getTranslationKey().contains("midnightcontrols")) {
+            if (!keyBinding.getTranslationKey().contains("midnightcontrols") && !keyBinding.getTranslationKey().contains("ok_zoomer") && !keyBinding.getTranslationKey().contains("okzoomer")) {
                 category = null;
                 InputManager.streamCategories().forEach(buttonCategory -> {
                     if (buttonCategory.getIdentifier().equals(new org.aperlambda.lambdacommon.Identifier("minecraft", keyBinding.getCategory())))

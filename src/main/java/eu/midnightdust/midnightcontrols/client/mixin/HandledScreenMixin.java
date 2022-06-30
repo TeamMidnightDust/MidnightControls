@@ -13,6 +13,7 @@ import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
+import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsRenderer;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
@@ -20,9 +21,11 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,6 +37,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin implements HandledScreenAccessor {
+    @Unique private static float scale = 1f;
 
     @Accessor("x")
     public abstract int getX();
@@ -55,16 +59,26 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
     public void onRender(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER) {
             var client = MinecraftClient.getInstance();
-            int x = 2, y = client.getWindow().getScaledHeight() - 2 - MidnightControlsRenderer.ICON_SIZE;
-
+            if (client.getWindow().getScaleFactor() >= 4) {
+                scale = (float) (0.75f * (client.getWindow().getScaleFactor()-3));
+            } else scale = 1f;
+            if (scale != 1f) matrices.scale(scale,scale,scale);
+            int x = 2, y = (int) (client.getWindow().getScaledHeight() * (1 / scale) - 2 - MidnightControlsRenderer.ICON_SIZE);
+            if (MidnightControlsCompat.isEMIPresent()) {
+                x += 40 * (1 / scale);
+            }
             x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_A}, "midnightcontrols.action.pickup_all", true, client) + 2;
             x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_B}, "midnightcontrols.action.exit", true, client) + 2;
             if (MidnightControlsCompat.isReiPresent()) {
                 x = 2;
                 y -= 24;
             }
-            x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_X}, "midnightcontrols.action.pickup", true, client) + 2;
+            if (MidnightControlsCompat.isEMIPresent()) {
+                x = (int) (client.getWindow().getScaledWidth() * (1 / scale) - 55 - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.pickup")) * (1 / scale) - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.quick_move")) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.TAKE) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.QUICK_MOVE));
+            }
+            x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_X}, "midnightcontrols.action.pickup", true, client);
             MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_Y}, "midnightcontrols.action.quick_move", true, client);
+            if (scale != 1f) matrices.scale(1,1,1);
         }
     }
 }

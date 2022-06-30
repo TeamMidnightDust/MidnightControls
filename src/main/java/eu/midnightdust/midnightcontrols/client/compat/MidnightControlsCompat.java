@@ -159,4 +159,12 @@ public class MidnightControlsCompat {
     public static boolean isReiPresent() {
         return FabricLoader.getInstance().isModLoaded("roughlyenoughitems");
     }
+    /**
+     * Returns whether EMI is present.
+     *
+     * @return true if EMI is present, else false
+     */
+    public static boolean isEMIPresent() {
+        return FabricLoader.getInstance().isModLoaded("emi");
+    }
 }

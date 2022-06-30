@@ -9,9 +9,9 @@
 
 package eu.midnightdust.midnightcontrols.client;
 
+import com.google.common.collect.Lists;
 import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.midnightcontrols.ControlsMode;
-import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
@@ -51,9 +51,8 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(name = "midnightcontrols.menu.left_dead_zone") public static double leftDeadZone = 0.25;
     @Entry(name = "midnightcontrols.menu.invert_right_y_axis") public static boolean invertRightYAxis = false;
     @Entry(name = "midnightcontrols.menu.invert_right_x_axis") public static boolean invertRightXAxis = false;
-    public static double DEFAULT_MAX_VALUE = 1;
     @Entry(name = "midnightcontrols.menu.rotation_speed") public static double rotationSpeed = 40.0; //used for x axis, name kept for compatability
-    @Entry(name = "midnightcontrols.menu.y_axis_rotation_speed") public static double yAxisRotationSpeed = 40.0;
+    @Entry(name = "midnightcontrols.menu.y_axis_rotation_speed") public static double yAxisRotationSpeed = rotationSpeed;
     @Entry(name = "midnightcontrols.menu.mouse_speed") public static double mouseSpeed = 25.0;
     @Entry(name = "midnightcontrols.menu.unfocused_input") public static boolean unfocusedInput = false;
     @Entry(name = "midnightcontrols.menu.virtual_mouse") public static boolean virtualMouse = false;
@@ -61,11 +60,11 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(name = "Controller ID") public static Object controllerID = 0;
     @Entry(name = "2nd Controller ID") public static Object secondControllerID = -1;
     @Entry(name = "midnightcontrols.menu.controller_type") public static ControllerType controllerType = ControllerType.DEFAULT;
-    @Entry(name = "Mouse screens") public static List<String> mouseScreens = List.of("me.jellysquid.mods.sodium.client.gui","net.coderbot.iris.gui","net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui");
-    @Entry(name = "Keybindings") public static Map<String, String> BINDINGS = Map.of();
+    @Entry(name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen");
+    @Entry(name = "Keybindings") public static Map<String, String> BINDINGS = new HashMap<>();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
-    @Entry(name = "Max analog values") public static double[] maxAnalogValues = new double[]{DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE};
+    @Entry(name = "Max analog values") public static double[] maxAnalogValues = new double[]{1, 1, 1, 1};
 
     /**
      * Loads the configuration
@@ -156,7 +155,7 @@ public class MidnightControlsConfig extends MidnightConfig {
 
     public static double getAxisMaxValue(int axis) {
         if (axis >= MidnightControlsConfig.maxAnalogValues.length)
-            return DEFAULT_MAX_VALUE;
+            return 1;
         return MidnightControlsConfig.maxAnalogValues[axis];
     }
 
@@ -273,9 +272,8 @@ public class MidnightControlsConfig extends MidnightConfig {
         leftDeadZone = 0.25;
         invertRightYAxis = false;
         invertRightXAxis = false;
-        DEFAULT_MAX_VALUE = 1;
         rotationSpeed = 40.0;
-        yAxisRotationSpeed = 40.0;
+        yAxisRotationSpeed = rotationSpeed;
         mouseSpeed = 25.0;
         unfocusedInput = false;
         virtualMouse = false;
@@ -283,9 +281,9 @@ public class MidnightControlsConfig extends MidnightConfig {
         controllerID = 0;
         secondControllerID = -1;
         controllerType = ControllerType.DEFAULT;
-        mouseScreens = List.of("me.jellysquid.mods.sodium.client.gui","net.coderbot.iris.gui","net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui");
-        BINDINGS = Map.of();
-        maxAnalogValues = new double[]{DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE};
+        mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen");
+        BINDINGS = new HashMap<>();
+        maxAnalogValues = new double[]{1, 1, 1, 1};
     }
 
     /**

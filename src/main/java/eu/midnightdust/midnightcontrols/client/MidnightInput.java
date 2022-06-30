@@ -267,7 +267,7 @@ public class MidnightInput {
         }
     }
 
-    private void handleButton(@NotNull MinecraftClient client, int button, int action, boolean state) {
+    public void handleButton(@NotNull MinecraftClient client, int button, int action, boolean state) {
         if (this.controlsInput != null && this.controlsInput.focusedBinding != null) {
             if (action == 0 && !this.controlsInput.currentButtons.contains(button)) {
                 this.controlsInput.currentButtons.add(button);
@@ -549,7 +549,7 @@ public class MidnightInput {
         }
     }
 
-    private boolean handleAButton(@NotNull Screen screen, @NotNull Element focused) {
+    public boolean handleAButton(@NotNull Screen screen, @NotNull Element focused) {
         if (focused instanceof PressableWidget widget) {
             widget.playDownSound(MinecraftClient.getInstance().getSoundManager());
             widget.onPress();

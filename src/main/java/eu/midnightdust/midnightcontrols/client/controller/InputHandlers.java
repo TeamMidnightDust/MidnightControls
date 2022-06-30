@@ -28,6 +28,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import org.aperlambda.lambdacommon.utils.Pair;
@@ -142,22 +143,29 @@ public class InputHandlers {
 
             int slotId;
             if (slot == null) {
-                if (client.player.currentScreenHandler.getCursorStack().isEmpty())
+                if (button.getName().equals("take_all")) {
                     return false;
+                }
                 slotId = accessor.midnightcontrols$isClickOutsideBounds(x, y, accessor.getX(), accessor.getY(), GLFW_MOUSE_BUTTON_1) ? -999 : -1;
             } else {
                 slotId = slot.id;
             }
             var actionType = SlotActionType.PICKUP;
             int clickData = GLFW.GLFW_MOUSE_BUTTON_1;
+
             MidnightControlsClient.get().input.inventoryInteractionCooldown = 5;
             switch (button.getName()) {
             case "take_all":
-                if (accessor instanceof CreativeInventoryScreen)
+                if (accessor instanceof CreativeInventoryScreen) {
                     if (((CreativeInventoryScreenAccessor) accessor).midnightcontrols$isCreativeInventorySlot(slot))
                         actionType = SlotActionType.CLONE;
-                if (slot != null && MidnightControlsCompat.streamCompatHandlers().anyMatch(handler -> handler.isCreativeSlot(screen, slot)))
-                    actionType = SlotActionType.CLONE;
+                    if (slot != null && MidnightControlsCompat.streamCompatHandlers().anyMatch(handler -> handler.isCreativeSlot(screen, slot)))
+                        actionType = SlotActionType.CLONE;
+                } else {
+                    if (slot != null && screen.getScreenHandler().getCursorStack() != null) {
+                        return screen.mouseReleased(x, y, GLFW.GLFW_MOUSE_BUTTON_1);
+                    } else actionType = SlotActionType.PICKUP_ALL;
+                }
                 break;
             case "take":
                 clickData = GLFW_MOUSE_BUTTON_2;

@@ -30,10 +30,6 @@ public class MidnightControlsMixinPlugin implements IMixinConfigPlugin {
     private final HashMap<String, Boolean> conditionalMixins = new HashMap<>();
 
     public MidnightControlsMixinPlugin() {
-        this.putConditionalMixin("EntryListWidgetAccessor", MidnightControlsCompat.isReiPresent());
-        this.putConditionalMixin("EntryWidgetAccessor", MidnightControlsCompat.isReiPresent());
-        this.putConditionalMixin("RecipeViewingScreenAccessor", MidnightControlsCompat.isReiPresent());
-        this.putConditionalMixin("VillagerRecipeViewingScreenAccessor", MidnightControlsCompat.isReiPresent());
         this.putConditionalMixin("SodiumOptionsGUIAccessor", FabricLoader.getInstance().isModLoaded("sodium"));
     }
 
