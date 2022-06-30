@@ -637,9 +637,9 @@ public class MidnightInput {
             double powValue = Math.pow(value, 2.0);
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
                 if (state == 2) {
-                    this.targetPitch = -MidnightControlsConfig.getRightYAxisSign() * (MidnightControlsConfig.rotationSpeed * powValue) * 0.11D;
+                    this.targetPitch = -MidnightControlsConfig.getRightYAxisSign() * (MidnightControlsConfig.yAxisRotationSpeed * powValue) * 0.11D;
                 } else if (state == 1) {
-                    this.targetPitch = MidnightControlsConfig.getRightYAxisSign() * (MidnightControlsConfig.rotationSpeed * powValue) * 0.11D;
+                    this.targetPitch = MidnightControlsConfig.getRightYAxisSign() * (MidnightControlsConfig.yAxisRotationSpeed * powValue) * 0.11D;
                 }
             }
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_X) {
