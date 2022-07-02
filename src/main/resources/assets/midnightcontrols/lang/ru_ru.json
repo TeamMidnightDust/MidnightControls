@@ -125,7 +125,7 @@
   "midnightcontrols.menu.title.controller_controls": "Управление Контроллером",
   "midnightcontrols.menu.title.gameplay": "Во Время Игры Настройки",
   "midnightcontrols.menu.title.general": "Общие Настройки",
-  "midnightcontrols.menu.title.hud": "Настройка Интерфейса"
+  "midnightcontrols.menu.title.hud": "Настройка Интерфейса",
   "midnightcontrols.menu.title.mappings.string": "Редактор Файлов Раскладок",
   "midnightcontrols.menu.title.visual": "Настройка Внешнего Вида",
   "midnightcontrols.menu.unfocused_input": "Несфокусированный Ввод",
