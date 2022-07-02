@@ -73,9 +73,9 @@
     "midnightcontrols.controller.mappings.updated": "Vastendused uuendatud!",
     "midnightcontrols.controller_type.default": "vaikimisi",
 
-    "midnightcontrols.controls_mode.default": "Klaviatuur/hiir",
-    "midnightcontrols.controls_mode.controller": "Mängupult",
-    "midnightcontrols.controls_mode.touchscreen": "Puuteekraan",
+    "midnightcontrols.controls_mode.default": "klaviatuur/hiir",
+    "midnightcontrols.controls_mode.controller": "mängupult",
+    "midnightcontrols.controls_mode.touchscreen": "puuteekraan",
     "midnightcontrols.hud_side.left": "vasak",
     "midnightcontrols.hud_side.right": "parem",
     "midnightcontrols.menu.analog_movement": "Analoogliikumine",
