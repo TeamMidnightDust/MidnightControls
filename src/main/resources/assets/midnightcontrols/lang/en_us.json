@@ -138,7 +138,7 @@
   "midnightcontrols.tooltip.controller2": "Second controller to use, which allows Joy-Cons support for example.",
   "midnightcontrols.tooltip.controller_type": "The controller type to display the correct buttons.",
   "midnightcontrols.tooltip.controls_mode": "The controls mode.",
-  "midnightcontrols.tooltip.double_tap_to_sprint": "Toggles whether the Wark Forwards key (default W) makes the player sprint when quickly double-tapped"
+  "midnightcontrols.tooltip.double_tap_to_sprint": "Toggles whether the Walk Forwards key makes the player sprint when quickly double-tapped",
   "midnightcontrols.tooltip.fast_block_placing": "While flying in creative mode, enables fast block placing depending on your speed. §cOn some servers this might be considered as cheating.",
   "midnightcontrols.tooltip.fly_drifting": "While flying, enables Vanilla drifting/inertia.",
   "midnightcontrols.tooltip.fly_drifting_vertical": "While flying, enables Vanilla vertical drifting/intertia.",
