@@ -138,6 +138,7 @@
   "midnightcontrols.tooltip.controller2": "Дополнительный контроллер, например для Джой-конов.",
   "midnightcontrols.tooltip.controller_type": "Тип контроллера, чтобы правильно сопоставить иконки кнопок.",
   "midnightcontrols.tooltip.controls_mode": "Тип контроля над игрой.",
+  "midnightcontrols.tooltip.double_tap_to_sprint": "При двойном перемещением на левый стик, персонаж начинает бежать.",
   "midnightcontrols.tooltip.fast_block_placing": "Во время полета в творческом режиме позволяет быстро размещать блоки в зависимости от вашей скорости. §cНа некоторых серверах это может расцениваться как читерство.§r",
   "midnightcontrols.tooltip.fly_drifting": "Во время полета включает ванильную инерцию.",
   "midnightcontrols.tooltip.fly_drifting_vertical": "Во время полета включает ванильную вертикальную инерцию.",
@@ -161,5 +162,5 @@
   "midnightcontrols.virtual_mouse.skin.default_dark": "Обычный Тёмный",
   "midnightcontrols.virtual_mouse.skin.second_light": "Дополнительный Светлый",
   "midnightcontrols.virtual_mouse.skin.second_dark": "Дополнительный Тёмный",
-  "modmenu.descriptionTranslation.midnightcontrols": "Добавление ​​поддержки контроллера и улучшенние элементов управления в целом.\nРазветвлен от LambdaControls, поддержка которого, к сожалению, прекращена.."
+  "modmenu.descriptionTranslation.midnightcontrols": "Добавление поддержки контроллера и улучшенние элементов управления в целом.\nРазветвлен от LambdaControls, поддержка которого, к сожалению, прекращена.."
 }
