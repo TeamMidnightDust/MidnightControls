@@ -27,7 +27,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -91,17 +93,17 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                 MidnightControlsClient.get().input.beginControlsInput(gui);
             }) {
                 protected Text getNarrationMessage() {
-                    return binding.isNotBound() ? Text.translatable("narrator.controls.unbound", bindingName)
-                            : Text.translatable("narrator.controls.bound", bindingName, super.getNarrationMessage());
+                    return binding.isNotBound() ? new TranslatableText("narrator.controls.unbound", bindingName)
+                            : new TranslatableText("narrator.controls.bound", bindingName, super.getNarrationMessage());
                 }
             };
             this.children.add(editButton);
             this.resetButton = new SpruceButtonWidget(Position.of(this,
                     this.editButton.getPosition().getRelativeX() + this.editButton.getWidth() + 2, 0),
-                    44, 20, Text.translatable("controls.reset"),
+                    44, 20, new TranslatableText("controls.reset"),
                     btn -> MidnightControlsConfig.setButtonBinding(binding, binding.getDefaultButton())) {
                 protected Text getNarrationMessage() {
-                    return Text.translatable("narrator.controls.reset", bindingName);
+                    return new TranslatableText("narrator.controls.reset", bindingName);
                 }
             };
             this.children.add(this.resetButton);
@@ -114,7 +116,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                         MidnightControlsClient.get().input.beginControlsInput(null);
                     }) {
                 protected Text getNarrationMessage() {
-                    return Text.translatable("midnightcontrols.narrator.unbound", bindingName);
+                    return new TranslatableText("midnightcontrols.narrator.unbound", bindingName);
                 }
             };
             this.children.add(this.unbindButton);
@@ -241,9 +243,9 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
 
             this.editButton.update();
             if (focused) {
-                var text = Text.literal("> ").formatted(Formatting.WHITE);
+                var text = new LiteralText("> ").formatted(Formatting.WHITE);
                 text.append(this.editButton.getMessage().copy().formatted(Formatting.YELLOW));
-                this.editButton.setMessage(text.append(Text.literal(" <").formatted(Formatting.WHITE)));
+                this.editButton.setMessage(text.append(new LiteralText(" <").formatted(Formatting.WHITE)));
             } else if (!this.binding.isNotBound() && InputManager.hasDuplicatedBindings(this.binding)) {
                 var text = this.editButton.getMessage().copy();
                 this.editButton.setMessage(text.formatted(Formatting.RED));
@@ -262,7 +264,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         protected CategoryEntry(ControlsListWidget parent, ButtonCategory category) {
             super(parent);
             this.separatorWidget = new SpruceSeparatorWidget(Position.of(this, 2, 0), this.getWidth() - 4,
-                    Text.literal(category.getTranslatedName())) {
+                    new LiteralText(category.getTranslatedName())) {
                 @Override
                 public int getWidth() {
                     return CategoryEntry.this.getWidth() - 4;

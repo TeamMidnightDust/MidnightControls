@@ -13,6 +13,7 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.ring.RingPage;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 /**
@@ -26,7 +27,7 @@ public class RingScreen extends Screen {
     protected final MidnightControlsClient mod;
 
     public RingScreen() {
-        super(Text.literal("midnightcontrols.menu.title.ring"));
+        super(new LiteralText("midnightcontrols.menu.title.ring"));
         this.mod = MidnightControlsClient.get();
     }
 

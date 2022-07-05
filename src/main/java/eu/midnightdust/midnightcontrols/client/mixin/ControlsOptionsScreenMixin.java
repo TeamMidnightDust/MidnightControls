@@ -18,6 +18,7 @@ import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -39,7 +40,7 @@ public abstract class ControlsOptionsScreenMixin extends GameOptionsScreen {
         if (showAlternativeButton) {
             this.addDrawableChild(new TexturedOverlayButtonWidget(this.width / 2 + 158, this.height / 6 - 12, 20, 20,0,0,20, new Identifier("midnightcontrols", "textures/gui/midnightcontrols_button.png"), 32, 64, (button) -> {
                 this.client.setScreen(new MidnightControlsSettingsScreen(this, false));
-            }, Text.translatable("midnightcontrols.menu.title.controller")));
+            }, new TranslatableText("midnightcontrols.menu.title.controller")));
         }
     }
     @Inject(method = "init", at = @At(value = "INVOKE", ordinal = 4, shift = At.Shift.AFTER, target = "Lnet/minecraft/client/gui/screen/option/ControlsOptionsScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;"))
@@ -48,7 +49,7 @@ public abstract class ControlsOptionsScreenMixin extends GameOptionsScreen {
             int i = this.width / 2 - 155;
             int j = i + 160;
             int k = this.height / 6 - 12 + 48;
-            this.addDrawableChild(new ButtonWidget(j, k, 150, 20, Text.translatable("midnightcontrols.menu.title.controller").append("..."), (button) -> {
+            this.addDrawableChild(new ButtonWidget(j, k, 150, 20, new TranslatableText("midnightcontrols.menu.title.controller").append("..."), (button) -> {
                 this.client.setScreen(new MidnightControlsSettingsScreen(this, false));
             }));
         }
