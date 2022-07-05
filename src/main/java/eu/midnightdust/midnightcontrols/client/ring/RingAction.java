@@ -15,7 +15,6 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,7 +42,7 @@ public abstract class RingAction extends DrawableHelper implements Nameable {
      * @return the text name
      */
     public Text getTextName() {
-        return new TranslatableText(this.getName());
+        return Text.translatable(this.getName());
     }
 
     /**

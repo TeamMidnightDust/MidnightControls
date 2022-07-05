@@ -14,8 +14,7 @@ import dev.lambdaurora.spruceui.option.SpruceSimpleActionOption;
 import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -35,7 +34,7 @@ public class ReloadControllerMappingsOption {
             if (client.currentScreen instanceof MidnightControlsSettingsScreen)
                 client.currentScreen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
             client.getToastManager().add(SystemToast.create(client, SystemToast.Type.TUTORIAL_HINT,
-                    new TranslatableText("midnightcontrols.controller.mappings.updated"), LiteralText.EMPTY));
-        }, new TranslatableText("midnightcontrols.tooltip.reload_controller_mappings"));
+                    Text.translatable("midnightcontrols.controller.mappings.updated"), Text.empty()));
+        }, Text.translatable("midnightcontrols.tooltip.reload_controller_mappings"));
     }
 }

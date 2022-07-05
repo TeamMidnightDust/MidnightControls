@@ -61,7 +61,7 @@ public class MidnightControlsFeature implements Nameable {
      * @return {@code true} if this feature is allowed, else {@code false}
      */
     public boolean isAllowed() {
-        return this.allowed;
+        return MidnightControls.isExtrasLoaded && this.allowed;
     }
 
     /**

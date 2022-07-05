@@ -32,16 +32,16 @@ This mod also adds controller support.
    - Front block placing (be careful with this one)
 - New controls settings!
 - Many options in config to change to your liking.
-- Many controllers supported and in a simply way your own controller mappings.
+- Many controllers supported and in a simple way your own controller mappings.
 - An easy API for developers to add their own button bindings.
 
 ## 🎮 Supported Controllers:
 
-- Dualshock controllers
-- Dualsense controllers
+- DualShock controllers
+- DualSense controllers
 - Xbox controllers
 - Switch Pro controllers
-- Joycons
+- Joy-Cons
 - Steam controller and Steam Deck (WIP)
 - And many more!
 

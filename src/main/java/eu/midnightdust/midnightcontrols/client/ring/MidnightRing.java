@@ -51,16 +51,16 @@ public final class MidnightRing {
      * Loads the ring from configuration.
      */
     public void load() {
-//        List<Config> configPages = MidnightControlsConfig.ringPages;
-//        if (configPages != null) {
-//            this.pages.clear();
-//            for (var configPage : configPages) {
-//                RingPage.parseRingPage(configPage).ifPresent(this.pages::add);
-//            }
-//        }
-//        if (this.pages.isEmpty()) {
-//            this.pages.add(RingPage.DEFAULT);
-//        }
+        List<Config> configPages = null;
+        if (configPages != null) {
+            this.pages.clear();
+            for (var configPage : configPages) {
+                RingPage.parseRingPage(configPage).ifPresent(this.pages::add);
+            }
+        }
+        if (this.pages.isEmpty()) {
+            this.pages.add(RingPage.DEFAULT);
+        }
     }
 
     public @NotNull RingPage getCurrentPage() {

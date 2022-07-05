@@ -13,7 +13,7 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.ring.RingPage;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 
 /**
  * Represents the controls ring screen.
@@ -26,7 +26,7 @@ public class RingScreen extends Screen {
     protected final MidnightControlsClient mod;
 
     public RingScreen() {
-        super(new TranslatableText("midnightcontrols.menu.title.ring"));
+        super(Text.literal("midnightcontrols.menu.title.ring"));
         this.mod = MidnightControlsClient.get();
     }
 
@@ -46,10 +46,10 @@ public class RingScreen extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        /*if (midnightcontrolsClient.BINDING_RING.matchesMouse(button)) {
-            this.onClose();
+        if (mod.ring.getCurrentPage().onClick(client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight(), (int) mouseX, (int) mouseY)) {
+            this.close();
             return true;
-        }*/
+        }
         return false;
     }
 }

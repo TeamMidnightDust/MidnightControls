@@ -9,12 +9,14 @@
 
 package eu.midnightdust.midnightcontrols.client;
 
+import com.google.common.collect.Lists;
 import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
+import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -22,48 +24,49 @@ import org.lwjgl.glfw.GLFW;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_X;
-import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Represents MidnightControls configuration.
  */
 public class MidnightControlsConfig extends MidnightConfig {
+    public static boolean isEditing = false;
     // General
-    @Entry public static ControlsMode controlsMode = ControlsMode.DEFAULT;
-    @Entry public static boolean autoSwitchMode = true;
-    @Entry public static boolean debug = false;
+    @Entry(name = "midnightcontrols.menu.controls_mode") public static ControlsMode controlsMode = ControlsMode.DEFAULT;
+    @Entry(name = "midnightcontrols.menu.auto_switch_mode") public static boolean autoSwitchMode = true;
+    @Entry(name = "Debug") public static boolean debug = false;
     // HUD
-    @Entry public static boolean hudEnable = true;
-    @Entry public static HudSide hudSide = HudSide.LEFT;
+    @Entry(name = "midnightcontrols.menu.hud_enable") public static boolean hudEnable = true;
+    @Entry(name = "midnightcontrols.menu.hud_side") public static HudSide hudSide = HudSide.LEFT;
     // Gameplay
-    @Entry public static boolean analogMovement = true;
-    @Entry public static boolean fastBlockPlacing = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
-    @Entry public static boolean flyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers. It can also conflict with some other mods.
-    @Entry public static boolean verticalFlyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers.
-    @Entry public static boolean horizontalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
-    @Entry public static boolean verticalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
-    @Entry public static boolean shouldRenderReacharoundOutline = true;
-    @Entry public static int[] reacharoundOutlineColor = new int[]{255, 255, 255, 102};
-    // Controller
-    @Entry public static ControllerType controllerType = ControllerType.DEFAULT;
-    @Entry public static double rightDeadZone = 0.25;
-    @Entry public static double leftDeadZone = 0.25;
-    @Entry public static boolean invertRightYAxis = false;
-    @Entry public static boolean invertRightXAxis = false;
-    @Entry public static double DEFAULT_MAX_VALUE = 1;
-    @Entry public static double rotationSpeed = 40.0;
-    @Entry public static double mouseSpeed = 25.0;
-    @Entry public static boolean unfocusedInput = false;
-    @Entry public static boolean virtualMouse = false;
-    @Entry public static VirtualMouseSkin virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
-    @Entry public static Object controllerID = 0;
-    @Entry public static Object secondControllerID = -1;
-    @Entry public static List<String> mouseScreens = List.of("me.jellysquid.mods.sodium.client.gui","net.coderbot.iris.gui","net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408");
-    @Entry public static Map<String, String> BINDINGS = Map.of();
+    @Entry(name = "midnightcontrols.menu.analog_movement") public static boolean analogMovement = true;
+    @Entry(name = "midnightcontrols.menu.double_tap_to_sprint") public static boolean doubleTapToSprint = true;
+    @Entry(name = "midnightcontrols.menu.fast_block_placing") public static boolean fastBlockPlacing = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
+    @Entry(name = "midnightcontrols.menu.fly_drifting") public static boolean flyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers. It can also conflict with some other mods.
+    @Entry(name = "midnightcontrols.menu.fly_drifting_vertical") public static boolean verticalFlyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers.
+    @Entry(name = "midnightcontrols.menu.reacharound.horizontal") public static boolean horizontalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
+    @Entry(name = "midnightcontrols.menu.reacharound.vertical") public static boolean verticalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
+    @Entry(name = "Reacharound Outline") public static boolean shouldRenderReacharoundOutline = true;
+    @Entry(name = "Reacharound Outline Color") public static int[] reacharoundOutlineColor = new int[]{255, 255, 255, 102};
+    @Entry(name = "midnightcontrols.menu.right_dead_zone") public static double rightDeadZone = 0.25;
+    @Entry(name = "midnightcontrols.menu.left_dead_zone") public static double leftDeadZone = 0.25;
+    @Entry(name = "midnightcontrols.menu.invert_right_y_axis") public static boolean invertRightYAxis = false;
+    @Entry(name = "midnightcontrols.menu.invert_right_x_axis") public static boolean invertRightXAxis = false;
+    @Entry(name = "midnightcontrols.menu.rotation_speed") public static double rotationSpeed = 40.0; //used for x axis, name kept for compatability
+    @Entry(name = "midnightcontrols.menu.y_axis_rotation_speed") public static double yAxisRotationSpeed = rotationSpeed;
+    @Entry(name = "midnightcontrols.menu.mouse_speed") public static double mouseSpeed = 25.0;
+    @Entry(name = "midnightcontrols.menu.unfocused_input") public static boolean unfocusedInput = false;
+    @Entry(name = "midnightcontrols.menu.virtual_mouse") public static boolean virtualMouse = false;
+    @Entry(name = "midnightcontrols.menu.virtual_mouse.skin") public static VirtualMouseSkin virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
+    @Entry(name = "Controller ID") public static Object controllerID = 0;
+    @Entry(name = "2nd Controller ID") public static Object secondControllerID = -1;
+    @Entry(name = "midnightcontrols.menu.controller_type") public static ControllerType controllerType = ControllerType.DEFAULT;
+    @Entry(name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen", "hardcorequesting.client.interfaces.GuiQuestBook", "hardcorequesting.client.interfaces.GuiReward", "hardcorequesting.client.interfaces.EditTrackerScreen");
+    @Entry(name = "Keybindings") public static Map<String, String> BINDINGS = new HashMap<>();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
-    @Entry public static double[] maxAnalogValues = new double[]{DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE, DEFAULT_MAX_VALUE};
+    @Entry(name = "Max analog values") public static double[] maxAnalogValues = new double[]{1, 1, 1, 1};
+    @Entry public static boolean triggerFix = true;
 
     /**
      * Loads the configuration
@@ -91,12 +94,23 @@ public class MidnightControlsConfig extends MidnightConfig {
      */
     public static Controller getController() {
         var raw = MidnightControlsConfig.controllerID;
+        Controller controller = Controller.byId(GLFW.GLFW_JOYSTICK_1);
         if (raw instanceof Number) {
-            return Controller.byId(((Number) raw).intValue());
+            controller = Controller.byId(((Number) raw).intValue());
         } else if (raw instanceof String) {
-            return Controller.byGuid((String) raw).orElse(Controller.byId(GLFW.GLFW_JOYSTICK_1));
+            controller = Controller.byGuid((String) raw).orElse(Controller.byId(GLFW.GLFW_JOYSTICK_1));
         }
-        return Controller.byId(GLFW.GLFW_JOYSTICK_1);
+        if ((!controller.isConnected() || !controller.isGamepad()) && MidnightControlsConfig.autoSwitchMode && !isEditing) {
+            for (int i = 0; i < GLFW.GLFW_JOYSTICK_LAST; ++i) {
+                Controller gamepad = Controller.byId(i);
+                if (gamepad.isConnected() && gamepad.isGamepad()) {
+                    controller = gamepad;
+                    i = GLFW_JOYSTICK_LAST;
+                }
+            }
+        }
+        if (controller.isConnected() && controller.isGamepad() && MidnightControlsConfig.autoSwitchMode && !isEditing) MidnightControlsConfig.controlsMode = ControlsMode.CONTROLLER;
+        return controller;
     }
 
     /**
@@ -154,7 +168,7 @@ public class MidnightControlsConfig extends MidnightConfig {
 
     public static double getAxisMaxValue(int axis) {
         if (axis >= MidnightControlsConfig.maxAnalogValues.length)
-            return DEFAULT_MAX_VALUE;
+            return 1;
         return MidnightControlsConfig.maxAnalogValues[axis];
     }
 
@@ -250,5 +264,56 @@ public class MidnightControlsConfig extends MidnightConfig {
      */
     public static boolean isMovementAxis(int axis) {
         return axis == GLFW_GAMEPAD_AXIS_LEFT_Y || axis == GLFW_GAMEPAD_AXIS_LEFT_X;
+    }
+
+    public static void reset() {
+        controlsMode = ControlsMode.DEFAULT;
+        autoSwitchMode = true;
+        debug = false;
+        hudEnable = true;
+        hudSide = HudSide.LEFT;
+        analogMovement = true;
+        doubleTapToSprint = true;
+        fastBlockPlacing = false;
+        flyDrifting = true;
+        verticalFlyDrifting = true;
+        horizontalReacharound = false;
+        verticalReacharound = false;
+        shouldRenderReacharoundOutline = true;
+        reacharoundOutlineColor = new int[]{255, 255, 255, 102};
+        rightDeadZone = 0.25;
+        leftDeadZone = 0.25;
+        invertRightYAxis = false;
+        invertRightXAxis = false;
+        rotationSpeed = 40.0;
+        yAxisRotationSpeed = rotationSpeed;
+        mouseSpeed = 25.0;
+        unfocusedInput = false;
+        virtualMouse = false;
+        virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
+        controllerID = 0;
+        secondControllerID = -1;
+        controllerType = ControllerType.DEFAULT;
+        mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen");
+        BINDINGS = new HashMap<>();
+        maxAnalogValues = new double[]{1, 1, 1, 1};
+    }
+
+    /**
+     * Gets the controller type from the controller's identifier.
+     *
+     * @return the controller name matches a type, else empty
+     */
+    public static @NotNull ControllerType matchControllerToType() {
+        String controller = getController().getName().toLowerCase();
+        if (controller.contains("xbox 360")) return ControllerType.XBOX_360;
+        else if (controller.contains("xbox") || controller.contains("afterglow")) return ControllerType.XBOX;
+        else if (controller.contains("steam deck")) return ControllerType.STEAM_DECK;
+        else if (controller.contains("steam")) return ControllerType.STEAM_CONTROLLER;
+        else if (controller.contains("dualsense")) return ControllerType.DUALSENSE;
+        else if (controller.contains("dualshock") || controller.contains("ps4")) return ControllerType.DUALSHOCK;
+        else if (controller.contains("switch") || controller.contains("joy-con")) return ControllerType.SWITCH;
+        else if (controller.contains("ouya")) return ControllerType.OUYA;
+        else return ControllerType.DEFAULT;
     }
 }

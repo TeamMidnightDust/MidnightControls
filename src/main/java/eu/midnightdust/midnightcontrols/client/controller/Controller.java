@@ -13,9 +13,9 @@ import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.toast.SystemToast;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -137,7 +137,7 @@ public record Controller(int id) implements Nameable {
             }
         }
 
-        buffer.flip(); // Force Java 8 >.<
+        if (buffer != null) buffer.flip(); // Force Java 8 >.<
         return buffer;
     }
 
@@ -150,7 +150,6 @@ public record Controller(int id) implements Nameable {
             File databaseFile = new File("config/gamecontrollerdatabase.txt");
             try {
                 BufferedInputStream in = new BufferedInputStream(new URL("https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt").openStream());
-
                 BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(databaseFile));
                 byte[] dataBuffer = new byte[1024];
                 int bytesRead;
@@ -160,11 +159,11 @@ public record Controller(int id) implements Nameable {
                 out.close();
             } catch (Exception ignored) {/* Just continue when internet connection is not available */}
             var database = ioResourceToBuffer(databaseFile.getPath(), 1024);
-            GLFW.glfwUpdateGamepadMappings(database);
+            if (database != null) GLFW.glfwUpdateGamepadMappings(database);
             if (!MidnightControlsClient.MAPPINGS_FILE.exists())
                 return;
             var buffer = ioResourceToBuffer(MidnightControlsClient.MAPPINGS_FILE.getPath(), 1024);
-            GLFW.glfwUpdateGamepadMappings(buffer);
+            if (buffer != null) GLFW.glfwUpdateGamepadMappings(buffer);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -178,7 +177,8 @@ public record Controller(int id) implements Nameable {
                 var client = MinecraftClient.getInstance();
                 if (client != null) {
                     client.getToastManager().add(SystemToast.create(client, SystemToast.Type.TUTORIAL_HINT,
-                            new TranslatableText("midnightcontrols.controller.mappings.error"), new LiteralText(string)));
+                            Text.translatable("midnightcontrols.controller.mappings.error"), Text.literal(string)));
+                    MidnightControls.get().log(I18n.translate("midnightcontrols.controller.mappings.error")+string);
                 }
             }
         } catch (Throwable e) {

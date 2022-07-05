@@ -29,7 +29,9 @@ public interface CreativeInventoryScreenAccessor {
      * @return the selected tab index
      */
     @Accessor("selectedTab")
-    int getSelectedTab();
+    static int getSelectedTab() {
+        return 0;
+    }
 
     /**
      * Sets the selected tab.

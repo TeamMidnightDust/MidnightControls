@@ -9,27 +9,44 @@
 
 package eu.midnightdust.midnightcontrols.client.controller;
 
+import com.google.common.collect.ImmutableSet;
 import eu.midnightdust.midnightcontrols.client.ButtonState;
+import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
+import eu.midnightdust.midnightcontrols.client.compat.EMICompat;
+import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
+import eu.midnightdust.midnightcontrols.client.compat.SodiumCompat;
 import eu.midnightdust.midnightcontrols.client.mixin.AdvancementsScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.RecipeBookWidgetAccessor;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
+import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
+import net.fabricmc.fabric.impl.item.group.CreativeGuiExtensions;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
+import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
 
 /**
  * Represents some input handlers.
@@ -55,7 +72,7 @@ public class InputHandlers {
                     client.player.getInventory().selectedSlot = client.player.getInventory().selectedSlot == 0 ? 8 : client.player.getInventory().selectedSlot - 1;
                 return true;
             } else if (client.currentScreen instanceof CreativeInventoryScreenAccessor inventory) {
-                int currentTab = inventory.getSelectedTab();
+                int currentTab = CreativeInventoryScreenAccessor.getSelectedTab();
                 int nextTab = currentTab + (next ? 1 : -1);
                 if (nextTab < 0)
                     nextTab = ItemGroup.GROUPS.length - 1;
@@ -96,8 +113,92 @@ public class InputHandlers {
                     }
                 }
                 return true;
+            } else if (FabricLoader.getInstance().isModLoaded("sodium")) SodiumCompat.handleTabs(client.currentScreen, next);
+            return false;
+        };
+    }
+    public static PressAction handlePage(boolean next) {
+        return (client, button, value, action) -> {
+            if (client.currentScreen instanceof CreativeInventoryScreen) {
+                var screen = (HandledScreenAccessor) client.currentScreen;
+                try {
+                    if (next) {
+                        return client.currentScreen.children().stream().filter(element -> element instanceof PressableWidget)
+                                .map(element -> (PressableWidget) element)
+                                .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
+                                .anyMatch(element -> {
+                                    if (element.getMessage().getString().equals(">")) {
+                                        element.onPress();
+                                        return true;
+                                    }
+                                    return false;
+                                });
+                    } else {
+                        return client.currentScreen.children().stream().filter(element -> element instanceof PressableWidget)
+                                .map(element -> (PressableWidget) element)
+                                .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
+                                .anyMatch(element -> {
+                                    if (element.getMessage().getString().equals("<")) {
+                                        element.onPress();
+                                        return true;
+                                    }
+                                    return false;
+                                });
+                    }
+                } catch (Exception ignored) {}
             }
             return false;
+        };
+    }
+    public static PressAction handleActions() {
+        return (client, button, value, action) -> {
+            if (!(client.currentScreen instanceof HandledScreen<?> screen)) return false;
+            if (client.interactionManager == null || client.player == null)
+                return false;
+
+            if (MidnightControlsClient.get().input.inventoryInteractionCooldown > 0)
+                return true;
+            double x = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
+            double y = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
+
+            var accessor = (HandledScreenAccessor) screen;
+            Slot slot = ((HandledScreenAccessor) screen).midnightcontrols$getSlotAt(x, y);
+
+            int slotId;
+            if (slot == null) {
+                if (button.getName().equals("take_all")) {
+                    ((MouseAccessor) client.mouse).setLeftButtonClicked(true);
+                    return false;
+                }
+                slotId = accessor.midnightcontrols$isClickOutsideBounds(x, y, accessor.getX(), accessor.getY(), GLFW_MOUSE_BUTTON_1) ? -999 : -1;
+            } else {
+                slotId = slot.id;
+            }
+            var actionType = SlotActionType.PICKUP;
+            int clickData = GLFW.GLFW_MOUSE_BUTTON_1;
+
+            MidnightControlsClient.get().input.inventoryInteractionCooldown = 5;
+            switch (button.getName()) {
+            case "take_all": {
+                if (screen instanceof CreativeInventoryScreen) {
+                    if (slot != null && (((CreativeInventoryScreenAccessor) accessor).midnightcontrols$isCreativeInventorySlot(slot) || MidnightControlsCompat.streamCompatHandlers().anyMatch(handler -> handler.isCreativeSlot(screen, slot))))
+                        actionType = SlotActionType.CLONE;
+                }
+                break;
+            }
+            case "take": {
+                clickData = GLFW_MOUSE_BUTTON_2;
+                break;
+            }
+            case "quick_move": {
+                actionType = SlotActionType.QUICK_MOVE;
+                break;
+            }
+            default:
+                return false;
+            }
+            accessor.midnightcontrols$onMouseClick(slot, slotId, clickData, actionType);
+            return true;
         };
     }
 
@@ -109,7 +210,7 @@ public class InputHandlers {
             else if (client.currentScreen instanceof HandledScreen && client.player != null) // If the current screen is a container then close it.
                 client.player.closeHandledScreen();
             else // Else just close the current screen.
-                client.currentScreen.onClose();
+                client.currentScreen.close();
         }
         return true;
     }
@@ -131,12 +232,12 @@ public class InputHandlers {
 
     public static boolean handleToggleSneak(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action) {
         button.asKeyBinding().ifPresent(binding -> {
-            boolean sneakToggled = client.options.sneakToggled;
+            boolean sneakToggled = client.options.getSneakToggled().getValue();
             if (client.player.getAbilities().flying && sneakToggled)
-                client.options.sneakToggled = false;
+                client.options.getSneakToggled().setValue(false);
             binding.setPressed(button.pressed);
             if (client.player.getAbilities().flying && sneakToggled)
-                client.options.sneakToggled = true;
+                client.options.getSneakToggled().setValue(true);
         });
         return true;
     }

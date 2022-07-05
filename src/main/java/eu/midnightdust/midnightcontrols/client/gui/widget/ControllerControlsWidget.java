@@ -17,9 +17,10 @@ import dev.lambdaurora.spruceui.Position;
 import dev.lambdaurora.spruceui.SpruceTexts;
 import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
+import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsSettingsScreen;
 import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import org.aperlambda.lambdacommon.utils.function.Predicates;
 
 import java.util.ArrayList;
@@ -46,9 +47,10 @@ public class ControllerControlsWidget extends SpruceContainerWidget {
 
     protected void init() {
         this.addChild(new SpruceButtonWidget(Position.of(this, this.width / 2 - 155, 18), 310, 20,
-                new TranslatableText("midnightcontrols.menu.keyboard_controls"),
+                Text.translatable("midnightcontrols.menu.keyboard_controls"),
                 btn -> this.client.setScreen(new ControlsOptionsScreen(null, this.client.options))));
         this.bindingsListWidget = new ControlsListWidget(Position.of(this, 0, 43), this.width, this.height - 43 - 35, this);
+        this.bindingsListWidget.setBackground(new MidnightControlsSettingsScreen.MidnightControlsBackground(130));
         this.addChild(this.bindingsListWidget);
         this.addChild(this.resetButton = new SpruceButtonWidget(Position.of(this, this.width / 2 - 155, this.height - 29), 150, 20,
                 SpruceTexts.CONTROLS_RESET_ALL,
@@ -57,7 +59,7 @@ public class ControllerControlsWidget extends SpruceContainerWidget {
 
     @Override
     public void renderWidget(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        drawCenteredText(matrices, this.client.textRenderer, new TranslatableText("midnightcontrols.menu.title.controller_controls"),
+        drawCenteredText(matrices, this.client.textRenderer, Text.translatable("midnightcontrols.menu.title.controller_controls"),
                 this.getX() + this.width / 2, this.getY() + 4, 16777215);
         this.resetButton.setActive(InputManager.streamBindings().anyMatch(Predicates.not(ButtonBinding::isDefault)));
         super.renderWidget(matrices, mouseX, mouseY, delta);

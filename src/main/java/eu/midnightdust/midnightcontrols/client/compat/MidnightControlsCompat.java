@@ -45,17 +45,13 @@ public class MidnightControlsCompat {
             mod.log("Adding Ok Zoomer compatibility...");
             HANDLERS.add(new OkZoomerCompat());
         }
-        /*if (isReiPresent()) {
-            mod.log("Adding REI compatiblity...");
-            HANDLERS.add(new ReiCompat());
-        }*/
+        if (isEMIPresent()) {
+            mod.log("Adding EMI compatibility...");
+            HANDLERS.add(new EMICompat());
+        }
         if (FabricLoader.getInstance().isModLoaded("hardcorequesting") && LambdaReflection.doesClassExist(HQMCompat.GUI_BASE_CLASS_PATH)) {
             mod.log("Adding HQM compatibility...");
             HANDLERS.add(new HQMCompat());
-        }
-        if (FabricLoader.getInstance().isModLoaded("emotecraft")) {
-            mod.log("Adding Emotecraft compatibility...");
-            HANDLERS.add(new EmotecraftCompat());
         }
         HANDLERS.forEach(handler -> handler.handle(mod));
         InputManager.loadButtonBindings();
@@ -162,5 +158,13 @@ public class MidnightControlsCompat {
      */
     public static boolean isReiPresent() {
         return FabricLoader.getInstance().isModLoaded("roughlyenoughitems");
+    }
+    /**
+     * Returns whether EMI is present.
+     *
+     * @return true if EMI is present, else false
+     */
+    public static boolean isEMIPresent() {
+        return FabricLoader.getInstance().isModLoaded("emi");
     }
 }

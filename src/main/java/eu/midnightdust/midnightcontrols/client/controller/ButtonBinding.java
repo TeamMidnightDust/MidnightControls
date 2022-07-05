@@ -13,8 +13,8 @@ import eu.midnightdust.midnightcontrols.client.ButtonState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.aperlambda.lambdacommon.utils.function.PairPredicate;
 import org.aperlambda.lambdacommon.utils.function.Predicates;
@@ -62,6 +62,9 @@ public class ButtonBinding {
             .action(MovementHandler.HANDLER).onlyInGame().register();
     public static final ButtonBinding SCREENSHOT = new Builder("screenshot").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_A)
             .action(InputHandlers::handleScreenshot).cooldown().register();
+
+    public static final ButtonBinding DEBUG_SCREEN = new Builder("debug_screen").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_B)
+            .action((client,binding,value,action) -> {if (action == ButtonState.PRESS) client.options.debugEnabled = !client.options.debugEnabled; return true;}).cooldown().register();
     public static final ButtonBinding SLOT_DOWN = new Builder("slot_down").buttons(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)
             .action(InputHandlers.handleInventorySlotPad(1)).onlyInInventory().cooldown().register();
     public static final ButtonBinding SLOT_LEFT = new Builder("slot_left").buttons(GLFW_GAMEPAD_BUTTON_DPAD_LEFT)
@@ -76,10 +79,20 @@ public class ButtonBinding {
     public static final ButtonBinding SPRINT = new Builder("sprint").buttons(GLFW_GAMEPAD_BUTTON_LEFT_THUMB).onlyInGame().register();
     public static final ButtonBinding SWAP_HANDS = new Builder("swap_hands").buttons(GLFW_GAMEPAD_BUTTON_X).onlyInGame().cooldown().register();
     public static final ButtonBinding TAB_LEFT = new Builder("tab_back").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
-            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements)).cooldown().register();
+            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((client, binding) -> client.currentScreen != null && client.currentScreen.getClass().toString().contains("sodium"))).cooldown().register();
     public static final ButtonBinding TAB_RIGHT = new Builder("tab_next").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
-            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements)).cooldown().register();
-    public static final ButtonBinding TOGGLE_PERSPECTIVE = new Builder("toggle_perspective").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_Y).cooldown().register();
+            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((client, binding) -> client.currentScreen != null && client.currentScreen.getClass().toString().contains("sodium"))).cooldown().register();
+    public static final ButtonBinding PAGE_LEFT = new Builder("page_back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
+            .action(InputHandlers.handlePage(false)).filter(InputHandlers::inInventory).cooldown().register();
+    public static final ButtonBinding PAGE_RIGHT = new Builder("page_next").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
+            .action(InputHandlers.handlePage(true)).filter(InputHandlers::inInventory).cooldown().register();
+    public static final ButtonBinding TAKE = new Builder("take").buttons(GLFW_GAMEPAD_BUTTON_X)
+            .action(InputHandlers.handleActions()).filter(InputHandlers::inInventory).cooldown().register();
+    public static final ButtonBinding TAKE_ALL = new Builder("take_all").buttons(GLFW_GAMEPAD_BUTTON_A)
+            .action(InputHandlers.handleActions()).filter(InputHandlers::inInventory).cooldown().register();
+    public static final ButtonBinding QUICK_MOVE = new Builder("quick_move").buttons(GLFW_GAMEPAD_BUTTON_Y)
+            .action(InputHandlers.handleActions()).filter(InputHandlers::inInventory).cooldown().register();
+    public static final ButtonBinding TOGGLE_PERSPECTIVE = new Builder("toggle_perspective").filter(InputHandlers::inGame).buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_Y).cooldown().register();
     public static final ButtonBinding USE = new Builder("use").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true)).register();
 
     private int[] button;
@@ -96,7 +109,7 @@ public class ButtonBinding {
     public ButtonBinding(String key, int[] defaultButton, List<PressAction> actions, PairPredicate<MinecraftClient, ButtonBinding> filter, boolean hasCooldown) {
         this.setButton(this.defaultButton = defaultButton);
         this.key = key;
-        this.text = new TranslatableText(this.key);
+        this.text = Text.translatable(this.key);
         this.filter = filter;
         this.actions.addAll(actions);
         this.hasCooldown = hasCooldown;
@@ -239,7 +252,7 @@ public class ButtonBinding {
      * @return the translation key
      */
     public @NotNull String getTranslationKey() {
-        return "midnightcontrols.action." + this.getName();
+        return I18n.hasTranslation("midnightcontrols.action." + this.getName()) ? "midnightcontrols.action." + this.getName() : this.getName();
     }
 
     public @NotNull Text getText() {
@@ -295,24 +308,24 @@ public class ButtonBinding {
     }
 
     public static void init(@NotNull GameOptions options) {
-        ATTACK.mcKeyBinding = options.keyAttack;
-        BACK.mcKeyBinding = options.keyBack;
-        CHAT.mcKeyBinding = options.keyChat;
-        DROP_ITEM.mcKeyBinding = options.keyDrop;
-        FORWARD.mcKeyBinding = options.keyForward;
-        INVENTORY.mcKeyBinding = options.keyInventory;
-        JUMP.mcKeyBinding = options.keyJump;
-        LEFT.mcKeyBinding = options.keyLeft;
-        PICK_BLOCK.mcKeyBinding = options.keyPickItem;
-        PLAYER_LIST.mcKeyBinding = options.keyPlayerList;
-        RIGHT.mcKeyBinding = options.keyRight;
-        SCREENSHOT.mcKeyBinding = options.keyScreenshot;
-        SMOOTH_CAMERA.mcKeyBinding = options.keySmoothCamera;
-        SNEAK.mcKeyBinding = options.keySneak;
-        SPRINT.mcKeyBinding = options.keySprint;
-        SWAP_HANDS.mcKeyBinding = options.keySwapHands;
-        TOGGLE_PERSPECTIVE.mcKeyBinding = options.keyTogglePerspective;
-        USE.mcKeyBinding = options.keyUse;
+        ATTACK.mcKeyBinding = options.attackKey;
+        BACK.mcKeyBinding = options.backKey;
+        CHAT.mcKeyBinding = options.chatKey;
+        DROP_ITEM.mcKeyBinding = options.dropKey;
+        FORWARD.mcKeyBinding = options.forwardKey;
+        INVENTORY.mcKeyBinding = options.inventoryKey;
+        JUMP.mcKeyBinding = options.jumpKey;
+        LEFT.mcKeyBinding = options.leftKey;
+        PICK_BLOCK.mcKeyBinding = options.pickItemKey;
+        PLAYER_LIST.mcKeyBinding = options.playerListKey;
+        RIGHT.mcKeyBinding = options.rightKey;
+        SCREENSHOT.mcKeyBinding = options.screenshotKey;
+        SMOOTH_CAMERA.mcKeyBinding = options.smoothCameraKey;
+        SNEAK.mcKeyBinding = options.sneakKey;
+        SPRINT.mcKeyBinding = options.sprintKey;
+        SWAP_HANDS.mcKeyBinding = options.swapHandsKey;
+        TOGGLE_PERSPECTIVE.mcKeyBinding = options.togglePerspectiveKey;
+        USE.mcKeyBinding = options.useKey;
     }
 
     /**
@@ -323,37 +336,37 @@ public class ButtonBinding {
      */
     public static @NotNull Text getLocalizedButtonName(int button) {
         return switch (button % 500) {
-            case -1 -> new TranslatableText("key.keyboard.unknown");
-            case GLFW_GAMEPAD_BUTTON_A -> new TranslatableText("midnightcontrols.button.a");
-            case GLFW_GAMEPAD_BUTTON_B -> new TranslatableText("midnightcontrols.button.b");
-            case GLFW_GAMEPAD_BUTTON_X -> new TranslatableText("midnightcontrols.button.x");
-            case GLFW_GAMEPAD_BUTTON_Y -> new TranslatableText("midnightcontrols.button.y");
-            case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER -> new TranslatableText("midnightcontrols.button.left_bumper");
-            case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER -> new TranslatableText("midnightcontrols.button.right_bumper");
-            case GLFW_GAMEPAD_BUTTON_BACK -> new TranslatableText("midnightcontrols.button.back");
-            case GLFW_GAMEPAD_BUTTON_START -> new TranslatableText("midnightcontrols.button.start");
-            case GLFW_GAMEPAD_BUTTON_GUIDE -> new TranslatableText("midnightcontrols.button.guide");
-            case GLFW_GAMEPAD_BUTTON_LEFT_THUMB -> new TranslatableText("midnightcontrols.button.left_thumb");
-            case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB -> new TranslatableText("midnightcontrols.button.right_thumb");
-            case GLFW_GAMEPAD_BUTTON_DPAD_UP -> new TranslatableText("midnightcontrols.button.dpad_up");
-            case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> new TranslatableText("midnightcontrols.button.dpad_right");
-            case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> new TranslatableText("midnightcontrols.button.dpad_down");
-            case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> new TranslatableText("midnightcontrols.button.dpad_left");
-            case 100 -> new TranslatableText("midnightcontrols.axis.left_x+");
-            case 101 -> new TranslatableText("midnightcontrols.axis.left_y+");
-            case 102 -> new TranslatableText("midnightcontrols.axis.right_x+");
-            case 103 -> new TranslatableText("midnightcontrols.axis.right_y+");
-            case 104 -> new TranslatableText("midnightcontrols.axis.left_trigger");
-            case 105 -> new TranslatableText("midnightcontrols.axis.right_trigger");
-            case 200 -> new TranslatableText("midnightcontrols.axis.left_x-");
-            case 201 -> new TranslatableText("midnightcontrols.axis.left_y-");
-            case 202 -> new TranslatableText("midnightcontrols.axis.right_x-");
-            case 203 -> new TranslatableText("midnightcontrols.axis.right_y-");
-            case 15 -> new TranslatableText("midnightcontrols.button.l4");
-            case 16 -> new TranslatableText("midnightcontrols.button.l5");
-            case 17 -> new TranslatableText("midnightcontrols.button.r4");
-            case 18 -> new TranslatableText("midnightcontrols.button.r5");
-            default -> new TranslatableText("midnightcontrols.button.unknown", button);
+            case -1 -> Text.translatable("key.keyboard.unknown");
+            case GLFW_GAMEPAD_BUTTON_A -> Text.translatable("midnightcontrols.button.a");
+            case GLFW_GAMEPAD_BUTTON_B -> Text.translatable("midnightcontrols.button.b");
+            case GLFW_GAMEPAD_BUTTON_X -> Text.translatable("midnightcontrols.button.x");
+            case GLFW_GAMEPAD_BUTTON_Y -> Text.translatable("midnightcontrols.button.y");
+            case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER -> Text.translatable("midnightcontrols.button.left_bumper");
+            case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER -> Text.translatable("midnightcontrols.button.right_bumper");
+            case GLFW_GAMEPAD_BUTTON_BACK -> Text.translatable("midnightcontrols.button.back");
+            case GLFW_GAMEPAD_BUTTON_START -> Text.translatable("midnightcontrols.button.start");
+            case GLFW_GAMEPAD_BUTTON_GUIDE -> Text.translatable("midnightcontrols.button.guide");
+            case GLFW_GAMEPAD_BUTTON_LEFT_THUMB -> Text.translatable("midnightcontrols.button.left_thumb");
+            case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB -> Text.translatable("midnightcontrols.button.right_thumb");
+            case GLFW_GAMEPAD_BUTTON_DPAD_UP -> Text.translatable("midnightcontrols.button.dpad_up");
+            case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> Text.translatable("midnightcontrols.button.dpad_right");
+            case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> Text.translatable("midnightcontrols.button.dpad_down");
+            case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> Text.translatable("midnightcontrols.button.dpad_left");
+            case 100 -> Text.translatable("midnightcontrols.axis.left_x+");
+            case 101 -> Text.translatable("midnightcontrols.axis.left_y+");
+            case 102 -> Text.translatable("midnightcontrols.axis.right_x+");
+            case 103 -> Text.translatable("midnightcontrols.axis.right_y+");
+            case 104 -> Text.translatable("midnightcontrols.axis.left_trigger");
+            case 105 -> Text.translatable("midnightcontrols.axis.right_trigger");
+            case 200 -> Text.translatable("midnightcontrols.axis.left_x-");
+            case 201 -> Text.translatable("midnightcontrols.axis.left_y-");
+            case 202 -> Text.translatable("midnightcontrols.axis.right_x-");
+            case 203 -> Text.translatable("midnightcontrols.axis.right_y-");
+            case 15 -> Text.translatable("midnightcontrols.button.l4");
+            case 16 -> Text.translatable("midnightcontrols.button.l5");
+            case 17 -> Text.translatable("midnightcontrols.button.r4");
+            case 18 -> Text.translatable("midnightcontrols.button.r5");
+            default -> Text.translatable("midnightcontrols.button.unknown", button);
         };
     }
 
@@ -376,14 +389,27 @@ public class ButtonBinding {
                 ButtonBinding.HOTBAR_LEFT,
                 ButtonBinding.HOTBAR_RIGHT,
                 ButtonBinding.INVENTORY,
-                ButtonBinding.SWAP_HANDS
+                ButtonBinding.SWAP_HANDS,
+                ButtonBinding.TAB_LEFT,
+                ButtonBinding.TAB_RIGHT,
+                ButtonBinding.PAGE_LEFT,
+                ButtonBinding.PAGE_RIGHT,
+                ButtonBinding.TAKE,
+                ButtonBinding.TAKE_ALL,
+                ButtonBinding.QUICK_MOVE,
+                ButtonBinding.SLOT_UP,
+                ButtonBinding.SLOT_DOWN,
+                ButtonBinding.SLOT_LEFT,
+                ButtonBinding.SLOT_RIGHT
         ));
         MULTIPLAYER_CATEGORY = InputManager.registerDefaultCategory("key.categories.multiplayer",
                 category -> category.registerAllBindings(ButtonBinding.CHAT, ButtonBinding.PLAYER_LIST));
         MISC_CATEGORY = InputManager.registerDefaultCategory("key.categories.misc", category -> category.registerAllBindings(
                 ButtonBinding.SCREENSHOT,
+                ButtonBinding.TOGGLE_PERSPECTIVE,
+                ButtonBinding.PAUSE_GAME,
                 //SMOOTH_CAMERA,
-                ButtonBinding.TOGGLE_PERSPECTIVE
+                ButtonBinding.DEBUG_SCREEN
         ));
     }
 
@@ -426,7 +452,7 @@ public class ButtonBinding {
         }
 
         public Builder(@NotNull Identifier identifier) {
-            this(identifier.getNamespace() + "." + identifier.getNamespace());
+            this(identifier.getNamespace() + "." + identifier.getPath());
         }
 
         /**

@@ -10,6 +10,7 @@
 package eu.midnightdust.midnightcontrols.client.mixin;
 
 import com.mojang.authlib.GameProfile;
+import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.MovementHandler;
@@ -19,12 +20,15 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
+import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
@@ -33,6 +37,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientPlayerEntity.class)
 public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
     private boolean midnightcontrols$driftingPrevented = false;
+
+    public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile, @Nullable PlayerPublicKey publicKey) {
+        super(world, profile, publicKey);
+    }
 
     @Shadow
     protected abstract boolean hasMovementInput();
@@ -47,13 +55,13 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     @Shadow
     protected abstract boolean isCamera();
 
-    public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
-        super(world, profile);
-    }
+    @Shadow protected int ticksLeftToDoubleTapSprint;
+
 
     @Inject(method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"))
     public void onMove(MovementType type, Vec3d movement, CallbackInfo ci) {
-        var mod = MidnightControlsClient.get();
+        if (!MidnightControlsConfig.doubleTapToSprint) ticksLeftToDoubleTapSprint = 0;
+        if (!MidnightControls.isExtrasLoaded) return;
         if (type == MovementType.SELF) {
             if (this.getAbilities().flying && (!MidnightControlsConfig.flyDrifting || !MidnightControlsConfig.verticalFlyDrifting)) {
                 if (!this.hasMovementInput()) {
@@ -68,7 +76,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         }
     }
 
-    @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/Input;tick(Z)V", shift = At.Shift.AFTER))
+    @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/Input;tick(ZF)V", shift = At.Shift.AFTER))
     public void onInputUpdate(CallbackInfo ci) {
         MovementHandler.HANDLER.applyMovement((ClientPlayerEntity) (Object) this);
     }
@@ -76,7 +84,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isCamera()Z"))
     public void onTickMovement(CallbackInfo ci) {
         if (this.getAbilities().flying && this.isCamera()) {
-            if (MidnightControlsConfig.verticalFlyDrifting)
+            if (MidnightControlsConfig.verticalFlyDrifting || !MidnightControls.isExtrasLoaded)
                 return;
             int moving = 0;
             if (this.input.sneaking) {

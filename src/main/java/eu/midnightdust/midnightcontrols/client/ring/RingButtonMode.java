@@ -10,7 +10,6 @@
 package eu.midnightdust.midnightcontrols.client.ring;
 
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +30,7 @@ public enum RingButtonMode implements Nameable {
 
     RingButtonMode(@NotNull String name) {
         this.name = name;
-        this.text = new TranslatableText(this.getTranslationKey());
+        this.text = Text.translatable(this.getTranslationKey());
     }
 
     /**

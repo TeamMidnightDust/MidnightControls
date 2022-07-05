@@ -4,6 +4,7 @@
   "plugin": "eu.midnightdust.midnightcontrols.client.compat.MidnightControlsMixinPlugin",
   "compatibilityLevel": "JAVA_16",
   "client": [
+    "SodiumOptionsGUIAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

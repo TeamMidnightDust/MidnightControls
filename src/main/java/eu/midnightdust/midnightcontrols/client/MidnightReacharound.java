@@ -144,7 +144,7 @@ public class MidnightReacharound {
                 return null;
             }
 
-            return new BlockHitResult(client.crosshairTarget.getPos(), direction, blockPos, false);
+            return new BlockHitResult(new Vec3d(blockPos.getX(),blockPos.getY(),blockPos.getZ()), direction, blockPos, false);
         }
         return null;
     }

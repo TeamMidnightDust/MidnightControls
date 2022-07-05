@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.compat;
 
+import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -29,10 +30,7 @@ public class MidnightControlsMixinPlugin implements IMixinConfigPlugin {
     private final HashMap<String, Boolean> conditionalMixins = new HashMap<>();
 
     public MidnightControlsMixinPlugin() {
-        this.putConditionalMixin("EntryListWidgetAccessor", MidnightControlsCompat.isReiPresent());
-        this.putConditionalMixin("EntryWidgetAccessor", MidnightControlsCompat.isReiPresent());
-        this.putConditionalMixin("RecipeViewingScreenAccessor", MidnightControlsCompat.isReiPresent());
-        this.putConditionalMixin("VillagerRecipeViewingScreenAccessor", MidnightControlsCompat.isReiPresent());
+        this.putConditionalMixin("SodiumOptionsGUIAccessor", FabricLoader.getInstance().isModLoaded("sodium"));
     }
 
     private void putConditionalMixin(@NotNull String path, boolean condition) {

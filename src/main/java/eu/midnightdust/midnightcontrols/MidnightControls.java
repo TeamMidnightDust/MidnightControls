@@ -16,7 +16,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,14 +37,14 @@ public class MidnightControls implements ModInitializer {
     public static final Identifier CONTROLS_MODE_CHANNEL = new Identifier(MidnightControlsConstants.CONTROLS_MODE_CHANNEL.toString());
     public static final Identifier FEATURE_CHANNEL = new Identifier(MidnightControlsConstants.FEATURE_CHANNEL.toString());
     public static final Identifier HELLO_CHANNEL = new Identifier(MidnightControlsConstants.HELLO_CHANNEL.toString());
-
-    public static final TranslatableText NOT_BOUND_TEXT = new TranslatableText("midnightcontrols.not_bound");
+    public static boolean isExtrasLoaded;
 
     public final Logger logger = LogManager.getLogger("MidnightControls");
 
     @Override
     public void onInitialize() {
         INSTANCE = this;
+        isExtrasLoaded = FabricLoader.getInstance().isModLoaded("midnightcontrols-extra");
         this.log("Initializing MidnightControls...");
 
         ServerPlayNetworking.registerGlobalReceiver(HELLO_CHANNEL, (server, player, handler, buf, responseSender) -> {

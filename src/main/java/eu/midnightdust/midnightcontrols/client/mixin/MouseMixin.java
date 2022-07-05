@@ -20,6 +20,7 @@ import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,6 +35,9 @@ public abstract class MouseMixin implements MouseAccessor {
     @Shadow
     @Final
     private MinecraftClient client;
+
+    @Accessor
+    public abstract void setLeftButtonClicked(boolean value);
 
     @Invoker("onCursorPos")
     public abstract void midnightcontrols$onCursorPos(long window, double x, double y);
