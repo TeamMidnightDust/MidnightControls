@@ -22,8 +22,10 @@ public class SodiumCompat {
             i = (direction ? ((max > i) ? ++i : 0) : (i > 0 ? --i : max));
 
             var dimensions = accessor.getControls().get(i).getDimensions();
-            InputManager.INPUT_MANAGER.targetMouseX = (int) (client.getWindow().getScaleFactor() * dimensions.getCenterX());
-            InputManager.INPUT_MANAGER.targetMouseY = (int) (client.getWindow().getScaleFactor() * dimensions.getCenterY());
+            int x = (int) (client.getWindow().getScaleFactor() * dimensions.getCenterX());
+            int y = (int) (client.getWindow().getScaleFactor() * dimensions.getCenterY());
+            InputManager.queueMousePosition(x,y);
+            InputManager.INPUT_MANAGER.updateMousePosition(client);
             MidnightControlsClient.get().input.actionGuiCooldown = 5;
             if (MidnightControlsConfig.debug) MidnightControls.get().log(i+" "+accessor.getControls().size()+" | " + dimensions.getCenterX() + " " + dimensions.getCenterY());
         }

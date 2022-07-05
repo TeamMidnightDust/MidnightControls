@@ -45,10 +45,10 @@ public class MidnightControlsCompat {
             mod.log("Adding Ok Zoomer compatibility...");
             HANDLERS.add(new OkZoomerCompat());
         }
-        /*if (isReiPresent()) {
-            mod.log("Adding REI compatiblity...");
-            HANDLERS.add(new ReiCompat());
-        }*/
+        if (isEMIPresent()) {
+            mod.log("Adding EMI compatibility...");
+            HANDLERS.add(new EMICompat());
+        }
         if (FabricLoader.getInstance().isModLoaded("hardcorequesting") && LambdaReflection.doesClassExist(HQMCompat.GUI_BASE_CLASS_PATH)) {
             mod.log("Adding HQM compatibility...");
             HANDLERS.add(new HQMCompat());

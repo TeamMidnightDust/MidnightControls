@@ -154,6 +154,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
 
     public MidnightControlsSettingsScreen(Screen parent, boolean hideControls) {
         super(Text.translatable("midnightcontrols.title.settings"));
+        MidnightControlsConfig.isEditing = true;
         this.parent = parent;
         // General options
         this.inputModeOption = new SpruceCyclingOption("midnightcontrols.menu.controls_mode",
@@ -248,12 +249,14 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
 
     @Override
     public void removed() {
+        MidnightControlsConfig.isEditing = false;
         MidnightControlsConfig.save();
         super.removed();
     }
 
     @Override
     public void close() {
+        MidnightControlsConfig.isEditing = false;
         MidnightControlsConfig.save();
         super.close();
     }

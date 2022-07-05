@@ -11,8 +11,8 @@ package eu.midnightdust.midnightcontrols.client;
 
 import com.google.common.collect.ImmutableSet;
 import dev.lambdaurora.spruceui.widget.container.SpruceEntryListWidget;
-import dev.lambdaurora.spruceui.widget.container.SpruceOptionListWidget;
 import eu.midnightdust.midnightcontrols.MidnightControls;
+import eu.midnightdust.midnightcontrols.client.compat.EMICompat;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.SodiumCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
@@ -31,7 +31,6 @@ import dev.lambdaurora.spruceui.widget.AbstractSprucePressableButtonWidget;
 import dev.lambdaurora.spruceui.widget.SpruceElement;
 import dev.lambdaurora.spruceui.widget.SpruceLabelWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceParentWidget;
-import net.fabricmc.fabric.impl.item.group.CreativeGuiExtensions;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
@@ -51,8 +50,6 @@ import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -129,6 +126,7 @@ public class MidnightInput {
         InputManager.updateStates();
 
         var controller = MidnightControlsConfig.getController();
+
         if (controller.isConnected()) {
             var state = controller.getState();
             this.fetchButtonInput(client, state, false);
@@ -141,10 +139,7 @@ public class MidnightInput {
                     this.fetchAxeInput(client, state, true);
                 });
 
-        boolean allowInput = true;
-
-        if (this.controlsInput != null && this.controlsInput.focusedBinding != null)
-            allowInput = false;
+        boolean allowInput = this.controlsInput == null || this.controlsInput.focusedBinding == null;
 
         if (allowInput)
             InputManager.updateBindings(client);
@@ -194,7 +189,7 @@ public class MidnightInput {
             float rotationPitch = (float) (player.prevPitch + (this.targetPitch / 0.10) * tickDelta);
             client.player.setYaw(rotationYaw);
             client.player.setPitch(MathHelper.clamp(rotationPitch, -90.f, 90.f));
-            if (client.player.isRiding()) {
+            if (client.player.isRiding() && client.player.getVehicle() != null) {
                 client.player.getVehicle().onPassengerLookAround(client.player);
             }
             client.getTutorialManager().onUpdateMouse(this.targetPitch, this.targetYaw);
@@ -322,7 +317,7 @@ public class MidnightInput {
 
         if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null && !isScreenInteractive(client.currentScreen)
                 && this.actionGuiCooldown == 0) {
-            if (client.currentScreen instanceof CreativeInventoryScreen creativeScreen && ((HandledScreenAccessor) creativeScreen).midnightcontrols$getSlotAt(
+            if (client.currentScreen instanceof HandledScreen<?> handledScreen && ((HandledScreenAccessor) handledScreen).midnightcontrols$getSlotAt(
                     client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth(),
                     client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight()) != null) return;
             if (!this.ignoreNextARelease) {
@@ -335,7 +330,7 @@ public class MidnightInput {
                     Screen.wrapScreenError(() -> client.currentScreen.mouseReleased(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1),
                             "mouseReleased event handler", client.currentScreen.getClass().getCanonicalName());
                 }
-                this.actionGuiCooldown = 5;
+                //this.actionGuiCooldown = 5;
             } else {
                 this.ignoreNextARelease = false;
             }
@@ -371,11 +366,24 @@ public class MidnightInput {
     private void handleAxe(@NotNull MinecraftClient client, int axis, float value, float absValue, int state) {
         int asButtonState = value > .5f ? 1 : (value < -.5f ? 2 : 0);
 
+
         if (axis == GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || axis == GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER
                 || axis == ButtonBinding.controller2Button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER)
-                || axis == ButtonBinding.controller2Button(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER))
-            if (asButtonState == 2)
+                || axis == ButtonBinding.controller2Button(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER)) {
+            if (asButtonState == 2) {
                 asButtonState = 0;
+            }
+            else {
+                // Fixes Triggers not working correctly on some controllers
+                if (MidnightControlsConfig.triggerFix) {
+                    value = 1.0f;
+                    absValue = 1.0f;
+                    state = 1;
+                    asButtonState = 1;
+                }
+                if (MidnightControlsConfig.debug) System.out.println(axis + " "+ value + " " + absValue + " " + state);
+            }
+        }
 
         {
             boolean currentPlusState = asButtonState == 1;
@@ -463,19 +471,20 @@ public class MidnightInput {
             }
         } else if (client.currentScreen != null) {
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y && absValue >= deadZone) {
+                float finalValue = value;
                 client.currentScreen.children().stream().filter(element -> element instanceof EntryListWidget)
                         .map(element -> (EntryListWidget<?>) element)
                         .filter(element -> element.getType().isFocused())
                         .anyMatch(element -> {
-                            element.mouseScrolled(0.0, 0.0, -value);
+                            element.mouseScrolled(0.0, 0.0, -finalValue);
                             return true;
                         });
                 client.currentScreen.children().stream().filter(element -> element instanceof SpruceEntryListWidget)
                         .map(element -> (SpruceEntryListWidget<?>) element)
                         .filter(element -> element.getType().isFocused())
                         .anyMatch(element -> {
-                            MidnightControls.get().log(String.valueOf(value));
-                            element.mouseScrolled(0.0, 0.0, -value);
+                            MidnightControls.get().log(String.valueOf(finalValue));
+                            element.mouseScrolled(0.0, 0.0, -finalValue);
                             return true;
                         });
                 return;
@@ -653,23 +662,28 @@ public class MidnightInput {
     }
 
     private boolean changeFocus(@NotNull Screen screen, NavigationDirection direction) {
-        if (screen instanceof SpruceScreen spruceScreen) {
-            if (spruceScreen.onNavigation(direction, false)) {
-                this.actionGuiCooldown = 5;
+        if (!isScreenInteractive(screen) && !screen.getClass().getCanonicalName().contains("me.jellysquid.mods.sodium.client.gui")) return false;
+        try {
+            if (screen instanceof SpruceScreen spruceScreen) {
+                if (spruceScreen.onNavigation(direction, false)) {
+                    this.actionGuiCooldown = 5;
+                }
+                return false;
             }
-            return false;
-        }
-        if (FabricLoader.getInstance().isModLoaded("sodium")) SodiumCompat.handleInput(screen, direction.isLookingForward());
-        if (!screen.changeFocus(direction.isLookingForward())) {
-            if (screen.changeFocus(direction.isLookingForward())) {
+            if (FabricLoader.getInstance().isModLoaded("sodium"))
+                SodiumCompat.handleInput(screen, direction.isLookingForward());
+            if (!screen.changeFocus(direction.isLookingForward())) {
+                if (screen.changeFocus(direction.isLookingForward())) {
+                    this.actionGuiCooldown = 5;
+                    return false;
+                }
+                return true;
+            } else {
                 this.actionGuiCooldown = 5;
                 return false;
             }
-            return true;
-        } else {
-            this.actionGuiCooldown = 5;
-            return false;
-        }
+        } catch (Exception exception) {MidnightControls.get().warn("Unknown exception encountered while trying to change focus: "+exception);}
+        return false;
     }
 
     public static boolean isScreenInteractive(@NotNull Screen screen) {

@@ -24,15 +24,15 @@ import java.util.Optional;
  * @since 1.0.0
  */
 public enum ControllerType implements Nameable {
-    DEFAULT(0, Text.of("Default")),
-    DUALSHOCK(1, Text.of("Dualshock")),
-    DUALSENSE(2, Text.of("Dualsense")),
-    SWITCH(3, Text.of("Switch")),
-    XBOX_360(4, Text.of("Xbox 360")),
-    XBOX(5, Text.of("Xbox")),
-    STEAM_DECK(6, Text.of("Steam Deck")),
-    STEAM_CONTROLLER(7, Text.of("Steam Controller")),
-    OUYA(8, Text.of("Ouya"));
+    DEFAULT(0),
+    DUALSHOCK(1),
+    DUALSENSE(2),
+    SWITCH(3),
+    XBOX_360(4),
+    XBOX(5),
+    STEAM_DECK(6),
+    STEAM_CONTROLLER(7),
+    OUYA(8);
 
     private final int id;
     private final Text text;

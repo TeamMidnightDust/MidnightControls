@@ -62,6 +62,9 @@ public class ButtonBinding {
             .action(MovementHandler.HANDLER).onlyInGame().register();
     public static final ButtonBinding SCREENSHOT = new Builder("screenshot").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_A)
             .action(InputHandlers::handleScreenshot).cooldown().register();
+
+    public static final ButtonBinding DEBUG_SCREEN = new Builder("debug_screen").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_B)
+            .action((client,binding,value,action) -> {if (action == ButtonState.PRESS) client.options.debugEnabled = !client.options.debugEnabled; return true;}).cooldown().register();
     public static final ButtonBinding SLOT_DOWN = new Builder("slot_down").buttons(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)
             .action(InputHandlers.handleInventorySlotPad(1)).onlyInInventory().cooldown().register();
     public static final ButtonBinding SLOT_LEFT = new Builder("slot_left").buttons(GLFW_GAMEPAD_BUTTON_DPAD_LEFT)
@@ -89,7 +92,7 @@ public class ButtonBinding {
             .action(InputHandlers.handleActions()).filter(InputHandlers::inInventory).cooldown().register();
     public static final ButtonBinding QUICK_MOVE = new Builder("quick_move").buttons(GLFW_GAMEPAD_BUTTON_Y)
             .action(InputHandlers.handleActions()).filter(InputHandlers::inInventory).cooldown().register();
-    public static final ButtonBinding TOGGLE_PERSPECTIVE = new Builder("toggle_perspective").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_Y).cooldown().register();
+    public static final ButtonBinding TOGGLE_PERSPECTIVE = new Builder("toggle_perspective").filter(InputHandlers::inGame).buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_Y).cooldown().register();
     public static final ButtonBinding USE = new Builder("use").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true)).register();
 
     private int[] button;
@@ -387,18 +390,26 @@ public class ButtonBinding {
                 ButtonBinding.HOTBAR_RIGHT,
                 ButtonBinding.INVENTORY,
                 ButtonBinding.SWAP_HANDS,
+                ButtonBinding.TAB_LEFT,
+                ButtonBinding.TAB_RIGHT,
                 ButtonBinding.PAGE_LEFT,
                 ButtonBinding.PAGE_RIGHT,
                 ButtonBinding.TAKE,
                 ButtonBinding.TAKE_ALL,
-                ButtonBinding.QUICK_MOVE
+                ButtonBinding.QUICK_MOVE,
+                ButtonBinding.SLOT_UP,
+                ButtonBinding.SLOT_DOWN,
+                ButtonBinding.SLOT_LEFT,
+                ButtonBinding.SLOT_RIGHT
         ));
         MULTIPLAYER_CATEGORY = InputManager.registerDefaultCategory("key.categories.multiplayer",
                 category -> category.registerAllBindings(ButtonBinding.CHAT, ButtonBinding.PLAYER_LIST));
         MISC_CATEGORY = InputManager.registerDefaultCategory("key.categories.misc", category -> category.registerAllBindings(
                 ButtonBinding.SCREENSHOT,
+                ButtonBinding.TOGGLE_PERSPECTIVE,
+                ButtonBinding.PAUSE_GAME,
                 //SMOOTH_CAMERA,
-                ButtonBinding.TOGGLE_PERSPECTIVE
+                ButtonBinding.DEBUG_SCREEN
         ));
     }
 

@@ -14,4 +14,5 @@ package eu.midnightdust.midnightcontrols.client.util;
  */
 public interface MouseAccessor {
     void midnightcontrols$onCursorPos(long window, double x, double y);
+    void setLeftButtonClicked(boolean value);
 }

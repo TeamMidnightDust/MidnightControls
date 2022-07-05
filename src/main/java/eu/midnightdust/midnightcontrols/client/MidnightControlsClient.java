@@ -20,7 +20,6 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsHud;
-import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingRegistryImplAccessor;
 import eu.midnightdust.midnightcontrols.client.ring.KeyBindingRingAction;

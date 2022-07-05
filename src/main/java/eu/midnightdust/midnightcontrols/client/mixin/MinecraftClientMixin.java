@@ -109,7 +109,11 @@ public abstract class MinecraftClientMixin {
         }
         this.midnightcontrols$lastPos = this.player.getPos();
     }
-    // Applied three times for smooth camera turning even on low FPS
+    // Applied multiple times for smooth camera turning even on low FPS
+    @Inject(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;startTick()V", shift = At.Shift.BEFORE))
+    private void onPrePreRender(CallbackInfo ci) {
+        MidnightControlsClient.get().onRender((MinecraftClient) (Object) (this));
+    }
     @Inject(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Recorder;startTick()V", shift = At.Shift.AFTER))
     private void onPreRender(CallbackInfo ci) {
         MidnightControlsClient.get().onRender((MinecraftClient) (Object) (this));
@@ -120,6 +124,10 @@ public abstract class MinecraftClientMixin {
     }
     @Inject(method = "render", at = @At("TAIL"))
     private void onPostRender(CallbackInfo ci) {
+        MidnightControlsClient.get().onRender((MinecraftClient) (Object) (this));
+    }
+    @Inject(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;endTick()V", shift = At.Shift.AFTER))
+    private void onPostPostRender(CallbackInfo ci) {
         MidnightControlsClient.get().onRender((MinecraftClient) (Object) (this));
     }
 

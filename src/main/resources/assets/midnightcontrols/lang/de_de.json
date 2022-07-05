@@ -83,7 +83,7 @@
   "midnightcontrols.controller_type.ouya": "OUYA",
   "midnightcontrols.controls_mode.default": "Tastatur/Maus",
   "midnightcontrols.controls_mode.controller": "Controller",
-  "midnightcontrols.controls_mode.touchscreen": "Touchscreen",
+  "midnightcontrols.controls_mode.touchscreen": "Touchscreen (In Arbeit)",
   "midnightcontrols.hud_side.left": "links",
   "midnightcontrols.hud_side.right": "rechts",
   "midnightcontrols.menu.analog_movement": "Analoge Bewegung",

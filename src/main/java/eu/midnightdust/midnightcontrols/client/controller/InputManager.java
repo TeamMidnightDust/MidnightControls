@@ -51,6 +51,10 @@ public class InputManager {
     }
 
     public void tick(@NotNull MinecraftClient client) {
+        if (MidnightControlsConfig.autoSwitchMode && !MidnightControlsConfig.isEditing && MidnightControlsConfig.controlsMode != ControlsMode.TOUCHSCREEN)
+            if (MidnightControlsConfig.getController().isConnected() && MidnightControlsConfig.getController().isGamepad())
+                 MidnightControlsConfig.controlsMode = ControlsMode.CONTROLLER;
+            else MidnightControlsConfig.controlsMode = ControlsMode.DEFAULT;
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER) {
             this.controllerTick(client);
         }

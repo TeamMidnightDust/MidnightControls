@@ -59,8 +59,8 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
     public void onRender(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER) {
             var client = MinecraftClient.getInstance();
-            if (client.getWindow().getScaleFactor() >= 4) {
-                scale = (float) (0.75f * (client.getWindow().getScaleFactor()-3));
+            if (client.options.getGuiScale().getValue() >= 4) {
+                scale = 0.75f;
             } else scale = 1f;
             if (scale != 1f) matrices.scale(scale,scale,scale);
             int x = 2, y = (int) (client.getWindow().getScaledHeight() * (1 / scale) - 2 - MidnightControlsRenderer.ICON_SIZE);
@@ -74,7 +74,9 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
                 y -= 24;
             }
             if (MidnightControlsCompat.isEMIPresent()) {
-                x = (int) (client.getWindow().getScaledWidth() * (1 / scale) - 55 - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.pickup")) * (1 / scale) - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.quick_move")) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.TAKE) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.QUICK_MOVE));
+                x = (int) (client.getWindow().getScaledWidth() * (1 / scale) - 55 - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.pickup"))
+                        * (1 / scale) - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.quick_move"))
+                        - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.TAKE) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.QUICK_MOVE));
             }
             x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_X}, "midnightcontrols.action.pickup", true, client);
             MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_Y}, "midnightcontrols.action.quick_move", true, client);

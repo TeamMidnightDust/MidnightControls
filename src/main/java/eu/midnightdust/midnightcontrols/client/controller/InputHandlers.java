@@ -9,23 +9,28 @@
 
 package eu.midnightdust.midnightcontrols.client.controller;
 
+import com.google.common.collect.ImmutableSet;
 import eu.midnightdust.midnightcontrols.client.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
+import eu.midnightdust.midnightcontrols.client.compat.EMICompat;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.SodiumCompat;
 import eu.midnightdust.midnightcontrols.client.mixin.AdvancementsScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.RecipeBookWidgetAccessor;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
+import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
 import net.fabricmc.fabric.impl.item.group.CreativeGuiExtensions;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Items;
@@ -118,9 +123,27 @@ public class InputHandlers {
                 var screen = (HandledScreenAccessor) client.currentScreen;
                 try {
                     if (next) {
-                        ((CreativeGuiExtensions) screen).fabric_nextPage();
+                        return client.currentScreen.children().stream().filter(element -> element instanceof PressableWidget)
+                                .map(element -> (PressableWidget) element)
+                                .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
+                                .anyMatch(element -> {
+                                    if (element.getMessage().getString().equals(">")) {
+                                        element.onPress();
+                                        return true;
+                                    }
+                                    return false;
+                                });
                     } else {
-                        ((CreativeGuiExtensions) screen).fabric_previousPage();
+                        return client.currentScreen.children().stream().filter(element -> element instanceof PressableWidget)
+                                .map(element -> (PressableWidget) element)
+                                .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
+                                .anyMatch(element -> {
+                                    if (element.getMessage().getString().equals("<")) {
+                                        element.onPress();
+                                        return true;
+                                    }
+                                    return false;
+                                });
                     }
                 } catch (Exception ignored) {}
             }
@@ -144,6 +167,7 @@ public class InputHandlers {
             int slotId;
             if (slot == null) {
                 if (button.getName().equals("take_all")) {
+                    ((MouseAccessor) client.mouse).setLeftButtonClicked(true);
                     return false;
                 }
                 slotId = accessor.midnightcontrols$isClickOutsideBounds(x, y, accessor.getX(), accessor.getY(), GLFW_MOUSE_BUTTON_1) ? -999 : -1;
@@ -155,24 +179,21 @@ public class InputHandlers {
 
             MidnightControlsClient.get().input.inventoryInteractionCooldown = 5;
             switch (button.getName()) {
-            case "take_all":
-                if (accessor instanceof CreativeInventoryScreen) {
-                    if (((CreativeInventoryScreenAccessor) accessor).midnightcontrols$isCreativeInventorySlot(slot))
+            case "take_all": {
+                if (screen instanceof CreativeInventoryScreen) {
+                    if (slot != null && (((CreativeInventoryScreenAccessor) accessor).midnightcontrols$isCreativeInventorySlot(slot) || MidnightControlsCompat.streamCompatHandlers().anyMatch(handler -> handler.isCreativeSlot(screen, slot))))
                         actionType = SlotActionType.CLONE;
-                    if (slot != null && MidnightControlsCompat.streamCompatHandlers().anyMatch(handler -> handler.isCreativeSlot(screen, slot)))
-                        actionType = SlotActionType.CLONE;
-                } else {
-                    if (slot != null && screen.getScreenHandler().getCursorStack() != null) {
-                        return screen.mouseReleased(x, y, GLFW.GLFW_MOUSE_BUTTON_1);
-                    } else actionType = SlotActionType.PICKUP_ALL;
                 }
                 break;
-            case "take":
+            }
+            case "take": {
                 clickData = GLFW_MOUSE_BUTTON_2;
                 break;
-            case "quick_move":
+            }
+            case "quick_move": {
                 actionType = SlotActionType.QUICK_MOVE;
                 break;
+            }
             default:
                 return false;
             }

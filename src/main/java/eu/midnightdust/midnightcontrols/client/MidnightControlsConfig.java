@@ -16,6 +16,7 @@ import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
+import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -23,13 +24,13 @@ import org.lwjgl.glfw.GLFW;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_X;
-import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Represents MidnightControls configuration.
  */
 public class MidnightControlsConfig extends MidnightConfig {
+    public static boolean isEditing = false;
     // General
     @Entry(name = "midnightcontrols.menu.controls_mode") public static ControlsMode controlsMode = ControlsMode.DEFAULT;
     @Entry(name = "midnightcontrols.menu.auto_switch_mode") public static boolean autoSwitchMode = true;
@@ -60,11 +61,12 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(name = "Controller ID") public static Object controllerID = 0;
     @Entry(name = "2nd Controller ID") public static Object secondControllerID = -1;
     @Entry(name = "midnightcontrols.menu.controller_type") public static ControllerType controllerType = ControllerType.DEFAULT;
-    @Entry(name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen");
+    @Entry(name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen", "hardcorequesting.client.interfaces.GuiQuestBook", "hardcorequesting.client.interfaces.GuiReward", "hardcorequesting.client.interfaces.EditTrackerScreen");
     @Entry(name = "Keybindings") public static Map<String, String> BINDINGS = new HashMap<>();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
     @Entry(name = "Max analog values") public static double[] maxAnalogValues = new double[]{1, 1, 1, 1};
+    @Entry public static boolean triggerFix = true;
 
     /**
      * Loads the configuration
@@ -92,12 +94,23 @@ public class MidnightControlsConfig extends MidnightConfig {
      */
     public static Controller getController() {
         var raw = MidnightControlsConfig.controllerID;
+        Controller controller = Controller.byId(GLFW.GLFW_JOYSTICK_1);
         if (raw instanceof Number) {
-            return Controller.byId(((Number) raw).intValue());
+            controller = Controller.byId(((Number) raw).intValue());
         } else if (raw instanceof String) {
-            return Controller.byGuid((String) raw).orElse(Controller.byId(GLFW.GLFW_JOYSTICK_1));
+            controller = Controller.byGuid((String) raw).orElse(Controller.byId(GLFW.GLFW_JOYSTICK_1));
         }
-        return Controller.byId(GLFW.GLFW_JOYSTICK_1);
+        if ((!controller.isConnected() || !controller.isGamepad()) && MidnightControlsConfig.autoSwitchMode && !isEditing) {
+            for (int i = 0; i < GLFW.GLFW_JOYSTICK_LAST; ++i) {
+                Controller gamepad = Controller.byId(i);
+                if (gamepad.isConnected() && gamepad.isGamepad()) {
+                    controller = gamepad;
+                    i = GLFW_JOYSTICK_LAST;
+                }
+            }
+        }
+        if (controller.isConnected() && controller.isGamepad() && MidnightControlsConfig.autoSwitchMode && !isEditing) MidnightControlsConfig.controlsMode = ControlsMode.CONTROLLER;
+        return controller;
     }
 
     /**
