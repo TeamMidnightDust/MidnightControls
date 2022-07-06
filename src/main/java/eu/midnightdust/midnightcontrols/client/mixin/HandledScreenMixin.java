@@ -63,6 +63,7 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
             if (client.options.guiScale >= 4) {
                 scale = 0.75f;
             } else scale = 1f;
+            matrices.push();
             if (scale != 1f) matrices.scale(scale,scale,scale);
             int x = 2, y = (int) (client.getWindow().getScaledHeight() * (1 / scale) - 2 - MidnightControlsRenderer.ICON_SIZE);
             if (MidnightControlsCompat.isEMIPresent()) {
@@ -81,7 +82,7 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
             }
             x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_X}, "midnightcontrols.action.pickup", true, client);
             MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_Y}, "midnightcontrols.action.quick_move", true, client);
-            if (scale != 1f) matrices.scale(1,1,1);
+            matrices.pop();
         }
     }
 }

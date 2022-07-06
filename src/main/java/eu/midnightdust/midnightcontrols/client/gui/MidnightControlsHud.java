@@ -86,12 +86,13 @@ public class MidnightControlsHud extends Hud {
         if (this.client == null) return;
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.currentScreen == null) {
             int y = bottom(2);
+            matrices.push();
             if (scale != 1f) matrices.scale(scale,scale,scale);
             this.renderFirstIcons(matrices, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : (int) ((client.getWindow().getScaledWidth() - 2) * (1 / scale)), y);
             this.renderSecondIcons(matrices, MidnightControlsConfig.hudSide == HudSide.RIGHT ? 2 : (int) ((client.getWindow().getScaledWidth() - 2) * (1 / scale)), y);
             this.renderFirstSection(matrices, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : (int) ((client.getWindow().getScaledWidth() - 2) * (1 / scale)), y);
             this.renderSecondSection(matrices, MidnightControlsConfig.hudSide == HudSide.RIGHT ? 2 : (int) ((client.getWindow().getScaledWidth() - 2) * (1 / scale)), y);
-            if (scale != 1f) matrices.scale(1,1,1);
+            matrices.pop();
         }
 
         if (this.mod.reacharound.isLastReacharoundVertical()) {
