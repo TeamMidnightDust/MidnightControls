@@ -1,3 +1,5 @@
+<div align="center">
+
 # MidnightControls
 
 <!-- modrinth_exclude.start -->
@@ -5,12 +7,14 @@
 [![Version](https://img.shields.io/github/v/tag/TeamMidnightDust/MidnightControls?label=version&style=round)](https://github.com/TeamMidnightDust/MidnightControls/releases)
 ![Environment: Client](https://img.shields.io/badge/environment-client-1976d2?style=round)
 [![Mod loader: Quilt/Fabric]][Quilt]
-![Java 17](https://img.shields.io/badge/language-Java%2017-9B599A.svg?style=round)
-[![GitHub license](https://img.shields.io/github/license/TeamMidnightDust/MidnightControls?style=round)](https://raw.githubusercontent.com/TeamMidnightDust/MidnightControls/master/LICENSE)
+[![Java 17](https://img.shields.io/badge/language-Java%2017-9B599A.svg?style=round)](https://www.oracle.com/java/technologies/downloads/#java17)
+[![GitHub license](https://img.shields.io/github/license/TeamMidnightDust/MidnightControls?style=round)](LICENSE)
 <!-- modrinth_exclude.end -->
 
 A Fabric Minecraft mod which adds better controls, reach-around and controller support.  
 Forked from [LambdaControls](https://github.com/LambdAurora/LambdaControls) by the amazing [LambdAurora](https://github.com/LambdAurora), which was sadly discontinued.
+
+</div>
 
 ## What's this mod?
 
