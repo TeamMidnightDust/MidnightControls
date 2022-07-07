@@ -1,4 +1,5 @@
 <div align="center">
+<img src=https://github.com/TeamMidnightDust/MidnightControls/blob/1.19/src/main/resources/assets/midnightcontrols/icon.png>
 
 # MidnightControls
 
