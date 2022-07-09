@@ -34,6 +34,7 @@
   "midnightcontrols.action.sneak": "Красться",
   "midnightcontrols.action.sprint": "Бег",
   "midnightcontrols.action.swap_hands": "Поменять Руку",
+  "midnightcontrols.action.toggle_perspective": "Переключить Перспективу",
   "midnightcontrols.action.toggle_smooth_camera": "Переключить Кинематографическую Камеру",
   "midnightcontrols.action.page_back": "Предыдущая Страница",
   "midnightcontrols.action.page_next": "Следующая Страница",
