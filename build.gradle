@@ -68,8 +68,8 @@ repositories {
         url 'https://maven.gegy.dev'
     }
     maven {
-        name 'CottonMC'
-        url 'https://server.bbkr.space/artifactory/libs-snapshot'
+        name = "CottonMC"
+        url = "https://server.bbkr.space/artifactory/libs-release"
     }
     maven { url "https://maven.terraformersmc.com/releases/" }
     maven { url 'https://maven.kosmx.dev' }
@@ -109,6 +109,7 @@ dependencies {
     // modImplementation("maven.modrinth:ok-zoomer:${project.ok_zoomer_version}")
     // modImplementation "io.github.ennuil:LibZoomer:${project.libzoomer_version}"
 
+    modImplementation "io.github.cottonmc:LibGui:${project.libgui_version}"
     modImplementation "org.quiltmc:quilt-json5:1.0.0"
     modCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
     modImplementation("maven.modrinth:emi:${project.emi_version}")
@@ -120,6 +121,7 @@ dependencies {
 
     shadow 'com.electronwill.night-config:core:3.6.3'
     shadow 'com.electronwill.night-config:toml:3.6.3'
+    apply plugin: 'java-library'
 }
 loom {
     accessWidenerPath = file("src/main/resources/midnightcontrols.accesswidener")

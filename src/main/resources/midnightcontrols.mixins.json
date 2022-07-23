@@ -17,7 +17,8 @@
     "MouseMixin",
     "RecipeBookWidgetAccessor",
     "WorldRendererMixin",
-    "KeyBindingRegistryImplAccessor"
+    "KeyBindingRegistryImplAccessor",
+    "ScreenAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

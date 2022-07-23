@@ -13,7 +13,17 @@ import eu.midnightdust.midnightcontrols.client.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.tutorial.MovementTutorialStepHandler;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.enchantment.SoulSpeedEnchantment;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.scanner.SimpleNbtScanner;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -79,18 +89,20 @@ public final class MovementHandler implements PressAction {
             this.pressingBack = direction < 0;
             this.movementForward = direction * value;
 
-            // Slowing down if sneaking.
-            if (client.player.input.sneaking)
-                this.movementForward *= 0.3D;
+            // Slowing down if sneaking or crawling.
+            if (client.player.shouldSlowDown()) {
+                this.movementForward *= MathHelper.clamp(0.3F + EnchantmentHelper.getSwiftSneakSpeedBoost(client.player), 0.0F, 1.0F);
+            }
         } else {
             // Handle sideways movement.
             this.pressingLeft = direction > 0;
             this.pressingRight = direction < 0;
             this.movementSideways = direction * value;
 
-            // Slowing down if sneaking.
-            if (client.player.input.sneaking)
-                this.movementSideways *= 0.3D;
+            // Slowing down if sneaking or crawling.
+            if (client.player.shouldSlowDown()) {
+                this.movementSideways *= MathHelper.clamp(0.3F + EnchantmentHelper.getSwiftSneakSpeedBoost(client.player), 0.0F, 1.0F);
+            }
         }
 
         return this.shouldOverrideMovement;

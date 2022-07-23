@@ -119,8 +119,10 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         });
 
         HudManager.register(this.hud = new MidnightControlsHud(this));
-        FabricLoader.getInstance().getModContainer("midnightcontrols").ifPresent(modContainer ->
-                ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","bedrock"), modContainer, ResourcePackActivationType.NORMAL));
+        FabricLoader.getInstance().getModContainer("midnightcontrols").ifPresent(modContainer -> {
+            ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","bedrock"), modContainer, ResourcePackActivationType.NORMAL);
+            ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","legacy"), modContainer, ResourcePackActivationType.NORMAL);
+        });
     }
 
     /**
@@ -192,7 +194,7 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
 //        }
     }
     public void onRender(MinecraftClient client) {
-        this.input.onRender(client.getTickDelta(), client);
+        this.input.onRender(client);
     }
 
     /**

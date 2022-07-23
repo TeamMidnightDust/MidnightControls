@@ -12,6 +12,7 @@
     "akemin-dayo",
     "DioEgizio",
     "Ivanoks",
+    "KiskaUWU",
     "FlashyReese",
     "Hambaka",
     "joaoh1",
@@ -53,7 +54,7 @@
     "modmenu": ">=1.12.2"
   },
   "suggests": {
-    "quilt_loader": "*"
+    "kontrolo": "*"
   },
   "breaks": {
     "lambdacontrols": "*",

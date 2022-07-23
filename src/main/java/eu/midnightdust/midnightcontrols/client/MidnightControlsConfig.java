@@ -61,7 +61,11 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(name = "Controller ID") public static Object controllerID = 0;
     @Entry(name = "2nd Controller ID") public static Object secondControllerID = -1;
     @Entry(name = "midnightcontrols.menu.controller_type") public static ControllerType controllerType = ControllerType.DEFAULT;
-    @Entry(name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen", "hardcorequesting.client.interfaces.GuiQuestBook", "hardcorequesting.client.interfaces.GuiReward", "hardcorequesting.client.interfaces.EditTrackerScreen");
+    @Entry(name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui",
+            "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375",
+            "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen",
+            "hardcorequesting.client.interfaces.GuiQuestBook", "hardcorequesting.client.interfaces.GuiReward", "hardcorequesting.client.interfaces.EditTrackerScreen",
+            "io.github.kosmx.emotes.arch.gui.screen.ingame.FastChosseScreen");
     @Entry(name = "Keybindings") public static Map<String, String> BINDINGS = new HashMap<>();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
