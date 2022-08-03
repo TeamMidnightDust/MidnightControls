@@ -348,9 +348,9 @@ public class MidnightInput {
         var set = ImmutableSet.of("gui.back", "gui.done", "gui.cancel", "gui.toTitle", "gui.toMenu");
         return screen.children().stream().filter(element -> element instanceof PressableWidget)
                 .map(element -> (PressableWidget) element)
-                .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
+                .filter(element -> element.getMessage() != null)
                 .anyMatch(element -> {
-                    if (set.stream().anyMatch(key -> element.getMessage().getContent().toString().equals(key))) {
+                    if (set.stream().anyMatch(key -> element.getMessage().toString().equals(key))) {
                         element.onPress();
                         return true;
                     }
@@ -571,7 +571,7 @@ public class MidnightInput {
             labelWidget.onPress();
             return true;
         } else if (focused instanceof WorldListWidget list) {
-            list.getSelectedAsOptional().ifPresent(WorldListWidget.WorldEntry::play);
+            list.getSelectedAsOptional().ifPresent(WorldListWidget.Entry::play);
             return true;
         } else if (focused instanceof MultiplayerServerListWidget list) {
             var entry = list.getSelectedOrNull();

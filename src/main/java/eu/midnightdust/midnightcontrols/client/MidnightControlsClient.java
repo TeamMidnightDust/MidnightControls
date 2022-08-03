@@ -38,7 +38,9 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -136,10 +138,10 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         GLFW.glfwSetJoystickCallback((jid, event) -> {
             if (event == GLFW.GLFW_CONNECTED) {
                 var controller = Controller.byId(jid);
-                client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, Text.translatable("midnightcontrols.controller.connected", jid),
-                        Text.literal(controller.getName())));
+                client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, new TranslatableText("midnightcontrols.controller.connected", jid),
+                        new LiteralText(controller.getName())));
             } else if (event == GLFW.GLFW_DISCONNECTED) {
-                client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, Text.translatable("midnightcontrols.controller.disconnected", jid),
+                client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, new TranslatableText("midnightcontrols.controller.disconnected", jid),
                         null));
             }
 

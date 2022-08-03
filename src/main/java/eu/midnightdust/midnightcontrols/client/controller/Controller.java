@@ -15,7 +15,9 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.toast.SystemToast;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -177,7 +179,7 @@ public record Controller(int id) implements Nameable {
                 var client = MinecraftClient.getInstance();
                 if (client != null) {
                     client.getToastManager().add(SystemToast.create(client, SystemToast.Type.TUTORIAL_HINT,
-                            Text.translatable("midnightcontrols.controller.mappings.error"), Text.literal(string)));
+                            new TranslatableText("midnightcontrols.controller.mappings.error"), new LiteralText(string)));
                     MidnightControls.get().log(I18n.translate("midnightcontrols.controller.mappings.error")+string);
                 }
             }

@@ -10,8 +10,7 @@
 package eu.midnightdust.midnightcontrols.client.mixin;
 
 import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.SimpleOption;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.client.option.Option;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,11 +25,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GameOptions.class)
 public abstract class GameOptionsMixin {
 
-    @Shadow public abstract SimpleOption<Boolean> getAutoJump();
+    @Shadow public boolean autoJump;
 
     @Inject(method = "load", at = @At("HEAD"))
     public void onInit(CallbackInfo ci) {
         // Set default value of the Auto-Jump option to false.
-        getAutoJump().setValue(false);
+        autoJump = false;
     }
 }

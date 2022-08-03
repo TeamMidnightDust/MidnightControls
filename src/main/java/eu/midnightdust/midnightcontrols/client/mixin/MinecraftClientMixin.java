@@ -61,6 +61,7 @@ public abstract class MinecraftClientMixin {
     @Shadow
     private int itemUseCooldown;
 
+    @Shadow @Nullable public ClientWorld world;
     private BlockPos midnightcontrols$lastTargetPos;
     private Vec3d midnightcontrols$lastPos;
     private Direction midnightcontrols$lastTargetSide;
@@ -150,7 +151,7 @@ public abstract class MinecraftClientMixin {
                     hitResult = mod.reacharound.withSideForReacharound(hitResult, stackInHand);
 
                     int previousStackCount = stackInHand.getCount();
-                    var result = this.interactionManager.interactBlock(this.player, hand, hitResult);
+                    var result = this.interactionManager.interactBlock(this.player, world, hand, hitResult);
                     if (result.isAccepted()) {
                         if (result.shouldSwingHand()) {
                             this.player.swingHand(hand);

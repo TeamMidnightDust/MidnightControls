@@ -125,7 +125,7 @@ public class InputHandlers {
                     if (next) {
                         return client.currentScreen.children().stream().filter(element -> element instanceof PressableWidget)
                                 .map(element -> (PressableWidget) element)
-                                .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
+                                .filter(element -> element.getMessage() != null)
                                 .anyMatch(element -> {
                                     if (element.getMessage().getString().equals(">")) {
                                         element.onPress();
@@ -136,7 +136,7 @@ public class InputHandlers {
                     } else {
                         return client.currentScreen.children().stream().filter(element -> element instanceof PressableWidget)
                                 .map(element -> (PressableWidget) element)
-                                .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
+                                .filter(element -> element.getMessage() != null)
                                 .anyMatch(element -> {
                                     if (element.getMessage().getString().equals("<")) {
                                         element.onPress();
@@ -232,12 +232,12 @@ public class InputHandlers {
 
     public static boolean handleToggleSneak(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action) {
         button.asKeyBinding().ifPresent(binding -> {
-            boolean sneakToggled = client.options.getSneakToggled().getValue();
+            boolean sneakToggled = client.options.sneakToggled;
             if (client.player.getAbilities().flying && sneakToggled)
-                client.options.getSneakToggled().setValue(false);
+                client.options.sneakToggled = false;
             binding.setPressed(button.pressed);
             if (client.player.getAbilities().flying && sneakToggled)
-                client.options.getSneakToggled().setValue(true);
+                client.options.sneakToggled = true;
         });
         return true;
     }

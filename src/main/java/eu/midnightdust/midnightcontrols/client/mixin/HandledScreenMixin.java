@@ -22,6 +22,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
@@ -59,7 +60,7 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
     public void onRender(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER) {
             var client = MinecraftClient.getInstance();
-            if (client.options.getGuiScale().getValue() >= 4) {
+            if (client.options.guiScale >= 4) {
                 scale = 0.75f;
             } else scale = 1f;
             matrices.push();
@@ -75,8 +76,8 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
                 y -= 24;
             }
             if (MidnightControlsCompat.isEMIPresent()) {
-                x = (int) (client.getWindow().getScaledWidth() * (1 / scale) - 55 - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.pickup"))
-                        * (1 / scale) - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.quick_move"))
+                x = (int) (client.getWindow().getScaledWidth() * (1 / scale) - 55 - client.textRenderer.getWidth(new TranslatableText("midnightcontrols.action.pickup"))
+                        * (1 / scale) - client.textRenderer.getWidth(new TranslatableText("midnightcontrols.action.quick_move"))
                         - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.TAKE) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.QUICK_MOVE));
             }
             x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_X}, "midnightcontrols.action.pickup", true, client);

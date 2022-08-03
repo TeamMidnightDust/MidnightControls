@@ -10,6 +10,7 @@
 package eu.midnightdust.midnightcontrols.client;
 
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +40,7 @@ public enum ControllerType implements Nameable {
 
     ControllerType(int id) {
         this.id = id;
-        this.text = Text.translatable("midnightcontrols.controller_type." + this.getName());
+        this.text = new TranslatableText("midnightcontrols.controller_type." + this.getName());
     }
 
     ControllerType(int id, @NotNull Text text) {

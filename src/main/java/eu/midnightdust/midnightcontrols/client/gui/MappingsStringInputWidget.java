@@ -16,7 +16,9 @@ import dev.lambdaurora.spruceui.option.SpruceOption;
 import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
 import dev.lambdaurora.spruceui.widget.text.SpruceTextAreaWidget;
 import net.minecraft.client.toast.SystemToast;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -64,7 +66,7 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
             } catch (IOException e) {
                 if (this.client != null)
                     this.client.getToastManager().add(SystemToast.create(this.client, SystemToast.Type.TUTORIAL_HINT,
-                            Text.translatable("midnightcontrols.controller.mappings.error.write"), Text.empty()));
+                            new TranslatableText("midnightcontrols.controller.mappings.error.write"), Text.of("")));
                 e.printStackTrace();
             }
         }
@@ -89,7 +91,7 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
         }
 
         int textFieldWidth = (int) (this.width * (5.0 / 6.0));
-        this.textArea = new SpruceTextAreaWidget(Position.of(this, this.width / 2 - textFieldWidth / 2, 0), textFieldWidth, this.height - 50, Text.literal(mappings));
+        this.textArea = new SpruceTextAreaWidget(Position.of(this, this.width / 2 - textFieldWidth / 2, 0), textFieldWidth, this.height - 50, new LiteralText(mappings));
         this.textArea.setText(mappings);
         // Display as many lines as possible
         this.textArea.setDisplayedLines(this.textArea.getInnerHeight() / this.client.textRenderer.fontHeight);

@@ -15,6 +15,7 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.aperlambda.lambdacommon.utils.function.PairPredicate;
 import org.aperlambda.lambdacommon.utils.function.Predicates;
@@ -109,7 +110,7 @@ public class ButtonBinding {
     public ButtonBinding(String key, int[] defaultButton, List<PressAction> actions, PairPredicate<MinecraftClient, ButtonBinding> filter, boolean hasCooldown) {
         this.setButton(this.defaultButton = defaultButton);
         this.key = key;
-        this.text = Text.translatable(this.key);
+        this.text = new TranslatableText(this.key);
         this.filter = filter;
         this.actions.addAll(actions);
         this.hasCooldown = hasCooldown;
@@ -336,37 +337,37 @@ public class ButtonBinding {
      */
     public static @NotNull Text getLocalizedButtonName(int button) {
         return switch (button % 500) {
-            case -1 -> Text.translatable("key.keyboard.unknown");
-            case GLFW_GAMEPAD_BUTTON_A -> Text.translatable("midnightcontrols.button.a");
-            case GLFW_GAMEPAD_BUTTON_B -> Text.translatable("midnightcontrols.button.b");
-            case GLFW_GAMEPAD_BUTTON_X -> Text.translatable("midnightcontrols.button.x");
-            case GLFW_GAMEPAD_BUTTON_Y -> Text.translatable("midnightcontrols.button.y");
-            case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER -> Text.translatable("midnightcontrols.button.left_bumper");
-            case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER -> Text.translatable("midnightcontrols.button.right_bumper");
-            case GLFW_GAMEPAD_BUTTON_BACK -> Text.translatable("midnightcontrols.button.back");
-            case GLFW_GAMEPAD_BUTTON_START -> Text.translatable("midnightcontrols.button.start");
-            case GLFW_GAMEPAD_BUTTON_GUIDE -> Text.translatable("midnightcontrols.button.guide");
-            case GLFW_GAMEPAD_BUTTON_LEFT_THUMB -> Text.translatable("midnightcontrols.button.left_thumb");
-            case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB -> Text.translatable("midnightcontrols.button.right_thumb");
-            case GLFW_GAMEPAD_BUTTON_DPAD_UP -> Text.translatable("midnightcontrols.button.dpad_up");
-            case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> Text.translatable("midnightcontrols.button.dpad_right");
-            case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> Text.translatable("midnightcontrols.button.dpad_down");
-            case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> Text.translatable("midnightcontrols.button.dpad_left");
-            case 100 -> Text.translatable("midnightcontrols.axis.left_x+");
-            case 101 -> Text.translatable("midnightcontrols.axis.left_y+");
-            case 102 -> Text.translatable("midnightcontrols.axis.right_x+");
-            case 103 -> Text.translatable("midnightcontrols.axis.right_y+");
-            case 104 -> Text.translatable("midnightcontrols.axis.left_trigger");
-            case 105 -> Text.translatable("midnightcontrols.axis.right_trigger");
-            case 200 -> Text.translatable("midnightcontrols.axis.left_x-");
-            case 201 -> Text.translatable("midnightcontrols.axis.left_y-");
-            case 202 -> Text.translatable("midnightcontrols.axis.right_x-");
-            case 203 -> Text.translatable("midnightcontrols.axis.right_y-");
-            case 15 -> Text.translatable("midnightcontrols.button.l4");
-            case 16 -> Text.translatable("midnightcontrols.button.l5");
-            case 17 -> Text.translatable("midnightcontrols.button.r4");
-            case 18 -> Text.translatable("midnightcontrols.button.r5");
-            default -> Text.translatable("midnightcontrols.button.unknown", button);
+            case -1 -> new TranslatableText("key.keyboard.unknown");
+            case GLFW_GAMEPAD_BUTTON_A -> new TranslatableText("midnightcontrols.button.a");
+            case GLFW_GAMEPAD_BUTTON_B -> new TranslatableText("midnightcontrols.button.b");
+            case GLFW_GAMEPAD_BUTTON_X -> new TranslatableText("midnightcontrols.button.x");
+            case GLFW_GAMEPAD_BUTTON_Y -> new TranslatableText("midnightcontrols.button.y");
+            case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER -> new TranslatableText("midnightcontrols.button.left_bumper");
+            case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER -> new TranslatableText("midnightcontrols.button.right_bumper");
+            case GLFW_GAMEPAD_BUTTON_BACK -> new TranslatableText("midnightcontrols.button.back");
+            case GLFW_GAMEPAD_BUTTON_START -> new TranslatableText("midnightcontrols.button.start");
+            case GLFW_GAMEPAD_BUTTON_GUIDE -> new TranslatableText("midnightcontrols.button.guide");
+            case GLFW_GAMEPAD_BUTTON_LEFT_THUMB -> new TranslatableText("midnightcontrols.button.left_thumb");
+            case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB -> new TranslatableText("midnightcontrols.button.right_thumb");
+            case GLFW_GAMEPAD_BUTTON_DPAD_UP -> new TranslatableText("midnightcontrols.button.dpad_up");
+            case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> new TranslatableText("midnightcontrols.button.dpad_right");
+            case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> new TranslatableText("midnightcontrols.button.dpad_down");
+            case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> new TranslatableText("midnightcontrols.button.dpad_left");
+            case 100 -> new TranslatableText("midnightcontrols.axis.left_x+");
+            case 101 -> new TranslatableText("midnightcontrols.axis.left_y+");
+            case 102 -> new TranslatableText("midnightcontrols.axis.right_x+");
+            case 103 -> new TranslatableText("midnightcontrols.axis.right_y+");
+            case 104 -> new TranslatableText("midnightcontrols.axis.left_trigger");
+            case 105 -> new TranslatableText("midnightcontrols.axis.right_trigger");
+            case 200 -> new TranslatableText("midnightcontrols.axis.left_x-");
+            case 201 -> new TranslatableText("midnightcontrols.axis.left_y-");
+            case 202 -> new TranslatableText("midnightcontrols.axis.right_x-");
+            case 203 -> new TranslatableText("midnightcontrols.axis.right_y-");
+            case 15 -> new TranslatableText("midnightcontrols.button.l4");
+            case 16 -> new TranslatableText("midnightcontrols.button.l5");
+            case 17 -> new TranslatableText("midnightcontrols.button.r4");
+            case 18 -> new TranslatableText("midnightcontrols.button.r5");
+            default -> new TranslatableText("midnightcontrols.button.unknown", button);
         };
     }
 

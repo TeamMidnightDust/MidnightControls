@@ -10,6 +10,7 @@
 package eu.midnightdust.midnightcontrols.client;
 
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +31,7 @@ public enum HudSide implements Nameable {
     private final Text text;
 
     HudSide() {
-        this.text = Text.translatable(this.getTranslationKey());
+        this.text = new TranslatableText(this.getTranslationKey());
     }
 
     /**

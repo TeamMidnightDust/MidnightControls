@@ -72,7 +72,7 @@ public class MidnightControlsHud extends Hud {
         this.dropItemButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.DROP_ITEM);
         this.attackButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.ATTACK);
         this.useButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.USE);
-        if (client.options.getGuiScale().getValue() >= 4) {
+        if (client.options.guiScale >= 4) {
             scale = 0.75f;
         } else scale = 1f;
     }
@@ -115,7 +115,7 @@ public class MidnightControlsHud extends Hud {
         this.drawButton(matrices, currentX, y, ButtonBinding.INVENTORY, true);
         this.drawButton(matrices, currentX += (MidnightControlsConfig.hudSide == HudSide.LEFT ? offset : -offset), y, ButtonBinding.SWAP_HANDS, true);
         offset = 2 + this.swapHandsWidth + this.dropItemButtonWidth + 4;
-        if (this.client.options.getShowSubtitles().getValue() && MidnightControlsConfig.hudSide == HudSide.RIGHT) {
+        if (this.client.options.showSubtitles && MidnightControlsConfig.hudSide == HudSide.RIGHT) {
             currentX += -offset;
         } else {
             currentX = MidnightControlsConfig.hudSide == HudSide.LEFT ? x : x - this.dropItemButtonWidth;
@@ -132,7 +132,7 @@ public class MidnightControlsHud extends Hud {
                 currentX -= this.useButtonWidth;
             this.drawButton(matrices, currentX, y, ButtonBinding.USE, true);
             offset = 2 + this.useWidth + 4;
-            if (this.client.options.getShowSubtitles().getValue() && MidnightControlsConfig.hudSide == HudSide.LEFT) {
+            if (this.client.options.showSubtitles && MidnightControlsConfig.hudSide == HudSide.LEFT) {
                 currentX -= offset;
             } else {
                 currentX = x;
@@ -152,7 +152,7 @@ public class MidnightControlsHud extends Hud {
         currentX += MidnightControlsConfig.hudSide == HudSide.LEFT ? this.inventoryWidth + 4 + this.swapHandsButtonWidth + 2
                 : -this.swapHandsWidth - 2 - this.swapHandsButtonWidth - 4;
         this.drawTip(matrices, currentX, y, ButtonBinding.SWAP_HANDS, true);
-        if (this.client.options.getShowSubtitles().getValue() && MidnightControlsConfig.hudSide == HudSide.RIGHT) {
+        if (this.client.options.showSubtitles && MidnightControlsConfig.hudSide == HudSide.RIGHT) {
             currentX += -this.dropItemWidth - 2 - this.dropItemButtonWidth - 4;
         } else {
             y -= 24;
@@ -169,7 +169,7 @@ public class MidnightControlsHud extends Hud {
 
             this.drawTip(matrices, currentX, y, this.placeAction, true);
 
-            if (this.client.options.getShowSubtitles().getValue() && MidnightControlsConfig.hudSide == HudSide.LEFT) {
+            if (this.client.options.showSubtitles && MidnightControlsConfig.hudSide == HudSide.LEFT) {
                 currentX -= 4;
             } else {
                 currentX = x;
