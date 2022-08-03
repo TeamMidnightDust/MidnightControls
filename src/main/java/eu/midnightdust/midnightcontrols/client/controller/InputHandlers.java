@@ -328,7 +328,7 @@ public class InputHandlers {
      * @return true if the client is in game, else false
      */
     public static boolean inGame(@NotNull MinecraftClient client, @NotNull ButtonBinding binding) {
-        return client.currentScreen == null;
+        return client.currentScreen == null && MidnightControlsClient.get().input.screenCloseCooldown <= 0;
     }
 
     /**

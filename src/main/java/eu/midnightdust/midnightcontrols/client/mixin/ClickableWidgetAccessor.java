@@ -17,4 +17,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface ClickableWidgetAccessor {
     @Accessor("height")
     int getHeight();
+    @Accessor("focused")
+    void setFocused(boolean value);
 }

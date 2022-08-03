@@ -121,8 +121,10 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         });
 
         HudManager.register(this.hud = new MidnightControlsHud(this));
-        FabricLoader.getInstance().getModContainer("midnightcontrols").ifPresent(modContainer ->
-                ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","bedrock"), modContainer, ResourcePackActivationType.NORMAL));
+        FabricLoader.getInstance().getModContainer("midnightcontrols").ifPresent(modContainer -> {
+            ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","bedrock"), modContainer, ResourcePackActivationType.NORMAL);
+            ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","legacy"), modContainer, ResourcePackActivationType.NORMAL);
+        });
     }
 
     /**
@@ -192,9 +194,16 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
 //        if (BINDING_RING.wasPressed()) {
 //            client.setScreen(new RingScreen());
 //        }
+        if (client.world != null && MidnightControlsConfig.enableHints && !MidnightControlsConfig.autoSwitchMode && MidnightControlsConfig.controlsMode == ControlsMode.DEFAULT && MidnightControlsConfig.getController().isGamepad()) {
+            client.getToastManager().add(SystemToast.create(client, SystemToast.Type.PERIODIC_NOTIFICATION, Text.translatable("midnightcontrols.controller.tutorial.title"),
+                    Text.translatable("midnightcontrols.controller.tutorial.description", Text.translatable("options.title"), Text.translatable("controls.title"),
+                            Text.translatable("midnightcontrols.menu.title.controller"))));
+            MidnightControlsConfig.enableHints = false;
+            MidnightControlsConfig.save();
+        }
     }
     public void onRender(MinecraftClient client) {
-        this.input.onRender(client.getTickDelta(), client);
+        this.input.onRender(client);
     }
 
     /**

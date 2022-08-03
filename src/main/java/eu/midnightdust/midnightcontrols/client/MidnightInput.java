@@ -10,9 +10,10 @@
 package eu.midnightdust.midnightcontrols.client;
 
 import com.google.common.collect.ImmutableSet;
+import dev.lambdaurora.spruceui.widget.AbstractSpruceWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceEntryListWidget;
 import eu.midnightdust.midnightcontrols.MidnightControls;
-import eu.midnightdust.midnightcontrols.client.compat.EMICompat;
+import eu.midnightdust.midnightcontrols.client.compat.LibGuiCompat;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.SodiumCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
@@ -20,9 +21,7 @@ import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.gui.widget.ControllerControlsWidget;
-import eu.midnightdust.midnightcontrols.client.mixin.AdvancementsScreenAccessor;
-import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
-import eu.midnightdust.midnightcontrols.client.mixin.EntryListWidgetAccessor;
+import eu.midnightdust.midnightcontrols.client.mixin.*;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
 import dev.lambdaurora.spruceui.navigation.NavigationDirection;
@@ -45,10 +44,7 @@ import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
-import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.client.gui.widget.PressableWidget;
-import net.minecraft.client.gui.widget.SliderWidget;
+import net.minecraft.client.gui.widget.*;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.utils.Pair;
@@ -82,6 +78,7 @@ public class MidnightInput {
     private float mouseSpeedX = 0.f;
     private float mouseSpeedY = 0.f;
     public int inventoryInteractionCooldown = 0;
+    public int screenCloseCooldown = 0;
 
     private ControllerControlsWidget controlsInput = null;
 
@@ -122,6 +119,8 @@ public class MidnightInput {
         // Decreases the cooldown for GUI actions.
         if (this.actionGuiCooldown > 0)
             --this.actionGuiCooldown;
+        if (this.screenCloseCooldown > 0)
+            --this.screenCloseCooldown;
 
         InputManager.updateStates();
 
@@ -176,7 +175,7 @@ public class MidnightInput {
      *
      * @param client the client instance
      */
-    public void onRender(float tickDelta, @NotNull MinecraftClient client) {
+    public void onRender(@NotNull MinecraftClient client) {
         if (!(client.currentScreen == null || client.currentScreen instanceof TouchscreenOverlay))
             return;
 
@@ -185,8 +184,8 @@ public class MidnightInput {
             return;
 
         if (this.targetYaw != 0.f || this.targetPitch != 0.f) {
-            float rotationYaw = (float) (player.prevYaw + (this.targetYaw / 0.10) * tickDelta);
-            float rotationPitch = (float) (player.prevPitch + (this.targetPitch / 0.10) * tickDelta);
+            float rotationYaw = (float) (player.prevYaw + (this.targetYaw / 0.10) * client.getTickDelta());
+            float rotationPitch = (float) (player.prevPitch + (this.targetPitch / 0.10) * client.getTickDelta());
             client.player.setYaw(rotationYaw);
             client.player.setPitch(MathHelper.clamp(rotationPitch, -90.f, 90.f));
             if (client.player.isRiding() && client.player.getVehicle() != null) {
@@ -302,6 +301,7 @@ public class MidnightInput {
                             return;
                         }
                     }
+                    else if (FabricLoader.getInstance().isModLoaded("libgui")) LibGuiCompat.handlePress(client.currentScreen);
                 }
             }
 
@@ -330,7 +330,7 @@ public class MidnightInput {
                     Screen.wrapScreenError(() -> client.currentScreen.mouseReleased(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1),
                             "mouseReleased event handler", client.currentScreen.getClass().getCanonicalName());
                 }
-                //this.actionGuiCooldown = 5;
+                this.screenCloseCooldown = 5;
             } else {
                 this.ignoreNextARelease = false;
             }
@@ -472,18 +472,18 @@ public class MidnightInput {
         } else if (client.currentScreen != null) {
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y && absValue >= deadZone) {
                 float finalValue = value;
+                client.currentScreen.children().stream().filter(element -> element instanceof SpruceEntryListWidget)
+                        .map(element -> (SpruceEntryListWidget<?>) element)
+                        .filter(AbstractSpruceWidget::isFocusedOrHovered)
+                        .anyMatch(element -> {
+                            MidnightControls.get().log(String.valueOf(finalValue));
+                            element.mouseScrolled(0.0, 0.0, -finalValue);
+                            return true;
+                        });
                 client.currentScreen.children().stream().filter(element -> element instanceof EntryListWidget)
                         .map(element -> (EntryListWidget<?>) element)
                         .filter(element -> element.getType().isFocused())
                         .anyMatch(element -> {
-                            element.mouseScrolled(0.0, 0.0, -finalValue);
-                            return true;
-                        });
-                client.currentScreen.children().stream().filter(element -> element instanceof SpruceEntryListWidget)
-                        .map(element -> (SpruceEntryListWidget<?>) element)
-                        .filter(element -> element.getType().isFocused())
-                        .anyMatch(element -> {
-                            MidnightControls.get().log(String.valueOf(finalValue));
                             element.mouseScrolled(0.0, 0.0, -finalValue);
                             return true;
                         });
@@ -621,7 +621,7 @@ public class MidnightInput {
             this.actionGuiCooldown = 2; // Prevent to press too quickly the focused element, so we have to skip 5 ticks.
             return false;
         } else if (element instanceof AlwaysSelectedEntryListWidget) {
-            ((EntryListWidgetAccessor) element).midnightcontrols$moveSelection(right ? EntryListWidget.MoveDirection.UP : EntryListWidget.MoveDirection.DOWN);
+            ((EntryListWidgetAccessor) element).midnightcontrols$moveSelection(right ? EntryListWidget.MoveDirection.DOWN : EntryListWidget.MoveDirection.UP);
             return false;
         } else if (element instanceof ParentElement entryList) {
             var focused = entryList.getFocused();
@@ -672,6 +672,69 @@ public class MidnightInput {
             }
             if (FabricLoader.getInstance().isModLoaded("sodium"))
                 SodiumCompat.handleInput(screen, direction.isLookingForward());
+            // This still needs some work
+//            ScreenAccessor accessor = (ScreenAccessor) screen;
+//            if (accessor.getSelected() != null && accessor.getSelected() instanceof ClickableWidget selected && accessor.getSelectables() != null) {
+//                //System.out.println(direction);
+//                if (accessor.getSelectables().size() >= 2) {
+//                    //System.out.println(direction + " 2");
+//                    int xDifference = Integer.MAX_VALUE;
+//                    int yDifference = Integer.MAX_VALUE;
+//                    ClickableWidget newWidget = null;
+//                    for (int i = 0; i < accessor.getSelectables().size(); ++i) {
+//                        if (accessor.getSelectables().get(i) instanceof ClickableWidget candidate) {
+//                            if (!(candidate.x == selected.x && candidate.y == selected.y)) {
+//                                int canXDifference = Math.abs(candidate.x - selected.x);
+//                                int canYDifference = Math.abs(candidate.y - selected.y);
+//                                if (direction.isHorizontal()) {
+//                                    if (direction.isLookingForward()) {
+//                                        if (candidate.x >= selected.x && canYDifference <= yDifference && canXDifference <= xDifference) {
+//                                            System.out.println(direction + " forward horizontal " + candidate);
+//                                            newWidget = candidate;
+//                                            xDifference = canXDifference;
+//                                            yDifference = canYDifference;
+//                                        }
+//                                    } else {
+//                                        if (candidate.x <= selected.x && canYDifference <= yDifference && canXDifference >= xDifference) {
+//                                            System.out.println(direction + " backward horizontal " + candidate);
+//                                            newWidget = candidate;
+//                                            xDifference = canXDifference;
+//                                            yDifference = canYDifference;
+//                                        }
+//                                    }
+//                                } else {
+//                                    if (direction.isLookingForward()) {
+//                                        if (candidate.y >= selected.y && canYDifference <= yDifference && canXDifference <= xDifference) {
+//                                            System.out.println(direction + " forward vertical " + candidate);
+//                                            newWidget = candidate;
+//                                            xDifference = canXDifference;
+//                                            yDifference = canYDifference;
+//                                        }
+//                                    } else {
+//                                        if (candidate.y <= selected.y && canYDifference >= yDifference && canXDifference <= xDifference) {
+//                                            System.out.println(direction + " backward vertical " + candidate);
+//                                            newWidget = candidate;
+//                                            xDifference = canXDifference;
+//                                            yDifference = canYDifference;
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                    if (newWidget != null)  {
+//                        //selected.changeFocus(true);
+//                        ((ClickableWidgetAccessor) selected).setFocused(false);
+//                        ((ClickableWidgetAccessor) newWidget).setFocused(true);
+//                        screen.setFocused(newWidget);
+//                        screen.changeFocus(false);
+//                        screen.changeFocus(true);
+//                        this.actionGuiCooldown = 5;
+//                        return true;
+//                    }
+//
+//                }
+//            }
             if (!screen.changeFocus(direction.isLookingForward())) {
                 if (screen.changeFocus(direction.isLookingForward())) {
                     this.actionGuiCooldown = 5;
