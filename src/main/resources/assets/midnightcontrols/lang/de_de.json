@@ -68,6 +68,8 @@
   "midnightcontrols.axis.right_x-": "Rechts X-",
   "midnightcontrols.axis.right_y-": "Rechts Y-",
   "midnightcontrols.button.unknown": "Unbekannt (%d)",
+  "midnightcontrols.controller.tutorial.title": "Spiele Minecraft mit Controller!",
+  "midnightcontrols.controller.tutorial.description": "Gehe zu %s -> %s -> %s",
   "midnightcontrols.controller.connected": "Controller %d verbunden.",
   "midnightcontrols.controller.disconnected": "Controller %d getrennt.",
   "midnightcontrols.controller.mappings.1": "Um die Controller-Mappings anzupassen, benutze %s",

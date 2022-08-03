@@ -80,6 +80,8 @@
   "midnightcontrols.axis.right_x-": "Right X-",
   "midnightcontrols.axis.right_y-": "Right Y-",
   "midnightcontrols.button.unknown": "Unknown (%d)",
+  "midnightcontrols.controller.tutorial.title": "Play the game with a Controller!",
+  "midnightcontrols.controller.tutorial.description": "Go to %s -> %s -> %s",
   "midnightcontrols.controller.connected": "Controller %d connected.",
   "midnightcontrols.controller.disconnected": "Controller %d disconnected.",
   "midnightcontrols.controller.mappings.1": "To configure the controller mappings, please use %s",

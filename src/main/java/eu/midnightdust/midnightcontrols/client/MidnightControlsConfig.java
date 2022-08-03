@@ -70,7 +70,9 @@ public class MidnightControlsConfig extends MidnightConfig {
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
     @Entry(name = "Max analog values") public static double[] maxAnalogValues = new double[]{1, 1, 1, 1};
-    @Entry public static boolean triggerFix = true;
+    @Entry(name = "Trigger button fix") public static boolean triggerFix = true;
+    @Entry(name = "Enable Hints") public static boolean enableHints = true;
+    @Entry(name = "Command Keybinds") public static List<String> commandKeybinds = Lists.newArrayList();
 
     /**
      * Loads the configuration
