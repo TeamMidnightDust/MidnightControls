@@ -64,6 +64,8 @@
     "midnightcontrols.axis.right_x-": "Parem X-",
     "midnightcontrols.axis.right_y-": "Parem Y-",
     "midnightcontrols.button.unknown": "Teadmata (%d)",
+  "midnightcontrols.controller.tutorial.title": "Mängi mängu oma juhtpuldiga!",
+  "midnightcontrols.controller.tutorial.description": "Mine %s -> %s -> %s",
     "midnightcontrols.controller.connected": "Mängupult %d ühendatud.",
     "midnightcontrols.controller.disconnected": "Mängupult %d lahti ühendatud.",
     "midnightcontrols.controller.mappings.1": "Mängupuldi vastenduste seadistamiseks palun kasuta %s",
@@ -75,7 +77,7 @@
 
     "midnightcontrols.controls_mode.default": "klaviatuur/hiir",
     "midnightcontrols.controls_mode.controller": "mängupult",
-    "midnightcontrols.controls_mode.touchscreen": "puuteekraan",
+    "midnightcontrols.controls_mode.touchscreen": "puuteekraan (arenduses)",
     "midnightcontrols.hud_side.left": "vasak",
     "midnightcontrols.hud_side.right": "parem",
     "midnightcontrols.menu.analog_movement": "Analoogliikumine",
