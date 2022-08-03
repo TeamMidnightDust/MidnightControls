@@ -91,7 +91,7 @@ public final class MovementHandler implements PressAction {
 
             // Slowing down if sneaking or crawling.
             if (client.player.shouldSlowDown()) {
-                this.movementForward *= MathHelper.clamp(0.3F + EnchantmentHelper.getSwiftSneakSpeedBoost(client.player), 0.0F, 1.0F);
+                this.movementForward *= MathHelper.clamp(0.3F, 0.0F, 1.0F);
             }
         } else {
             // Handle sideways movement.
@@ -101,7 +101,7 @@ public final class MovementHandler implements PressAction {
 
             // Slowing down if sneaking or crawling.
             if (client.player.shouldSlowDown()) {
-                this.movementSideways *= MathHelper.clamp(0.3F + EnchantmentHelper.getSwiftSneakSpeedBoost(client.player), 0.0F, 1.0F);
+                this.movementSideways *= MathHelper.clamp(0.3F, 0.0F, 1.0F);
             }
         }
 

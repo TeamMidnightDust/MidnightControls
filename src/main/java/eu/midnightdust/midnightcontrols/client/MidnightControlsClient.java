@@ -195,9 +195,9 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
 //            client.setScreen(new RingScreen());
 //        }
         if (client.world != null && MidnightControlsConfig.enableHints && !MidnightControlsConfig.autoSwitchMode && MidnightControlsConfig.controlsMode == ControlsMode.DEFAULT && MidnightControlsConfig.getController().isGamepad()) {
-            client.getToastManager().add(SystemToast.create(client, SystemToast.Type.PERIODIC_NOTIFICATION, Text.translatable("midnightcontrols.controller.tutorial.title"),
-                    Text.translatable("midnightcontrols.controller.tutorial.description", Text.translatable("options.title"), Text.translatable("controls.title"),
-                            Text.translatable("midnightcontrols.menu.title.controller"))));
+            client.getToastManager().add(SystemToast.create(client, SystemToast.Type.PERIODIC_NOTIFICATION, new TranslatableText("midnightcontrols.controller.tutorial.title"),
+                    new TranslatableText("midnightcontrols.controller.tutorial.description", new TranslatableText("options.title"), new TranslatableText("controls.title"),
+                            new TranslatableText("midnightcontrols.menu.title.controller"))));
             MidnightControlsConfig.enableHints = false;
             MidnightControlsConfig.save();
         }
