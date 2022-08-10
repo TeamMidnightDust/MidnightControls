@@ -1,6 +1,6 @@
 {
   "pack": {
     "pack_format": 8,
-    "description": "Makes the controller buttons look like from Bedrock Edition"
+    "description": "Makes controller tooltips use similar icons to Bedrock Edition"
   }
 }
