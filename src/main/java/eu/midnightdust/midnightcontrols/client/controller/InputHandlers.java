@@ -67,9 +67,9 @@ public class InputHandlers {
             // When ingame
             if (client.currentScreen == null && client.player != null) {
                 if (next)
-                    client.player.getInventory().selectedSlot = client.player.getInventory().selectedSlot == 8 ? 0 : client.player.getInventory().selectedSlot + 1;
+                    client.player.getInventory().scrollInHotbar(1.0);
                 else
-                    client.player.getInventory().selectedSlot = client.player.getInventory().selectedSlot == 0 ? 8 : client.player.getInventory().selectedSlot - 1;
+                    client.player.getInventory().scrollInHotbar(-1.0);
                 return true;
             } else if (client.currentScreen instanceof CreativeInventoryScreenAccessor inventory) {
                 int currentTab = CreativeInventoryScreenAccessor.getSelectedTab();
