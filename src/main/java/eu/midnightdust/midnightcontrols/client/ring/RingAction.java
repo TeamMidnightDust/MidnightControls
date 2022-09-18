@@ -29,11 +29,9 @@ import java.util.function.Supplier;
  * @since 1.4.0
  */
 public abstract class RingAction extends DrawableHelper implements Nameable {
-    protected Config config;
     protected boolean activated = false;
 
-    public RingAction(@NotNull Config config) {
-        this.config = config;
+    public RingAction() {
     }
 
     /**
@@ -62,8 +60,8 @@ public abstract class RingAction extends DrawableHelper implements Nameable {
 
     public abstract void onAction(@NotNull RingButtonMode mode);
 
-    public void render(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered) {
-        fill(matrices, x, y, x + MidnightRing.ELEMENT_SIZE, y + MidnightRing.ELEMENT_SIZE, hovered ? 0xbb777777 : 0xbb000000);
+    public void render(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered, int index) {
+        fill(matrices, x, y, x + MidnightRing.ELEMENT_SIZE, y + MidnightRing.ELEMENT_SIZE, hovered || RingPage.selected == index ? 0xbb777777 : 0xbb000000);
         drawIcon(matrices, textRenderer, x, y, hovered);
     }
 

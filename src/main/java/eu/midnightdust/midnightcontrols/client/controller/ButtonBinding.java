@@ -10,6 +10,8 @@
 package eu.midnightdust.midnightcontrols.client.controller;
 
 import eu.midnightdust.midnightcontrols.client.ButtonState;
+import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
@@ -44,6 +46,15 @@ public class ButtonBinding {
     public static final ButtonBinding BACK = new Builder("back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, false))
             .action(MovementHandler.HANDLER).onlyInGame().register();
     public static final ButtonBinding CHAT = new Builder("chat").buttons(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT).onlyInGame().cooldown().register();
+    public static final ButtonBinding CONTROLS_RING = new Builder("controls_ring").buttons(GLFW_GAMEPAD_BUTTON_GUIDE).onlyInGame().cooldown()
+            .action((client, button1, value, action) -> {
+                if (action.isPressed()) {
+                    MidnightControlsClient.get().ring.loadFromUnbound();
+                    client.setScreen(new RingScreen());
+                }
+                if (action.isUnpressed() && client.currentScreen != null) client.currentScreen.close();
+                return true;
+            }).register();
     public static final ButtonBinding DROP_ITEM = new Builder("drop_item").buttons(GLFW_GAMEPAD_BUTTON_B).onlyInGame().cooldown().register();
     public static final ButtonBinding FORWARD = new Builder("forward").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, true))
             .action(MovementHandler.HANDLER).onlyInGame().register();
@@ -52,6 +63,8 @@ public class ButtonBinding {
     public static final ButtonBinding HOTBAR_RIGHT = new Builder("hotbar_right").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
             .action(InputHandlers.handleHotbar(true)).onlyInGame().cooldown().register();
     public static final ButtonBinding INVENTORY = new Builder("inventory").buttons(GLFW_GAMEPAD_BUTTON_Y).onlyInGame().cooldown().register();
+    public static final ButtonBinding EXIT = new Builder("exit").buttons(GLFW_GAMEPAD_BUTTON_B).filter((client, buttonBinding) -> client.currentScreen != null && buttonBinding.cooldown == 0 && INVENTORY.cooldown == 0)
+            .action(InputHandlers.handleExit()).cooldown().register();
     public static final ButtonBinding JUMP = new Builder("jump").buttons(GLFW_GAMEPAD_BUTTON_A).onlyInGame().register();
     public static final ButtonBinding LEFT = new Builder("left").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, false))
             .action(MovementHandler.HANDLER).onlyInGame().register();
@@ -73,7 +86,6 @@ public class ButtonBinding {
             .action(InputHandlers.handleInventorySlotPad(2)).onlyInInventory().cooldown().register();
     public static final ButtonBinding SLOT_UP = new Builder("slot_up").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP)
             .action(InputHandlers.handleInventorySlotPad(0)).onlyInInventory().cooldown().register();
-    public static final ButtonBinding SMOOTH_CAMERA = new Builder("toggle_smooth_camera").onlyInGame().cooldown().register();
     public static final ButtonBinding SNEAK = new Builder("sneak").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_THUMB)
             .actions(InputHandlers::handleToggleSneak).onlyInGame().cooldown().register();
     public static final ButtonBinding SPRINT = new Builder("sprint").buttons(GLFW_GAMEPAD_BUTTON_LEFT_THUMB).onlyInGame().register();
@@ -83,9 +95,9 @@ public class ButtonBinding {
     public static final ButtonBinding TAB_RIGHT = new Builder("tab_next").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
             .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((client, binding) -> client.currentScreen != null && client.currentScreen.getClass().toString().contains("sodium"))).cooldown().register();
     public static final ButtonBinding PAGE_LEFT = new Builder("page_back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
-            .action(InputHandlers.handlePage(false)).filter(InputHandlers::inInventory).cooldown().register();
+            .action(InputHandlers.handlePage(false)).filter(InputHandlers::inInventory).cooldown(30).register();
     public static final ButtonBinding PAGE_RIGHT = new Builder("page_next").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
-            .action(InputHandlers.handlePage(true)).filter(InputHandlers::inInventory).cooldown().register();
+            .action(InputHandlers.handlePage(true)).filter(InputHandlers::inInventory).cooldown(30).register();
     public static final ButtonBinding TAKE = new Builder("take").buttons(GLFW_GAMEPAD_BUTTON_X)
             .action(InputHandlers.handleActions()).filter(InputHandlers::inInventory).cooldown().register();
     public static final ButtonBinding TAKE_ALL = new Builder("take_all").buttons(GLFW_GAMEPAD_BUTTON_A)
@@ -103,6 +115,7 @@ public class ButtonBinding {
     protected PairPredicate<MinecraftClient, ButtonBinding> filter;
     private final List<PressAction> actions = new ArrayList<>(Collections.singletonList(PressAction.DEFAULT_ACTION));
     private boolean hasCooldown;
+    private int cooldownLength = 5;
     private int cooldown = 0;
     boolean pressed = false;
 
@@ -114,9 +127,21 @@ public class ButtonBinding {
         this.actions.addAll(actions);
         this.hasCooldown = hasCooldown;
     }
+    public ButtonBinding(String key, int[] defaultButton, List<PressAction> actions, PairPredicate<MinecraftClient, ButtonBinding> filter, boolean hasCooldown, int cooldownLength) {
+        this.setButton(this.defaultButton = defaultButton);
+        this.key = key;
+        this.text = Text.translatable(this.key);
+        this.filter = filter;
+        this.actions.addAll(actions);
+        this.hasCooldown = hasCooldown;
+        this.cooldownLength = cooldownLength;
+    }
 
     public ButtonBinding(String key, int[] defaultButton, boolean hasCooldown) {
         this(key, defaultButton, Collections.emptyList(), Predicates.pairAlwaysTrue(), hasCooldown);
+    }
+    public ButtonBinding(String key, int[] defaultButton, boolean hasCooldown, int cooldownLength) {
+        this(key, defaultButton, Collections.emptyList(), Predicates.pairAlwaysTrue(), hasCooldown, cooldownLength);
     }
 
     /**
@@ -234,7 +259,7 @@ public class ButtonBinding {
         if (state == ButtonState.REPEAT && this.hasCooldown && this.cooldown != 0)
             return;
         if (this.hasCooldown && state.isPressed()) {
-            this.cooldown = 5;
+            this.cooldown = cooldownLength;
         }
         for (int i = this.actions.size() - 1; i >= 0; i--) {
             if (this.actions.get(i).press(client, this, value, state))
@@ -320,7 +345,6 @@ public class ButtonBinding {
         PLAYER_LIST.mcKeyBinding = options.playerListKey;
         RIGHT.mcKeyBinding = options.rightKey;
         SCREENSHOT.mcKeyBinding = options.screenshotKey;
-        SMOOTH_CAMERA.mcKeyBinding = options.smoothCameraKey;
         SNEAK.mcKeyBinding = options.sneakKey;
         SPRINT.mcKeyBinding = options.sprintKey;
         SWAP_HANDS.mcKeyBinding = options.swapHandsKey;
@@ -385,6 +409,7 @@ public class ButtonBinding {
                 ButtonBinding.USE
         ));
         INVENTORY_CATEGORY = InputManager.registerDefaultCategory("key.categories.inventory", category -> category.registerAllBindings(
+                ButtonBinding.EXIT,
                 ButtonBinding.DROP_ITEM,
                 ButtonBinding.HOTBAR_LEFT,
                 ButtonBinding.HOTBAR_RIGHT,
@@ -409,7 +434,8 @@ public class ButtonBinding {
                 ButtonBinding.TOGGLE_PERSPECTIVE,
                 ButtonBinding.PAUSE_GAME,
                 //SMOOTH_CAMERA,
-                ButtonBinding.DEBUG_SCREEN
+                ButtonBinding.DEBUG_SCREEN,
+                ButtonBinding.CONTROLS_RING
         ));
     }
 
@@ -438,6 +464,7 @@ public class ButtonBinding {
         private final List<PressAction> actions = new ArrayList<>();
         private PairPredicate<MinecraftClient, ButtonBinding> filter = Predicates.pairAlwaysTrue();
         private boolean cooldown = false;
+        private int cooldownLength = 5;
         private ButtonCategory category = null;
         private KeyBinding mcBinding = null;
 
@@ -540,6 +567,17 @@ public class ButtonBinding {
             this.cooldown = cooldown;
             return this;
         }
+        /**
+         * Sets the cooldown enabled with a custom duration for {@link ButtonBinding}.
+         *
+         * @param cooldownLength duration of {@link ButtonBinding} cooldown
+         * @return the builder instance
+         */
+        public Builder cooldown(int cooldownLength) {
+            this.cooldownLength = cooldownLength;
+            this.cooldown = true;
+            return this;
+        }
 
         /**
          * Puts a cooldown on the {@link ButtonBinding}.
@@ -579,7 +617,7 @@ public class ButtonBinding {
          * @return the built {@link ButtonBinding}
          */
         public ButtonBinding build() {
-            var binding = new ButtonBinding(this.key, this.buttons, this.actions, this.filter, this.cooldown);
+            var binding = new ButtonBinding(this.key, this.buttons, this.actions, this.filter, this.cooldown, this.cooldownLength);
             if (this.category != null)
                 this.category.registerBinding(binding);
             if (this.mcBinding != null)

@@ -17,6 +17,7 @@ import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.Identifier;
@@ -127,6 +128,29 @@ public class InputManager {
      */
     public static boolean hasBinding(@NotNull Identifier identifier) {
         return hasBinding(identifier.getNamespace() + "." + identifier.getName());
+    }
+    private static ButtonBinding tempBinding;
+    /**
+     * Returns the binding matching the given string.
+     *
+     * @param name the name of the binding to get
+     * @return true if the binding is registered, else false
+     */
+    public static ButtonBinding getBinding(@NotNull String name) {
+        if (BINDINGS.parallelStream().map(ButtonBinding::getName).anyMatch(binding -> binding.equalsIgnoreCase(name)))
+            BINDINGS.forEach(binding -> {
+                if (binding.getName().equalsIgnoreCase(name)) InputManager.tempBinding = binding;
+            });
+        return tempBinding;
+    }
+    private static List<ButtonBinding> unboundBindings;
+    public static List<ButtonBinding> getUnboundBindings() {
+        unboundBindings = new ArrayList<>();
+        BINDINGS.forEach(binding -> {
+            if (binding.isNotBound() && !MidnightControlsConfig.ignoredUnboundKeys.contains(binding.getTranslationKey())) unboundBindings.add(binding);
+        });
+        unboundBindings.sort(Comparator.comparing(s -> I18n.translate(s.getTranslationKey())));
+        return unboundBindings;
     }
 
     /**

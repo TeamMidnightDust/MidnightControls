@@ -9,6 +9,8 @@
 
 package eu.midnightdust.midnightcontrols.client.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import eu.midnightdust.lib.util.MidnightColorUtil;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import net.minecraft.block.ShapeContext;
@@ -30,6 +32,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.awt.*;
+
 /**
  * Represents a mixin to WorldRenderer.
  * <p>
@@ -49,7 +53,7 @@ public abstract class WorldRendererMixin {
     private BufferBuilderStorage bufferBuilders;
 
     @Shadow
-    private static void drawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
+    public static void drawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
     }
 
     @Inject(
@@ -86,12 +90,20 @@ public abstract class WorldRendererMixin {
             var pos = camera.getPos();
 
             var outlineShape = placementState.getOutlineShape(this.client.world, blockPos, ShapeContext.of(camera.getFocusedEntity()));
-            int[] color = MidnightControlsConfig.reacharoundOutlineColor;
+            Color rgb = MidnightColorUtil.hex2Rgb(MidnightControlsConfig.reacharoundOutlineColorHex);
+            if (MidnightControlsConfig.reacharoundOutlineColorHex.isEmpty()) rgb = MidnightColorUtil.radialRainbow(1,1);
 
-            var vertexConsumer = this.bufferBuilders.getEntityVertexConsumers().getBuffer(RenderLayer.getLines());
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.disableTexture();
+            RenderSystem.disableBlend();
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            RenderSystem.setShaderColor(rgb.getRed(), rgb.getGreen(), rgb.getBlue(), MidnightControlsConfig.reacharoundOutlineColorAlpha);
+            matrices.push();
+            var vertexConsumer = this.bufferBuilders.getOutlineVertexConsumers().getBuffer(RenderLayer.getLines());
             drawShapeOutline(matrices, vertexConsumer, outlineShape,
                     (double) blockPos.getX() - pos.getX(), (double) blockPos.getY() - pos.getY(), (double) blockPos.getZ() - pos.getZ(),
-                    color[0] / 255.f, color[1] / 255.f, color[2] / 255.f, color[3] / 255.f);
+                    rgb.getRed() / 255.f, rgb.getGreen() / 255.f, rgb.getBlue() / 255.f, MidnightControlsConfig.reacharoundOutlineColorAlpha / 255.f);
+            matrices.pop();
         }
     }
 }

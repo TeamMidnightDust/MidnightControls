@@ -12,6 +12,7 @@ package eu.midnightdust.midnightcontrols.client.mixin;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
+import eu.midnightdust.midnightcontrols.client.compat.EMICompat;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsRenderer;
@@ -59,13 +60,13 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
     public void onRender(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER) {
             var client = MinecraftClient.getInstance();
-            if (client.options.getGuiScale().getValue() >= 4) {
+            if (client.getWindow().getScaleFactor() >= 4) {
                 scale = 0.75f;
             } else scale = 1f;
             matrices.push();
             if (scale != 1f) matrices.scale(scale,scale,scale);
             int x = 2, y = (int) (client.getWindow().getScaledHeight() * (1 / scale) - 2 - MidnightControlsRenderer.ICON_SIZE);
-            if (MidnightControlsCompat.isEMIPresent()) {
+            if (MidnightControlsCompat.isEMIPresent() && EMICompat.isEMIEnabled()) {
                 x += 40 * (1 / scale);
             }
             x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_A}, "midnightcontrols.action.pickup_all", true, client) + 2;
@@ -74,7 +75,7 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
                 x = 2;
                 y -= 24;
             }
-            if (MidnightControlsCompat.isEMIPresent()) {
+            if (MidnightControlsCompat.isEMIPresent() && EMICompat.isEMIEnabled()) {
                 x = (int) (client.getWindow().getScaledWidth() * (1 / scale) - 55 - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.pickup"))
                         * (1 / scale) - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.quick_move"))
                         - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.TAKE) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.QUICK_MOVE));

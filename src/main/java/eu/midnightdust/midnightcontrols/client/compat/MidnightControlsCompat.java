@@ -167,4 +167,20 @@ public class MidnightControlsCompat {
     public static boolean isEMIPresent() {
         return FabricLoader.getInstance().isModLoaded("emi");
     }
+    /**
+     * Returns whether InventoryTabs is present.
+     *
+     * @return true if InventoryTabs is present, else false
+     */
+    public static boolean isInventoryTabsPresent() {
+        return FabricLoader.getInstance().isModLoaded("inventorytabs");
+    }
+    /**
+     * Returns whether Emotecraft is present.
+     *
+     * @return true if Emotecraft is present, else false
+     */
+    public static boolean isEmotecraftPresent() {
+        return FabricLoader.getInstance().isModLoaded("emotecraft");
+    }
 }

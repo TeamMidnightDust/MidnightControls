@@ -11,6 +11,8 @@ package eu.midnightdust.midnightcontrols.client.ring;
 
 import com.electronwill.nightconfig.core.Config;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
+import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
@@ -33,18 +35,14 @@ public class RingPage extends DrawableHelper {
     public static final RingPage DEFAULT = new RingPage("Default");
 
     public final String name;
-    private RingAction[] actions = new RingAction[8];
+    public static int selected = -1;
+    public RingAction[] actions = new RingAction[8];
 
     public RingPage(@NotNull String name) {
         this.name = name;
         for (int i = 0; i < 8; i++) {
             this.actions[i] = null;
         }
-        this.actions[0] = new DummyRingAction(null);
-        this.actions[1] = new KeyBindingRingAction(null, MidnightControlsClient.BINDING_LOOK_UP);
-        this.actions[2] = new KeyBindingRingAction(null, MidnightControlsClient.BINDING_LOOK_LEFT);
-        this.actions[3] = new KeyBindingRingAction(null, MidnightControlsClient.BINDING_LOOK_RIGHT);
-        this.actions[4] = new KeyBindingRingAction(null, MidnightControlsClient.BINDING_LOOK_DOWN);
     }
 
     /**
@@ -60,6 +58,7 @@ public class RingPage extends DrawableHelper {
     public void render(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int width, int height, int mouseX, int mouseY, float tickDelta) {
         int centerX = width / 2;
         int centerY = height / 2;
+        if (MidnightControlsClient.get().ring.getMaxPages() > 1) drawCenteredText(matrices, textRenderer, name, centerX, 5, 0xffffff);
 
         int offset = MidnightRing.ELEMENT_SIZE + (MidnightRing.ELEMENT_SIZE / 2) + 5;
 
@@ -68,29 +67,29 @@ public class RingPage extends DrawableHelper {
         for (int i = 0; i < 3; i++) {
             var ringAction = this.actions[i];
             if (ringAction != null)
-                ringAction.render(matrices, textRenderer, x, y, isHovered(x, y, mouseX, mouseY));
-            x += 55;
+                ringAction.render(matrices, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
+            x += MidnightRing.ELEMENT_SIZE + 5;
         }
-        y += 55;
+        y += MidnightRing.ELEMENT_SIZE + 5;
         x = centerX - offset;
         for (int i = 3; i < 5; i++) {
             var ringAction = this.actions[i];
             if (ringAction != null)
-                ringAction.render(matrices, textRenderer, x, y, isHovered(x, y, mouseX, mouseY));
-            x += 55 * 2;
+                ringAction.render(matrices, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
+            x += (MidnightRing.ELEMENT_SIZE + 5) * 2;
         }
-        y += 55;
+        y += MidnightRing.ELEMENT_SIZE + 5;
         x = centerX - offset;
         for (int i = 5; i < 8; i++) {
             var ringAction = this.actions[i];
             if (ringAction != null)
-                ringAction.render(matrices, textRenderer, x, y, isHovered(x, y, mouseX, mouseY));
-            x += 55;
+                ringAction.render(matrices, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
+            x += MidnightRing.ELEMENT_SIZE + 5;
         }
     }
 
     private static boolean isHovered(int x, int y, int mouseX, int mouseY) {
-        return mouseX >= x && mouseY >= y && mouseX <= x + MidnightRing.ELEMENT_SIZE && mouseY <= y + MidnightRing.ELEMENT_SIZE;
+        return mouseX >= x && mouseY >= y && mouseX <= x + MidnightRing.ELEMENT_SIZE && mouseY <= y + MidnightRing.ELEMENT_SIZE && selected < 0;
     }
     /**
      * Renders the ring page.
@@ -114,9 +113,9 @@ public class RingPage extends DrawableHelper {
                 ringAction.activate(RingButtonMode.PRESS);
                 return true;
             }
-            x += 55;
+            x += MidnightRing.ELEMENT_SIZE + 5;
         }
-        y += 55;
+        y += MidnightRing.ELEMENT_SIZE + 5;
         x = centerX - offset;
         for (int i = 3; i < 5; i++) {
             var ringAction = this.actions[i];
@@ -124,9 +123,9 @@ public class RingPage extends DrawableHelper {
                 ringAction.activate(RingButtonMode.PRESS);
                 return true;
             }
-            x += 55 * 2;
+            x += (MidnightRing.ELEMENT_SIZE + 5) * 2;
         }
-        y += 55;
+        y += MidnightRing.ELEMENT_SIZE + 5;
         x = centerX - offset;
         for (int i = 5; i < 8; i++) {
             var ringAction = this.actions[i];
@@ -134,27 +133,8 @@ public class RingPage extends DrawableHelper {
                 ringAction.activate(RingButtonMode.PRESS);
                 return true;
             }
-            x += 55;
+            x += MidnightRing.ELEMENT_SIZE + 5;
         }
         return false;
-    }
-
-    /**
-     * Tries to parse a ring page configuration.
-     *
-     * @param config the configuration
-     * @return an optional ring page
-     */
-    public static @NotNull Optional<RingPage> parseRingPage(@NotNull Config config) {
-        String name = config.get("name");
-        if (name == null)
-            return Optional.empty();
-
-        var page = new RingPage(name);
-
-        List<Config> actionConfigs = config.get("actions");
-
-
-        return Optional.of(page);
     }
 }

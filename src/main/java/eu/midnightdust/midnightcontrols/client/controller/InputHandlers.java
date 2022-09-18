@@ -9,31 +9,27 @@
 
 package eu.midnightdust.midnightcontrols.client.controller;
 
-import com.google.common.collect.ImmutableSet;
 import eu.midnightdust.midnightcontrols.client.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
-import eu.midnightdust.midnightcontrols.client.compat.EMICompat;
+import eu.midnightdust.midnightcontrols.client.compat.InventoryTabsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.SodiumCompat;
+import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.mixin.AdvancementsScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.RecipeBookWidgetAccessor;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
-import net.fabricmc.fabric.impl.item.group.CreativeGuiExtensions;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.gui.hud.DebugHud;
+import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.screen.ingame.*;
+import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.item.ItemGroup;
-import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import org.aperlambda.lambdacommon.utils.Pair;
@@ -67,10 +63,12 @@ public class InputHandlers {
             // When ingame
             if (client.currentScreen == null && client.player != null) {
                 if (next)
-                    client.player.getInventory().scrollInHotbar(1.0);
-                else
                     client.player.getInventory().scrollInHotbar(-1.0);
+                else
+                    client.player.getInventory().scrollInHotbar(1.0);
                 return true;
+            } else if (client.currentScreen instanceof RingScreen) {
+                MidnightControlsClient.get().ring.cyclePage(next);
             } else if (client.currentScreen instanceof CreativeInventoryScreenAccessor inventory) {
                 int currentTab = CreativeInventoryScreenAccessor.getSelectedTab();
                 int nextTab = currentTab + (next ? 1 : -1);
@@ -80,21 +78,27 @@ public class InputHandlers {
                     nextTab = 0;
                 inventory.midnightcontrols$setSelectedTab(ItemGroup.GROUPS[nextTab]);
                 return true;
-            } else if (client.currentScreen instanceof InventoryScreen inventoryScreen) {
-                var recipeBook = (RecipeBookWidgetAccessor) inventoryScreen.getRecipeBookWidget();
-                var tabs = recipeBook.getTabButtons();
-                var currentTab = recipeBook.getCurrentTab();
-                if (currentTab == null)
+            } else if (client.currentScreen instanceof InventoryScreen || client.currentScreen instanceof CraftingScreen || client.currentScreen instanceof AbstractFurnaceScreen<?>) {
+                RecipeBookWidget recipeBook;
+                if (client.currentScreen instanceof InventoryScreen inventoryScreen) recipeBook = inventoryScreen.getRecipeBookWidget();
+                else if (client.currentScreen instanceof CraftingScreen craftingScreen) recipeBook = craftingScreen.getRecipeBookWidget();
+                else recipeBook = ((AbstractFurnaceScreen<?>)client.currentScreen).getRecipeBookWidget();
+                var recipeBookAccessor = (RecipeBookWidgetAccessor) recipeBook;
+                var tabs = recipeBookAccessor.getTabButtons();
+                var currentTab = recipeBookAccessor.getCurrentTab();
+                if (currentTab == null || !recipeBook.isOpen()) {
+                    if (MidnightControlsCompat.isInventoryTabsPresent()) InventoryTabsCompat.handleInventoryTabs(client.currentScreen, next);
                     return false;
+                }
                 int nextTab = tabs.indexOf(currentTab) + (next ? 1 : -1);
                 if (nextTab < 0)
                     nextTab = tabs.size() - 1;
                 else if (nextTab >= tabs.size())
                     nextTab = 0;
                 currentTab.setToggled(false);
-                recipeBook.setCurrentTab(currentTab = tabs.get(nextTab));
+                recipeBookAccessor.setCurrentTab(currentTab = tabs.get(nextTab));
                 currentTab.setToggled(true);
-                recipeBook.midnightcontrols$refreshResults(true);
+                recipeBookAccessor.midnightcontrols$refreshResults(true);
                 return true;
             } else if (client.currentScreen instanceof AdvancementsScreenAccessor screen) {
                 var tabs = screen.getTabs().values().stream().distinct().collect(Collectors.toList());
@@ -113,7 +117,10 @@ public class InputHandlers {
                     }
                 }
                 return true;
-            } else if (FabricLoader.getInstance().isModLoaded("sodium")) SodiumCompat.handleTabs(client.currentScreen, next);
+            } else {
+                if (FabricLoader.getInstance().isModLoaded("sodium")) SodiumCompat.handleTabs(client.currentScreen, next);
+            }
+            if (MidnightControlsCompat.isInventoryTabsPresent()) InventoryTabsCompat.handleInventoryTabs(client.currentScreen, next);
             return false;
         };
     }
@@ -146,6 +153,18 @@ public class InputHandlers {
                                 });
                     }
                 } catch (Exception ignored) {}
+            }
+            if (MidnightControlsCompat.isInventoryTabsPresent()) InventoryTabsCompat.handleInventoryPage(client.currentScreen, next);
+            return false;
+        };
+    }
+    public static PressAction handleExit() {
+        return (client, button, value, action) -> {
+            if (client.currentScreen != null && client.currentScreen.getClass() != TitleScreen.class) {
+                if (!MidnightControlsCompat.handleMenuBack(client, client.currentScreen))
+                    if (!MidnightControlsClient.get().input.tryGoBack(client.currentScreen))
+                        client.currentScreen.close();
+                return true;
             }
             return false;
         };
@@ -205,7 +224,7 @@ public class InputHandlers {
     public static boolean handlePauseGame(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action) {
         if (action == ButtonState.PRESS) {
             // If in game, then pause the game.
-            if (client.currentScreen == null)
+            if (client.currentScreen == null || client.currentScreen instanceof RingScreen)
                 client.openPauseMenu(false);
             else if (client.currentScreen instanceof HandledScreen && client.player != null) // If the current screen is a container then close it.
                 client.player.closeHandledScreen();
@@ -328,7 +347,7 @@ public class InputHandlers {
      * @return true if the client is in game, else false
      */
     public static boolean inGame(@NotNull MinecraftClient client, @NotNull ButtonBinding binding) {
-        return client.currentScreen == null && MidnightControlsClient.get().input.screenCloseCooldown <= 0;
+        return (client.currentScreen == null && MidnightControlsClient.get().input.screenCloseCooldown <= 0) || client.currentScreen instanceof RingScreen;
     }
 
     /**

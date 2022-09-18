@@ -14,7 +14,6 @@ import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.HudSide;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import dev.lambdaurora.spruceui.hud.Hud;
@@ -72,7 +71,7 @@ public class MidnightControlsHud extends Hud {
         this.dropItemButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.DROP_ITEM);
         this.attackButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.ATTACK);
         this.useButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.USE);
-        if (client.options.getGuiScale().getValue() >= 4) {
+        if (client.getWindow().getScaleFactor() >= 4) {
             scale = 0.75f;
         } else scale = 1f;
     }
@@ -119,7 +118,7 @@ public class MidnightControlsHud extends Hud {
             currentX += -offset;
         } else {
             currentX = MidnightControlsConfig.hudSide == HudSide.LEFT ? x : x - this.dropItemButtonWidth;
-            y -= 24;
+            y -= 20;
         }
         this.drawButton(matrices, currentX, y, ButtonBinding.DROP_ITEM, !this.client.player.getMainHandStack().isEmpty());
     }
@@ -136,7 +135,7 @@ public class MidnightControlsHud extends Hud {
                 currentX -= offset;
             } else {
                 currentX = x;
-                y -= 24;
+                y -= 20;
             }
         }
 
@@ -155,7 +154,7 @@ public class MidnightControlsHud extends Hud {
         if (this.client.options.getShowSubtitles().getValue() && MidnightControlsConfig.hudSide == HudSide.RIGHT) {
             currentX += -this.dropItemWidth - 2 - this.dropItemButtonWidth - 4;
         } else {
-            y -= 24;
+            y -= 20;
             currentX = MidnightControlsConfig.hudSide == HudSide.LEFT ? x + this.dropItemButtonWidth + 2 : x - this.dropItemButtonWidth - 2 - this.dropItemWidth;
         }
         this.drawTip(matrices, currentX, y, ButtonBinding.DROP_ITEM, !this.client.player.getMainHandStack().isEmpty());
@@ -173,7 +172,7 @@ public class MidnightControlsHud extends Hud {
                 currentX -= 4;
             } else {
                 currentX = x;
-                y -= 24;
+                y -= 20;
             }
         }
 

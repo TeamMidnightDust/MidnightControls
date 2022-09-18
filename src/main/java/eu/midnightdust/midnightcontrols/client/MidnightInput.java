@@ -13,15 +13,18 @@ import com.google.common.collect.ImmutableSet;
 import dev.lambdaurora.spruceui.widget.AbstractSpruceWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceEntryListWidget;
 import eu.midnightdust.midnightcontrols.MidnightControls;
+import eu.midnightdust.midnightcontrols.client.compat.EmotecraftCompat;
 import eu.midnightdust.midnightcontrols.client.compat.LibGuiCompat;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.SodiumCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
+import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.gui.widget.ControllerControlsWidget;
 import eu.midnightdust.midnightcontrols.client.mixin.*;
+import eu.midnightdust.midnightcontrols.client.ring.RingPage;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
 import dev.lambdaurora.spruceui.navigation.NavigationDirection;
@@ -41,11 +44,13 @@ import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.MerchantScreen;
+import net.minecraft.client.gui.screen.ingame.StonecutterScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -171,11 +176,11 @@ public class MidnightInput {
     }
 
     /**
-     * This method is called when Minecraft renders.
+     * This method is called to update the camera
      *
      * @param client the client instance
      */
-    public void onRender(@NotNull MinecraftClient client) {
+    public void updateCamera(@NotNull MinecraftClient client) {
         if (!(client.currentScreen == null || client.currentScreen instanceof TouchscreenOverlay))
             return;
 
@@ -184,8 +189,10 @@ public class MidnightInput {
             return;
 
         if (this.targetYaw != 0.f || this.targetPitch != 0.f) {
-            float rotationYaw = (float) (player.prevYaw + (this.targetYaw / 0.10) * client.getTickDelta());
-            float rotationPitch = (float) (player.prevPitch + (this.targetPitch / 0.10) * client.getTickDelta());
+            float rotationYaw = (float) (client.player.prevYaw + (this.targetYaw * 0.2));
+            float rotationPitch = (float) (client.player.prevPitch + (this.targetPitch * 0.2));
+            client.player.prevYaw = rotationYaw;
+            client.player.prevPitch = MathHelper.clamp(rotationPitch, -90.f, 90.f);
             client.player.setYaw(rotationYaw);
             client.player.setPitch(MathHelper.clamp(rotationPitch, -90.f, 90.f));
             if (client.player.isRiding() && client.player.getVehicle() != null) {
@@ -257,7 +264,30 @@ public class MidnightInput {
                 value *= -1.0F;
 
             int state = value > MidnightControlsConfig.rightDeadZone ? 1 : (value < -MidnightControlsConfig.rightDeadZone ? 2 : 0);
-            this.handleAxe(client, axis, value, absValue, state);
+            if (!(client.currentScreen instanceof RingScreen || (MidnightControlsCompat.isEmotecraftPresent() && EmotecraftCompat.isEmotecraftScreen(client.currentScreen)))) this.handleAxe(client, axis, value, absValue, state);
+        }
+        if (client.currentScreen instanceof RingScreen || (MidnightControlsCompat.isEmotecraftPresent() && EmotecraftCompat.isEmotecraftScreen(client.currentScreen))) {
+            float x = Math.abs(buffer.get(GLFW_GAMEPAD_AXIS_LEFT_X)) > MidnightControlsConfig.leftDeadZone ? buffer.get(GLFW_GAMEPAD_AXIS_LEFT_X) : 0;
+            float y = Math.abs(buffer.get(GLFW_GAMEPAD_AXIS_LEFT_Y)) > MidnightControlsConfig.leftDeadZone ? buffer.get(GLFW_GAMEPAD_AXIS_LEFT_Y) : 0;
+            if (x == 0 && y == 0) {
+                x = Math.abs(buffer.get(GLFW_GAMEPAD_AXIS_RIGHT_X)) > MidnightControlsConfig.rightDeadZone ? buffer.get(GLFW_GAMEPAD_AXIS_RIGHT_X) : 0;
+                y = Math.abs(buffer.get(GLFW_GAMEPAD_AXIS_RIGHT_Y)) > MidnightControlsConfig.rightDeadZone ? buffer.get(GLFW_GAMEPAD_AXIS_RIGHT_Y) : 0;
+            }
+            int index = -1;
+            if (x < 0) {
+                if (y < 0) index = 0;
+                if (y == 0) index = 3;
+                if (y > 0) index = 5;
+            } else if (x == 0) {
+                if (y < 0) index = 1;
+                if (y > 0) index = 6;
+            } else if (x > 0) {
+                if (y < 0) index = 2;
+                if (y == 0) index = 4;
+                if (y > 0) index = 7;
+            }
+            if (client.currentScreen instanceof RingScreen && index > -1) RingPage.selected = index;
+            if (MidnightControlsCompat.isEmotecraftPresent() && EmotecraftCompat.isEmotecraftScreen(client.currentScreen)) EmotecraftCompat.handleEmoteSelector(index);
         }
     }
 
@@ -304,15 +334,6 @@ public class MidnightInput {
                     else if (FabricLoader.getInstance().isModLoaded("libgui")) LibGuiCompat.handlePress(client.currentScreen);
                 }
             }
-
-            if (button == GLFW.GLFW_GAMEPAD_BUTTON_B) {
-                if (client.currentScreen != null && client.currentScreen.getClass() != TitleScreen.class) {
-                    if (!MidnightControlsCompat.handleMenuBack(client, client.currentScreen))
-                        if (!this.tryGoBack(client.currentScreen))
-                            client.currentScreen.close();
-                    return;
-                }
-            }
         }
 
         if (button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null && !isScreenInteractive(client.currentScreen)
@@ -346,13 +367,16 @@ public class MidnightInput {
      */
     public boolean tryGoBack(@NotNull Screen screen) {
         var set = ImmutableSet.of("gui.back", "gui.done", "gui.cancel", "gui.toTitle", "gui.toMenu");
+
         return screen.children().stream().filter(element -> element instanceof PressableWidget)
                 .map(element -> (PressableWidget) element)
                 .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
                 .anyMatch(element -> {
-                    if (set.stream().anyMatch(key -> element.getMessage().getContent().toString().equals(key))) {
-                        element.onPress();
-                        return true;
+                    if (element.getMessage().getContent() instanceof TranslatableTextContent translatableText) {
+                        if (set.stream().anyMatch(key -> translatableText.getKey().equals(key))) {
+                            element.onPress();
+                            return true;
+                        }
                     }
                     return false;
                 });
@@ -457,6 +481,14 @@ public class MidnightInput {
                 // @TODO allow rebinding to left stick
                 if (absValue >= deadZone) {
                     merchantScreen.mouseScrolled(0.0, 0.0, -(value * 1.5f));
+                }
+                return;
+            }
+        } else if (client.currentScreen instanceof StonecutterScreen stonecutterScreen) {
+            if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
+                // @TODO allow rebinding to left stick
+                if (absValue >= deadZone) {
+                    stonecutterScreen.mouseScrolled(0.0, 0.0, -(value * 1.5f));
                 }
                 return;
             }

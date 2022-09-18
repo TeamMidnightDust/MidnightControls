@@ -20,9 +20,10 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsHud;
+import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingRegistryImplAccessor;
-import eu.midnightdust.midnightcontrols.client.ring.KeyBindingRingAction;
+import eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction;
 import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
 import dev.lambdaurora.spruceui.hud.HudManager;
 import net.fabricmc.api.ClientModInitializer;
@@ -44,6 +45,8 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Represents the midnightcontrols client mod.
@@ -83,10 +86,9 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_RIGHT);
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_DOWN);
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_LEFT);
-        //KeyBindingHelper.registerKeyBinding(BINDING_RING);
+        KeyBindingHelper.registerKeyBinding(BINDING_RING);
 
-        this.ring.registerAction("keybinding", KeyBindingRingAction.FACTORY);
-        this.ring.load();
+        this.ring.registerAction("buttonbinding", ButtonBindingRingAction.FACTORY);
 
         ClientPlayNetworking.registerGlobalReceiver(CONTROLS_MODE_CHANNEL, (client, handler, buf, responseSender) ->
                 responseSender.sendPacket(CONTROLS_MODE_CHANNEL, this.makeControlsModeBuffer(MidnightControlsConfig.controlsMode)));
@@ -123,6 +125,14 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
             ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","bedrock"), modContainer, ResourcePackActivationType.NORMAL);
             ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","legacy"), modContainer, ResourcePackActivationType.NORMAL);
         });
+        int delay = 0; // delay for 0 sec.
+        int period = 1; // repeat every 0.001 sec. (100 times a second)
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                input.updateCamera(MinecraftClient.getInstance());
+            }
+        }, delay, period);
     }
 
     /**
@@ -189,9 +199,10 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && (client.isWindowFocused() || MidnightControlsConfig.unfocusedInput))
             this.input.tickController(client);
 
-//        if (BINDING_RING.wasPressed()) {
-//            client.setScreen(new RingScreen());
-//        }
+        if (BINDING_RING.wasPressed()) {
+            ring.loadFromUnbound();
+            client.setScreen(new RingScreen());
+        }
         if (client.world != null && MidnightControlsConfig.enableHints && !MidnightControlsConfig.autoSwitchMode && MidnightControlsConfig.controlsMode == ControlsMode.DEFAULT && MidnightControlsConfig.getController().isGamepad()) {
             client.getToastManager().add(SystemToast.create(client, SystemToast.Type.PERIODIC_NOTIFICATION, Text.translatable("midnightcontrols.controller.tutorial.title"),
                     Text.translatable("midnightcontrols.controller.tutorial.description", Text.translatable("options.title"), Text.translatable("controls.title"),
@@ -201,7 +212,7 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         }
     }
     public void onRender(MinecraftClient client) {
-        this.input.onRender(client);
+        //this.input.onRender(client);
     }
 
     /**

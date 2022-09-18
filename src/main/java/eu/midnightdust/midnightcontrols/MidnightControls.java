@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols;
 
+import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.event.PlayerChangeControlsModeCallback;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;

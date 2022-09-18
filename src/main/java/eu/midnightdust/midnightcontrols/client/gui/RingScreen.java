@@ -10,8 +10,11 @@
 package eu.midnightdust.midnightcontrols.client.gui;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
+import eu.midnightdust.midnightcontrols.client.ring.RingButtonMode;
 import eu.midnightdust.midnightcontrols.client.ring.RingPage;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
@@ -31,6 +34,15 @@ public class RingScreen extends Screen {
     }
 
     @Override
+    protected void init() {
+        super.init();
+        if (mod.ring.getMaxPages() > 1) {
+            this.addDrawableChild(new ButtonWidget(5, 5, 20, 20, Text.of("◀"), button -> this.mod.ring.cyclePage(false)));
+            this.addDrawableChild(new ButtonWidget(width - 25, 5, 20, 20, Text.of("▶"), button -> this.mod.ring.cyclePage(true)));
+        }
+    }
+
+    @Override
     public boolean shouldPause() {
         return false;
     }
@@ -40,13 +52,36 @@ public class RingScreen extends Screen {
         super.render(matrices, mouseX, mouseY, delta);
 
         RingPage page = this.mod.ring.getCurrentPage();
-
         page.render(matrices, this.textRenderer, this.width, this.height, mouseX, mouseY, delta);
     }
 
     @Override
+    public void close() {
+        super.close();
+        assert client != null;
+        client.currentScreen = null;
+        RingPage page = this.mod.ring.getCurrentPage();
+        if (RingPage.selected >= 0 && page.actions[RingPage.selected] != null)
+            page.actions[RingPage.selected].activate(RingButtonMode.PRESS);
+        RingPage.selected = -1;
+        this.removed();
+    }
+    @Override
+    public boolean changeFocus(boolean lookForwards) {
+        if (lookForwards) {
+            if (RingPage.selected < 7) ++RingPage.selected;
+            else RingPage.selected = -1;
+        }
+        else  {
+            if (RingPage.selected > -1) --RingPage.selected;
+            else RingPage.selected = 7;
+        }
+        return true;
+    }
+
+    @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (mod.ring.getCurrentPage().onClick(client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight(), (int) mouseX, (int) mouseY)) {
+        if (mod.ring.getCurrentPage().onClick(width, height, (int) mouseX, (int) mouseY)) {
             this.close();
             return true;
         }

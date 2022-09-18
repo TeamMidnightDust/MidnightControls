@@ -31,6 +31,7 @@ import static org.lwjgl.glfw.GLFW.*;
  */
 public class MidnightControlsConfig extends MidnightConfig {
     public static boolean isEditing = false;
+    @Hidden @Entry public static int configVersion = 1;
     // General
     @Entry(name = "midnightcontrols.menu.controls_mode") public static ControlsMode controlsMode = ControlsMode.DEFAULT;
     @Entry(name = "midnightcontrols.menu.auto_switch_mode") public static boolean autoSwitchMode = true;
@@ -47,12 +48,13 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(name = "midnightcontrols.menu.reacharound.horizontal") public static boolean horizontalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
     @Entry(name = "midnightcontrols.menu.reacharound.vertical") public static boolean verticalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
     @Entry(name = "Reacharound Outline") public static boolean shouldRenderReacharoundOutline = true;
-    @Entry(name = "Reacharound Outline Color") public static int[] reacharoundOutlineColor = new int[]{255, 255, 255, 102};
+    @Entry(name = "Reacharound Outline Color (WIP)", isColor = true) public static String reacharoundOutlineColorHex = "#ffffff";
+    @Entry(name = "Reacharound Outline Alpha", min = 0, max = 255) public static int reacharoundOutlineColorAlpha = 102;
     @Entry(name = "midnightcontrols.menu.right_dead_zone") public static double rightDeadZone = 0.25;
     @Entry(name = "midnightcontrols.menu.left_dead_zone") public static double leftDeadZone = 0.25;
     @Entry(name = "midnightcontrols.menu.invert_right_y_axis") public static boolean invertRightYAxis = false;
     @Entry(name = "midnightcontrols.menu.invert_right_x_axis") public static boolean invertRightXAxis = false;
-    @Entry(name = "midnightcontrols.menu.rotation_speed") public static double rotationSpeed = 40.0; //used for x axis, name kept for compatability
+    @Entry(name = "midnightcontrols.menu.rotation_speed") public static double rotationSpeed = 30.0; //used for x axis, name kept for compatability
     @Entry(name = "midnightcontrols.menu.y_axis_rotation_speed") public static double yAxisRotationSpeed = rotationSpeed;
     @Entry(name = "midnightcontrols.menu.mouse_speed") public static double mouseSpeed = 25.0;
     @Entry(name = "midnightcontrols.menu.unfocused_input") public static boolean unfocusedInput = false;
@@ -64,15 +66,16 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui",
             "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375",
             "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen",
-            "hardcorequesting.client.interfaces.GuiQuestBook", "hardcorequesting.client.interfaces.GuiReward", "hardcorequesting.client.interfaces.EditTrackerScreen",
-            "io.github.kosmx.emotes.arch.gui.screen.ingame.FastChosseScreen");
+            "hardcorequesting.client.interfaces.GuiQuestBook", "hardcorequesting.client.interfaces.GuiReward", "hardcorequesting.client.interfaces.EditTrackerScreen");
     @Entry(name = "Keybindings") public static Map<String, String> BINDINGS = new HashMap<>();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
     @Entry(name = "Max analog values") public static double[] maxAnalogValues = new double[]{1, 1, 1, 1};
     @Entry(name = "Trigger button fix") public static boolean triggerFix = true;
     @Entry(name = "Enable Hints") public static boolean enableHints = true;
-    @Entry(name = "Command Keybinds") public static List<String> commandKeybinds = Lists.newArrayList();
+    @Entry(name = "Enable Shortcut in Controls Options") public static boolean shortcutInControls = true;
+    @Entry(name = "Ring Bindings (WIP)") public static List<String> ringBindings = new ArrayList<>();
+    @Entry(name = "Ignored Unbound Keys") public static List<String> ignoredUnboundKeys = Lists.newArrayList("inventorytabs.key.next_tab");
 
     /**
      * Loads the configuration
@@ -82,7 +85,6 @@ public class MidnightControlsConfig extends MidnightConfig {
         MidnightControlsClient.get().log("Configuration loaded.");
         // Controller controls.
         InputManager.loadButtonBindings();
-        //this.mod.ring.load(this.config);
     }
 
     /**
@@ -286,12 +288,13 @@ public class MidnightControlsConfig extends MidnightConfig {
         horizontalReacharound = false;
         verticalReacharound = false;
         shouldRenderReacharoundOutline = true;
-        reacharoundOutlineColor = new int[]{255, 255, 255, 102};
+        reacharoundOutlineColorHex = "#ffffff";
+        reacharoundOutlineColorAlpha = 102;
         rightDeadZone = 0.25;
         leftDeadZone = 0.25;
         invertRightYAxis = false;
         invertRightXAxis = false;
-        rotationSpeed = 40.0;
+        rotationSpeed = 30.0;
         yAxisRotationSpeed = rotationSpeed;
         mouseSpeed = 25.0;
         unfocusedInput = false;
@@ -303,6 +306,11 @@ public class MidnightControlsConfig extends MidnightConfig {
         mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen");
         BINDINGS = new HashMap<>();
         maxAnalogValues = new double[]{1, 1, 1, 1};
+        triggerFix = true;
+        enableHints = true;
+        shortcutInControls = true;
+        ringBindings = new ArrayList<>();
+        ignoredUnboundKeys = Lists.newArrayList("inventorytabs.key.next_tab");
     }
 
     /**
