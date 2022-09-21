@@ -54,7 +54,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(name = "midnightcontrols.menu.left_dead_zone") public static double leftDeadZone = 0.25;
     @Entry(name = "midnightcontrols.menu.invert_right_y_axis") public static boolean invertRightYAxis = false;
     @Entry(name = "midnightcontrols.menu.invert_right_x_axis") public static boolean invertRightXAxis = false;
-    @Entry(name = "midnightcontrols.menu.rotation_speed") public static double rotationSpeed = 30.0; //used for x axis, name kept for compatability
+    @Entry(name = "midnightcontrols.menu.rotation_speed") public static double rotationSpeed = 40.0; //used for x-axis, name kept for compatability
     @Entry(name = "midnightcontrols.menu.y_axis_rotation_speed") public static double yAxisRotationSpeed = rotationSpeed;
     @Entry(name = "midnightcontrols.menu.mouse_speed") public static double mouseSpeed = 25.0;
     @Entry(name = "midnightcontrols.menu.unfocused_input") public static boolean unfocusedInput = false;
@@ -294,7 +294,7 @@ public class MidnightControlsConfig extends MidnightConfig {
         leftDeadZone = 0.25;
         invertRightYAxis = false;
         invertRightXAxis = false;
-        rotationSpeed = 30.0;
+        rotationSpeed = 40.0;
         yAxisRotationSpeed = rotationSpeed;
         mouseSpeed = 25.0;
         unfocusedInput = false;
@@ -325,8 +325,8 @@ public class MidnightControlsConfig extends MidnightConfig {
         else if (controller.contains("steam deck")) return ControllerType.STEAM_DECK;
         else if (controller.contains("steam")) return ControllerType.STEAM_CONTROLLER;
         else if (controller.contains("dualsense")) return ControllerType.DUALSENSE;
-        else if (controller.contains("dualshock") || controller.contains("ps4")) return ControllerType.DUALSHOCK;
-        else if (controller.contains("switch") || controller.contains("joy-con")) return ControllerType.SWITCH;
+        else if (controller.contains("dualshock") || controller.contains("ps4")  || controller.contains("sony")) return ControllerType.DUALSHOCK;
+        else if (controller.contains("switch") || controller.contains("joy-con")  || controller.contains("wii") || controller.contains("nintendo")) return ControllerType.SWITCH;
         else if (controller.contains("ouya")) return ControllerType.OUYA;
         else return ControllerType.DEFAULT;
     }

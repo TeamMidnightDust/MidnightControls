@@ -189,8 +189,8 @@ public class MidnightInput {
             return;
 
         if (this.targetYaw != 0.f || this.targetPitch != 0.f) {
-            float rotationYaw = (float) (client.player.prevYaw + (this.targetYaw * 0.2));
-            float rotationPitch = (float) (client.player.prevPitch + (this.targetPitch * 0.2));
+            float rotationYaw = (float) (client.player.prevYaw + (this.targetYaw * 0.175));
+            float rotationPitch = (float) (client.player.prevPitch + (this.targetPitch * 0.175));
             client.player.prevYaw = rotationYaw;
             client.player.prevPitch = MathHelper.clamp(rotationPitch, -90.f, 90.f);
             client.player.setYaw(rotationYaw);
@@ -199,7 +199,18 @@ public class MidnightInput {
                 client.player.getVehicle().onPassengerLookAround(client.player);
             }
             client.getTutorialManager().onUpdateMouse(this.targetPitch, this.targetYaw);
+            MidnightControlsCompat.HANDLERS.forEach(handler -> handler.handleCamera(client, targetYaw, targetPitch));
+            this.onRender(client);
         }
+    }
+    /**
+     * This method is deprecated and will be removed in future versions
+     * It is just kept, because the current version of 'Do a Barrel Roll' mixins into this method
+     *
+     * @param client the client instance
+     */
+    @Deprecated
+    public void onRender(@NotNull MinecraftClient client) {
     }
 
     /**
@@ -504,21 +515,25 @@ public class MidnightInput {
         } else if (client.currentScreen != null) {
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y && absValue >= deadZone) {
                 float finalValue = value;
-                client.currentScreen.children().stream().filter(element -> element instanceof SpruceEntryListWidget)
+                if (client.currentScreen.children().stream().filter(element -> element instanceof SpruceEntryListWidget)
                         .map(element -> (SpruceEntryListWidget<?>) element)
                         .filter(AbstractSpruceWidget::isFocusedOrHovered)
-                        .anyMatch(element -> {
-                            MidnightControls.get().log(String.valueOf(finalValue));
+                        .noneMatch(element -> {
                             element.mouseScrolled(0.0, 0.0, -finalValue);
                             return true;
-                        });
-                client.currentScreen.children().stream().filter(element -> element instanceof EntryListWidget)
+                        })
+                        &&
+                        client.currentScreen.children().stream().filter(element -> element instanceof EntryListWidget)
                         .map(element -> (EntryListWidget<?>) element)
                         .filter(element -> element.getType().isFocused())
-                        .anyMatch(element -> {
+                        .noneMatch(element -> {
                             element.mouseScrolled(0.0, 0.0, -finalValue);
                             return true;
-                        });
+                        }))
+                {
+                    client.currentScreen.mouseScrolled(0.0, 0.0, -(value * 1.5f));
+                }
+
                 return;
             }
         }

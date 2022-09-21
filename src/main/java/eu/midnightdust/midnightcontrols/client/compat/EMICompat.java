@@ -42,4 +42,7 @@ public class EMICompat implements CompatHandler {
     public static boolean isEMIEnabled() {
         return EmiConfig.enabled;
     }
+    public static boolean isSearchBarCentered() {
+        return EmiConfig.centerSearchBar;
+    }
 }

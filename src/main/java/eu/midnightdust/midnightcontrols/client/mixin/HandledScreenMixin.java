@@ -38,8 +38,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin implements HandledScreenAccessor {
-    @Unique private static float scale = 1f;
-
     @Accessor("x")
     public abstract int getX();
 
@@ -58,30 +56,26 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
 
     @Inject(method = "render", at = @At("RETURN"))
     public void onRender(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER) {
+        if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.hudEnable) {
             var client = MinecraftClient.getInstance();
-            if (client.getWindow().getScaleFactor() >= 4) {
-                scale = 0.75f;
-            } else scale = 1f;
             matrices.push();
-            if (scale != 1f) matrices.scale(scale,scale,scale);
-            int x = 2, y = (int) (client.getWindow().getScaledHeight() * (1 / scale) - 2 - MidnightControlsRenderer.ICON_SIZE);
+            int x = 2, y = client.getWindow().getScaledHeight() - 2 - MidnightControlsRenderer.ICON_SIZE;
             if (MidnightControlsCompat.isEMIPresent() && EMICompat.isEMIEnabled()) {
-                x += 40 * (1 / scale);
+                x += 42;
             }
-            x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_A}, "midnightcontrols.action.pickup_all", true, client) + 2;
-            x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_B}, "midnightcontrols.action.exit", true, client) + 2;
+            if (!ButtonBinding.TAKE_ALL.isNotBound()) x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, ButtonBinding.TAKE_ALL,true, client) + 2;
+            if (!ButtonBinding.EXIT.isNotBound()) x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, ButtonBinding.EXIT, true, client) + 2;
             if (MidnightControlsCompat.isReiPresent()) {
                 x = 2;
                 y -= 24;
             }
-            if (MidnightControlsCompat.isEMIPresent() && EMICompat.isEMIEnabled()) {
-                x = (int) (client.getWindow().getScaledWidth() * (1 / scale) - 55 - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.pickup"))
-                        * (1 / scale) - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.quick_move"))
-                        - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.TAKE) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.QUICK_MOVE));
+            if (MidnightControlsCompat.isEMIPresent() && EMICompat.isEMIEnabled() && EMICompat.isSearchBarCentered()) {
+                x = client.getWindow().getScaledWidth() - 55 - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.pickup"))
+                        - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.quick_move"))
+                        - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.TAKE) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.QUICK_MOVE);
             }
-            x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_X}, "midnightcontrols.action.pickup", true, client);
-            MidnightControlsRenderer.drawButtonTip(matrices, x, y, new int[]{GLFW.GLFW_GAMEPAD_BUTTON_Y}, "midnightcontrols.action.quick_move", true, client);
+            if (!ButtonBinding.TAKE.isNotBound()) x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, ButtonBinding.TAKE, true, client);
+            if (!ButtonBinding.QUICK_MOVE.isNotBound()) MidnightControlsRenderer.drawButtonTip(matrices, x, y, ButtonBinding.QUICK_MOVE, true, client);
             matrices.pop();
         }
     }

@@ -34,6 +34,13 @@ public interface CompatHandler {
     void handle(@NotNull MidnightControlsClient mod);
 
     /**
+     * Handles custom camera updates
+     *
+     * @param client the Minecraft client instance
+     */
+    default void handleCamera(@NotNull MinecraftClient client, double targetYaw, double targetPitch) {};
+
+    /**
      * Returns whether the mouse is required on the specified screen.
      *
      * @param screen the screen
