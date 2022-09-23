@@ -82,7 +82,7 @@ public class MidnightControlsHud extends Hud {
     public void render(MatrixStack matrices, float tickDelta) {
         if (this.client == null) return;
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.currentScreen == null) {
-            isCrammed = client.getWindow().getScaledWidth() < 560;
+            isCrammed = client.getWindow().getScaledWidth() < 520;
             int y = bottom(2);
             matrices.push();
             this.renderFirstIcons(matrices, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
