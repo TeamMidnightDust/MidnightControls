@@ -10,13 +10,13 @@
 package eu.midnightdust.midnightcontrols.client;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
-import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -67,7 +67,7 @@ public class MidnightControlsConfig extends MidnightConfig {
             "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375",
             "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen",
             "hardcorequesting.client.interfaces.GuiQuestBook", "hardcorequesting.client.interfaces.GuiReward", "hardcorequesting.client.interfaces.EditTrackerScreen");
-    @Entry(name = "Keybindings") public static Map<String, String> BINDINGS = new HashMap<>();
+    @Entry(name = "Keybindings") public static Map<String, String> BINDING = new HashMap<>();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
     @Entry(name = "Max analog values") public static double[] maxAnalogValues = new double[]{1, 1, 1, 1};
@@ -76,6 +76,9 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(name = "Enable Shortcut in Controls Options") public static boolean shortcutInControls = true;
     @Entry(name = "Ring Bindings (WIP)") public static List<String> ringBindings = new ArrayList<>();
     @Entry(name = "Ignored Unbound Keys") public static List<String> ignoredUnboundKeys = Lists.newArrayList("inventorytabs.key.next_tab");
+    @Entry @Hidden public static Map<String, Map<String, String>> controllerBindingProfiles = new HashMap<>();
+    private static Map<String, String> currentBindingProfile = new HashMap<>();
+    private static Controller prevController;
 
     /**
      * Loads the configuration
@@ -94,6 +97,15 @@ public class MidnightControlsConfig extends MidnightConfig {
         MidnightControlsConfig.write("midnightcontrols");
         MidnightControlsClient.get().log("Configuration saved.");
         MidnightControlsFeature.refreshEnabled();
+    }
+    public static void updateBindingsForController(Controller controller) {
+        if (controller.isConnected() && controller.isGamepad() && controllerBindingProfiles.containsKey(controller.getGuid()))
+            currentBindingProfile = controllerBindingProfiles.get(controller.getGuid());
+        else currentBindingProfile = Maps.newHashMap(BINDING);
+        InputManager.loadButtonBindings();
+    }
+    public static Map<String, String> getBindingsForController() {
+        return currentBindingProfile;
     }
     /**
      * Gets the used controller.
@@ -118,6 +130,8 @@ public class MidnightControlsConfig extends MidnightConfig {
             }
         }
         if (controller.isConnected() && controller.isGamepad() && MidnightControlsConfig.autoSwitchMode && !isEditing) MidnightControlsConfig.controlsMode = ControlsMode.CONTROLLER;
+        if (prevController != controller) updateBindingsForController(controller);
+        prevController = controller;
         return controller;
     }
 
@@ -192,7 +206,7 @@ public class MidnightControlsConfig extends MidnightConfig {
      */
     public static void loadButtonBinding(@NotNull ButtonBinding button) {
         button.setButton(button.getDefaultButton());
-        var code = MidnightControlsConfig.BINDINGS.getOrDefault("controller.controls." + button.getName(), button.getButtonCode());
+        var code = getBindingsForController().getOrDefault("controller.controls." + button.getName(), button.getButtonCode());
 
         var matcher = BUTTON_BINDING_PATTERN.matcher(code);
 
@@ -216,14 +230,14 @@ public class MidnightControlsConfig extends MidnightConfig {
             button.setButton(buttons);
         } catch (Exception e) {
             MidnightControlsClient.get().warn("Malformed config value \"" + code + "\" for binding \"" + button.getName() + "\".");
-            MidnightControlsConfig.BINDINGS.put("controller.controls." + button.getName(), button.getButtonCode());
+            setButtonBinding(button, button.getButton());
         }
     }
 
     private static boolean checkValidity(@NotNull ButtonBinding binding, @NotNull String input, String group) {
         if (group == null) {
             MidnightControlsClient.get().warn("Malformed config value \"" + input + "\" for binding \"" + binding.getName() + "\".");
-            MidnightControlsConfig.BINDINGS.put("controller.controls." + binding.getName(), binding.getButtonCode());
+            setButtonBinding(binding, binding.getButton());
             return false;
         }
         return true;
@@ -237,7 +251,9 @@ public class MidnightControlsConfig extends MidnightConfig {
      */
     public static void setButtonBinding(@NotNull ButtonBinding binding, int[] button) {
         binding.setButton(button);
-        MidnightControlsConfig.BINDINGS.put("controller.controls." + binding.getName(), binding.getButtonCode());
+        getBindingsForController().put("controller.controls." + binding.getName(), binding.getButtonCode());
+        if (controllerBindingProfiles.containsKey(getController().getGuid())) controllerBindingProfiles.get(getController().getGuid()).put("controller.controls." + binding.getName(), binding.getButtonCode());
+        else BINDING.put("controller.controls." + binding.getName(), binding.getButtonCode());
     }
 
     public static boolean isBackButton(int btn, boolean isBtn, int state) {
@@ -304,13 +320,14 @@ public class MidnightControlsConfig extends MidnightConfig {
         secondControllerID = -1;
         controllerType = ControllerType.DEFAULT;
         mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen");
-        BINDINGS = new HashMap<>();
+        BINDING = new HashMap<>();
         maxAnalogValues = new double[]{1, 1, 1, 1};
         triggerFix = true;
         enableHints = true;
         shortcutInControls = true;
         ringBindings = new ArrayList<>();
         ignoredUnboundKeys = Lists.newArrayList("inventorytabs.key.next_tab");
+        controllerBindingProfiles = new HashMap<>();
     }
 
     /**

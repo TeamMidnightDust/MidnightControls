@@ -46,6 +46,7 @@ public class MidnightControlsHud extends Hud {
     private int inventoryButtonWidth = 0;
     private int swapHandsWidth = 0;
     private int swapHandsButtonWidth = 0;
+    private boolean showSwapHandsAction = false;
     private int useWidth = 0;
     private int useButtonWidth = 0;
     private BlockHitResult placeHitResult;
@@ -109,11 +110,7 @@ public class MidnightControlsHud extends Hud {
         int offset = 2 + this.inventoryWidth + this.inventoryButtonWidth + 4;
         int currentX = MidnightControlsConfig.hudSide == HudSide.LEFT ? x : x - this.inventoryButtonWidth;
         if (!ButtonBinding.INVENTORY.isNotBound()) this.drawButton(matrices, currentX, y, ButtonBinding.INVENTORY, true);
-        if (isCrammed) {
-            offset = 0;
-            y -= 20;
-        }
-        if (!ButtonBinding.SWAP_HANDS.isNotBound()) this.drawButton(matrices, currentX += (MidnightControlsConfig.hudSide == HudSide.LEFT ? offset : -offset), y, ButtonBinding.SWAP_HANDS, true);
+        if (!ButtonBinding.SWAP_HANDS.isNotBound() && !isCrammed && showSwapHandsAction) this.drawButton(matrices, currentX += (MidnightControlsConfig.hudSide == HudSide.LEFT ? offset : -offset), y, ButtonBinding.SWAP_HANDS, true);
         offset = 2 + this.swapHandsWidth + this.dropItemButtonWidth + 4;
         if (this.client.options.getShowSubtitles().getValue() && MidnightControlsConfig.hudSide == HudSide.RIGHT) {
             currentX += -offset;
@@ -127,6 +124,13 @@ public class MidnightControlsHud extends Hud {
     public void renderSecondIcons(MatrixStack matrices, int x, int y) {
         int offset;
         int currentX = x;
+        if (isCrammed && showSwapHandsAction && !this.client.options.getShowSubtitles().getValue() && !ButtonBinding.SWAP_HANDS.isNotBound()) {
+            if (MidnightControlsConfig.hudSide == HudSide.LEFT)
+                currentX -= this.useButtonWidth;
+            this.drawButton(matrices, currentX, y, ButtonBinding.SWAP_HANDS, true);
+            currentX = x;
+            y -= 20;
+        }
         if (!this.placeAction.isEmpty() && (!ButtonBinding.USE.isNotBound()) ) {
             if (MidnightControlsConfig.hudSide == HudSide.LEFT)
                 currentX -= this.useButtonWidth;
@@ -151,11 +155,7 @@ public class MidnightControlsHud extends Hud {
         if (!ButtonBinding.INVENTORY.isNotBound()) this.drawTip(matrices, currentX, y, ButtonBinding.INVENTORY, true);
         currentX += MidnightControlsConfig.hudSide == HudSide.LEFT ? this.inventoryWidth + 4 + this.swapHandsButtonWidth + 2
                 : -this.swapHandsWidth - 2 - this.swapHandsButtonWidth - 4;
-        if (isCrammed) {
-            currentX = MidnightControlsConfig.hudSide == HudSide.LEFT ? x + this.inventoryButtonWidth + 2 : x - this.inventoryButtonWidth - 2 - this.inventoryWidth;
-            y -= 20;
-        }
-        if (!ButtonBinding.SWAP_HANDS.isNotBound()) this.drawTip(matrices, currentX, y, ButtonBinding.SWAP_HANDS, true);
+        if (!ButtonBinding.SWAP_HANDS.isNotBound() && !isCrammed && showSwapHandsAction) this.drawTip(matrices, currentX, y, ButtonBinding.SWAP_HANDS, true);
         if (this.client.options.getShowSubtitles().getValue() && MidnightControlsConfig.hudSide == HudSide.RIGHT) {
             currentX += -this.dropItemWidth - 2 - this.dropItemButtonWidth - 4;
         } else {
@@ -168,6 +168,14 @@ public class MidnightControlsHud extends Hud {
     public void renderSecondSection(MatrixStack matrices, int x, int y) {
         int currentX = x;
 
+        if (isCrammed && showSwapHandsAction && !this.client.options.getShowSubtitles().getValue() && !ButtonBinding.SWAP_HANDS.isNotBound()) {
+            currentX += MidnightControlsConfig.hudSide == HudSide.RIGHT ? this.swapHandsButtonWidth + 2 : -this.swapHandsButtonWidth - 2 - this.swapHandsWidth;
+
+            this.drawTip(matrices, currentX, y, ButtonBinding.SWAP_HANDS, true);
+
+            currentX = x;
+            y -= 20;
+        }
         if (!this.placeAction.isEmpty()) {
             currentX += MidnightControlsConfig.hudSide == HudSide.RIGHT ? this.useButtonWidth + 2 : -this.useButtonWidth - 2 - this.useWidth;
 
@@ -244,6 +252,7 @@ public class MidnightControlsHud extends Hud {
                 placeAction = customUseAction;
 
             this.placeAction = placeAction;
+            this.showSwapHandsAction = !this.client.player.getMainHandStack().isEmpty() || !this.client.player.getOffHandStack().isEmpty();
 
             // Cache the "Use" tip width.
             if (this.placeAction.isEmpty())

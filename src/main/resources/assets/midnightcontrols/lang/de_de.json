@@ -110,6 +110,7 @@
   "midnightcontrols.menu.right_dead_zone": "Tote Zone des rechten Sticks",
   "midnightcontrols.menu.rotation_speed": "Rotationsgeschwindigkeit (X-Achse)",
   "midnightcontrols.menu.y_axis_rotation_speed": "Rotationsgeschwindigkeit (Y-Achse)",
+  "midnightcontrols.menu.separate_controller_profile": "Separates Controller-Profil",
   "midnightcontrols.menu.separator.controller": "Controller",
   "midnightcontrols.menu.separator.general": "Generell",
   "midnightcontrols.menu.title": "MidnightControls - Einstellungen",

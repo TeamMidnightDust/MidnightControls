@@ -116,6 +116,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption unfocusedInputOption;
     private final SpruceOption invertsRightXAxis;
     private final SpruceOption invertsRightYAxis;
+    private final SpruceOption toggleControllerProfileOption;
     private final SpruceOption rightDeadZoneOption;
     private final SpruceOption leftDeadZoneOption;
     private final SpruceOption[] maxAnalogValueOptions = new SpruceOption[]{
@@ -163,7 +164,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                     MidnightControlsConfig.controlsMode = next;
                     MidnightControlsConfig.save();
 
-                    if (this.client.player != null) {
+                    if (this.client != null && this.client.player != null) {
                         ClientPlayNetworking.getSender().sendPacket(MidnightControls.CONTROLS_MODE_CHANNEL, this.mod.makeControlsModeBuffer(next));
                     }
                 }, option -> option.getDisplayText(Text.translatable(MidnightControlsConfig.controlsMode.getTranslationKey())),
@@ -183,7 +184,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                 value -> MidnightControlsConfig.mouseSpeed = value, option -> option.getDisplayText(Text.literal(String.valueOf(option.get()))),
                 Text.translatable("midnightcontrols.tooltip.mouse_speed"));
         this.resetOption = SpruceSimpleActionOption.reset(btn -> {
-            // TODO
             MidnightControlsConfig.reset();
             var client = MinecraftClient.getInstance();
             this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
@@ -225,6 +225,16 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                 option -> option.getDisplayText(MidnightControlsConfig.hudSide.getTranslatedText()),
                 Text.translatable("midnightcontrols.tooltip.hud_side"));
         // Controller options
+        this.toggleControllerProfileOption = new SpruceToggleBooleanOption("midnightcontrols.menu.separate_controller_profile", () -> MidnightControlsConfig.controllerBindingProfiles.containsKey(MidnightControlsConfig.getController().getGuid()), value -> {
+            if (value) {
+                MidnightControlsConfig.controllerBindingProfiles.put(MidnightControlsConfig.getController().getGuid(), MidnightControlsConfig.getBindingsForController());
+                MidnightControlsConfig.updateBindingsForController(MidnightControlsConfig.getController());
+            } else {
+                MidnightControlsConfig.controllerBindingProfiles.remove(MidnightControlsConfig.getController().getGuid());
+                MidnightControlsConfig.updateBindingsForController(MidnightControlsConfig.getController());
+            }
+
+        }, Text.translatable(""));
         this.rightDeadZoneOption = new SpruceDoubleOption("midnightcontrols.menu.right_dead_zone", 0.05, 1.0, .05f,
                 () -> MidnightControlsConfig.rightDeadZone,
                 value -> MidnightControlsConfig.rightDeadZone = value, option -> {
@@ -372,6 +382,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         list.setBackground(new MidnightControlsBackground(130));
         list.addSingleOptionEntry(this.controllerOption);
         list.addSingleOptionEntry(this.secondControllerOption);
+        list.addSingleOptionEntry(this.toggleControllerProfileOption);
         list.addSingleOptionEntry(this.unfocusedInputOption);
         list.addOptionEntry(this.invertsRightXAxis, this.invertsRightYAxis);
         list.addSingleOptionEntry(this.rightDeadZoneOption);

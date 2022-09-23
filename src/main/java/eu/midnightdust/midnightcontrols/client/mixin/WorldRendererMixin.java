@@ -9,7 +9,6 @@
 
 package eu.midnightdust.midnightcontrols.client.mixin;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import eu.midnightdust.lib.util.MidnightColorUtil;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
@@ -53,7 +52,7 @@ public abstract class WorldRendererMixin {
     private BufferBuilderStorage bufferBuilders;
 
     @Shadow
-    public static void drawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
+    private static void drawCuboidShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape shape, double offsetX, double offsetY, double offsetZ, float red, float green, float blue, float alpha) {
     }
 
     @Inject(
@@ -73,7 +72,7 @@ public abstract class WorldRendererMixin {
         if (result == null)
             return;
         var blockPos = result.getBlockPos();
-        if (this.world.getWorldBorder().contains(blockPos)) {
+        if (this.world.getWorldBorder().contains(blockPos) && this.client.player != null) {
             var stack = this.client.player.getStackInHand(Hand.MAIN_HAND);
             if (stack == null || !(stack.getItem() instanceof BlockItem))
                 return;
@@ -92,15 +91,9 @@ public abstract class WorldRendererMixin {
             var outlineShape = placementState.getOutlineShape(this.client.world, blockPos, ShapeContext.of(camera.getFocusedEntity()));
             Color rgb = MidnightColorUtil.hex2Rgb(MidnightControlsConfig.reacharoundOutlineColorHex);
             if (MidnightControlsConfig.reacharoundOutlineColorHex.isEmpty()) rgb = MidnightColorUtil.radialRainbow(1,1);
-
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.disableTexture();
-            RenderSystem.disableBlend();
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            RenderSystem.setShaderColor(rgb.getRed(), rgb.getGreen(), rgb.getBlue(), MidnightControlsConfig.reacharoundOutlineColorAlpha);
             matrices.push();
-            var vertexConsumer = this.bufferBuilders.getOutlineVertexConsumers().getBuffer(RenderLayer.getLines());
-            drawShapeOutline(matrices, vertexConsumer, outlineShape,
+            var vertexConsumer = this.bufferBuilders.getEntityVertexConsumers().getBuffer(RenderLayer.getLines());
+            drawCuboidShapeOutline(matrices, vertexConsumer, outlineShape,
                     (double) blockPos.getX() - pos.getX(), (double) blockPos.getY() - pos.getY(), (double) blockPos.getZ() - pos.getZ(),
                     rgb.getRed() / 255.f, rgb.getGreen() / 255.f, rgb.getBlue() / 255.f, MidnightControlsConfig.reacharoundOutlineColorAlpha / 255.f);
             matrices.pop();
