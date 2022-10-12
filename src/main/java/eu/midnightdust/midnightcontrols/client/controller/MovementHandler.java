@@ -40,6 +40,7 @@ public final class MovementHandler implements PressAction {
     private boolean pressingBack = false;
     private boolean pressingLeft = false;
     private boolean pressingRight = false;
+    private float slowdownFactor = 1.f;
     private float movementForward = 0.f;
     private float movementSideways = 0.f;
 
@@ -52,14 +53,21 @@ public final class MovementHandler implements PressAction {
      * @param player The client player.
      */
     public void applyMovement(@NotNull ClientPlayerEntity player) {
+        double movementR, movementTheta;
+
         if (!this.shouldOverrideMovement)
             return;
         player.input.pressingForward = this.pressingForward;
         player.input.pressingBack = this.pressingBack;
         player.input.pressingLeft = this.pressingLeft;
         player.input.pressingRight = this.pressingRight;
-        player.input.movementForward = this.movementForward;
-        player.input.movementSideways = this.movementSideways;
+
+        // Do a implicit square here
+        movementR = this.slowdownFactor * (Math.pow(this.movementSideways, 2) + Math.pow(this.movementForward, 2));
+        movementTheta = Math.atan2(this.movementForward, this.movementSideways);
+        player.input.movementForward = (float) (movementR * Math.sin(movementTheta));
+        player.input.movementSideways = (float) (movementR * Math.cos(movementTheta));
+
         this.shouldOverrideMovement = false;
     }
 
@@ -79,30 +87,26 @@ public final class MovementHandler implements PressAction {
 
         this.shouldOverrideMovement = direction != 0;
 
-        if (MidnightControlsConfig.analogMovement) {
-            value = (float) Math.pow(value, 2);
-        } else value = 1.f;
+        if (!MidnightControlsConfig.analogMovement) {
+            value = 1.f;
+        }
+
+        this.slowdownFactor = client.player.shouldSlowDown() ? (MathHelper.clamp(
+            0.3F + EnchantmentHelper.getSwiftSneakSpeedBoost(client.player),
+            0.0F,
+            1.0F
+        )) : 1.f;
 
         if (button == ButtonBinding.FORWARD || button == ButtonBinding.BACK) {
             // Handle forward movement.
             this.pressingForward = direction > 0;
             this.pressingBack = direction < 0;
             this.movementForward = direction * value;
-
-            // Slowing down if sneaking or crawling.
-            if (client.player.shouldSlowDown()) {
-                this.movementForward *= MathHelper.clamp(0.3F + EnchantmentHelper.getSwiftSneakSpeedBoost(client.player), 0.0F, 1.0F);
-            }
         } else {
             // Handle sideways movement.
             this.pressingLeft = direction > 0;
             this.pressingRight = direction < 0;
             this.movementSideways = direction * value;
-
-            // Slowing down if sneaking or crawling.
-            if (client.player.shouldSlowDown()) {
-                this.movementSideways *= MathHelper.clamp(0.3F + EnchantmentHelper.getSwiftSneakSpeedBoost(client.player), 0.0F, 1.0F);
-            }
         }
 
         return this.shouldOverrideMovement;
