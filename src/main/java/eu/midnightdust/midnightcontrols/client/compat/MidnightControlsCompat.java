@@ -53,6 +53,10 @@ public class MidnightControlsCompat {
             mod.log("Adding HQM compatibility...");
             HANDLERS.add(new HQMCompat());
         }
+        if (FabricLoader.getInstance().isModLoaded("bedrockify")) {
+            mod.log("Adding Bedrockify compatibility...");
+            HANDLERS.add(new BedrockifyCompat());
+        }
         HANDLERS.forEach(handler -> handler.handle(mod));
         InputManager.loadButtonBindings();
     }

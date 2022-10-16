@@ -118,6 +118,7 @@ dependencies {
     modImplementation "io.github.kosmx:bendy-lib:${project.bendylib_version}"
     modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
     modImplementation "maven.modrinth:inventory-tabs-updated:${project.inventorytabs_version}"
+    modImplementation "maven.modrinth:bedrockify:${project.bedrockify_version}"
     // Required for Inventory Tabs
     modApi("me.shedaniel.cloth:cloth-config-fabric:${project.clothconfig_version}") {
         exclude(group: "net.fabricmc.fabric-api")

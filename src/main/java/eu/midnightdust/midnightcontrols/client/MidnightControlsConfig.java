@@ -17,6 +17,7 @@ import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
+import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -42,6 +43,8 @@ public class MidnightControlsConfig extends MidnightConfig {
     // Gameplay
     @Entry(name = "midnightcontrols.menu.analog_movement") public static boolean analogMovement = true;
     @Entry(name = "midnightcontrols.menu.double_tap_to_sprint") public static boolean doubleTapToSprint = true;
+    @Entry(name = "midnightcontrols.menu.controller_toggle_sneak") public static boolean controllerToggleSneak = MinecraftClient.getInstance().options.getSneakToggled().getValue();
+    @Entry(name = "midnightcontrols.menu.controller_toggle_sprint") public static boolean controllerToggleSprint = MinecraftClient.getInstance().options.getSprintToggled().getValue();
     @Entry(name = "midnightcontrols.menu.fast_block_placing") public static boolean fastBlockPlacing = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
     @Entry(name = "midnightcontrols.menu.fly_drifting") public static boolean flyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers. It can also conflict with some other mods.
     @Entry(name = "midnightcontrols.menu.fly_drifting_vertical") public static boolean verticalFlyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers.
@@ -66,7 +69,8 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui",
             "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375",
             "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen",
-            "hardcorequesting.client.interfaces.GuiQuestBook", "hardcorequesting.client.interfaces.GuiReward", "hardcorequesting.client.interfaces.EditTrackerScreen");
+            "hardcorequesting.client.interfaces.GuiQuestBook", "hardcorequesting.client.interfaces.GuiReward", "hardcorequesting.client.interfaces.EditTrackerScreen",
+            "me.shedaniel.clothconfig2.gui.ClothConfigScreen");
     @Entry(name = "Keybindings") public static Map<String, String> BINDING = new HashMap<>();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
@@ -298,6 +302,8 @@ public class MidnightControlsConfig extends MidnightConfig {
         hudSide = HudSide.LEFT;
         analogMovement = true;
         doubleTapToSprint = true;
+        controllerToggleSneak = MinecraftClient.getInstance().options.getSneakToggled().getValue();
+        controllerToggleSprint = MinecraftClient.getInstance().options.getSprintToggled().getValue();
         fastBlockPlacing = false;
         flyDrifting = true;
         verticalFlyDrifting = true;
@@ -319,7 +325,7 @@ public class MidnightControlsConfig extends MidnightConfig {
         controllerID = 0;
         secondControllerID = -1;
         controllerType = ControllerType.DEFAULT;
-        mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen");
+        mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen", "me.shedaniel.clothconfig2.gui.ClothConfigScreen");
         BINDING = new HashMap<>();
         maxAnalogValues = new double[]{1, 1, 1, 1};
         triggerFix = true;

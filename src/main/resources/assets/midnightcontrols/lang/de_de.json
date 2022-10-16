@@ -77,6 +77,7 @@
   "midnightcontrols.controller.mappings.error.write": "Fehler beim Schreiben der Controller Mappings.",
   "midnightcontrols.controller.mappings.updated": "Mappings aktualisiert!",
   "midnightcontrols.controller_type.default": "Standard",
+  "midnightcontrols.controller_type.numbered": "Nummerierter Controller",
   "midnightcontrols.controls_mode.default": "Tastatur/Maus",
   "midnightcontrols.controls_mode.controller": "Controller",
   "midnightcontrols.controls_mode.touchscreen": "Touchscreen (In Arbeit)",

@@ -32,7 +32,8 @@ public enum ControllerType implements Nameable {
     XBOX(5),
     STEAM_DECK(6),
     STEAM_CONTROLLER(7),
-    OUYA(8);
+    OUYA(8),
+    NUMBERED(9);
 
     private final int id;
     private final Text text;

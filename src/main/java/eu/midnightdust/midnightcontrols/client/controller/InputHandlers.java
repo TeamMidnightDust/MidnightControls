@@ -11,6 +11,7 @@ package eu.midnightdust.midnightcontrols.client.controller;
 
 import eu.midnightdust.midnightcontrols.client.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.compat.InventoryTabsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
@@ -254,9 +255,28 @@ public class InputHandlers {
             boolean sneakToggled = client.options.getSneakToggled().getValue();
             if (client.player.getAbilities().flying && sneakToggled)
                 client.options.getSneakToggled().setValue(false);
+            else if (MidnightControlsConfig.controllerToggleSneak != sneakToggled)
+                client.options.getSneakToggled().setValue(!sneakToggled);
             binding.setPressed(button.pressed);
             if (client.player.getAbilities().flying && sneakToggled)
                 client.options.getSneakToggled().setValue(true);
+            else if (MidnightControlsConfig.controllerToggleSneak != sneakToggled)
+                client.options.getSneakToggled().setValue(sneakToggled);
+        });
+        return true;
+    }
+    public static boolean handleToggleSprint(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action) {
+        button.asKeyBinding().ifPresent(binding -> {
+            boolean sprintToggled = client.options.getSprintToggled().getValue();
+            if (client.player.getAbilities().flying && sprintToggled)
+                client.options.getSprintToggled().setValue(false);
+            else if (MidnightControlsConfig.controllerToggleSneak != sprintToggled)
+                client.options.getSprintToggled().setValue(!sprintToggled);
+            binding.setPressed(button.pressed);
+            if (client.player.getAbilities().flying && sprintToggled)
+                client.options.getSprintToggled().setValue(true);
+            else if (MidnightControlsConfig.controllerToggleSneak != sprintToggled)
+                client.options.getSprintToggled().setValue(sprintToggled);
         });
         return true;
     }

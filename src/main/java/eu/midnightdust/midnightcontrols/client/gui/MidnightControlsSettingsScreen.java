@@ -63,6 +63,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption analogMovementOption;
     private final SpruceOption doubleTapToSprintOption;
     private final SpruceOption autoJumpOption;
+    private final SpruceOption controllerToggleSneakOption;
+    private final SpruceOption controllerToggleSprintOption;
     private final SpruceOption fastBlockPlacingOption;
     private final SpruceOption frontBlockPlacingOption;
     private final SpruceOption verticalReacharoundOption;
@@ -199,6 +201,12 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                 () -> this.client.options.getAutoJump().getValue(),
                 newValue -> this.client.options.getAutoJump().setValue(newValue),
                 null);
+        this.controllerToggleSneakOption = new SpruceToggleBooleanOption("midnightcontrols.menu.controller_toggle_sneak",
+                () -> MidnightControlsConfig.controllerToggleSneak, value -> MidnightControlsConfig.controllerToggleSneak = value,
+                null);
+        this.controllerToggleSprintOption = new SpruceToggleBooleanOption("midnightcontrols.menu.controller_toggle_sprint",
+                () -> MidnightControlsConfig.controllerToggleSprint, value -> MidnightControlsConfig.controllerToggleSprint = value,
+                null);
         this.fastBlockPlacingOption = new SpruceToggleBooleanOption("midnightcontrols.menu.fast_block_placing", () -> MidnightControlsConfig.fastBlockPlacing,
                 value -> MidnightControlsConfig.fastBlockPlacing = value, Text.translatable("midnightcontrols.tooltip.fast_block_placing"));
         this.frontBlockPlacingOption = new SpruceToggleBooleanOption("midnightcontrols.menu.reacharound.horizontal", () -> MidnightControlsConfig.horizontalReacharound,
@@ -329,6 +337,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         list.setBackground(new MidnightControlsBackground(130));
         list.addSingleOptionEntry(this.analogMovementOption);
         list.addSingleOptionEntry(this.doubleTapToSprintOption);
+        list.addSingleOptionEntry(this.controllerToggleSneakOption);
+        list.addSingleOptionEntry(this.controllerToggleSprintOption);
         if (MidnightControls.isExtrasLoaded) list.addSingleOptionEntry(this.fastBlockPlacingOption);
         if (MidnightControls.isExtrasLoaded) list.addSingleOptionEntry(this.frontBlockPlacingOption);
         if (MidnightControls.isExtrasLoaded) list.addSingleOptionEntry(this.verticalReacharoundOption);

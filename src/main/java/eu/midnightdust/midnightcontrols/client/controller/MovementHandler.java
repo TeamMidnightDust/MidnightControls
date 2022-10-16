@@ -62,7 +62,7 @@ public final class MovementHandler implements PressAction {
         player.input.pressingLeft = this.pressingLeft;
         player.input.pressingRight = this.pressingRight;
 
-        // Do a implicit square here
+        // Do an implicit square here
         movementR = this.slowdownFactor * (Math.pow(this.movementSideways, 2) + Math.pow(this.movementForward, 2));
         movementR = MathHelper.clamp(movementR, 0.f, 1.f);
         movementTheta = Math.atan2(this.movementForward, this.movementSideways);
