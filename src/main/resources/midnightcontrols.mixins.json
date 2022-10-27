@@ -18,6 +18,7 @@
     "RecipeBookWidgetAccessor",
     "WorldRendererMixin",
     "KeyBindingRegistryImplAccessor",
+    "KeyBindingIDAccessor",
     "ScreenAccessor"
   ],
   "injectors": {

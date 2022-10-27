@@ -18,6 +18,7 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ChatScreen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -68,9 +69,11 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(name = "midnightcontrols.menu.controller_type") public static ControllerType controllerType = ControllerType.DEFAULT;
     @Entry(name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui",
             "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375",
-            "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen",
+            "net.minecraft.class_457", "net.minecraft.class_408", "net.minecraft.class_3872", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen",
             "hardcorequesting.client.interfaces.GuiQuestBook", "hardcorequesting.client.interfaces.GuiReward", "hardcorequesting.client.interfaces.EditTrackerScreen",
-            "me.shedaniel.clothconfig2.gui.ClothConfigScreen");
+            "me.shedaniel.clothconfig2.gui.ClothConfigScreen", "com.mamiyaotaru.voxelmap.gui.GuiWaypoints", "com.mamiyaotaru.voxelmap.gui.GuiPersistentMap");
+    @Entry(name = "Arrow screens") public static List<String> arrowScreens = Lists.newArrayList(ChatScreen.class.getCanonicalName());
+    @Entry(name = "WASD screens") public static List<String> wasdScreens = Lists.newArrayList("com.ultreon.devices.core.Laptop");
     @Entry(name = "Keybindings") public static Map<String, String> BINDING = new HashMap<>();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
@@ -325,7 +328,7 @@ public class MidnightControlsConfig extends MidnightConfig {
         controllerID = 0;
         secondControllerID = -1;
         controllerType = ControllerType.DEFAULT;
-        mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen", "me.shedaniel.clothconfig2.gui.ClothConfigScreen");
+        mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "net.minecraft.class_3872", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen", "me.shedaniel.clothconfig2.gui.ClothConfigScreen", "com.mamiyaotaru.voxelmap.gui.GuiWaypoints", "com.mamiyaotaru.voxelmap.gui.GuiPersistentMap");
         BINDING = new HashMap<>();
         maxAnalogValues = new double[]{1, 1, 1, 1};
         triggerFix = true;

@@ -49,6 +49,8 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.input.Input;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.math.MathHelper;
@@ -74,6 +76,7 @@ public class MidnightInput {
     // Cooldowns
     public int actionGuiCooldown = 0;
     public boolean ignoreNextARelease = false;
+    public boolean ignoreNextXRelease = false;
     private double targetYaw = 0.0;
     private double targetPitch = 0.0;
     private float prevXAxis = 0.f;
@@ -317,12 +320,33 @@ public class MidnightInput {
             return;
         }
 
-        if (action == 0 || action == 2) {
+        if (client.currentScreen != null && (action == 0 || action == 2) && button == GLFW_GAMEPAD_BUTTON_Y &&
+                MidnightControlsConfig.arrowScreens.contains(client.currentScreen.getClass().getCanonicalName())) {
+            pressKeyboardKey(client, GLFW.GLFW_KEY_ENTER);
+            this.screenCloseCooldown = 5;
+        }
+        else if (action == 0 || action == 2) {
             if (client.currentScreen != null
                     && (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP || button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN
                     || button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT || button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT)) {
                 if (this.actionGuiCooldown == 0) {
-                    if (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP) {
+                    if (MidnightControlsConfig.arrowScreens.contains(client.currentScreen.getClass().getCanonicalName())) {
+                        switch (button) {
+                            case GLFW_GAMEPAD_BUTTON_DPAD_UP -> pressKeyboardKey(client, GLFW.GLFW_KEY_UP);
+                            case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> pressKeyboardKey(client, GLFW.GLFW_KEY_DOWN);
+                            case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> pressKeyboardKey(client, GLFW.GLFW_KEY_LEFT);
+                            case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> pressKeyboardKey(client, GLFW.GLFW_KEY_RIGHT);
+                        }
+                    }
+                    else if (MidnightControlsConfig.wasdScreens.contains(client.currentScreen.getClass().getCanonicalName())) {
+                        switch (button) {
+                            case GLFW_GAMEPAD_BUTTON_DPAD_UP -> pressKeyboardKey(client, GLFW.GLFW_KEY_W);
+                            case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> pressKeyboardKey(client, GLFW.GLFW_KEY_S);
+                            case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> pressKeyboardKey(client, GLFW.GLFW_KEY_A);
+                            case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> pressKeyboardKey(client, GLFW.GLFW_KEY_D);
+                        }
+                    }
+                    else if (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP) {
                         this.changeFocus(client.currentScreen, NavigationDirection.UP);
                     } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN) {
                         this.changeFocus(client.currentScreen, NavigationDirection.DOWN);
@@ -356,17 +380,54 @@ public class MidnightInput {
                 double mouseX = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
                 double mouseY = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
                 if (action == 0) {
-                    Screen.wrapScreenError(() -> client.currentScreen.mouseClicked(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1),
+                    Screen.wrapScreenError(() -> {
+                        ((MouseAccessor) client.mouse).setLeftButtonClicked(false);
+                        client.currentScreen.mouseClicked(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1);
+                            },
                             "mouseClicked event handler", client.currentScreen.getClass().getCanonicalName());
                 } else if (action == 1) {
-                    Screen.wrapScreenError(() -> client.currentScreen.mouseReleased(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1),
+                    Screen.wrapScreenError(() -> {
+                        ((MouseAccessor) client.mouse).setLeftButtonClicked(false);
+                        client.currentScreen.mouseReleased(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1);
+                            },
                             "mouseReleased event handler", client.currentScreen.getClass().getCanonicalName());
+                } else if (action == 2) {
+                    Screen.wrapScreenError(() -> {
+                        client.currentScreen.setDragging(true);
+                        ((MouseAccessor) client.mouse).setLeftButtonClicked(true);
+                        ((MouseAccessor) client.mouse).midnightcontrols$onCursorPos(client.getWindow().getHandle(), client.mouse.getX(), client.mouse.getY());
+                        client.currentScreen.setDragging(false);
+                            },
+                            "mouseClicked event handler", client.currentScreen.getClass().getCanonicalName());
                 }
                 this.screenCloseCooldown = 5;
             } else {
                 this.ignoreNextARelease = false;
             }
         }
+        else if (button == GLFW.GLFW_GAMEPAD_BUTTON_X && client.currentScreen != null && !isScreenInteractive(client.currentScreen)
+                && this.actionGuiCooldown == 0) {
+            if (client.currentScreen instanceof HandledScreen<?> handledScreen && ((HandledScreenAccessor) handledScreen).midnightcontrols$getSlotAt(
+                    client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth(),
+                    client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight()) != null) return;
+            if (!this.ignoreNextXRelease) {
+                double mouseX = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
+                double mouseY = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
+                if (action == 0) {
+                    Screen.wrapScreenError(() -> client.currentScreen.mouseClicked(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_2),
+                            "mouseClicked event handler", client.currentScreen.getClass().getCanonicalName());
+                } else if (action == 1) {
+                    Screen.wrapScreenError(() -> client.currentScreen.mouseReleased(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_2),
+                            "mouseReleased event handler", client.currentScreen.getClass().getCanonicalName());
+                }
+                this.screenCloseCooldown = 5;
+            } else {
+                this.ignoreNextXRelease = false;
+            }
+        }
+    }
+    public void pressKeyboardKey(MinecraftClient client, int key) {
+        client.keyboard.onKey(client.getWindow().getHandle(), key, 0, 1, 0);
     }
     /**
 

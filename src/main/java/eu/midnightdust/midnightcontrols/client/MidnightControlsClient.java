@@ -15,6 +15,7 @@ import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
+import eu.midnightdust.midnightcontrols.client.compat.VoxelMapCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
@@ -22,6 +23,7 @@ import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsHud;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
+import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingIDAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingRegistryImplAccessor;
 import eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction;
 import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
@@ -57,6 +59,7 @@ import java.util.TimerTask;
  */
 public class MidnightControlsClient extends MidnightControls implements ClientModInitializer {
     public static boolean lateInitDone = false;
+    public static boolean voxelmapInitDone = false;
     private static MidnightControlsClient INSTANCE;
     public static final KeyBinding BINDING_LOOK_UP = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "look_up"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.movement");
@@ -163,6 +166,12 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
      * This method is called to initialize keybindings
      */
     public void initKeybindings() {
+        if (!voxelmapInitDone && FabricLoader.getInstance().isModLoaded("voxelmap") && KeyBindingIDAccessor.getKEYS_BY_ID().containsKey("key.minimap.toggleingamewaypoints")) {
+            this.log("Adding VoxelMap compatibility...");
+            new VoxelMapCompat().handle(this);
+            InputManager.loadButtonBindings();
+            voxelmapInitDone = true;
+        }
         if (lateInitDone) return;
         if (KeyBindingRegistryImplAccessor.getModdedKeyBindings() == null || KeyBindingRegistryImplAccessor.getModdedKeyBindings().isEmpty()) return;
         for (int i = 0; i < KeyBindingRegistryImplAccessor.getModdedKeyBindings().size(); ++i) {

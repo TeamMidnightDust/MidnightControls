@@ -24,15 +24,19 @@ import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.SpectatorHud;
+import net.minecraft.client.gui.hud.spectator.SpectatorMenu;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
+import net.minecraft.client.input.Input;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -61,12 +65,22 @@ public class InputHandlers {
             if (action == ButtonState.RELEASE)
                 return false;
 
-            // When ingame
+            // When in-game
             if (client.currentScreen == null && client.player != null) {
-                if (next)
-                    client.player.getInventory().scrollInHotbar(-1.0);
-                else
-                    client.player.getInventory().scrollInHotbar(1.0);
+                if (!client.player.isSpectator()) {
+                    if (next)
+                        client.player.getInventory().scrollInHotbar(-1.0);
+                    else
+                        client.player.getInventory().scrollInHotbar(1.0);
+                }
+                else {
+                    if (client.inGameHud.getSpectatorHud().isOpen()) {
+                        client.inGameHud.getSpectatorHud().cycleSlot(next ? -1 : 1);
+                    } else {
+                        float g = MathHelper.clamp(client.player.getAbilities().getFlySpeed() + (next ? 1 : -1) * 0.005F, 0.0F, 0.2F);
+                        client.player.getAbilities().setFlySpeed(g);
+                    }
+                }
                 return true;
             } else if (client.currentScreen instanceof RingScreen) {
                 MidnightControlsClient.get().ring.cyclePage(next);
@@ -102,7 +116,7 @@ public class InputHandlers {
                 recipeBookAccessor.midnightcontrols$refreshResults(true);
                 return true;
             } else if (client.currentScreen instanceof AdvancementsScreenAccessor screen) {
-                var tabs = screen.getTabs().values().stream().distinct().collect(Collectors.toList());
+                var tabs = screen.getTabs().values().stream().distinct().toList();
                 var tab = screen.getSelectedTab();
                 if (tab == null)
                     return false;
