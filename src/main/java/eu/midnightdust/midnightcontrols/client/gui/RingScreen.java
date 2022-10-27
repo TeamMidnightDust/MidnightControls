@@ -37,8 +37,8 @@ public class RingScreen extends Screen {
     protected void init() {
         super.init();
         if (mod.ring.getMaxPages() > 1) {
-            this.addDrawableChild(new ButtonWidget(5, 5, 20, 20, Text.of("◀"), button -> this.mod.ring.cyclePage(false)));
-            this.addDrawableChild(new ButtonWidget(width - 25, 5, 20, 20, Text.of("▶"), button -> this.mod.ring.cyclePage(true)));
+            this.addDrawableChild(ButtonWidget.method_46430(Text.of("◀"), button -> this.mod.ring.cyclePage(false)).method_46434(5, 5, 20, 20).method_46431());
+            this.addDrawableChild(ButtonWidget.method_46430(Text.of("▶"), button -> this.mod.ring.cyclePage(true)).method_46434(width - 25, 5, 20, 20).method_46431());
         }
     }
 

@@ -48,9 +48,9 @@ public abstract class ControlsOptionsScreenMixin extends GameOptionsScreen {
             int i = this.width / 2 - 155;
             int j = i + 160;
             int k = this.height / 6 - 12 + 48;
-            this.addDrawableChild(new ButtonWidget(j, k, 150, 20, Text.translatable("midnightcontrols.menu.title.controller").append("..."), (button) -> {
+            this.addDrawableChild(ButtonWidget.method_46430(Text.translatable("midnightcontrols.menu.title.controller").append("..."), (button) -> {
                 this.client.setScreen(new MidnightControlsSettingsScreen(this, false));
-            }));
+            }).method_46434(j, k, 150, 20).method_46431());
         }
     }
 }

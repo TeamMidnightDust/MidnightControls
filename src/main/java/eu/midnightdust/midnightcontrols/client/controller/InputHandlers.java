@@ -34,6 +34,7 @@ import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroups;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.MathHelper;
@@ -88,10 +89,10 @@ public class InputHandlers {
                 int currentTab = CreativeInventoryScreenAccessor.getSelectedTab();
                 int nextTab = currentTab + (next ? 1 : -1);
                 if (nextTab < 0)
-                    nextTab = ItemGroup.GROUPS.length - 1;
-                else if (nextTab >= ItemGroup.GROUPS.length)
+                    nextTab = ItemGroups.GROUPS.length - 1;
+                else if (nextTab >= ItemGroups.GROUPS.length)
                     nextTab = 0;
-                inventory.midnightcontrols$setSelectedTab(ItemGroup.GROUPS[nextTab]);
+                inventory.midnightcontrols$setSelectedTab(ItemGroups.GROUPS[nextTab]);
                 return true;
             } else if (client.currentScreen instanceof InventoryScreen || client.currentScreen instanceof CraftingScreen || client.currentScreen instanceof AbstractFurnaceScreen<?>) {
                 RecipeBookWidget recipeBook;

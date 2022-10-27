@@ -38,7 +38,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.Matrix4f;
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -290,8 +290,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         this.buildTabs();
 
         this.addDrawableChild(this.resetOption.createWidget(Position.of(this.width / 2 - 155, this.height - 29), 150));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, SpruceTexts.GUI_DONE,
-                btn -> this.client.setScreen(this.parent)));
+        this.addDrawableChild(ButtonWidget.method_46430(SpruceTexts.GUI_DONE, btn -> this.client.setScreen(this.parent))
+                .method_46434(this.width / 2 - 155 + 160, this.height - 29, 150, 20).method_46431());
     }
 
     public void buildTabs() {
