@@ -16,6 +16,7 @@ import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.compat.InventoryTabsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.SodiumCompat;
+import eu.midnightdust.midnightcontrols.client.compat.YACLCompat;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.mixin.AdvancementsScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
@@ -161,7 +162,10 @@ public class InputHandlers {
                 }
                 return true;
             } else {
-                if (FabricLoader.getInstance().isModLoaded("sodium")) SodiumCompat.handleTabs(client.currentScreen, next);
+                if (FabricLoader.getInstance().isModLoaded("sodium"))
+                    SodiumCompat.handleTabs(client.currentScreen, next);
+                if (FabricLoader.getInstance().isModLoaded("yet-another-config-lib") && YACLCompat.handleCategories(client.currentScreen, next))
+                    return true;
             }
             if (MidnightControlsCompat.isInventoryTabsPresent()) InventoryTabsCompat.handleInventoryTabs(client.currentScreen, next);
             return false;
@@ -198,6 +202,7 @@ public class InputHandlers {
                 } catch (Exception ignored) {}
             }
             if (MidnightControlsCompat.isInventoryTabsPresent()) InventoryTabsCompat.handleInventoryPage(client.currentScreen, next);
+
             return false;
         };
     }
