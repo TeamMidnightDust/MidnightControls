@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.12-SNAPSHOT'
+    id 'fabric-loom' version '1.0-SNAPSHOT'
     id 'java-library'
     id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
@@ -32,7 +32,7 @@ boolean isMCVersionNonRelease() {
 }
 
 String getMCVersionString() {
-    if (isMCVersionNonRelease()) {
+    if (isMCVersionNonRelease() || project.minecraft_version == "1.19.3") {
         return project.minecraft_version
     }
     def version = project.minecraft_version.split('\\.')
@@ -113,7 +113,7 @@ dependencies {
     modCompileOnlyApi "io.github.cottonmc:LibGui:${project.libgui_version}"
     modCompileOnlyApi "org.quiltmc:quilt-json5:1.0.0"
     modCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
-    modCompileOnlyApi "maven.modrinth:emi:${project.emi_version}"
+    modImplementation "maven.modrinth:emi:${project.emi_version}"
     modCompileOnlyApi "maven.modrinth:emotecraft:${project.emotecraft_version}"
     modCompileOnlyApi "io.github.kosmx:bendy-lib:${project.bendylib_version}"
     modCompileOnlyApi "dev.isxander:yet-another-config-lib:${project.yacl_version}"

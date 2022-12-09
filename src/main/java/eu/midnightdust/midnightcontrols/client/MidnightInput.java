@@ -858,7 +858,7 @@ public class MidnightInput {
     }
 
     public static boolean isScreenInteractive(@NotNull Screen screen) {
-        return !(screen instanceof HandledScreen || MidnightControlsConfig.mouseScreens.stream().anyMatch(a -> screen.getClass().toString().contains(a))
+        return !(screen instanceof HandledScreen || MidnightControlsConfig.joystickAsMouse || MidnightControlsConfig.mouseScreens.stream().anyMatch(a -> screen.getClass().toString().contains(a))
                 || (screen instanceof SpruceScreen && ((SpruceScreen) screen).requiresCursor())
                 || MidnightControlsCompat.requireMouseOnScreen(screen));
     }

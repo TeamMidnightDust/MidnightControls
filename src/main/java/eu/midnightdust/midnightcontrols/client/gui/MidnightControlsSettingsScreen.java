@@ -57,8 +57,10 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption rotationSpeedOption;
     private final SpruceOption yAxisRotationSpeedOption;
     private final SpruceOption mouseSpeedOption;
+    private final SpruceOption joystickAsMouseOption;
     private final SpruceOption virtualMouseOption;
     private final SpruceOption resetOption;
+    private final SpruceOption advancedConfigOption;
     // Gameplay options
     private final SpruceOption analogMovementOption;
     private final SpruceOption doubleTapToSprintOption;
@@ -75,6 +77,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption virtualMouseSkinOption;
     private final SpruceOption hudEnableOption;
     private final SpruceOption hudSideOption;
+    private final SpruceOption moveChatOption;
     // Controller options
     private final SpruceOption controllerOption =
             new SpruceCyclingOption("midnightcontrols.menu.controller",
@@ -184,12 +187,16 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         this.mouseSpeedOption = new SpruceDoubleOption("midnightcontrols.menu.mouse_speed", 0.0, 150.0, .5f,
                 () -> MidnightControlsConfig.mouseSpeed,
                 value -> MidnightControlsConfig.mouseSpeed = value, option -> option.getDisplayText(Text.literal(String.valueOf(option.get()))),
-                Text.translatable("midnightcontrols.tooltip.mouse_speed"));
+                Text.translatable("midnightcontrols.tooltip.joystick_as_mouse"));
+        this.joystickAsMouseOption = new SpruceToggleBooleanOption("midnightcontrols.menu.joystick_as_mouse",
+                () -> MidnightControlsConfig.joystickAsMouse, value -> MidnightControlsConfig.joystickAsMouse = value,
+                Text.translatable("midnightcontrols.tooltip.joystick_as_mouse"));
         this.resetOption = SpruceSimpleActionOption.reset(btn -> {
             MidnightControlsConfig.reset();
             var client = MinecraftClient.getInstance();
             this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
         });
+        this.advancedConfigOption = SpruceSimpleActionOption.of("midnightcontrols.midnightconfig.title", button -> client.setScreen(MidnightControlsConfig.getScreen(this, "midnightcontrols")));
         // Gameplay options
         this.analogMovementOption = new SpruceToggleBooleanOption("midnightcontrols.menu.analog_movement",
                 () -> MidnightControlsConfig.analogMovement, value -> MidnightControlsConfig.analogMovement = value,
@@ -232,6 +239,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                 amount -> MidnightControlsConfig.hudSide = MidnightControlsConfig.hudSide.next(),
                 option -> option.getDisplayText(MidnightControlsConfig.hudSide.getTranslatedText()),
                 Text.translatable("midnightcontrols.tooltip.hud_side"));
+        this.moveChatOption = new SpruceToggleBooleanOption("midnightcontrols.menu.move_chat", () -> MidnightControlsConfig.moveChat,
+                value -> MidnightControlsConfig.moveChat = value, Text.translatable("midnightcontrols.tooltip.move_chat"));
         // Controller options
         this.toggleControllerProfileOption = new SpruceToggleBooleanOption("midnightcontrols.menu.separate_controller_profile", () -> MidnightControlsConfig.controllerBindingProfiles.containsKey(MidnightControlsConfig.getController().getGuid()), value -> {
             if (value) {
@@ -290,8 +299,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         this.buildTabs();
 
         this.addDrawableChild(this.resetOption.createWidget(Position.of(this.width / 2 - 155, this.height - 29), 150));
-        this.addDrawableChild(ButtonWidget.method_46430(SpruceTexts.GUI_DONE, btn -> this.client.setScreen(this.parent))
-                .method_46434(this.width / 2 - 155 + 160, this.height - 29, 150, 20).method_46431());
+        this.addDrawableChild(ButtonWidget.builder(SpruceTexts.GUI_DONE, btn -> this.client.setScreen(this.parent))
+                .dimensions(this.width / 2 - 155 + 160, this.height - 29, 150, 20).build());
     }
 
     public void buildTabs() {
@@ -329,6 +338,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         list.addSingleOptionEntry(this.yAxisRotationSpeedOption);
         list.addSingleOptionEntry(this.mouseSpeedOption);
         list.addSingleOptionEntry(this.virtualMouseOption);
+        list.addSingleOptionEntry(this.joystickAsMouseOption);
+        list.addSingleOptionEntry(this.advancedConfigOption);
         return list;
     }
 
@@ -356,6 +367,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         list.addSingleOptionEntry(new SpruceSeparatorOption("midnightcontrols.menu.title.hud", true, null));
         list.addSingleOptionEntry(this.hudEnableOption);
         list.addSingleOptionEntry(this.hudSideOption);
+        list.addSingleOptionEntry(this.moveChatOption);
         return list;
     }
 
@@ -437,13 +449,13 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             RenderSystem.enableBlend();
             RenderSystem.disableTexture();
             RenderSystem.defaultBlendFunc();
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
             bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             bufferBuilder.vertex(matrix, (float)x1, (float)y2, 0.0F).color(r, g, b, t).next();
             bufferBuilder.vertex(matrix, (float)x2, (float)y2, 0.0F).color(r, g, b, t).next();
             bufferBuilder.vertex(matrix, (float)x2, (float)y1, 0.0F).color(r, g, b, t).next();
             bufferBuilder.vertex(matrix, (float)x1, (float)y1, 0.0F).color(r, g, b, t).next();
-            BufferRenderer.drawWithShader(bufferBuilder.end());
+            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             RenderSystem.enableTexture();
             RenderSystem.disableBlend();
             matrixStack.pop();
