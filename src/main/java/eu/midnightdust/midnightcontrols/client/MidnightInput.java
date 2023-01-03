@@ -13,10 +13,7 @@ import com.google.common.collect.ImmutableSet;
 import dev.lambdaurora.spruceui.widget.AbstractSpruceWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceEntryListWidget;
 import eu.midnightdust.midnightcontrols.MidnightControls;
-import eu.midnightdust.midnightcontrols.client.compat.EmotecraftCompat;
-import eu.midnightdust.midnightcontrols.client.compat.LibGuiCompat;
-import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
-import eu.midnightdust.midnightcontrols.client.compat.SodiumCompat;
+import eu.midnightdust.midnightcontrols.client.compat.*;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
@@ -695,6 +692,8 @@ public class MidnightInput {
             var childFocused = widget.getFocused();
             if (childFocused != null)
                 return this.handleAButton(screen, childFocused);
+        } else if (FabricLoader.getInstance().isModLoaded("yet-another-config-lib") && YACLCompat.handleAButton(screen, focused)) {
+            return true;
         }
         return false;
     }
@@ -708,6 +707,10 @@ public class MidnightInput {
     private boolean handleLeftRight(@NotNull Screen screen, boolean right) {
         if (screen instanceof SpruceScreen spruceScreen) {
             spruceScreen.onNavigation(right ? NavigationDirection.RIGHT : NavigationDirection.LEFT, false);
+            this.actionGuiCooldown = 5;
+            return false;
+        }
+        if (FabricLoader.getInstance().isModLoaded("yet-another-config-lib") && YACLCompat.handleLeftRight(screen, right)) {
             this.actionGuiCooldown = 5;
             return false;
         }
