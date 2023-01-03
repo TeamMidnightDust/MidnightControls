@@ -15,6 +15,7 @@
     "KeyBindingMixin",
     "MinecraftClientMixin",
     "MouseMixin",
+    "ChatScreenMixin",
     "RecipeBookWidgetAccessor",
     "WorldRendererMixin",
     "KeyBindingRegistryImplAccessor",

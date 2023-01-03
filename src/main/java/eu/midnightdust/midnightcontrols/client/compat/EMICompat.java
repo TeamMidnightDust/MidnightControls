@@ -1,6 +1,6 @@
 package eu.midnightdust.midnightcontrols.client.compat;
 
-import dev.emi.emi.EmiConfig;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.screen.EmiScreen;
 import dev.emi.emi.screen.EmiScreenManager;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
@@ -14,9 +14,9 @@ import org.lwjgl.glfw.GLFW;
 
 public class EMICompat implements CompatHandler {
     public static boolean handleTabs(boolean direction) {
-        if (isEMIEnabled() && MidnightControlsClient.get().input.actionGuiCooldown == 0 && EmiScreenManager.searchLeft != null && EmiScreenManager.searchRight != null) {
-            if (direction) EmiScreenManager.searchRight.onPress();
-            else EmiScreenManager.searchLeft.onPress();
+        if (isEMIEnabled() && MidnightControlsClient.get().input.actionGuiCooldown == 0 && EmiScreenManager.getSearchPanel() != null && EmiScreenManager.getSearchPanel().pageLeft != null && EmiScreenManager.getSearchPanel().pageRight != null) {
+            if (direction) EmiScreenManager.getSearchPanel().pageRight.onPress();
+            else EmiScreenManager.getSearchPanel().pageLeft.onPress();
             MidnightControlsClient.get().input.actionGuiCooldown = 5;
             return true;
         }

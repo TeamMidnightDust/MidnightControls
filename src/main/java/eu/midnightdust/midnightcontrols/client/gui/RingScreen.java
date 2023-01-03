@@ -10,7 +10,6 @@
 package eu.midnightdust.midnightcontrols.client.gui;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
-import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
 import eu.midnightdust.midnightcontrols.client.ring.RingButtonMode;
 import eu.midnightdust.midnightcontrols.client.ring.RingPage;
 import net.minecraft.client.gui.screen.Screen;
@@ -37,8 +36,8 @@ public class RingScreen extends Screen {
     protected void init() {
         super.init();
         if (mod.ring.getMaxPages() > 1) {
-            this.addDrawableChild(new ButtonWidget(5, 5, 20, 20, Text.of("◀"), button -> this.mod.ring.cyclePage(false)));
-            this.addDrawableChild(new ButtonWidget(width - 25, 5, 20, 20, Text.of("▶"), button -> this.mod.ring.cyclePage(true)));
+            this.addDrawableChild(ButtonWidget.builder(Text.of("◀"), button -> this.mod.ring.cyclePage(false)).dimensions(5, 5, 20, 20).build());
+            this.addDrawableChild(ButtonWidget.builder(Text.of("▶"), button -> this.mod.ring.cyclePage(true)).dimensions(width - 25, 5, 20, 20).build());
         }
     }
 

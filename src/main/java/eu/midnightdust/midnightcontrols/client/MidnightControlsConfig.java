@@ -41,6 +41,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     // HUD
     @Entry(name = "midnightcontrols.menu.hud_enable") public static boolean hudEnable = true;
     @Entry(name = "midnightcontrols.menu.hud_side") public static HudSide hudSide = HudSide.LEFT;
+    @Entry(name = "midnightcontrols.menu.move_chat") public static boolean moveChat = false;
     // Gameplay
     @Entry(name = "midnightcontrols.menu.analog_movement") public static boolean analogMovement = true;
     @Entry(name = "midnightcontrols.menu.double_tap_to_sprint") public static boolean doubleTapToSprint = true;
@@ -61,6 +62,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(name = "midnightcontrols.menu.rotation_speed") public static double rotationSpeed = 40.0; //used for x-axis, name kept for compatability
     @Entry(name = "midnightcontrols.menu.y_axis_rotation_speed") public static double yAxisRotationSpeed = rotationSpeed;
     @Entry(name = "midnightcontrols.menu.mouse_speed") public static double mouseSpeed = 25.0;
+    @Entry(name = "midnightcontrols.menu.joystick_as_mouse") public static boolean joystickAsMouse = false;
     @Entry(name = "midnightcontrols.menu.unfocused_input") public static boolean unfocusedInput = false;
     @Entry(name = "midnightcontrols.menu.virtual_mouse") public static boolean virtualMouse = false;
     @Entry(name = "midnightcontrols.menu.virtual_mouse.skin") public static VirtualMouseSkin virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
@@ -350,7 +352,7 @@ public class MidnightControlsConfig extends MidnightConfig {
         else if (controller.contains("xbox") || controller.contains("afterglow")) return ControllerType.XBOX;
         else if (controller.contains("steam deck")) return ControllerType.STEAM_DECK;
         else if (controller.contains("steam")) return ControllerType.STEAM_CONTROLLER;
-        else if (controller.contains("dualsense")) return ControllerType.DUALSENSE;
+        else if (controller.contains("dualsense") || controller.contains("ps5")) return ControllerType.DUALSENSE;
         else if (controller.contains("dualshock") || controller.contains("ps4")  || controller.contains("sony")) return ControllerType.DUALSHOCK;
         else if (controller.contains("switch") || controller.contains("joy-con")  || controller.contains("wii") || controller.contains("nintendo")) return ControllerType.SWITCH;
         else if (controller.contains("ouya")) return ControllerType.OUYA;
