@@ -116,7 +116,7 @@ dependencies {
     modImplementation "maven.modrinth:emi:${project.emi_version}"
     modCompileOnlyApi "maven.modrinth:emotecraft:${project.emotecraft_version}"
     modCompileOnlyApi "io.github.kosmx:bendy-lib:${project.bendylib_version}"
-    modCompileOnlyApi "dev.isxander:yet-another-config-lib:${project.yacl_version}"
+    modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
     modCompileOnlyApi "maven.modrinth:inventory-tabs-updated:${project.inventorytabs_version}"
     modCompileOnlyApi "maven.modrinth:bedrockify:${project.bedrockify_version}"
     // Required for Inventory Tabs

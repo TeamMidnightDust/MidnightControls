@@ -92,9 +92,9 @@ public class ButtonBinding {
             .actions(InputHandlers::handleToggleSprint).onlyInGame().register();
     public static final ButtonBinding SWAP_HANDS = new Builder("swap_hands").buttons(GLFW_GAMEPAD_BUTTON_X).onlyInGame().cooldown().register();
     public static final ButtonBinding TAB_LEFT = new Builder("tab_back").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
-            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((client, binding) -> client.currentScreen != null && client.currentScreen.getClass().toString().contains("sodium"))).cooldown().register();
+            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((client, binding) -> client.currentScreen != null)).cooldown().register();
     public static final ButtonBinding TAB_RIGHT = new Builder("tab_next").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
-            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((client, binding) -> client.currentScreen != null && client.currentScreen.getClass().toString().contains("sodium"))).cooldown().register();
+            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((client, binding) -> client.currentScreen != null)).cooldown().register();
     public static final ButtonBinding PAGE_LEFT = new Builder("page_back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
             .action(InputHandlers.handlePage(false)).filter(InputHandlers::inInventory).cooldown(30).register();
     public static final ButtonBinding PAGE_RIGHT = new Builder("page_next").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
