@@ -173,9 +173,9 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
             voxelmapInitDone = true;
         }
         if (lateInitDone) return;
-        if (KeyBindingRegistryImplAccessor.getMODDED_KEY_BINDINGS() == null || KeyBindingRegistryImplAccessor.getMODDED_KEY_BINDINGS().isEmpty()) return;
-        for (int i = 0; i < KeyBindingRegistryImplAccessor.getMODDED_KEY_BINDINGS().size(); ++i) {
-            KeyBinding keyBinding = KeyBindingRegistryImplAccessor.getMODDED_KEY_BINDINGS().get(i);
+        if (KeyBindingRegistryImplAccessor.getModdedKeyBindings() == null || KeyBindingRegistryImplAccessor.getModdedKeyBindings().isEmpty()) return;
+        for (int i = 0; i < KeyBindingRegistryImplAccessor.getModdedKeyBindings().size(); ++i) {
+            KeyBinding keyBinding = KeyBindingRegistryImplAccessor.getModdedKeyBindings().get(i);
             if (!keyBinding.getTranslationKey().contains("midnightcontrols") && !keyBinding.getTranslationKey().contains("ok_zoomer") && !keyBinding.getTranslationKey().contains("okzoomer")) {
                 category = null;
                 InputManager.streamCategories().forEach(buttonCategory -> {

@@ -11,7 +11,6 @@ package eu.midnightdust.midnightcontrols.client.mixin;
 
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemGroups;
 import net.minecraft.screen.slot.Slot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,8 +29,8 @@ public interface CreativeInventoryScreenAccessor {
      * @return the selected tab index
      */
     @Accessor("selectedTab")
-    static ItemGroup getSelectedTab() {
-        return ItemGroups.getDefaultTab();
+    static int getSelectedTab() {
+        return 0;
     }
 
     /**

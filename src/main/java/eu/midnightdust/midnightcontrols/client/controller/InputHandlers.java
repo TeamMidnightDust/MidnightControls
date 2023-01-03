@@ -23,10 +23,6 @@ import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAcce
 import eu.midnightdust.midnightcontrols.client.mixin.RecipeBookWidgetAccessor;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
-import net.fabricmc.fabric.impl.client.itemgroup.CreativeGuiExtensions;
-import net.fabricmc.fabric.impl.client.itemgroup.FabricCreativeGuiComponents;
-import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
-import net.fabricmc.fabric.impl.itemgroup.ItemGroupHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
@@ -36,7 +32,6 @@ import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemGroups;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.MathHelper;
@@ -62,13 +57,6 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
 @SuppressWarnings("UnstableApiUsage")
 public class InputHandlers {
     private InputHandlers() {
-    }
-    private static List<ItemGroup> getVisibleGroups(CreativeInventoryScreen screen) {
-        return ItemGroupHelper.sortedGroups.stream()
-            .filter(itemGroup -> {
-                if (FabricCreativeGuiComponents.COMMON_GROUPS.contains(itemGroup)) return true;
-                return ((CreativeGuiExtensions)screen).fabric_currentPage() == ((FabricItemGroup)itemGroup).getPage() && itemGroup.shouldDisplay() && (!itemGroup.equals(ItemGroups.OPERATOR) || ItemGroups.operatorEnabled);
-            }).toList();
     }
 
     public static PressAction handleHotbar(boolean next) {
@@ -96,31 +84,13 @@ public class InputHandlers {
             } else if (client.currentScreen instanceof RingScreen) {
                 MidnightControlsClient.get().ring.cyclePage(next);
             } else if (client.currentScreen instanceof CreativeInventoryScreenAccessor inventory) {
-                ItemGroup currentTab = CreativeInventoryScreenAccessor.getSelectedTab();
-                int currentColumn = currentTab.getColumn();
-                ItemGroup.Row currentRow = currentTab.getRow();
-                ItemGroup newTab = null;
-                List<ItemGroup> visibleTabs = getVisibleGroups((CreativeInventoryScreen) client.currentScreen);
-                for (ItemGroup tab : visibleTabs) {
-                    if (tab.getRow().equals(currentRow) && ((newTab == null && ((next && tab.getColumn() > currentColumn) ||
-                            (!next && tab.getColumn() < currentColumn))) || (newTab != null && ((next && tab.getColumn() > currentColumn && tab.getColumn() < newTab.getColumn()) ||
-                            (!next && tab.getColumn() < currentColumn && tab.getColumn() > newTab.getColumn())))))
-                        newTab = tab;
-                }
-                if (newTab == null)
-                    for (ItemGroup tab : visibleTabs) {
-                        if ((tab.getRow().compareTo(currentRow)) != 0 && ((next && newTab == null || next && newTab.getColumn() > tab.getColumn()) || (!next && newTab == null) || (!next && newTab.getColumn() < tab.getColumn())))
-                            newTab = tab;
-                    }
-                if (newTab == null) {
-                    for (ItemGroup tab : visibleTabs) {
-                        if ((next && tab.getRow() == ItemGroup.Row.TOP && tab.getColumn() == 0) ||
-                                !next && tab.getRow() == ItemGroup.Row.BOTTOM && (newTab == null || tab.getColumn() > newTab.getColumn()))
-                            newTab = tab;
-                    }
-                }
-                if (newTab == null || newTab.equals(currentTab)) newTab = ItemGroups.getDefaultTab();
-                inventory.midnightcontrols$setSelectedTab(newTab);
+                int currentTab = CreativeInventoryScreenAccessor.getSelectedTab();
+                int nextTab = currentTab + (next ? 1 : -1);
+                if (nextTab < 0)
+                    nextTab = ItemGroup.GROUPS.length - 1;
+                else if (nextTab >= ItemGroup.GROUPS.length)
+                    nextTab = 0;
+                inventory.midnightcontrols$setSelectedTab(ItemGroup.GROUPS[nextTab]);
                 return true;
             } else if (client.currentScreen instanceof InventoryScreen || client.currentScreen instanceof CraftingScreen || client.currentScreen instanceof AbstractFurnaceScreen<?>) {
                 RecipeBookWidget recipeBook;

@@ -38,7 +38,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
-import org.joml.Matrix4f;
+import net.minecraft.util.math.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -299,8 +299,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         this.buildTabs();
 
         this.addDrawableChild(this.resetOption.createWidget(Position.of(this.width / 2 - 155, this.height - 29), 150));
-        this.addDrawableChild(ButtonWidget.builder(SpruceTexts.GUI_DONE, btn -> this.client.setScreen(this.parent))
-                .dimensions(this.width / 2 - 155 + 160, this.height - 29, 150, 20).build());
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, SpruceTexts.GUI_DONE, btn -> this.client.setScreen(this.parent)));
     }
 
     public void buildTabs() {
@@ -449,13 +448,13 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             RenderSystem.enableBlend();
             RenderSystem.disableTexture();
             RenderSystem.defaultBlendFunc();
-            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
             bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             bufferBuilder.vertex(matrix, (float)x1, (float)y2, 0.0F).color(r, g, b, t).next();
             bufferBuilder.vertex(matrix, (float)x2, (float)y2, 0.0F).color(r, g, b, t).next();
             bufferBuilder.vertex(matrix, (float)x2, (float)y1, 0.0F).color(r, g, b, t).next();
             bufferBuilder.vertex(matrix, (float)x1, (float)y1, 0.0F).color(r, g, b, t).next();
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            BufferRenderer.drawWithShader(bufferBuilder.end());
             RenderSystem.enableTexture();
             RenderSystem.disableBlend();
             matrixStack.pop();
