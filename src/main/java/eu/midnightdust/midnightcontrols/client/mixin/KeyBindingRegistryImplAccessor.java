@@ -10,8 +10,10 @@ import java.util.List;
 
 @Mixin(value = KeyBindingRegistryImpl.class, remap = false)
 public interface KeyBindingRegistryImplAccessor {
+
     @Accessor @Final
-    static List<KeyBinding> getModdedKeyBindings() {
+    static List<KeyBinding> getMODDED_KEY_BINDINGS() {
         return null;
     }
+
 }
