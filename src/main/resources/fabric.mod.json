@@ -52,7 +52,7 @@
   ],
   "depends": {
     "fabricloader": ">=0.11.3",
-    "fabric": ">=0.36.0",
+    "fabric": ">=0.71.0",
     "minecraft": "~1.19.3",
     "spruceui": ">=3.2.0",
     "java": ">=17"
