@@ -102,7 +102,9 @@ dependencies {
     }
     include 'org.aperlambda:lambdajcommon:1.8.1'
 
-    modCompileOnlyApi "com.terraformersmc:modmenu:${project.modmenu_version}"
+    modCompileOnlyApi ("com.terraformersmc:modmenu:${project.modmenu_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
 
     // Compatibility mods
 
@@ -110,13 +112,17 @@ dependencies {
     // modImplementation("maven.modrinth:ok-zoomer:${project.ok_zoomer_version}")
     // modImplementation "io.github.ennuil:LibZoomer:${project.libzoomer_version}"
 
-    modCompileOnlyApi "io.github.cottonmc:LibGui:${project.libgui_version}"
+    modCompileOnlyApi ("io.github.cottonmc:LibGui:${project.libgui_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
     modCompileOnlyApi "org.quiltmc:quilt-json5:1.0.0"
     modCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
     modImplementation "maven.modrinth:emi:${project.emi_version}"
     modCompileOnlyApi "maven.modrinth:emotecraft:${project.emotecraft_version}"
     modCompileOnlyApi "io.github.kosmx:bendy-lib:${project.bendylib_version}"
-    modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
+    modImplementation ("dev.isxander:yet-another-config-lib:${project.yacl_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
     modCompileOnlyApi "maven.modrinth:inventory-tabs-updated:${project.inventorytabs_version}"
     modCompileOnlyApi "maven.modrinth:bedrockify:${project.bedrockify_version}"
     // Required for Inventory Tabs

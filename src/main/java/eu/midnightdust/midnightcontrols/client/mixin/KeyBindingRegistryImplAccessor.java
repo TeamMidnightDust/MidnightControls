@@ -12,7 +12,7 @@ import java.util.List;
 public interface KeyBindingRegistryImplAccessor {
 
     @Accessor @Final
-    static List<KeyBinding> getModdedKeyBindings() {
+    static List<KeyBinding> getMODDED_KEY_BINDINGS() {
         return null;
     }
 
