@@ -64,8 +64,8 @@ public final class MidnightRing {
             for (String binding : configBindings) {
                 ButtonBinding buttonBinding = InputManager.getBinding(binding);
                 if (buttonBinding != null) {
-                    RingPage page = this.pages.get(MathHelper.fastFloor(bindingIndex / 8f));
-                    page.actions[bindingIndex - 8 * (MathHelper.fastFloor(bindingIndex / 8f))] = (new ButtonBindingRingAction(buttonBinding));
+                    RingPage page = this.pages.get(MathHelper.floor(bindingIndex / 8f));
+                    page.actions[bindingIndex - 8 * (MathHelper.floor(bindingIndex / 8f))] = (new ButtonBindingRingAction(buttonBinding));
                     ++bindingIndex;
                 }
             }
@@ -88,8 +88,8 @@ public final class MidnightRing {
 
             for (ButtonBinding buttonBinding : unboundBindings) {
                 if (buttonBinding != null) {
-                    RingPage page = this.pages.get(MathHelper.fastFloor(bindingIndex / 8f));
-                    page.actions[bindingIndex - 8 * (MathHelper.fastFloor(bindingIndex / 8f))] = (new ButtonBindingRingAction(buttonBinding));
+                    RingPage page = this.pages.get(MathHelper.floor(bindingIndex / 8f));
+                    page.actions[bindingIndex - 8 * (MathHelper.floor(bindingIndex / 8f))] = (new ButtonBindingRingAction(buttonBinding));
                     ++bindingIndex;
                 }
             }

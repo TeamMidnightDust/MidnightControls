@@ -327,15 +327,13 @@ public class MidnightInput {
                     && (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP || button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN
                     || button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT || button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT)) {
                 if (this.actionGuiCooldown == 0) {
-                    if (MidnightControlsConfig.arrowScreens.contains(client.currentScreen.getClass().getCanonicalName())) {
-                        switch (button) {
-                            case GLFW_GAMEPAD_BUTTON_DPAD_UP -> pressKeyboardKey(client, GLFW.GLFW_KEY_UP);
-                            case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> pressKeyboardKey(client, GLFW.GLFW_KEY_DOWN);
-                            case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> pressKeyboardKey(client, GLFW.GLFW_KEY_LEFT);
-                            case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> pressKeyboardKey(client, GLFW.GLFW_KEY_RIGHT);
-                        }
+                    switch (button) {
+                        case GLFW_GAMEPAD_BUTTON_DPAD_UP -> pressKeyboardKey(client, GLFW.GLFW_KEY_UP);
+                        case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> pressKeyboardKey(client, GLFW.GLFW_KEY_DOWN);
+                        case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> pressKeyboardKey(client, GLFW.GLFW_KEY_LEFT);
+                        case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> pressKeyboardKey(client, GLFW.GLFW_KEY_RIGHT);
                     }
-                    else if (MidnightControlsConfig.wasdScreens.contains(client.currentScreen.getClass().getCanonicalName())) {
+                    if (MidnightControlsConfig.wasdScreens.contains(client.currentScreen.getClass().getCanonicalName())) {
                         switch (button) {
                             case GLFW_GAMEPAD_BUTTON_DPAD_UP -> pressKeyboardKey(client, GLFW.GLFW_KEY_W);
                             case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> pressKeyboardKey(client, GLFW.GLFW_KEY_S);
@@ -343,11 +341,11 @@ public class MidnightInput {
                             case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> pressKeyboardKey(client, GLFW.GLFW_KEY_D);
                         }
                     }
-                    else if (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP) {
-                        this.changeFocus(client.currentScreen, NavigationDirection.UP);
-                    } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN) {
-                        this.changeFocus(client.currentScreen, NavigationDirection.DOWN);
-                    } else this.handleLeftRight(client.currentScreen, button != GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT);
+//                    else if (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP) {
+//                        this.changeFocus(client.currentScreen, NavigationDirection.UP);
+//                    } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN) {
+//                        this.changeFocus(client.currentScreen, NavigationDirection.DOWN);
+//                    } else this.handleLeftRight(client.currentScreen, button != GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT);
                 }
                 return;
             }
@@ -425,6 +423,9 @@ public class MidnightInput {
     }
     public void pressKeyboardKey(MinecraftClient client, int key) {
         client.keyboard.onKey(client.getWindow().getHandle(), key, 0, 1, 0);
+    }
+    public void pressKeyboardKey(Screen screen, int key) {
+        screen.keyPressed(key, 0, 1);
     }
     /**
 
@@ -732,7 +733,7 @@ public class MidnightInput {
             this.actionGuiCooldown = 2; // Prevent to press too quickly the focused element, so we have to skip 5 ticks.
             return false;
         } else if (element instanceof AlwaysSelectedEntryListWidget) {
-            ((EntryListWidgetAccessor) element).midnightcontrols$moveSelection(right ? EntryListWidget.MoveDirection.DOWN : EntryListWidget.MoveDirection.UP);
+            //TODO((EntryListWidgetAccessor) element).midnightcontrols$moveSelection(right ? EntryListWidget.MoveDirection.DOWN : EntryListWidget.MoveDirection.UP);
             return false;
         } else if (element instanceof ParentElement entryList) {
             var focused = entryList.getFocused();
@@ -783,76 +784,13 @@ public class MidnightInput {
             }
             if (FabricLoader.getInstance().isModLoaded("sodium"))
                 SodiumCompat.handleInput(screen, direction.isLookingForward());
-            // This still needs some work
-//            ScreenAccessor accessor = (ScreenAccessor) screen;
-//            if (accessor.getSelected() != null && accessor.getSelected() instanceof ClickableWidget selected && accessor.getSelectables() != null) {
-//                //System.out.println(direction);
-//                if (accessor.getSelectables().size() >= 2) {
-//                    //System.out.println(direction + " 2");
-//                    int xDifference = Integer.MAX_VALUE;
-//                    int yDifference = Integer.MAX_VALUE;
-//                    ClickableWidget newWidget = null;
-//                    for (int i = 0; i < accessor.getSelectables().size(); ++i) {
-//                        if (accessor.getSelectables().get(i) instanceof ClickableWidget candidate) {
-//                            if (!(candidate.x == selected.x && candidate.y == selected.y)) {
-//                                int canXDifference = Math.abs(candidate.x - selected.x);
-//                                int canYDifference = Math.abs(candidate.y - selected.y);
-//                                if (direction.isHorizontal()) {
-//                                    if (direction.isLookingForward()) {
-//                                        if (candidate.x >= selected.x && canYDifference <= yDifference && canXDifference <= xDifference) {
-//                                            System.out.println(direction + " forward horizontal " + candidate);
-//                                            newWidget = candidate;
-//                                            xDifference = canXDifference;
-//                                            yDifference = canYDifference;
-//                                        }
-//                                    } else {
-//                                        if (candidate.x <= selected.x && canYDifference <= yDifference && canXDifference >= xDifference) {
-//                                            System.out.println(direction + " backward horizontal " + candidate);
-//                                            newWidget = candidate;
-//                                            xDifference = canXDifference;
-//                                            yDifference = canYDifference;
-//                                        }
-//                                    }
-//                                } else {
-//                                    if (direction.isLookingForward()) {
-//                                        if (candidate.y >= selected.y && canYDifference <= yDifference && canXDifference <= xDifference) {
-//                                            System.out.println(direction + " forward vertical " + candidate);
-//                                            newWidget = candidate;
-//                                            xDifference = canXDifference;
-//                                            yDifference = canYDifference;
-//                                        }
-//                                    } else {
-//                                        if (candidate.y <= selected.y && canYDifference >= yDifference && canXDifference <= xDifference) {
-//                                            System.out.println(direction + " backward vertical " + candidate);
-//                                            newWidget = candidate;
-//                                            xDifference = canXDifference;
-//                                            yDifference = canYDifference;
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                    if (newWidget != null)  {
-//                        //selected.changeFocus(true);
-//                        ((ClickableWidgetAccessor) selected).setFocused(false);
-//                        ((ClickableWidgetAccessor) newWidget).setFocused(true);
-//                        screen.setFocused(newWidget);
-//                        screen.changeFocus(false);
-//                        screen.changeFocus(true);
-//                        this.actionGuiCooldown = 5;
-//                        return true;
-//                    }
-//
-//                }
-//            }
-            if (!screen.changeFocus(direction.isLookingForward())) {
-                if (screen.changeFocus(direction.isLookingForward())) {
-                    this.actionGuiCooldown = 5;
-                    return false;
+            else {
+                switch (direction) {
+                    case UP -> pressKeyboardKey(screen, GLFW.GLFW_KEY_UP);
+                    case DOWN -> pressKeyboardKey(screen, GLFW.GLFW_KEY_DOWN);
+                    case LEFT -> pressKeyboardKey(screen, GLFW.GLFW_KEY_LEFT);
+                    case RIGHT -> pressKeyboardKey(screen, GLFW.GLFW_KEY_RIGHT);
                 }
-                return true;
-            } else {
                 this.actionGuiCooldown = 5;
                 return false;
             }

@@ -424,7 +424,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
 
     @Override
     public void renderTitle(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        drawCenteredText(matrices, this.textRenderer, I18n.translate("midnightcontrols.menu.title"), this.width / 2, 8, 16777215);
+        drawCenteredTextWithShadow(matrices, this.textRenderer, I18n.translate("midnightcontrols.menu.title"), this.width / 2, 8, 16777215);
     }
 
     public static class MidnightControlsBackground implements Background {
@@ -447,7 +447,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             float t = (float)(transparency) / 255.0F;
             BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
             RenderSystem.enableBlend();
-            RenderSystem.disableTexture();
+            //RenderSystem.enableColorLogicOp();//.disableTexture();
             RenderSystem.defaultBlendFunc();
             RenderSystem.setShader(GameRenderer::getPositionColorProgram);
             bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
@@ -456,7 +456,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             bufferBuilder.vertex(matrix, (float)x2, (float)y1, 0.0F).color(r, g, b, t).next();
             bufferBuilder.vertex(matrix, (float)x1, (float)y1, 0.0F).color(r, g, b, t).next();
             BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-            RenderSystem.enableTexture();
+            //RenderSystem.enableColorLogicOp();//enableTexture
             RenderSystem.disableBlend();
             matrixStack.pop();
         }

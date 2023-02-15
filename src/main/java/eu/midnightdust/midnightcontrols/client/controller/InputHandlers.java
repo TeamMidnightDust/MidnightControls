@@ -67,7 +67,7 @@ public class InputHandlers {
         return ItemGroupHelper.sortedGroups.stream()
             .filter(itemGroup -> {
                 if (FabricCreativeGuiComponents.COMMON_GROUPS.contains(itemGroup)) return true;
-                return ((CreativeGuiExtensions)screen).fabric_currentPage() == ((FabricItemGroup)itemGroup).getPage() && itemGroup.shouldDisplay() && (!itemGroup.equals(ItemGroups.OPERATOR) || ItemGroups.operatorEnabled);
+                return ((CreativeGuiExtensions)screen).fabric_currentPage() == ((FabricItemGroup)itemGroup).getPage() && itemGroup.shouldDisplay();
             }).toList();
     }
 

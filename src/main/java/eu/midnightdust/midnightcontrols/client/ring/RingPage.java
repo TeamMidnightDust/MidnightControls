@@ -58,7 +58,7 @@ public class RingPage extends DrawableHelper {
     public void render(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int width, int height, int mouseX, int mouseY, float tickDelta) {
         int centerX = width / 2;
         int centerY = height / 2;
-        if (MidnightControlsClient.get().ring.getMaxPages() > 1) drawCenteredText(matrices, textRenderer, name, centerX, 5, 0xffffff);
+        if (MidnightControlsClient.get().ring.getMaxPages() > 1) drawCenteredTextWithShadow(matrices, textRenderer, name, centerX, 5, 0xffffff);
 
         int offset = MidnightRing.ELEMENT_SIZE + (MidnightRing.ELEMENT_SIZE / 2) + 5;
 

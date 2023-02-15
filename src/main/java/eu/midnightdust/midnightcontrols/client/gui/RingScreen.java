@@ -65,18 +65,18 @@ public class RingScreen extends Screen {
         RingPage.selected = -1;
         this.removed();
     }
-    @Override
-    public boolean changeFocus(boolean lookForwards) {
-        if (lookForwards) {
-            if (RingPage.selected < 7) ++RingPage.selected;
-            else RingPage.selected = -1;
-        }
-        else  {
-            if (RingPage.selected > -1) --RingPage.selected;
-            else RingPage.selected = 7;
-        }
-        return true;
-    }
+//    @Override
+//    public boolean changeFocus(boolean lookForwards) {
+//        if (lookForwards) {
+//            if (RingPage.selected < 7) ++RingPage.selected;
+//            else RingPage.selected = -1;
+//        }
+//        else  {
+//            if (RingPage.selected > -1) --RingPage.selected;
+//            else RingPage.selected = 7;
+//        }
+//        return true;
+//    }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {

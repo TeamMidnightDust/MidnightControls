@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.0-SNAPSHOT'
+    id 'fabric-loom' version '1.1-SNAPSHOT'
     id 'java-library'
     id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
@@ -78,6 +78,9 @@ repositories {
     maven { url 'https://jitpack.io' }
     maven { url "https://api.modrinth.com/maven" }
     maven { url 'https://maven.quiltmc.org/repository/release'}
+    flatDir {
+        dirs "localMaven"
+    }
 }
 
 configurations {
@@ -113,10 +116,10 @@ dependencies {
     modCompileOnlyApi "io.github.cottonmc:LibGui:${project.libgui_version}"
     modCompileOnlyApi "org.quiltmc:quilt-json5:1.0.0"
     modCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
-    modImplementation "maven.modrinth:emi:${project.emi_version}"
+    modCompileOnlyApi "maven.modrinth:emi:${project.emi_version}"
     modCompileOnlyApi "maven.modrinth:emotecraft:${project.emotecraft_version}"
     modCompileOnlyApi "io.github.kosmx:bendy-lib:${project.bendylib_version}"
-    modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
+    modCompileOnlyApi "dev.isxander:yet-another-config-lib:${project.yacl_version}"
     modCompileOnlyApi "maven.modrinth:inventory-tabs-updated:${project.inventorytabs_version}"
     modCompileOnlyApi "maven.modrinth:bedrockify:${project.bedrockify_version}"
     // Required for Inventory Tabs

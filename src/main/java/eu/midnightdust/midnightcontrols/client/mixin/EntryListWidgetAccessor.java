@@ -9,12 +9,13 @@
 
 package eu.midnightdust.midnightcontrols.client.mixin;
 
+import net.minecraft.client.gui.navigation.NavigationDirection;
 import net.minecraft.client.gui.widget.EntryListWidget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(EntryListWidget.class)
 public interface EntryListWidgetAccessor {
-    @Invoker("moveSelection")
-    void midnightcontrols$moveSelection(EntryListWidget.MoveDirection direction);
+    //@Invoker("getNeighbouringEntry")
+    //void midnightcontrols$getNeighbouringEntry(NavigationDirection direction);
 }

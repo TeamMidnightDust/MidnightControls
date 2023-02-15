@@ -24,7 +24,7 @@ public abstract class ChatScreenMixin extends Screen {
     private void midnightcontrols$moveInputField(CallbackInfo ci) {
         if (MidnightControlsConfig.moveChat) chatField.setY(4);
     }
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/TextFieldWidget;setTextFieldFocused(Z)V", shift = At.Shift.AFTER))
+    @Inject(method = "render", at = @At("HEAD"))
     private void midnightcontrols$moveInputFieldBackground(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (MidnightControlsConfig.moveChat) matrices.translate(0f, -this.height + 16, 0f);
     }
