@@ -428,16 +428,16 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     }
 
     public static class MidnightControlsBackground implements Background {
-        private int transparency = 160;
+        private static int transparency = 160;
         public MidnightControlsBackground() {}
         public MidnightControlsBackground(int transparency) {
-            this.transparency = transparency;
+            MidnightControlsBackground.transparency = transparency;
         }
         @Override
         public void render(MatrixStack matrixStack, SpruceWidget widget, int vOffset, int mouseX, int mouseY, float delta) {
             fill(matrixStack, widget.getX(), widget.getY(), widget.getX() + widget.getWidth(), widget.getY() + widget.getHeight(), MidnightColorUtil.hex2Rgb("#000000"));
         }
-        private void fill(MatrixStack matrixStack, int x2, int y2, int x1, int y1, Color color) {
+        private static void fill(MatrixStack matrixStack, int x2, int y2, int x1, int y1, Color color) {
             matrixStack.push();
 
             Matrix4f matrix = matrixStack.peek().getPositionMatrix();
@@ -447,7 +447,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             float t = (float)(transparency) / 255.0F;
             BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
             RenderSystem.enableBlend();
-            //RenderSystem.enableColorLogicOp();//.disableTexture();
             RenderSystem.defaultBlendFunc();
             RenderSystem.setShader(GameRenderer::getPositionColorProgram);
             bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
@@ -456,7 +455,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             bufferBuilder.vertex(matrix, (float)x2, (float)y1, 0.0F).color(r, g, b, t).next();
             bufferBuilder.vertex(matrix, (float)x1, (float)y1, 0.0F).color(r, g, b, t).next();
             BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-            //RenderSystem.enableColorLogicOp();//enableTexture
             RenderSystem.disableBlend();
             matrixStack.pop();
         }

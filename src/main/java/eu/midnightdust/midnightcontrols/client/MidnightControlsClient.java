@@ -144,6 +144,11 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
     public void onMcInit(@NotNull MinecraftClient client) {
         ButtonBinding.init(client.options);
         MidnightControlsConfig.load();
+        if (MidnightControlsConfig.configVersion < 2) {
+            MidnightControlsConfig.mouseScreens.remove("me.jellysquid.mods.sodium.client.gui");
+            MidnightControlsConfig.mouseScreens.remove("net.coderbot.iris.gui");
+            MidnightControlsConfig.write("midnightcontrols");
+        }
         this.hud.setVisible(MidnightControlsConfig.hudEnable);
         Controller.updateMappings();
         GLFW.glfwSetJoystickCallback((jid, event) -> {

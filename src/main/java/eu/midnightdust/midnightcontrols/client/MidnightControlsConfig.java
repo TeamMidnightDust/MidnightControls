@@ -33,58 +33,61 @@ import static org.lwjgl.glfw.GLFW.*;
  */
 public class MidnightControlsConfig extends MidnightConfig {
     public static boolean isEditing = false;
-    @Hidden @Entry public static int configVersion = 1;
+    @Hidden @Entry public static int configVersion = 2;
     // General
-    @Entry(name = "midnightcontrols.menu.controls_mode") public static ControlsMode controlsMode = ControlsMode.DEFAULT;
-    @Entry(name = "midnightcontrols.menu.auto_switch_mode") public static boolean autoSwitchMode = true;
-    @Entry(name = "Debug") public static boolean debug = false;
+    @Entry(category = "controller", name = "midnightcontrols.menu.controls_mode") public static ControlsMode controlsMode = ControlsMode.DEFAULT;
+    @Entry(category = "controller", name = "midnightcontrols.menu.auto_switch_mode") public static boolean autoSwitchMode = true;
+    @Entry(category = "misc", name = "Debug") public static boolean debug = false;
     // HUD
-    @Entry(name = "midnightcontrols.menu.hud_enable") public static boolean hudEnable = true;
-    @Entry(name = "midnightcontrols.menu.hud_side") public static HudSide hudSide = HudSide.LEFT;
-    @Entry(name = "midnightcontrols.menu.move_chat") public static boolean moveChat = false;
+    @Entry(category = "visual", name = "midnightcontrols.menu.hud_enable") public static boolean hudEnable = true;
+    @Entry(category = "visual", name = "midnightcontrols.menu.hud_side") public static HudSide hudSide = HudSide.LEFT;
+    @Entry(category = "screens", name = "midnightcontrols.menu.move_chat") public static boolean moveChat = false;
     // Gameplay
-    @Entry(name = "midnightcontrols.menu.analog_movement") public static boolean analogMovement = true;
-    @Entry(name = "midnightcontrols.menu.double_tap_to_sprint") public static boolean doubleTapToSprint = true;
-    @Entry(name = "midnightcontrols.menu.controller_toggle_sneak") public static boolean controllerToggleSneak = MinecraftClient.getInstance().options.getSneakToggled().getValue();
-    @Entry(name = "midnightcontrols.menu.controller_toggle_sprint") public static boolean controllerToggleSprint = MinecraftClient.getInstance().options.getSprintToggled().getValue();
-    @Entry(name = "midnightcontrols.menu.fast_block_placing") public static boolean fastBlockPlacing = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
-    @Entry(name = "midnightcontrols.menu.fly_drifting") public static boolean flyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers. It can also conflict with some other mods.
-    @Entry(name = "midnightcontrols.menu.fly_drifting_vertical") public static boolean verticalFlyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers.
-    @Entry(name = "midnightcontrols.menu.reacharound.horizontal") public static boolean horizontalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
-    @Entry(name = "midnightcontrols.menu.reacharound.vertical") public static boolean verticalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
-    @Entry(name = "Reacharound Outline") public static boolean shouldRenderReacharoundOutline = true;
-    @Entry(name = "Reacharound Outline Color (WIP)", isColor = true) public static String reacharoundOutlineColorHex = "#ffffff";
-    @Entry(name = "Reacharound Outline Alpha", min = 0, max = 255) public static int reacharoundOutlineColorAlpha = 102;
-    @Entry(name = "midnightcontrols.menu.right_dead_zone") public static double rightDeadZone = 0.25;
-    @Entry(name = "midnightcontrols.menu.left_dead_zone") public static double leftDeadZone = 0.25;
-    @Entry(name = "midnightcontrols.menu.invert_right_y_axis") public static boolean invertRightYAxis = false;
-    @Entry(name = "midnightcontrols.menu.invert_right_x_axis") public static boolean invertRightXAxis = false;
-    @Entry(name = "midnightcontrols.menu.rotation_speed") public static double rotationSpeed = 40.0; //used for x-axis, name kept for compatability
-    @Entry(name = "midnightcontrols.menu.y_axis_rotation_speed") public static double yAxisRotationSpeed = rotationSpeed;
-    @Entry(name = "midnightcontrols.menu.mouse_speed") public static double mouseSpeed = 25.0;
-    @Entry(name = "midnightcontrols.menu.joystick_as_mouse") public static boolean joystickAsMouse = false;
-    @Entry(name = "midnightcontrols.menu.unfocused_input") public static boolean unfocusedInput = false;
-    @Entry(name = "midnightcontrols.menu.virtual_mouse") public static boolean virtualMouse = false;
-    @Entry(name = "midnightcontrols.menu.virtual_mouse.skin") public static VirtualMouseSkin virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
-    @Entry(name = "Controller ID") public static Object controllerID = 0;
-    @Entry(name = "2nd Controller ID") public static Object secondControllerID = -1;
-    @Entry(name = "midnightcontrols.menu.controller_type") public static ControllerType controllerType = ControllerType.DEFAULT;
-    @Entry(name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui",
-            "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375",
+    @Entry(category = "gameplay", name = "midnightcontrols.menu.analog_movement") public static boolean analogMovement = true;
+    @Entry(category = "gameplay", name = "midnightcontrols.menu.double_tap_to_sprint") public static boolean doubleTapToSprint = true;
+    @Entry(category = "gameplay", name = "midnightcontrols.menu.controller_toggle_sneak") public static boolean controllerToggleSneak = MinecraftClient.getInstance().options.getSneakToggled().getValue();
+    @Entry(category = "gameplay", name = "midnightcontrols.menu.controller_toggle_sprint") public static boolean controllerToggleSprint = MinecraftClient.getInstance().options.getSprintToggled().getValue();
+    @Entry(category = "gameplay", name = "midnightcontrols.menu.fast_block_placing") public static boolean fastBlockPlacing = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
+    @Entry(category = "gameplay", name = "midnightcontrols.menu.fly_drifting") public static boolean flyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers. It can also conflict with some other mods.
+    @Entry(category = "gameplay", name = "midnightcontrols.menu.fly_drifting_vertical") public static boolean verticalFlyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers.
+    @Entry(category = "gameplay", name = "midnightcontrols.menu.reacharound.horizontal") public static boolean horizontalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
+    @Entry(category = "gameplay", name = "midnightcontrols.menu.reacharound.vertical") public static boolean verticalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
+    @Entry(category = "visual", name = "Reacharound Outline") public static boolean shouldRenderReacharoundOutline = true;
+    @Entry(category = "visual", name = "Reacharound Outline Color", isColor = true) public static String reacharoundOutlineColorHex = "#ffffff";
+    @Entry(category = "visual", name = "Reacharound Outline Alpha", isSlider = true, min = 0, max = 255) public static int reacharoundOutlineColorAlpha = 102;
+    @Entry(category = "controller", name = "midnightcontrols.menu.right_dead_zone", isSlider = true, min = 0.05, max = 1) public static double rightDeadZone = 0.25;
+    @Entry(category = "controller", name = "midnightcontrols.menu.left_dead_zone", isSlider = true, min = 0.05, max = 1) public static double leftDeadZone = 0.25;
+    @Entry(category = "controller", name = "midnightcontrols.menu.invert_right_y_axis") public static boolean invertRightYAxis = false;
+    @Entry(category = "controller", name = "midnightcontrols.menu.invert_right_x_axis") public static boolean invertRightXAxis = false;
+    @Entry(category = "controller", name = "midnightcontrols.menu.rotation_speed", isSlider = true, min = 0, max = 100, precision = 10) public static double rotationSpeed = 40.0; //used for x-axis, name kept for compatibility
+    @Entry(category = "controller", name = "midnightcontrols.menu.y_axis_rotation_speed", isSlider = true, min = 0, max = 100, precision = 10) public static double yAxisRotationSpeed = rotationSpeed;
+    @Entry(category = "screens", name = "midnightcontrols.menu.mouse_speed", isSlider = true, min = 0, max = 150, precision = 10) public static double mouseSpeed = 25.0;
+    @Entry(category = "screens", name = "midnightcontrols.menu.joystick_as_mouse") public static boolean joystickAsMouse = false;
+    @Entry(category = "controller", name = "midnightcontrols.menu.unfocused_input") public static boolean unfocusedInput = false;
+    @Entry(category = "screens", name = "midnightcontrols.menu.virtual_mouse") public static boolean virtualMouse = false;
+    @Entry(category = "screens", name = "midnightcontrols.menu.virtual_mouse.skin") public static VirtualMouseSkin virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
+    @Entry(category = "controller", name = "Controller ID") @Hidden public static Object controllerID = 0;
+    @Entry(category = "controller", name = "2nd Controller ID") @Hidden public static Object secondControllerID = -1;
+    @Entry(category = "visual", name = "midnightcontrols.menu.controller_type") public static ControllerType controllerType = ControllerType.DEFAULT;
+    @Entry(category = "screens", name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375",
             "net.minecraft.class_457", "net.minecraft.class_408", "net.minecraft.class_3872", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen",
             "hardcorequesting.client.interfaces.GuiQuestBook", "hardcorequesting.client.interfaces.GuiReward", "hardcorequesting.client.interfaces.EditTrackerScreen",
             "me.shedaniel.clothconfig2.gui.ClothConfigScreen", "com.mamiyaotaru.voxelmap.gui.GuiWaypoints", "com.mamiyaotaru.voxelmap.gui.GuiPersistentMap");
-    @Entry(name = "Arrow screens") public static List<String> arrowScreens = Lists.newArrayList(ChatScreen.class.getCanonicalName());
-    @Entry(name = "WASD screens") public static List<String> wasdScreens = Lists.newArrayList("com.ultreon.devices.core.Laptop");
-    @Entry(name = "Keybindings") public static Map<String, String> BINDING = new HashMap<>();
+    @Entry(category = "screens", name = "Arrow screens") public static List<String> arrowScreens = Lists.newArrayList(ChatScreen.class.getCanonicalName());
+    @Entry(category = "screens", name = "WASD screens") public static List<String> wasdScreens = Lists.newArrayList("com.ultreon.devices.core.Laptop");
+    @Entry @Hidden public static Map<String, String> BINDING = new HashMap<>();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
-    @Entry(name = "Max analog values") public static double[] maxAnalogValues = new double[]{1, 1, 1, 1};
-    @Entry(name = "Trigger button fix") public static boolean triggerFix = true;
-    @Entry(name = "Enable Hints") public static boolean enableHints = true;
-    @Entry(name = "Enable Shortcut in Controls Options") public static boolean shortcutInControls = true;
-    @Entry(name = "Ring Bindings (WIP)") public static List<String> ringBindings = new ArrayList<>();
-    @Entry(name = "Ignored Unbound Keys") public static List<String> ignoredUnboundKeys = Lists.newArrayList("inventorytabs.key.next_tab");
+    @Deprecated @Hidden @Entry public static double[] maxAnalogValues = new double[]{1, 1, 1, 1};
+    @Entry(category = "controller", name = "Max analog value: Left X", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueLeftX = maxAnalogValues[0];
+    @Entry(category = "controller", name = "Max analog value: Left Y", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueLeftY = maxAnalogValues[1];
+    @Entry(category = "controller", name = "Max analog value: Right X", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightX = maxAnalogValues[2];
+    @Entry(category = "controller", name = "Max analog value: Right Y", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightY = maxAnalogValues[3];
+    @Entry(category = "controller", name = "Trigger button fix") public static boolean triggerFix = true;
+    @Entry(category = "gameplay", name = "Enable Hints") public static boolean enableHints = true;
+    @Entry(category = "screens", name = "Enable Shortcut in Controls Options") public static boolean shortcutInControls = true;
+    @Entry(category = "misc", name = "Ring Bindings (WIP)") public static List<String> ringBindings = new ArrayList<>();
+    @Entry(category = "misc", name = "Ignored Unbound Keys") public static List<String> ignoredUnboundKeys = Lists.newArrayList("inventorytabs.key.next_tab");
     @Entry @Hidden public static Map<String, Map<String, String>> controllerBindingProfiles = new HashMap<>();
     private static Map<String, String> currentBindingProfile = new HashMap<>();
     private static Controller prevController;
@@ -198,14 +201,21 @@ public class MidnightControlsConfig extends MidnightConfig {
     }
 
     public static double getAxisMaxValue(int axis) {
-        if (axis >= MidnightControlsConfig.maxAnalogValues.length)
-            return 1;
-        return MidnightControlsConfig.maxAnalogValues[axis];
+        return switch (axis) {
+            case GLFW_GAMEPAD_AXIS_LEFT_X -> MidnightControlsConfig.maxAnalogValueLeftX;
+            case GLFW_GAMEPAD_AXIS_LEFT_Y -> MidnightControlsConfig.maxAnalogValueLeftY;
+            case GLFW_GAMEPAD_AXIS_RIGHT_X -> MidnightControlsConfig.maxAnalogValueRightX;
+            default -> MidnightControlsConfig.maxAnalogValueRightY;
+        };
     }
 
     public static void setAxisMaxValue(int axis, double value) {
-        if (axis < MidnightControlsConfig.maxAnalogValues.length)
-            MidnightControlsConfig.maxAnalogValues[axis] = value;
+        switch (axis) {
+            case GLFW_GAMEPAD_AXIS_LEFT_X -> MidnightControlsConfig.maxAnalogValueLeftX = value;
+            case GLFW_GAMEPAD_AXIS_LEFT_Y -> MidnightControlsConfig.maxAnalogValueLeftY = value;
+            case GLFW_GAMEPAD_AXIS_RIGHT_X -> MidnightControlsConfig.maxAnalogValueRightX = value;
+            default -> MidnightControlsConfig.maxAnalogValueRightY = value;
+        };
     }
 
     /**
@@ -330,9 +340,12 @@ public class MidnightControlsConfig extends MidnightConfig {
         controllerID = 0;
         secondControllerID = -1;
         controllerType = ControllerType.DEFAULT;
-        mouseScreens = Lists.newArrayList("me.jellysquid.mods.sodium.client.gui", "net.coderbot.iris.gui", "net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "net.minecraft.class_3872", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen", "me.shedaniel.clothconfig2.gui.ClothConfigScreen", "com.mamiyaotaru.voxelmap.gui.GuiWaypoints", "com.mamiyaotaru.voxelmap.gui.GuiPersistentMap");
+        mouseScreens = Lists.newArrayList("net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "net.minecraft.class_3872", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen", "me.shedaniel.clothconfig2.gui.ClothConfigScreen", "com.mamiyaotaru.voxelmap.gui.GuiWaypoints", "com.mamiyaotaru.voxelmap.gui.GuiPersistentMap");
         BINDING = new HashMap<>();
-        maxAnalogValues = new double[]{1, 1, 1, 1};
+        maxAnalogValueLeftX = 1;
+        maxAnalogValueLeftY = 1;
+        maxAnalogValueRightX = 1;
+        maxAnalogValueRightY = 1;
         triggerFix = true;
         enableHints = true;
         shortcutInControls = true;

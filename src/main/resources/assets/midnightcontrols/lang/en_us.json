@@ -203,5 +203,10 @@
   "midnightcontrols.virtual_mouse.skin.default_dark": "Default Dark",
   "midnightcontrols.virtual_mouse.skin.second_light": "Second Light",
   "midnightcontrols.virtual_mouse.skin.second_dark": "Second Dark",
+  "midnightcontrols.midnightconfig.category.controller": "Controller",
+  "midnightcontrols.midnightconfig.category.misc": "Miscellaneous",
+  "midnightcontrols.midnightconfig.category.screens": "Screens",
+  "midnightcontrols.midnightconfig.category.gameplay": "Gameplay",
+  "midnightcontrols.midnightconfig.category.visual": "Visual",
   "modmenu.descriptionTranslation.midnightcontrols": "Adds controller support and enhanced controls overall.\nForked from LambdaControls, which sadly got discontinued."
 }

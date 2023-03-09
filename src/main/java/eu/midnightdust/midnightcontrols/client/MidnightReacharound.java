@@ -130,7 +130,7 @@ public class MidnightReacharound {
             } else {
                 this.onSlab = false;
             }
-            var targetPos = new BlockPos(client.crosshairTarget.getPos()).subtract(playerPos);
+            var targetPos = BlockPos.ofFloored(client.crosshairTarget.getPos()).subtract(playerPos);
             var vector = new BlockPos.Mutable(MathHelper.clamp(targetPos.getX(), -1, 1), 0, MathHelper.clamp(targetPos.getZ(), -1, 1));
             var blockPos = playerPos.add(vector);
 
