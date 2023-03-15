@@ -30,7 +30,7 @@ public class MidnightControlsMixinPlugin implements IMixinConfigPlugin {
     private final HashMap<String, Boolean> conditionalMixins = new HashMap<>();
 
     public MidnightControlsMixinPlugin() {
-        this.putConditionalMixin("SodiumOptionsGUIAccessor", FabricLoader.getInstance().isModLoaded("sodium"));
+        //this.putConditionalMixin("SodiumOptionsGUIAccessor", FabricLoader.getInstance().isModLoaded("sodium"));
     }
 
     private void putConditionalMixin(@NotNull String path, boolean condition) {

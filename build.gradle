@@ -97,7 +97,9 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation "dev.lambdaurora:spruceui:${project.spruceui_version}"
+    modImplementation ("dev.lambdaurora:spruceui:${project.spruceui_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
     include "dev.lambdaurora:spruceui:${project.spruceui_version}"
     api('org.aperlambda:lambdajcommon:1.8.1') {
         exclude group: 'com.google.code.gson'
@@ -105,7 +107,9 @@ dependencies {
     }
     include 'org.aperlambda:lambdajcommon:1.8.1'
 
-    modCompileOnlyApi "com.terraformersmc:modmenu:${project.modmenu_version}"
+    modCompileOnlyApi ("com.terraformersmc:modmenu:${project.modmenu_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
 
     // Compatibility mods
 

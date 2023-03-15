@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.controller;
 
+import com.google.common.collect.Lists;
 import eu.midnightdust.midnightcontrols.client.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
@@ -21,6 +22,7 @@ import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.mixin.AdvancementsScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.RecipeBookWidgetAccessor;
+import eu.midnightdust.midnightcontrols.client.mixin.TabNavigationWidgetAccessor;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
 import net.fabricmc.fabric.impl.client.itemgroup.CreativeGuiExtensions;
@@ -33,7 +35,9 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
+import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.widget.PressableWidget;
+import net.minecraft.client.gui.widget.TabNavigationWidget;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
@@ -161,6 +165,18 @@ public class InputHandlers {
                     }
                 }
                 return true;
+            } else if (client.currentScreen != null && client.currentScreen.children().stream().anyMatch(e -> e instanceof TabNavigationWidget)) {
+                Lists.newCopyOnWriteArrayList(client.currentScreen.children()).stream().anyMatch(e -> {
+                    if (e instanceof TabNavigationWidget tabs) {
+                        TabNavigationWidgetAccessor accessor = (TabNavigationWidgetAccessor) tabs;
+                        if (next ? accessor.getCurrentTabIndex()+1 < accessor.getTabs().size() : accessor.getCurrentTabIndex() > 0) {
+                            if (next) tabs.selectTab(accessor.getCurrentTabIndex() + 1, true);
+                            else tabs.selectTab(accessor.getCurrentTabIndex() - 1, true);
+                            return true;
+                        }
+                    }
+                    return false;
+                });
             } else {
                 if (FabricLoader.getInstance().isModLoaded("sodium"))
                     SodiumCompat.handleTabs(client.currentScreen, next);
@@ -174,31 +190,20 @@ public class InputHandlers {
     public static PressAction handlePage(boolean next) {
         return (client, button, value, action) -> {
             if (client.currentScreen instanceof CreativeInventoryScreen) {
-                var screen = (HandledScreenAccessor) client.currentScreen;
                 try {
-                    if (next) {
-                        return client.currentScreen.children().stream().filter(element -> element instanceof PressableWidget)
-                                .map(element -> (PressableWidget) element)
-                                .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
-                                .anyMatch(element -> {
-                                    if (element.getMessage().getString().equals(">")) {
-                                        element.onPress();
-                                        return true;
-                                    }
-                                    return false;
-                                });
-                    } else {
-                        return client.currentScreen.children().stream().filter(element -> element instanceof PressableWidget)
-                                .map(element -> (PressableWidget) element)
-                                .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
-                                .anyMatch(element -> {
-                                    if (element.getMessage().getString().equals("<")) {
-                                        element.onPress();
-                                        return true;
-                                    }
-                                    return false;
-                                });
-                    }
+                    return client.currentScreen.children().stream().filter(element -> element instanceof PressableWidget)
+                            .map(element -> (PressableWidget) element)
+                            .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
+                            .anyMatch(element -> {
+                                if (next && element.getMessage().getString().equals(">")) {
+                                    element.onPress();
+                                    return true;
+                                } else if (element.getMessage().getString().equals("<")) {
+                                    element.onPress();
+                                    return true;
+                                }
+                                return false;
+                            });
                 } catch (Exception ignored) {}
             }
             if (MidnightControlsCompat.isInventoryTabsPresent()) InventoryTabsCompat.handleInventoryPage(client.currentScreen, next);
@@ -246,23 +251,21 @@ public class InputHandlers {
 
             MidnightControlsClient.get().input.inventoryInteractionCooldown = 5;
             switch (button.getName()) {
-            case "take_all": {
-                if (screen instanceof CreativeInventoryScreen) {
-                    if (slot != null && (((CreativeInventoryScreenAccessor) accessor).midnightcontrols$isCreativeInventorySlot(slot) || MidnightControlsCompat.streamCompatHandlers().anyMatch(handler -> handler.isCreativeSlot(screen, slot))))
-                        actionType = SlotActionType.CLONE;
+                case "take_all" -> {
+                    if (screen instanceof CreativeInventoryScreen) {
+                        if (slot != null && (((CreativeInventoryScreenAccessor) accessor).midnightcontrols$isCreativeInventorySlot(slot) || MidnightControlsCompat.streamCompatHandlers().anyMatch(handler -> handler.isCreativeSlot(screen, slot))))
+                            actionType = SlotActionType.CLONE;
+                    }
                 }
-                break;
-            }
-            case "take": {
-                clickData = GLFW_MOUSE_BUTTON_2;
-                break;
-            }
-            case "quick_move": {
-                actionType = SlotActionType.QUICK_MOVE;
-                break;
-            }
-            default:
-                return false;
+                case "take" -> {
+                    clickData = GLFW_MOUSE_BUTTON_2;
+                }
+                case "quick_move" -> {
+                    actionType = SlotActionType.QUICK_MOVE;
+                }
+                default -> {
+                    return false;
+                }
             }
             accessor.midnightcontrols$onMouseClick(slot, slotId, clickData, actionType);
             return true;

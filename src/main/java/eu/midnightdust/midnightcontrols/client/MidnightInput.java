@@ -72,6 +72,7 @@ public class MidnightInput {
     private static final Map<Integer, Integer> BUTTON_COOLDOWNS = new HashMap<>();
     // Cooldowns
     public int actionGuiCooldown = 0;
+    public int joystickCooldown = 0;
     public boolean ignoreNextARelease = false;
     public boolean ignoreNextXRelease = false;
     private double targetYaw = 0.0;
@@ -126,6 +127,8 @@ public class MidnightInput {
             --this.actionGuiCooldown;
         if (this.screenCloseCooldown > 0)
             --this.screenCloseCooldown;
+        if (this.joystickCooldown > 0)
+            --this.joystickCooldown;
 
         InputManager.updateStates();
 
@@ -328,10 +331,10 @@ public class MidnightInput {
                     || button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT || button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT)) {
                 if (this.actionGuiCooldown == 0) {
                     switch (button) {
-                        case GLFW_GAMEPAD_BUTTON_DPAD_UP -> pressKeyboardKey(client, GLFW.GLFW_KEY_UP);
-                        case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> pressKeyboardKey(client, GLFW.GLFW_KEY_DOWN);
-                        case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> pressKeyboardKey(client, GLFW.GLFW_KEY_LEFT);
-                        case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> pressKeyboardKey(client, GLFW.GLFW_KEY_RIGHT);
+                        case GLFW_GAMEPAD_BUTTON_DPAD_UP -> this.changeFocus(client.currentScreen, NavigationDirection.UP);
+                        case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> this.changeFocus(client.currentScreen, NavigationDirection.DOWN);
+                        case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> this.handleLeftRight(client.currentScreen, false);
+                        case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> this.handleLeftRight(client.currentScreen, true);
                     }
                     if (MidnightControlsConfig.wasdScreens.contains(client.currentScreen.getClass().getCanonicalName())) {
                         switch (button) {
@@ -341,11 +344,6 @@ public class MidnightInput {
                             case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> pressKeyboardKey(client, GLFW.GLFW_KEY_D);
                         }
                     }
-//                    else if (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP) {
-//                        this.changeFocus(client.currentScreen, NavigationDirection.UP);
-//                    } else if (button == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN) {
-//                        this.changeFocus(client.currentScreen, NavigationDirection.DOWN);
-//                    } else this.handleLeftRight(client.currentScreen, button != GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT);
                 }
                 return;
             }
@@ -572,9 +570,8 @@ public class MidnightInput {
                 return;
             }
         } else if (client.currentScreen != null) {
-            if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y && absValue >= deadZone) {
-                float finalValue = value;
-                if (client.currentScreen.children().stream().filter(element -> element instanceof SpruceEntryListWidget)
+            float finalValue = value;
+            if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y && absValue >= deadZone && client.currentScreen.children().stream().filter(element -> element instanceof SpruceEntryListWidget)
                         .map(element -> (SpruceEntryListWidget<?>) element)
                         .filter(AbstractSpruceWidget::isFocusedOrHovered)
                         .noneMatch(element -> {
@@ -592,7 +589,20 @@ public class MidnightInput {
                 {
                     client.currentScreen.mouseScrolled(0.0, 0.0, -(value * 1.5f));
                 }
-
+            else if (absValue >= deadZone) {
+                if (value > 0 && joystickCooldown == 0) {
+                    switch (axis) {
+                        case GLFW_GAMEPAD_AXIS_LEFT_Y -> this.changeFocus(client.currentScreen, NavigationDirection.UP);
+                        case GLFW_GAMEPAD_AXIS_LEFT_X -> this.handleLeftRight(client.currentScreen, true);
+                    }
+                    if (axis == GLFW_GAMEPAD_AXIS_LEFT_Y || axis == GLFW_GAMEPAD_AXIS_LEFT_X) joystickCooldown = 4;
+                } else if (value < 0 && joystickCooldown == 0) {
+                    switch (axis) {
+                        case GLFW_GAMEPAD_AXIS_LEFT_Y -> this.changeFocus(client.currentScreen, NavigationDirection.DOWN);
+                        case GLFW_GAMEPAD_AXIS_LEFT_X -> this.handleLeftRight(client.currentScreen, false);
+                    }
+                    if (axis == GLFW_GAMEPAD_AXIS_LEFT_Y || axis == GLFW_GAMEPAD_AXIS_LEFT_X) joystickCooldown = 4;
+                }
                 return;
             }
         }
@@ -696,6 +706,7 @@ public class MidnightInput {
         } else if (FabricLoader.getInstance().isModLoaded("yet-another-config-lib") && YACLCompat.handleAButton(screen, focused)) {
             return true;
         }
+        else pressKeyboardKey(screen, GLFW_KEY_ENTER);
         return false;
     }
 
@@ -729,9 +740,11 @@ public class MidnightInput {
             return !spruceElement.onNavigation(right ? NavigationDirection.RIGHT : NavigationDirection.LEFT, false);
         }
         if (element instanceof SliderWidget slider) {
-            slider.keyPressed(right ? 262 : 263, 0, 0);
-            this.actionGuiCooldown = 2; // Prevent to press too quickly the focused element, so we have to skip 5 ticks.
-            return false;
+            if (slider.active) {
+                slider.keyPressed(right ? 262 : 263, 0, 0);
+                this.actionGuiCooldown = 2; // Prevent to press too quickly the focused element, so we have to skip 5 ticks.
+                return true;
+            }
         } else if (element instanceof AlwaysSelectedEntryListWidget) {
             //TODO((EntryListWidgetAccessor) element).midnightcontrols$moveSelection(right ? EntryListWidget.MoveDirection.DOWN : EntryListWidget.MoveDirection.UP);
             return false;
@@ -782,18 +795,14 @@ public class MidnightInput {
                 }
                 return false;
             }
-            if (FabricLoader.getInstance().isModLoaded("sodium"))
-                SodiumCompat.handleInput(screen, direction.isLookingForward());
-            else {
-                switch (direction) {
-                    case UP -> pressKeyboardKey(screen, GLFW.GLFW_KEY_UP);
-                    case DOWN -> pressKeyboardKey(screen, GLFW.GLFW_KEY_DOWN);
-                    case LEFT -> pressKeyboardKey(screen, GLFW.GLFW_KEY_LEFT);
-                    case RIGHT -> pressKeyboardKey(screen, GLFW.GLFW_KEY_RIGHT);
-                }
-                this.actionGuiCooldown = 5;
-                return false;
+            switch (direction) {
+                case UP -> pressKeyboardKey(screen, GLFW.GLFW_KEY_UP);
+                case DOWN -> pressKeyboardKey(screen, GLFW.GLFW_KEY_DOWN);
+                case LEFT -> pressKeyboardKey(screen, GLFW.GLFW_KEY_LEFT);
+                case RIGHT -> pressKeyboardKey(screen, GLFW.GLFW_KEY_RIGHT);
             }
+            this.actionGuiCooldown = 5;
+            return false;
         } catch (Exception exception) {MidnightControls.get().warn("Unknown exception encountered while trying to change focus: "+exception);}
         return false;
     }
