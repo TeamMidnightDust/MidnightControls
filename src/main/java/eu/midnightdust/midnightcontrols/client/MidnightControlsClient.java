@@ -147,6 +147,9 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         if (MidnightControlsConfig.configVersion < 2) {
             MidnightControlsConfig.mouseScreens.remove("me.jellysquid.mods.sodium.client.gui");
             MidnightControlsConfig.mouseScreens.remove("net.coderbot.iris.gui");
+            MidnightControlsConfig.mouseScreens.remove("net.minecraft.class_5375");
+            MidnightControlsConfig.mouseScreens.remove("net.minecraft.client.gui.screen.pack.PackScreen");
+            MidnightControlsConfig.configVersion = 2;
             MidnightControlsConfig.write("midnightcontrols");
         }
         this.hud.setVisible(MidnightControlsConfig.hudEnable);

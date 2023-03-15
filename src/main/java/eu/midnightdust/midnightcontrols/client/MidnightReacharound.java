@@ -140,7 +140,7 @@ public class MidnightReacharound {
             var blockPos = playerPos.add(vector);
 
             // Some functions still need BlockPos, so this is here to let that happen
-            var blockyPos = new BlockPos(blockPos);
+            var blockyPos = BlockPos.ofFloored(blockPos);
 
             var direction = client.player.getHorizontalFacing();
 

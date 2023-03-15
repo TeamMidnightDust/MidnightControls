@@ -166,12 +166,13 @@ public class InputHandlers {
                 }
                 return true;
             } else if (client.currentScreen != null && client.currentScreen.children().stream().anyMatch(e -> e instanceof TabNavigationWidget)) {
-                Lists.newCopyOnWriteArrayList(client.currentScreen.children()).stream().anyMatch(e -> {
+                return Lists.newCopyOnWriteArrayList(client.currentScreen.children()).stream().anyMatch(e -> {
                     if (e instanceof TabNavigationWidget tabs) {
                         TabNavigationWidgetAccessor accessor = (TabNavigationWidgetAccessor) tabs;
-                        if (next ? accessor.getCurrentTabIndex()+1 < accessor.getTabs().size() : accessor.getCurrentTabIndex() > 0) {
-                            if (next) tabs.selectTab(accessor.getCurrentTabIndex() + 1, true);
-                            else tabs.selectTab(accessor.getCurrentTabIndex() - 1, true);
+                        int tabIndex = accessor.getTabs().indexOf(accessor.getTabManager().getCurrentTab());
+                        if (next ? tabIndex+1 < accessor.getTabs().size() : tabIndex > 0) {
+                            if (next) tabs.selectTab(tabIndex + 1, true);
+                            else tabs.selectTab(tabIndex - 1, true);
                             return true;
                         }
                     }

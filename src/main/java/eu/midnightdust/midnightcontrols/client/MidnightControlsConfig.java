@@ -11,6 +11,7 @@ package eu.midnightdust.midnightcontrols.client;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mojang.blaze3d.platform.GlDebugInfo;
 import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
@@ -69,7 +70,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(category = "controller", name = "Controller ID") @Hidden public static Object controllerID = 0;
     @Entry(category = "controller", name = "2nd Controller ID") @Hidden public static Object secondControllerID = -1;
     @Entry(category = "visual", name = "midnightcontrols.menu.controller_type") public static ControllerType controllerType = ControllerType.DEFAULT;
-    @Entry(category = "screens", name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375",
+    @Entry(category = "screens", name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("net.minecraft.client.gui.screen.advancement",
             "net.minecraft.class_457", "net.minecraft.class_408", "net.minecraft.class_3872", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen",
             "hardcorequesting.client.interfaces.GuiQuestBook", "hardcorequesting.client.interfaces.GuiReward", "hardcorequesting.client.interfaces.EditTrackerScreen",
             "me.shedaniel.clothconfig2.gui.ClothConfigScreen", "com.mamiyaotaru.voxelmap.gui.GuiWaypoints", "com.mamiyaotaru.voxelmap.gui.GuiPersistentMap");
@@ -340,7 +341,7 @@ public class MidnightControlsConfig extends MidnightConfig {
         controllerID = 0;
         secondControllerID = -1;
         controllerType = ControllerType.DEFAULT;
-        mouseScreens = Lists.newArrayList("net.minecraft.client.gui.screen.advancement", "net.minecraft.client.gui.screen.pack.PackScreen", "net.minecraft.class_5375", "net.minecraft.class_457", "net.minecraft.class_408", "net.minecraft.class_3872", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen", "me.shedaniel.clothconfig2.gui.ClothConfigScreen", "com.mamiyaotaru.voxelmap.gui.GuiWaypoints", "com.mamiyaotaru.voxelmap.gui.GuiPersistentMap");
+        mouseScreens = Lists.newArrayList("net.minecraft.client.gui.screen.advancement", "net.minecraft.class_457", "net.minecraft.class_408", "net.minecraft.class_3872", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen", "me.shedaniel.clothconfig2.gui.ClothConfigScreen", "com.mamiyaotaru.voxelmap.gui.GuiWaypoints", "com.mamiyaotaru.voxelmap.gui.GuiPersistentMap");
         BINDING = new HashMap<>();
         maxAnalogValueLeftX = 1;
         maxAnalogValueLeftY = 1;
@@ -363,7 +364,7 @@ public class MidnightControlsConfig extends MidnightConfig {
         String controller = getController().getName().toLowerCase();
         if (controller.contains("xbox 360")) return ControllerType.XBOX_360;
         else if (controller.contains("xbox") || controller.contains("afterglow")) return ControllerType.XBOX;
-        else if (controller.contains("steam deck")) return ControllerType.STEAM_DECK;
+        else if (controller.contains("steam") && GlDebugInfo.getCpuInfo().contains("AMD Custom APU")) return ControllerType.STEAM_DECK;
         else if (controller.contains("steam")) return ControllerType.STEAM_CONTROLLER;
         else if (controller.contains("dualsense") || controller.contains("ps5")) return ControllerType.DUALSENSE;
         else if (controller.contains("dualshock") || controller.contains("ps4")  || controller.contains("sony")) return ControllerType.DUALSHOCK;
