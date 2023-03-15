@@ -120,31 +120,39 @@ public class MidnightReacharound {
             return null;
 
         if (client.player != null && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.MISS
-                && client.player.isOnGround() && client.player.getPitch(0.f) > 35.f) {
+                && client.player.isOnGround() && client.player.getPitch(0.f) >= 35.f) {
             if (client.player.isRiding())
                 return null;
-            var playerPos = client.player.getBlockPos().down();
+            // Temporary pos, do not use
+            Vec3d playerPosi = client.player.getPos();
+
+            // Imitates var playerPos = client.player.getBlockPos().down();
+            Vec3d playerPos = new Vec3d(playerPosi.getX(), playerPosi.getY() - 1.0, playerPosi.getZ());
             if (client.player.getY() - playerPos.getY() - 1.0 >= 0.25) {
-                playerPos = playerPos.up();
+                // Imitates playerPos = playerPos.up();
+                playerPos = playerPosi;
                 this.onSlab = true;
             } else {
                 this.onSlab = false;
             }
-            var targetPos = BlockPos.ofFloored(client.crosshairTarget.getPos()).subtract(playerPos);
-            var vector = new BlockPos.Mutable(MathHelper.clamp(targetPos.getX(), -1, 1), 0, MathHelper.clamp(targetPos.getZ(), -1, 1));
+            var targetPos = new Vec3d(client.crosshairTarget.getPos().getX(), client.crosshairTarget.getPos().getY(), client.crosshairTarget.getPos().getZ()).subtract(playerPos);
+            var vector = new Vec3d(MathHelper.clamp(targetPos.getX(), -1, 1), 0, MathHelper.clamp(targetPos.getZ(), -1, 1));
             var blockPos = playerPos.add(vector);
+
+            // Some functions still need BlockPos, so this is here to let that happen
+            var blockyPos = new BlockPos(blockPos);
 
             var direction = client.player.getHorizontalFacing();
 
-            var state = client.world.getBlockState(blockPos);
+            var state = client.world.getBlockState(blockyPos);
             if (!state.isAir())
                 return null;
-            var adjacentBlockState = client.world.getBlockState(blockPos.offset(direction.getOpposite()));
+            var adjacentBlockState = client.world.getBlockState(blockyPos.offset(direction.getOpposite()));
             if (adjacentBlockState.isAir() || adjacentBlockState.getBlock() instanceof FluidBlock || (vector.getX() == 0 && vector.getZ() == 0)) {
                 return null;
             }
 
-            return new BlockHitResult(new Vec3d(blockPos.getX(),blockPos.getY(),blockPos.getZ()), direction, blockPos, false);
+            return new BlockHitResult(blockPos, direction, blockyPos, false);
         }
         return null;
     }
