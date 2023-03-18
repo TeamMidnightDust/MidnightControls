@@ -589,7 +589,7 @@ public class MidnightInput {
                 {
                     client.currentScreen.mouseScrolled(0.0, 0.0, -(value * 1.5f));
                 }
-            else if (absValue >= deadZone) {
+            else if (isScreenInteractive(client.currentScreen) && absValue >= deadZone) {
                 if (value > 0 && joystickCooldown == 0) {
                     switch (axis) {
                         case GLFW_GAMEPAD_AXIS_LEFT_Y -> this.changeFocus(client.currentScreen, NavigationDirection.UP);
