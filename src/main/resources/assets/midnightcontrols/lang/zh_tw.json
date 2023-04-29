@@ -183,7 +183,7 @@
   "midnightcontrols.tooltip.fly_drifting_vertical": "處於飛行狀態時，啟用原版的垂直方向飛行慣性（緩停滑行）。",
   "midnightcontrols.tooltip.hud_enable": "顯示搖桿按鍵操作提示。",
   "midnightcontrols.tooltip.hud_side": "HUD 的位置位於畫面的哪一側。",
-  "midnightcontrols.tooltip.joystick_as_mouse": "讓 joystick 在每個介面有滑鼠的功能。",
+  "midnightcontrols.tooltip.joystick_as_mouse": "讓搖桿在每個介面有滑鼠的功能。",
   "midnightcontrols.tooltip.left_dead_zone": "左搖桿設定的死區。\n死區決定搖桿要偏離中心位置多遠才能讓搖桿的輸入有效。",
   "midnightcontrols.tooltip.max_left_x_value": "更改左搖桿 X 軸最大值的識別範圍。\n若感覺即便推滿搖桿也未達到最大的輸入值，導致在識別搖桿輸入的精確值的情況下，左右移動較為緩慢等問題，本項可能會有所幫助。",
   "midnightcontrols.tooltip.max_left_y_value": "更改左搖桿 Y 軸最大值的識別範圍。\n若感覺即便推滿搖桿也未達到最大的輸入值，導致在識別搖桿輸入的精確值的情況下，前後移動較為緩慢等問題，本項可能會有所幫助。",
