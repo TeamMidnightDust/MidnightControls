@@ -64,6 +64,8 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(category = "controller", name = "midnightcontrols.menu.y_axis_rotation_speed", isSlider = true, min = 0, max = 100, precision = 10) public static double yAxisRotationSpeed = rotationSpeed;
     @Entry(category = "screens", name = "midnightcontrols.menu.mouse_speed", isSlider = true, min = 0, max = 150, precision = 10) public static double mouseSpeed = 25.0;
     @Entry(category = "screens", name = "midnightcontrols.menu.joystick_as_mouse") public static boolean joystickAsMouse = false;
+    @Entry(category = "screens", name = "midnightcontrols.menu.eye_tracker_as_mouse") public static boolean eyeTrackerAsMouse = false;
+    @Entry(category = "screens", name = "midnightcontrols.menu.eye_tracker_deadzone", isSlider = true, min = 0, max = 0.4) public static double eyeTrackerDeadzone = 0.05;
     @Entry(category = "controller", name = "midnightcontrols.menu.unfocused_input") public static boolean unfocusedInput = false;
     @Entry(category = "screens", name = "midnightcontrols.menu.virtual_mouse") public static boolean virtualMouse = false;
     @Entry(category = "screens", name = "midnightcontrols.menu.virtual_mouse.skin") public static VirtualMouseSkin virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
