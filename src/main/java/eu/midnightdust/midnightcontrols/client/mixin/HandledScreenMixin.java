@@ -18,6 +18,7 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsRenderer;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
@@ -55,16 +56,16 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
     public abstract void midnightcontrols$onMouseClick(@Nullable Slot slot, int slotId, int clickData, SlotActionType actionType);
 
     @Inject(method = "render", at = @At("RETURN"))
-    public void onRender(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    public void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.hudEnable) {
             var client = MinecraftClient.getInstance();
-            matrices.push();
+            context.getMatrices().push();
             int x = 2, y = client.getWindow().getScaledHeight() - 2 - MidnightControlsRenderer.ICON_SIZE;
             if (MidnightControlsCompat.isEMIPresent() && EMICompat.isEMIEnabled()) {
                 x += 42;
             }
-            if (!ButtonBinding.TAKE_ALL.isNotBound()) x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, ButtonBinding.TAKE_ALL,true, client) + 2;
-            if (!ButtonBinding.EXIT.isNotBound()) x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, ButtonBinding.EXIT, true, client) + 2;
+            if (!ButtonBinding.TAKE_ALL.isNotBound()) x = MidnightControlsRenderer.drawButtonTip(context, x, y, ButtonBinding.TAKE_ALL,true, client) + 2;
+            if (!ButtonBinding.EXIT.isNotBound()) x = MidnightControlsRenderer.drawButtonTip(context, x, y, ButtonBinding.EXIT, true, client) + 2;
             if (MidnightControlsCompat.isReiPresent()) {
                 x = 2;
                 y -= 24;
@@ -74,9 +75,9 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
                         - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.quick_move"))
                         - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.TAKE) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.QUICK_MOVE);
             }
-            if (!ButtonBinding.TAKE.isNotBound()) x = MidnightControlsRenderer.drawButtonTip(matrices, x, y, ButtonBinding.TAKE, true, client);
-            if (!ButtonBinding.QUICK_MOVE.isNotBound()) MidnightControlsRenderer.drawButtonTip(matrices, x, y, ButtonBinding.QUICK_MOVE, true, client);
-            matrices.pop();
+            if (!ButtonBinding.TAKE.isNotBound()) x = MidnightControlsRenderer.drawButtonTip(context, x, y, ButtonBinding.TAKE, true, client);
+            if (!ButtonBinding.QUICK_MOVE.isNotBound()) MidnightControlsRenderer.drawButtonTip(context, x, y, ButtonBinding.QUICK_MOVE, true, client);
+            context.getMatrices().pop();
         }
     }
 }

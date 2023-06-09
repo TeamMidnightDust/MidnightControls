@@ -29,6 +29,7 @@ import dev.lambdaurora.spruceui.widget.container.SpruceOptionListWidget;
 import dev.lambdaurora.spruceui.widget.container.tabbed.SpruceTabbedWidget;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.*;
@@ -423,8 +424,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     }
 
     @Override
-    public void renderTitle(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        drawCenteredTextWithShadow(matrices, this.textRenderer, I18n.translate("midnightcontrols.menu.title"), this.width / 2, 8, 16777215);
+    public void renderTitle(DrawContext context, int mouseX, int mouseY, float delta) {
+        context.drawCenteredTextWithShadow(this.textRenderer, I18n.translate("midnightcontrols.menu.title"), this.width / 2, 8, 16777215);
     }
 
     public static class MidnightControlsBackground implements Background {
@@ -434,8 +435,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             MidnightControlsBackground.transparency = transparency;
         }
         @Override
-        public void render(MatrixStack matrixStack, SpruceWidget widget, int vOffset, int mouseX, int mouseY, float delta) {
-            fill(matrixStack, widget.getX(), widget.getY(), widget.getX() + widget.getWidth(), widget.getY() + widget.getHeight(), MidnightColorUtil.hex2Rgb("#000000"));
+        public void render(DrawContext context, SpruceWidget widget, int vOffset, int mouseX, int mouseY, float delta) {
+            context.fill(widget.getX(), widget.getY(), widget.getX() + widget.getWidth(), widget.getY() + widget.getHeight(), 0);
         }
         private static void fill(MatrixStack matrixStack, int x2, int y2, int x1, int y1, Color color) {
             matrixStack.push();

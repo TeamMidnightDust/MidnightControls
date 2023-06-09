@@ -28,14 +28,12 @@ import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
 import net.fabricmc.fabric.impl.client.itemgroup.CreativeGuiExtensions;
 import net.fabricmc.fabric.impl.client.itemgroup.FabricCreativeGuiComponents;
 import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
-import net.fabricmc.fabric.impl.itemgroup.ItemGroupHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
-import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.gui.widget.TabNavigationWidget;
 import net.minecraft.client.util.ScreenshotRecorder;
@@ -53,7 +51,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
 
 /**
@@ -68,11 +66,11 @@ public class InputHandlers {
     private InputHandlers() {
     }
     private static List<ItemGroup> getVisibleGroups(CreativeInventoryScreen screen) {
-        return ItemGroupHelper.sortedGroups.stream()
-            .filter(itemGroup -> {
-                if (FabricCreativeGuiComponents.COMMON_GROUPS.contains(itemGroup)) return true;
-                return ((CreativeGuiExtensions)screen).fabric_currentPage() == ((FabricItemGroup)itemGroup).getPage() && itemGroup.shouldDisplay();
-            }).toList();
+        return ItemGroups.getGroups().stream()
+                .filter(itemGroup -> {
+                    if (FabricCreativeGuiComponents.COMMON_GROUPS.contains(itemGroup)) return true;
+                    return ((CreativeGuiExtensions) screen).fabric_currentPage() == ((FabricItemGroup) itemGroup).getPage() && itemGroup.shouldDisplay();
+                }).toList();
     }
 
     public static PressAction handleHotbar(boolean next) {
@@ -87,8 +85,7 @@ public class InputHandlers {
                         client.player.getInventory().scrollInHotbar(-1.0);
                     else
                         client.player.getInventory().scrollInHotbar(1.0);
-                }
-                else {
+                } else {
                     if (client.inGameHud.getSpectatorHud().isOpen()) {
                         client.inGameHud.getSpectatorHud().cycleSlot(next ? -1 : 1);
                     } else {
@@ -128,14 +125,17 @@ public class InputHandlers {
                 return true;
             } else if (client.currentScreen instanceof InventoryScreen || client.currentScreen instanceof CraftingScreen || client.currentScreen instanceof AbstractFurnaceScreen<?>) {
                 RecipeBookWidget recipeBook;
-                if (client.currentScreen instanceof InventoryScreen inventoryScreen) recipeBook = inventoryScreen.getRecipeBookWidget();
-                else if (client.currentScreen instanceof CraftingScreen craftingScreen) recipeBook = craftingScreen.getRecipeBookWidget();
-                else recipeBook = ((AbstractFurnaceScreen<?>)client.currentScreen).getRecipeBookWidget();
+                if (client.currentScreen instanceof InventoryScreen inventoryScreen)
+                    recipeBook = inventoryScreen.getRecipeBookWidget();
+                else if (client.currentScreen instanceof CraftingScreen craftingScreen)
+                    recipeBook = craftingScreen.getRecipeBookWidget();
+                else recipeBook = ((AbstractFurnaceScreen<?>) client.currentScreen).getRecipeBookWidget();
                 var recipeBookAccessor = (RecipeBookWidgetAccessor) recipeBook;
                 var tabs = recipeBookAccessor.getTabButtons();
                 var currentTab = recipeBookAccessor.getCurrentTab();
                 if (currentTab == null || !recipeBook.isOpen()) {
-                    if (MidnightControlsCompat.isInventoryTabsPresent()) InventoryTabsCompat.handleInventoryTabs(client.currentScreen, next);
+                    if (MidnightControlsCompat.isInventoryTabsPresent())
+                        InventoryTabsCompat.handleInventoryTabs(client.currentScreen, next);
                     return false;
                 }
                 int nextTab = tabs.indexOf(currentTab) + (next ? 1 : -1);
@@ -170,7 +170,7 @@ public class InputHandlers {
                     if (e instanceof TabNavigationWidget tabs) {
                         TabNavigationWidgetAccessor accessor = (TabNavigationWidgetAccessor) tabs;
                         int tabIndex = accessor.getTabs().indexOf(accessor.getTabManager().getCurrentTab());
-                        if (next ? tabIndex+1 < accessor.getTabs().size() : tabIndex > 0) {
+                        if (next ? tabIndex + 1 < accessor.getTabs().size() : tabIndex > 0) {
                             if (next) tabs.selectTab(tabIndex + 1, true);
                             else tabs.selectTab(tabIndex - 1, true);
                             return true;
@@ -184,7 +184,8 @@ public class InputHandlers {
                 if (FabricLoader.getInstance().isModLoaded("yet-another-config-lib") && YACLCompat.handleCategories(client.currentScreen, next))
                     return true;
             }
-            if (MidnightControlsCompat.isInventoryTabsPresent()) InventoryTabsCompat.handleInventoryTabs(client.currentScreen, next);
+            if (MidnightControlsCompat.isInventoryTabsPresent())
+                InventoryTabsCompat.handleInventoryTabs(client.currentScreen, next);
             return false;
         };
     }
@@ -205,9 +206,11 @@ public class InputHandlers {
                                 }
                                 return false;
                             });
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
-            if (MidnightControlsCompat.isInventoryTabsPresent()) InventoryTabsCompat.handleInventoryPage(client.currentScreen, next);
+            if (MidnightControlsCompat.isInventoryTabsPresent())
+                InventoryTabsCompat.handleInventoryPage(client.currentScreen, next);
 
             return false;
         };
@@ -289,9 +292,9 @@ public class InputHandlers {
     /**
      * Handles the screenshot action.
      *
-     * @param client the client instance
+     * @param client  the client instance
      * @param binding the binding which fired the action
-     * @param action the action done on the binding
+     * @param action  the action done on the binding
      * @return true if handled, else false
      */
     public static boolean handleScreenshot(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action) {
@@ -402,7 +405,7 @@ public class InputHandlers {
     /**
      * Returns always true to the filter.
      *
-     * @param client the client instance
+     * @param client  the client instance
      * @param binding the affected binding
      * @return true
      */
@@ -413,7 +416,7 @@ public class InputHandlers {
     /**
      * Returns whether the client is in game or not.
      *
-     * @param client the client instance
+     * @param client  the client instance
      * @param binding the affected binding
      * @return true if the client is in game, else false
      */
@@ -424,7 +427,7 @@ public class InputHandlers {
     /**
      * Returns whether the client is in a non-interactive screen (which means require mouse input) or not.
      *
-     * @param client the client instance
+     * @param client  the client instance
      * @param binding the affected binding
      * @return true if the client is in a non-interactive screen, else false
      */
@@ -437,7 +440,7 @@ public class InputHandlers {
     /**
      * Returns whether the client is in an inventory or not.
      *
-     * @param client the client instance
+     * @param client  the client instance
      * @param binding the affected binding
      * @return true if the client is in an inventory, else false
      */
@@ -448,7 +451,7 @@ public class InputHandlers {
     /**
      * Returns whether the client is in the advancements screen or not.
      *
-     * @param client the client instance
+     * @param client  the client instance
      * @param binding the affected binding
      * @return true if the client is in the advancements screen, else false
      */

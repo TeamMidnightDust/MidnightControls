@@ -101,7 +101,7 @@ public class MidnightReacharound {
             BlockPos blockPos = result.getBlockPos().down();
             BlockState state = client.world.getBlockState(blockPos);
 
-            if (client.player.getBlockPos().getY() - blockPos.getY() > 1 && (client.world.isAir(blockPos) || state.getMaterial().isReplaceable())) {
+            if (client.player.getBlockPos().getY() - blockPos.getY() > 1 && (client.world.isAir(blockPos) || state.isReplaceable())) {
                 return new BlockHitResult(result.getPos(), Direction.DOWN, blockPos, false);
             }
         }

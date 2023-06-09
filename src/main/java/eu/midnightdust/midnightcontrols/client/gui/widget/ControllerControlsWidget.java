@@ -18,6 +18,7 @@ import dev.lambdaurora.spruceui.SpruceTexts;
 import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsSettingsScreen;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -58,11 +59,11 @@ public class ControllerControlsWidget extends SpruceContainerWidget {
     }
 
     @Override
-    public void renderWidget(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        drawCenteredTextWithShadow(matrices, this.client.textRenderer, Text.translatable("midnightcontrols.menu.title.controller_controls"),
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        context.drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.title.controller_controls"),
                 this.getX() + this.width / 2, this.getY() + 4, 16777215);
         this.resetButton.setActive(InputManager.streamBindings().anyMatch(Predicates.not(ButtonBinding::isDefault)));
-        super.renderWidget(matrices, mouseX, mouseY, delta);
+        super.renderWidget(context, mouseX, mouseY, delta);
     }
 
     public void finishBindingEdit(int... buttons) {

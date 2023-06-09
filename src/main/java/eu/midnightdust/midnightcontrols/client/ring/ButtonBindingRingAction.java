@@ -15,6 +15,7 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.util.KeyBindingAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.StickyKeyBinding;
@@ -51,10 +52,10 @@ public class ButtonBindingRingAction extends RingAction {
     }
 
     @Override
-    public void drawIcon(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered) {
+    public void drawIcon(@NotNull DrawContext context, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered) {
         List<OrderedText> lines = textRenderer.wrapLines(Text.translatable(this.getName()), MidnightRing.ELEMENT_SIZE);
         for (int i = 0; i < lines.size(); ++i) {
-            drawCenteredTextWithShadow(matrices, textRenderer, lines.get(i), x + MidnightRing.ELEMENT_SIZE / 2, y + MidnightRing.ELEMENT_SIZE / 2 - textRenderer.fontHeight / 2 * (lines.size()-1) - textRenderer.fontHeight / 2 + textRenderer.fontHeight * i, 0xffffff);
+            context.drawCenteredTextWithShadow(textRenderer, lines.get(i), x + MidnightRing.ELEMENT_SIZE / 2, y + MidnightRing.ELEMENT_SIZE / 2 - textRenderer.fontHeight / 2 * (lines.size()-1) - textRenderer.fontHeight / 2 + textRenderer.fontHeight * i, 0xffffff);
         }
     }
 

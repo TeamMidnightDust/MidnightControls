@@ -15,6 +15,7 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsRenderer;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -115,7 +116,9 @@ public abstract class MinecraftClientMixin {
     }
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;render(FJZ)V", shift = At.Shift.AFTER))
     private void renderVirtualCursor(boolean fullRender, CallbackInfo ci) {
-        MidnightControlsRenderer.renderVirtualCursor(new MatrixStack(), (MinecraftClient) (Object) this);
+        var mc = (MinecraftClient) (Object) this;
+        var drawContext = new DrawContext(mc, mc.getBufferBuilders().getEntityVertexConsumers());
+        MidnightControlsRenderer.renderVirtualCursor(drawContext, mc);
     }
 
     @Inject(method = "doItemUse()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/HitResult;getType()Lnet/minecraft/util/hit/HitResult$Type;"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true)
