@@ -1,10 +1,10 @@
 package eu.midnightdust.midnightcontrols.client.mixin;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,11 +25,11 @@ public abstract class ChatScreenMixin extends Screen {
         if (MidnightControlsConfig.moveChat) chatField.setY(4);
     }
     @Inject(method = "render", at = @At("HEAD"))
-    private void midnightcontrols$moveInputFieldBackground(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (MidnightControlsConfig.moveChat) matrices.translate(0f, -this.height + 16, 0f);
+    private void midnightcontrols$moveInputFieldBackground(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (MidnightControlsConfig.moveChat) context.getMatrices().translate(0f, -this.height + 16, 0f);
     }
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/TextFieldWidget;render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", shift = At.Shift.BEFORE))
-    private void midnightcontrols$dontMoveOtherStuff(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (MidnightControlsConfig.moveChat) matrices.translate(0f, this.height - 16, 0f);
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/TextFieldWidget;render(Lnet/minecraft/client/gui/DrawContext;IIF)V", shift = At.Shift.BEFORE))
+    private void midnightcontrols$dontMoveOtherStuff(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (MidnightControlsConfig.moveChat) context.getMatrices().translate(0f, this.height - 16, 0f);
     }
 }

@@ -9,20 +9,11 @@
 
 package eu.midnightdust.midnightcontrols.client.ring;
 
-import com.electronwill.nightconfig.core.Config;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
-import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
-import eu.midnightdust.midnightcontrols.client.controller.InputManager;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Represents a ring page.
@@ -31,7 +22,7 @@ import java.util.Optional;
  * @version 1.5.0
  * @since 1.4.0
  */
-public class RingPage extends DrawableHelper {
+public class RingPage {
     public static final RingPage DEFAULT = new RingPage("Default");
 
     public final String name;
@@ -48,17 +39,17 @@ public class RingPage extends DrawableHelper {
     /**
      * Renders the ring page.
      *
-     * @param matrices the matrices
+     * @param context the context
      * @param width the screen width
      * @param height the screen height
      * @param mouseX the mouse X-coordinate
      * @param mouseY the mouse Y-coordinate
      * @param tickDelta the tick delta
      */
-    public void render(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int width, int height, int mouseX, int mouseY, float tickDelta) {
+    public void render(@NotNull DrawContext context, @NotNull TextRenderer textRenderer, int width, int height, int mouseX, int mouseY, float tickDelta) {
         int centerX = width / 2;
         int centerY = height / 2;
-        if (MidnightControlsClient.get().ring.getMaxPages() > 1) drawCenteredTextWithShadow(matrices, textRenderer, name, centerX, 5, 0xffffff);
+        if (MidnightControlsClient.get().ring.getMaxPages() > 1) context.drawCenteredTextWithShadow(textRenderer, name, centerX, 5, 0xffffff);
 
         int offset = MidnightRing.ELEMENT_SIZE + (MidnightRing.ELEMENT_SIZE / 2) + 5;
 
@@ -67,7 +58,7 @@ public class RingPage extends DrawableHelper {
         for (int i = 0; i < 3; i++) {
             var ringAction = this.actions[i];
             if (ringAction != null)
-                ringAction.render(matrices, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
+                ringAction.render(context, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
             x += MidnightRing.ELEMENT_SIZE + 5;
         }
         y += MidnightRing.ELEMENT_SIZE + 5;
@@ -75,7 +66,7 @@ public class RingPage extends DrawableHelper {
         for (int i = 3; i < 5; i++) {
             var ringAction = this.actions[i];
             if (ringAction != null)
-                ringAction.render(matrices, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
+                ringAction.render(context, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
             x += (MidnightRing.ELEMENT_SIZE + 5) * 2;
         }
         y += MidnightRing.ELEMENT_SIZE + 5;
@@ -83,7 +74,7 @@ public class RingPage extends DrawableHelper {
         for (int i = 5; i < 8; i++) {
             var ringAction = this.actions[i];
             if (ringAction != null)
-                ringAction.render(matrices, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
+                ringAction.render(context, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
             x += MidnightRing.ELEMENT_SIZE + 5;
         }
     }

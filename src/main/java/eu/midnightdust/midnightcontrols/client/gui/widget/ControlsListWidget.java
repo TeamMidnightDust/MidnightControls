@@ -25,6 +25,7 @@ import dev.lambdaurora.spruceui.widget.container.SpruceEntryListWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceParentWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -226,14 +227,14 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         /* Rendering */
 
         @Override
-        protected void renderWidget(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
             boolean focused = gui.focusedBinding == this.binding;
 
             var textRenderer = ControlsListWidget.this.client.textRenderer;
             int height = this.getHeight();
             //float textX = (float) (this.getX() + 70 - ControlsListWidget.this.maxTextLength);
             int textY = this.getY() + height / 2;
-            textRenderer.draw(matrices, this.bindingName, this.getX(), (float) (textY - 9 / 2), 16777215);
+            context.drawText(textRenderer, this.bindingName, this.getX(), (textY - 9 / 2), 16777215, true);
 
             this.resetButton.setVisible(!focused);
             this.unbindButton.setVisible(focused);
@@ -252,7 +253,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                 this.editButton.setMessage(text.formatted(Formatting.GOLD));
             }
 
-            this.children.forEach(widget -> widget.render(matrices, mouseX, mouseY, delta));
+            this.children.forEach(widget -> widget.render(context, mouseX, mouseY, delta));
         }
     }
 
@@ -289,8 +290,8 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         /* Rendering */
 
         @Override
-        protected void renderWidget(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-            this.separatorWidget.render(matrices, mouseX, mouseY, delta);
+        protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+            this.separatorWidget.render(context, mouseX, mouseY, delta);
         }
 
         @Override

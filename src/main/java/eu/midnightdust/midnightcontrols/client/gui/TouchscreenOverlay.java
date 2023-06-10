@@ -53,7 +53,6 @@ public class TouchscreenOverlay extends Screen {
     public TouchscreenOverlay(@NotNull MidnightControlsClient mod) {
         super(Text.literal("Touchscreen overlay"));
         this.mod = mod;
-        this.passEvents = true;
     }
 
     @Override

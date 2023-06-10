@@ -11,9 +11,8 @@ package eu.midnightdust.midnightcontrols.client.ring;
 
 import com.electronwill.nightconfig.core.Config;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +27,7 @@ import java.util.function.Supplier;
  * @version 1.5.0
  * @since 1.4.0
  */
-public abstract class RingAction extends DrawableHelper implements Nameable {
+public abstract class RingAction implements Nameable {
     protected boolean activated = false;
 
     public RingAction() {
@@ -60,12 +59,12 @@ public abstract class RingAction extends DrawableHelper implements Nameable {
 
     public abstract void onAction(@NotNull RingButtonMode mode);
 
-    public void render(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered, int index) {
-        fill(matrices, x, y, x + MidnightRing.ELEMENT_SIZE, y + MidnightRing.ELEMENT_SIZE, hovered || RingPage.selected == index ? 0xbb777777 : 0xbb000000);
-        drawIcon(matrices, textRenderer, x, y, hovered);
+    public void render(@NotNull DrawContext context, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered, int index) {
+        context.fill(x, y, x + MidnightRing.ELEMENT_SIZE, y + MidnightRing.ELEMENT_SIZE, hovered || RingPage.selected == index ? 0xbb777777 : 0xbb000000);
+        drawIcon(context, textRenderer, x, y, hovered);
     }
 
-    public abstract void drawIcon(@NotNull MatrixStack matrices, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered);
+    public abstract void drawIcon(@NotNull DrawContext context, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered);
 
     /**
      * Represents a factory for {@link RingAction}.

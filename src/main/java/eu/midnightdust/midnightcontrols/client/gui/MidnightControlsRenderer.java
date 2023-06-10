@@ -10,7 +10,6 @@
 package eu.midnightdust.midnightcontrols.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.ControllerType;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
@@ -20,10 +19,11 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -77,17 +77,17 @@ public class MidnightControlsRenderer {
         return width;
     }
 
-    public static ButtonSize drawButton(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, @NotNull MinecraftClient client) {
-        return drawButton(matrices, x, y, button.getButton(), client);
+    public static ButtonSize drawButton(DrawContext context, int x, int y, @NotNull ButtonBinding button, @NotNull MinecraftClient client) {
+        return drawButton(context, x, y, button.getButton(), client);
     }
 
-    public static ButtonSize drawButton(MatrixStack matrices, int x, int y, int[] buttons, @NotNull MinecraftClient client) {
+    public static ButtonSize drawButton(DrawContext context, int x, int y, int[] buttons, @NotNull MinecraftClient client) {
         int height = 0;
         int length = 0;
         int currentX = x;
         for (int i = 0; i < buttons.length; i++) {
             int btn = buttons[i];
-            int size = drawButton(matrices, currentX, y, btn, client);
+            int size = drawButton(context, currentX, y, btn, client);
             if (size > height)
                 height = size;
             length += size;
@@ -99,7 +99,7 @@ public class MidnightControlsRenderer {
         return new ButtonSize(length, height);
     }
 
-    public static int drawButton(MatrixStack matrices, int x, int y, int button, @NotNull MinecraftClient client) {
+    public static int drawButton(DrawContext context, int x, int y, int button, @NotNull MinecraftClient client) {
         boolean second = false;
         if (button == -1)
             return 0;
@@ -159,13 +159,13 @@ public class MidnightControlsRenderer {
             case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER + 100, GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER + 200 -> buttonOffset = 10 * 15;
         }
 
-        RenderSystem.setShaderTexture(0, axis ? MidnightControlsClient.CONTROLLER_AXIS : button >= 15 && button <= 19 ? MidnightControlsClient.CONTROLLER_EXPANDED :MidnightControlsClient.CONTROLLER_BUTTONS);
         RenderSystem.disableDepthTest();
 
         int assetSize = axis || (button >= 15 && button <= 18) ? AXIS_SIZE : BUTTON_SIZE;
 
         RenderSystem.setShaderColor(1.f, second ? 0.f : 1.f, 1.f, 1.f);
-        DrawableHelper.drawTexture(matrices, x + (ICON_SIZE / 2 - assetSize / 2), y + (ICON_SIZE / 2 - assetSize / 2),
+        context.drawTexture(axis ? MidnightControlsClient.CONTROLLER_AXIS : button >= 15 && button <= 19 ? MidnightControlsClient.CONTROLLER_EXPANDED :MidnightControlsClient.CONTROLLER_BUTTONS
+                , x + (ICON_SIZE / 2 - assetSize / 2), y + (ICON_SIZE / 2 - assetSize / 2),
                 (float) buttonOffset, (float) (controllerType * assetSize),
                 assetSize, assetSize,
                 256, 256);
@@ -174,18 +174,18 @@ public class MidnightControlsRenderer {
         return ICON_SIZE;
     }
 
-    public static int drawButtonTip(MatrixStack matrices, int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull MinecraftClient client) {
-        return drawButtonTip(matrices, x, y, button.getButton(), button.getTranslationKey(), display, client);
+    public static int drawButtonTip(DrawContext context, int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull MinecraftClient client) {
+        return drawButtonTip(context, x, y, button.getButton(), button.getTranslationKey(), display, client);
     }
 
-    public static int drawButtonTip(MatrixStack matrices, int x, int y, int[] button, @NotNull String action, boolean display, @NotNull MinecraftClient client) {
+    public static int drawButtonTip(DrawContext context, int x, int y, int[] button, @NotNull String action, boolean display, @NotNull MinecraftClient client) {
         if (display) {
-            int buttonWidth = drawButton(matrices, x, y, button, client).length();
+            int buttonWidth = drawButton(context, x, y, button, client).length();
 
             var translatedAction = I18n.translate(action);
             int textY = (MidnightControlsRenderer.ICON_SIZE / 2 - client.textRenderer.fontHeight / 2) + 1;
 
-            return client.textRenderer.drawWithShadow(matrices, translatedAction, (float) (x + buttonWidth + 2), (float) (y + textY), 14737632);
+            return context.drawTextWithShadow(client.textRenderer, translatedAction, (x + buttonWidth + 2), (y + textY), 14737632);
         }
 
         return -10;
@@ -195,7 +195,7 @@ public class MidnightControlsRenderer {
         return 15 + 5 + textRenderer.getWidth(action);
     }
 
-    public static void renderVirtualCursor(@NotNull MatrixStack matrices, @NotNull MinecraftClient client) {
+    public static void renderVirtualCursor(@NotNull DrawContext context, @NotNull MinecraftClient client) {
         if (!MidnightControlsConfig.virtualMouse || (client.currentScreen == null
                 || MidnightInput.isScreenInteractive(client.currentScreen)))
             return;
@@ -233,27 +233,31 @@ public class MidnightControlsRenderer {
             mouseY -= 8;
         }
 
-        drawCursor(matrices, mouseX, mouseY, hoverSlot, client);
+        //context.getMatrices().push();
+        drawCursor(context, mouseX, mouseY, hoverSlot, client);
+        //context.getMatrices().pop();
     }
 
     /**
      * Draws the virtual cursor.
      *
-     * @param matrices the matrix stack
+     * @param context the context
      * @param x x coordinate
      * @param y y coordinate
      * @param hoverSlot true if hovering a slot, else false
      * @param client the client instance
      */
-    public static void drawCursor(@NotNull MatrixStack matrices, int x, int y, boolean hoverSlot, @NotNull MinecraftClient client) {
-        RenderSystem.disableDepthTest();
-
-        RenderSystem.setShaderColor(1.f, 1.f, 1.f, 1.f);
-        RenderSystem.setShaderTexture(0, MidnightControlsClient.CURSOR_TEXTURE);
-        DrawableHelper.drawTexture(matrices, x, y,
+    public static void drawCursor(@NotNull DrawContext context, int x, int y, boolean hoverSlot, @NotNull MinecraftClient client) {
+        //RenderSystem.disableDepthTest();
+        //RenderSystem.setShaderColor(1.f, 1.f, 1.f, 1.f);
+        //RenderSystem.disableBlend();
+        //RenderSystem.setShaderTexture(0, MidnightControlsClient.CURSOR_TEXTURE);
+        context.drawTexture(MidnightControlsClient.CURSOR_TEXTURE, x, y,
                 hoverSlot ? 16.f : 0.f, MidnightControlsConfig.virtualMouseSkin.ordinal() * 16.f,
                 16, 16, 32, 64);
-        RenderSystem.enableDepthTest();
+        context.fill(1, 1, x, y, 0xFFFFFF);
+        context.draw();
+        //RenderSystem.enableDepthTest();
     }
 
     public record ButtonSize(int length, int height) {

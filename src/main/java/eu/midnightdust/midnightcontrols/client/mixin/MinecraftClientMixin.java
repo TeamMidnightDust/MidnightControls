@@ -12,12 +12,15 @@ package eu.midnightdust.midnightcontrols.client.mixin;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsRenderer;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
@@ -31,6 +34,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -60,6 +64,8 @@ public abstract class MinecraftClientMixin {
 
     @Shadow
     private int itemUseCooldown;
+
+    @Shadow public abstract BufferBuilderStorage getBufferBuilders();
 
     private BlockPos midnightcontrols$lastTargetPos;
     private Vec3d midnightcontrols$lastPos;
@@ -113,9 +119,13 @@ public abstract class MinecraftClientMixin {
     private void onRender(CallbackInfo ci) {
         MidnightControlsClient.get().onRender((MinecraftClient) (Object) (this));
     }
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;render(FJZ)V", shift = At.Shift.AFTER))
-    private void renderVirtualCursor(boolean fullRender, CallbackInfo ci) {
-        MidnightControlsRenderer.renderVirtualCursor(new MatrixStack(), (MinecraftClient) (Object) this);
+
+    @Inject(at = @At("TAIL"), method = "setScreen")
+    private void setScreen(Screen screen, CallbackInfo info) {
+        if (MidnightControlsConfig.hideNormalMouse){
+            if (screen != null) GLFW.glfwSetInputMode(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
+            else GLFW.glfwSetInputMode(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+        }
     }
 
     @Inject(method = "doItemUse()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/HitResult;getType()Lnet/minecraft/util/hit/HitResult$Type;"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true)

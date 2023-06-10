@@ -67,6 +67,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(category = "controller", name = "midnightcontrols.menu.unfocused_input") public static boolean unfocusedInput = false;
     @Entry(category = "screens", name = "midnightcontrols.menu.virtual_mouse") public static boolean virtualMouse = false;
     @Entry(category = "screens", name = "midnightcontrols.menu.virtual_mouse.skin") public static VirtualMouseSkin virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
+    @Entry(category = "screens", name = "midnightcontrols.menu.hide_cursor") public static boolean hideNormalMouse = false;
     @Entry(category = "controller", name = "Controller ID") @Hidden public static Object controllerID = 0;
     @Entry(category = "controller", name = "2nd Controller ID") @Hidden public static Object secondControllerID = -1;
     @Entry(category = "visual", name = "midnightcontrols.menu.controller_type") public static ControllerType controllerType = ControllerType.DEFAULT;

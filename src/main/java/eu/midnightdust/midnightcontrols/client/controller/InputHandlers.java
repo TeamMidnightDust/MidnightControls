@@ -25,17 +25,17 @@ import eu.midnightdust.midnightcontrols.client.mixin.RecipeBookWidgetAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.TabNavigationWidgetAccessor;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.impl.client.itemgroup.CreativeGuiExtensions;
 import net.fabricmc.fabric.impl.client.itemgroup.FabricCreativeGuiComponents;
 import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
-import net.fabricmc.fabric.impl.itemgroup.ItemGroupHelper;
+import net.fabricmc.fabric.impl.itemgroup.ItemGroupEventsImpl;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
-import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.gui.widget.TabNavigationWidget;
 import net.minecraft.client.util.ScreenshotRecorder;
@@ -68,7 +68,7 @@ public class InputHandlers {
     private InputHandlers() {
     }
     private static List<ItemGroup> getVisibleGroups(CreativeInventoryScreen screen) {
-        return ItemGroupHelper.sortedGroups.stream()
+        return ItemGroups.getGroups().stream()
             .filter(itemGroup -> {
                 if (FabricCreativeGuiComponents.COMMON_GROUPS.contains(itemGroup)) return true;
                 return ((CreativeGuiExtensions)screen).fabric_currentPage() == ((FabricItemGroup)itemGroup).getPage() && itemGroup.shouldDisplay();
