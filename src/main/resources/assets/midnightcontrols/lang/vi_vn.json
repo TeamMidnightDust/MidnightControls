@@ -205,10 +205,10 @@
   "midnightcontrols.virtual_mouse.skin.default_dark": "Tối mặc định",
   "midnightcontrols.virtual_mouse.skin.second_light": "Sáng thứ hai",
   "midnightcontrols.virtual_mouse.skin.second_dark": "Tối thứ hai",
-  "midnightcontrols.midnightconfig.category.controller": "Controller",
-  "midnightcontrols.midnightconfig.category.misc": "Miscellaneous",
-  "midnightcontrols.midnightconfig.category.screens": "Screens",
+  "midnightcontrols.midnightconfig.category.controller": "Bộ điều khiển",
+  "midnightcontrols.midnightconfig.category.misc": "Khác",
+  "midnightcontrols.midnightconfig.category.screens": "Màn hình",
   "midnightcontrols.midnightconfig.category.gameplay": "Gameplay",
-  "midnightcontrols.midnightconfig.category.visual": "Visual",
-  "modmenu.descriptionTranslation.midnightcontrols": "Adds controller support and enhanced controls overall.\nForked from LambdaControls, which sadly got discontinued."
+  "midnightcontrols.midnightconfig.category.visual": "Hình ảnh",
+  "modmenu.descriptionTranslation.midnightcontrols": "Thêm hỗ trợ bộ điều khiển và kiểm soát nâng cao tổng thể.\nĐược phân tách từ LambdaControls, đáng tiếc là đã ngừng hoạt động."
 }
