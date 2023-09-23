@@ -13,6 +13,7 @@
     "GameRendererMixin",
     "HandledScreenMixin",
     "KeyBindingMixin",
+    "InputUtilMixin",
     "MinecraftClientMixin",
     "MouseMixin",
     "ChatScreenMixin",
