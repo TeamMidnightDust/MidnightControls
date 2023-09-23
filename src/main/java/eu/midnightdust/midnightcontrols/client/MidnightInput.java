@@ -203,17 +203,7 @@ public class MidnightInput {
             }
             client.getTutorialManager().onUpdateMouse(this.targetPitch, this.targetYaw);
             MidnightControlsCompat.HANDLERS.forEach(handler -> handler.handleCamera(client, targetYaw, targetPitch));
-            this.onRender(client);
         }
-    }
-    /**
-     * This method is deprecated and will be removed in future versions
-     * It is just kept, because the current version of 'Do a Barrel Roll' mixins into this method
-     *
-     * @param client the client instance
-     */
-    @Deprecated
-    public void onRender(@NotNull MinecraftClient client) {
     }
 
     /**
@@ -540,7 +530,7 @@ public class MidnightInput {
                 var accessor = (CreativeInventoryScreenAccessor) creativeInventoryScreen;
                 // @TODO allow rebinding to left stick
                 if (accessor.midnightcontrols$hasScrollbar() && absValue >= deadZone) {
-                    creativeInventoryScreen.mouseScrolled(0.0, 0.0, -value);
+                    creativeInventoryScreen.mouseScrolled(0.0, 0.0, 0, -value);
                 }
                 return;
             }
@@ -548,7 +538,7 @@ public class MidnightInput {
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
                 // @TODO allow rebinding to left stick
                 if (absValue >= deadZone) {
-                    merchantScreen.mouseScrolled(0.0, 0.0, -(value * 1.5f));
+                    merchantScreen.mouseScrolled(0.0, 0.0, 0, -(value * 1.5f));
                 }
                 return;
             }
@@ -556,7 +546,7 @@ public class MidnightInput {
             if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
                 // @TODO allow rebinding to left stick
                 if (absValue >= deadZone) {
-                    stonecutterScreen.mouseScrolled(0.0, 0.0, -(value * 1.5f));
+                    stonecutterScreen.mouseScrolled(0.0, 0.0, 0, -(value * 1.5f));
                 }
                 return;
             }
@@ -575,7 +565,7 @@ public class MidnightInput {
                         .map(element -> (SpruceEntryListWidget<?>) element)
                         .filter(AbstractSpruceWidget::isFocusedOrHovered)
                         .noneMatch(element -> {
-                            element.mouseScrolled(0.0, 0.0, -finalValue);
+                            element.mouseScrolled(0.0, 0.0, 0, -finalValue);
                             return true;
                         })
                         &&
@@ -583,11 +573,11 @@ public class MidnightInput {
                         .map(element -> (EntryListWidget<?>) element)
                         .filter(element -> element.getType().isFocused())
                         .noneMatch(element -> {
-                            element.mouseScrolled(0.0, 0.0, -finalValue);
+                            element.mouseScrolled(0.0, 0.0, 0, -finalValue);
                             return true;
                         }))
                 {
-                    client.currentScreen.mouseScrolled(0.0, 0.0, -(value * 1.5f));
+                    client.currentScreen.mouseScrolled(0.0, 0.0, 0, -(value * 1.5f));
                 }
             else if (isScreenInteractive(client.currentScreen) && absValue >= deadZone) {
                 if (value > 0 && joystickCooldown == 0) {

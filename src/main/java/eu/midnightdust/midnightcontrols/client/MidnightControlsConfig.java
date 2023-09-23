@@ -18,8 +18,10 @@ import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
+import eu.midnightdust.midnightcontrols.client.touch.TouchMode;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -79,6 +81,10 @@ public class MidnightControlsConfig extends MidnightConfig {
             "me.shedaniel.clothconfig2.gui.ClothConfigScreen", "com.mamiyaotaru.voxelmap.gui.GuiWaypoints", "com.mamiyaotaru.voxelmap.gui.GuiPersistentMap");
     @Entry(category = "screens", name = "Arrow screens") public static List<String> arrowScreens = Lists.newArrayList(ChatScreen.class.getCanonicalName());
     @Entry(category = "screens", name = "WASD screens") public static List<String> wasdScreens = Lists.newArrayList("com.ultreon.devices.core.Laptop");
+    @Entry(category = "touch", name = "Screens with close button") public static List<String> closeButtonScreens = Lists.newArrayList(ChatScreen.class.getCanonicalName(), AdvancementsScreen.class.getCanonicalName());
+    @Entry(category = "touch", name = "midnightcontrols.menu.touch_speed", isSlider = true, min = 0, max = 150, precision = 10) public static double touchSpeed = 25.0;
+    @Entry(category = "touch", name = "midnightcontrols.menu.touch_mode") public static TouchMode touchMode = TouchMode.CROSSHAIR;
+
     @Entry @Hidden public static Map<String, String> BINDING = new HashMap<>();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");

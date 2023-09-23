@@ -115,10 +115,6 @@ public abstract class MinecraftClientMixin {
 //        }
         this.midnightcontrols$lastPos = this.player.getPos();
     }
-    @Inject(method = "render", at = @At("HEAD"))
-    private void onRender(CallbackInfo ci) {
-        MidnightControlsClient.get().onRender((MinecraftClient) (Object) (this));
-    }
 
     @Inject(at = @At("TAIL"), method = "setScreen")
     private void setScreen(Screen screen, CallbackInfo info) {

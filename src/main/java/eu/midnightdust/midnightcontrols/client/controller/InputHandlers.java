@@ -10,6 +10,7 @@
 package eu.midnightdust.midnightcontrols.client.controller;
 
 import com.google.common.collect.Lists;
+import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.client.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
@@ -19,17 +20,16 @@ import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.SodiumCompat;
 import eu.midnightdust.midnightcontrols.client.compat.YACLCompat;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
+import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.mixin.AdvancementsScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.RecipeBookWidgetAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.TabNavigationWidgetAccessor;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.impl.client.itemgroup.CreativeGuiExtensions;
 import net.fabricmc.fabric.impl.client.itemgroup.FabricCreativeGuiComponents;
 import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
-import net.fabricmc.fabric.impl.itemgroup.ItemGroupEventsImpl;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
@@ -100,6 +100,7 @@ public class InputHandlers {
             } else if (client.currentScreen instanceof RingScreen) {
                 MidnightControlsClient.get().ring.cyclePage(next);
             } else if (client.currentScreen instanceof CreativeInventoryScreenAccessor inventory) {
+                if (PlatformFunctions.isModLoaded("connectormod")) return true;
                 ItemGroup currentTab = CreativeInventoryScreenAccessor.getSelectedTab();
                 int currentColumn = currentTab.getColumn();
                 ItemGroup.Row currentRow = currentTab.getRow();
@@ -160,7 +161,7 @@ public class InputHandlers {
                             nextTab = tabs.size() - 1;
                         else if (nextTab >= tabs.size())
                             nextTab = 0;
-                        screen.getAdvancementManager().selectTab(tabs.get(nextTab).getRoot(), true);
+                        screen.getAdvancementManager().selectTab(tabs.get(nextTab).getRoot().getAdvancementEntry(), true);
                         break;
                     }
                 }
@@ -277,7 +278,7 @@ public class InputHandlers {
         if (action == ButtonState.PRESS) {
             // If in game, then pause the game.
             if (client.currentScreen == null || client.currentScreen instanceof RingScreen)
-                client.openPauseMenu(false);
+                client.openGameMenu(false);
             else if (client.currentScreen instanceof HandledScreen && client.player != null) // If the current screen is a container then close it.
                 client.player.closeHandledScreen();
             else // Else just close the current screen.
@@ -418,7 +419,7 @@ public class InputHandlers {
      * @return true if the client is in game, else false
      */
     public static boolean inGame(@NotNull MinecraftClient client, @NotNull ButtonBinding binding) {
-        return (client.currentScreen == null && MidnightControlsClient.get().input.screenCloseCooldown <= 0) || client.currentScreen instanceof RingScreen;
+        return (client.currentScreen == null && MidnightControlsClient.get().input.screenCloseCooldown <= 0) || client.currentScreen instanceof TouchscreenOverlay || client.currentScreen instanceof RingScreen;
     }
 
     /**

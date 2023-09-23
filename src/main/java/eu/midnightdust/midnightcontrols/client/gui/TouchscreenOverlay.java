@@ -15,16 +15,23 @@ import eu.midnightdust.midnightcontrols.client.HudSide;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.gui.widget.SilentTexturedButtonWidget;
+import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
 import eu.midnightdust.midnightcontrols.client.util.KeyBindingAccessor;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.GameMenuScreen;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.*;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.gui.widget.TexturedButtonWidget;
+import net.minecraft.client.gui.widget.TextIconButtonWidget;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
@@ -62,11 +69,7 @@ public class TouchscreenOverlay extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        super.keyPressed(keyCode,scanCode,modifiers);
-        //return false;
-        return true;
-    }
+    public void renderInGameBackground(DrawContext context) {}
 
     private void pauseGame(boolean bl) {
         if (this.client == null)
@@ -136,27 +139,14 @@ public class TouchscreenOverlay extends Screen {
     }
 
     @Override
-    public void tick() {
-        if (this.forwardButtonTick > 0) {
-            this.forwardButtonTick--;
-        } else if (this.forwardButtonTick == 0) {
-            if (this.forwardLeftButton.isVisible())
-                this.forwardLeftButton.setVisible(false);
-            if (this.forwardRightButton.isVisible())
-                this.forwardRightButton.setVisible(false);
-        }
-        this.updateJumpButtons();
-    }
-
-    @Override
     protected void init() {
         super.init();
         int scaledWidth = this.client.getWindow().getScaledWidth();
         int scaledHeight = this.client.getWindow().getScaledHeight();
-        this.addDrawableChild(new TexturedButtonWidget(scaledWidth / 2 - 20, 0, 20, 20, 0, 106, 20, new Identifier("textures/gui/widgets.png"), 256, 256,
-                btn -> this.client.setScreen(new ChatScreen("")), Text.empty()));
-        this.addDrawableChild(new TexturedButtonWidget(scaledWidth / 2, 0, 20, 20, 0, 0, 20, WIDGETS_LOCATION, 256, 256,
-                btn -> this.pauseGame(false)));
+        TextIconButtonWidget chatButton = TextIconButtonWidget.builder(Text.empty(), btn -> this.client.setScreen(new ChatScreen("")), true).width(20).texture(new Identifier("icon/language"), 15, 15).build();
+        chatButton.setPosition(scaledWidth / 2 - 20, 0);
+        this.addDrawableChild(chatButton);
+        this.addDrawableChild(new SilentTexturedButtonWidget(Position.of(scaledWidth / 2, 0), 20, 20, Text.empty(), btn -> this.pauseGame(false), 0, 0, 20, WIDGETS_LOCATION, 256, 256));
         // Inventory buttons.
         int inventoryButtonX = scaledWidth / 2;
         int inventoryButtonY = scaledHeight - 16 - 5;
@@ -165,15 +155,15 @@ public class TouchscreenOverlay extends Screen {
         } else {
             inventoryButtonX = inventoryButtonX + 91 + 4;
         }
-        this.addDrawableChild(new TexturedButtonWidget(inventoryButtonX, inventoryButtonY, 20, 20, 20, 0, 20, WIDGETS_LOCATION, 256, 256,
-                btn -> {
-                    if (this.client.interactionManager.hasRidingInventory()) {
-                        this.client.player.openRidingInventory();
-                    } else {
-                        this.client.getTutorialManager().onInventoryOpened();
-                        this.client.setScreen(new InventoryScreen(this.client.player));
-                    }
-                }));
+        this.addDrawableChild(new SilentTexturedButtonWidget(Position.of(inventoryButtonX, inventoryButtonY), 20, 20, Text.empty(), btn -> {
+            if (this.client.interactionManager.hasRidingInventory()) {
+                this.client.player.openRidingInventory();
+            } else {
+                this.client.getTutorialManager().onInventoryOpened();
+                this.client.setScreen(new InventoryScreen(this.client.player));
+            }
+        }, 20, 0, 20, WIDGETS_LOCATION, 256, 256));
+                ;
         int jumpButtonX, swapHandsX, sneakButtonX;
         int sneakButtonY = scaledHeight - 10 - 40 - 5;
         if (MidnightControlsConfig.hudSide == HudSide.LEFT) {
@@ -196,7 +186,7 @@ public class TouchscreenOverlay extends Screen {
                 },0, 160, 20, WIDGETS_LOCATION));
         // Drop
         this.addDrawableChild(new SilentTexturedButtonWidget(Position.of(swapHandsX, sneakButtonY + 5 + 20), 20, 20, Text.empty(), btn ->
-                ((KeyBindingAccessor) this.client.options.dropKey).midnightcontrols$handlePressState(btn.isActive()), 0, 160, 20, WIDGETS_LOCATION));
+                client.player.getInventory().dropSelectedItem(false), 20, 160, 20, WIDGETS_LOCATION));
         // Jump keys
         this.addDrawableChild(this.jumpButton = new SilentTexturedButtonWidget(Position.of(jumpButtonX, sneakButtonY), 20, 20, Text.empty(), this::handleJump, 0, 40, 20, WIDGETS_LOCATION));
         this.addDrawableChild(this.flyButton = new SilentTexturedButtonWidget(Position.of(jumpButtonX, sneakButtonY), 20, 20, Text.empty(),btn -> {
@@ -247,7 +237,7 @@ public class TouchscreenOverlay extends Screen {
             this.updateForwardButtonsState(btn.isActive());
         }, 100, 80, 20, WIDGETS_LOCATION
         ));
-        this.forwardRightButton.setVisible(true);
+        this.forwardRightButton.setVisible(false);
         this.addDrawableChild(new SilentTexturedButtonWidget(Position.of(sneakButtonX + 20 + 5, sneakButtonY), 20, 20, Text.empty(),
                 btn -> ((KeyBindingAccessor) this.client.options.rightKey).midnightcontrols$handlePressState(btn.isActive()), 20, 80, 20, WIDGETS_LOCATION
         ));
@@ -260,35 +250,119 @@ public class TouchscreenOverlay extends Screen {
     }
 
     @Override
+    public void tick() {
+        if (this.forwardButtonTick > 0) {
+            this.forwardButtonTick--;
+        } else if (this.forwardButtonTick == 0) {
+            if (this.forwardLeftButton.isVisible())
+                this.forwardLeftButton.setVisible(false);
+            if (this.forwardRightButton.isVisible())
+                this.forwardRightButton.setVisible(false);
+        }
+        this.updateJumpButtons();
+        double scaleFactor = client.getWindow().getScaleFactor();
+        if (clickStartTime > 0 && System.currentTimeMillis() - clickStartTime >= 100) mouseHeldDown(client.mouse.getX() / scaleFactor, client.mouse.getY() / scaleFactor);
+        else client.interactionManager.cancelBlockBreaking();
+    }
+
+    private long clickStartTime;
+    private double[] firstPosition = new double[2];
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (mouseY >= (double) (this.height - 22) && this.client != null && this.client.player != null) {
-            int centerX = this.width / 2;
-            if (mouseX >= (double) (centerX - 90) && mouseX <= (double) (centerX + 90)) {
-                for (int slot = 0; slot < 9; ++slot) {
-                    int slotX = centerX - 90 + slot * 20 + 2;
-                    if (mouseX >= (double) slotX && mouseX <= (double) (slotX + 20)) {
-                        this.client.player.getInventory().selectedSlot = slot;
+        int centerX = this.width / 2;
+        if (mouseY >= (double) (this.height - 22) && this.client != null && this.client.player != null && mouseX >= (double) (centerX - 90) && mouseX <= (double) (centerX + 90)) {
+            for (int slot = 0; slot < 9; ++slot) {
+                int slotX = centerX - 90 + slot * 20 + 2;
+                if (mouseX >= (double) slotX && mouseX <= (double) (slotX + 20)) {
+                    this.client.player.getInventory().selectedSlot = slot;
+                    return true;
+                }
+            }
+        } else {
+            clickStartTime = System.currentTimeMillis();
+            firstPosition[0] = mouseX;
+            firstPosition[1] = mouseY;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (!super.mouseReleased(mouseX, mouseY, button) && System.currentTimeMillis() - clickStartTime < 200) {
+            clickStartTime = -1;
+            HitResult result = TouchUtils.getTargettedObject(mouseX, mouseY);
+            if (result == null) return false;
+
+            if (result.getType() == HitResult.Type.BLOCK) {
+                BlockHitResult blockHit = (BlockHitResult) result;
+                BlockPos blockPos = blockHit.getBlockPos().offset(blockHit.getSide());
+                BlockState state = client.world.getBlockState(blockPos);
+
+                if (client.world.isAir(blockPos) || state.isReplaceable()) {
+                    ItemStack stackInHand = client.player.getMainHandStack();
+                    int previousStackCount = stackInHand.getCount();
+                    var interaction = client.interactionManager.interactBlock(client.player, client.player.getActiveHand(), blockHit);
+                    if (interaction.isAccepted()) {
+                        if (interaction.shouldSwingHand()) {
+                            client.player.swingHand(client.player.preferredHand);
+                            if (!stackInHand.isEmpty() && (stackInHand.getCount() != previousStackCount || client.interactionManager.hasCreativeInventory())) {
+                                client.gameRenderer.firstPersonRenderer.resetEquipProgress(client.player.preferredHand);
+                            }
+                        }
                         return true;
                     }
                 }
             }
+            if (result.getType() == HitResult.Type.ENTITY) {
+                client.interactionManager.attackEntity(client.player, ((EntityHitResult)result).getEntity());
+            }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        firstPosition = new double[2];
+        clickStartTime = -1;
+        return false;
+    }
+    public boolean mouseHeldDown(double mouseX, double mouseY) {
+        System.out.println(mouseX + " " + firstPosition[0]);
+        if (!isDragging() && Math.abs(mouseX-firstPosition[0]) < 1 && Math.abs(mouseY-firstPosition[1]) < 1) {
+            HitResult result = TouchUtils.getTargettedObject(mouseX, mouseY);
+            if (result == null) return false;
+
+            if (result.getType() == HitResult.Type.BLOCK) {
+                BlockHitResult blockHit = (BlockHitResult) result;
+                System.out.println(blockHit.getBlockPos().toString());
+                return client.interactionManager.updateBlockBreakingProgress(blockHit.getBlockPos(), blockHit.getSide());
+            }
+            if (result.getType() == HitResult.Type.ENTITY) {
+                client.interactionManager.interactEntity(client.player, ((EntityHitResult)result).getEntity(), client.player.getActiveHand());
+            }
+        }
+        return false;
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_1 && this.client != null) {
             if (deltaY > 0.01)
-                this.mod.input.handleLook(this.client, GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) Math.abs(deltaY / 5.0), 2);
-            else if (deltaY < 0.01)
-                this.mod.input.handleLook(this.client, GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) Math.abs(deltaY / 5.0), 1);
+                this.mod.input.handleLook(this.client, GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) Math.abs((deltaY / 3.0)*MidnightControlsConfig.touchSpeed/100), 2);
+            else this.mod.input.handleLook(this.client, GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) Math.abs((deltaY / 3.0)*MidnightControlsConfig.touchSpeed/100), 1);
 
             if (deltaX > 0.01)
-                this.mod.input.handleLook(this.client, GLFW_GAMEPAD_AXIS_RIGHT_X, (float) Math.abs(deltaX / 5.0), 2);
-            else if (deltaX < 0.01)
-                this.mod.input.handleLook(this.client, GLFW_GAMEPAD_AXIS_RIGHT_X, (float) Math.abs(deltaX / 5.0), 1);
+                this.mod.input.handleLook(this.client, GLFW_GAMEPAD_AXIS_RIGHT_X, (float) Math.abs((deltaX / 3.0)*MidnightControlsConfig.touchSpeed/100), 2);
+            else this.mod.input.handleLook(this.client, GLFW_GAMEPAD_AXIS_RIGHT_X, (float) Math.abs((deltaX / 3.0)*MidnightControlsConfig.touchSpeed/100), 1);
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        KeyBinding.onKeyPressed(InputUtil.fromKeyCode(keyCode, scanCode));
+        //return false;
+        super.keyPressed(keyCode,scanCode,modifiers);
+        return true;
+    }
+
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+        context.fill(mouseX-10, mouseY-10, mouseX+10, mouseY+10, 0xFFFFFF);
     }
 }

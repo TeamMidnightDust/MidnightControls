@@ -28,6 +28,7 @@ import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingRegistryImplAcces
 import eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction;
 import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
 import dev.lambdaurora.spruceui.hud.HudManager;
+import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -122,20 +123,21 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
                 this.input.onScreenOpen(client, client.getWindow().getWidth(), client.getWindow().getHeight());
             }
         });
+        final MinecraftClient client = MinecraftClient.getInstance();
+        int delay = 0; // delay for 0 sec.
+        int period = 1; // repeat every 0.001 sec. (100 times a second)
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                input.updateCamera(client);
+            }
+        }, delay, period);
 
         HudManager.register(this.hud = new MidnightControlsHud(this));
         FabricLoader.getInstance().getModContainer("midnightcontrols").ifPresent(modContainer -> {
             ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","bedrock"), modContainer, ResourcePackActivationType.NORMAL);
             ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","legacy"), modContainer, ResourcePackActivationType.NORMAL);
         });
-        int delay = 0; // delay for 0 sec.
-        int period = 1; // repeat every 0.001 sec. (100 times a second)
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
-                input.updateCamera(MinecraftClient.getInstance());
-            }
-        }, delay, period);
     }
 
     /**
@@ -227,9 +229,7 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
             MidnightControlsConfig.enableHints = false;
             MidnightControlsConfig.save();
         }
-    }
-    public void onRender(MinecraftClient client) {
-        //this.input.onRender(client);
+        RainbowColor.tick();
     }
 
     /**

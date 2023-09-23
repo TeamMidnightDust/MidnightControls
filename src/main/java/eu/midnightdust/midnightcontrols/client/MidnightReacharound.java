@@ -73,7 +73,7 @@ public class MidnightReacharound {
         return MidnightControlsFeature.HORIZONTAL_REACHAROUND.isAvailable() || MidnightControlsFeature.VERTICAL_REACHAROUND.isAvailable();
     }
 
-    private float getPlayerRange(@NotNull MinecraftClient client) {
+    public static float getPlayerRange(@NotNull MinecraftClient client) {
         return client.interactionManager != null ? client.interactionManager.getReachDistance() : 0.f;
     }
 

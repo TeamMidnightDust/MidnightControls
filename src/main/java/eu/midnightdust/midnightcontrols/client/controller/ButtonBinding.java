@@ -13,6 +13,8 @@ import eu.midnightdust.midnightcontrols.client.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.DebugHud;
+import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
@@ -75,9 +77,8 @@ public class ButtonBinding {
             .action(MovementHandler.HANDLER).onlyInGame().register();
     public static final ButtonBinding SCREENSHOT = new Builder("screenshot").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_A)
             .action(InputHandlers::handleScreenshot).cooldown().register();
-
     public static final ButtonBinding DEBUG_SCREEN = new Builder("debug_screen").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_B)
-            .action((client,binding,value,action) -> {if (action == ButtonState.PRESS) client.options.debugEnabled = !client.options.debugEnabled; return true;}).cooldown().register();
+            .action((client,binding,value,action) -> {if (action == ButtonState.PRESS) client.inGameHud.getDebugHud().toggleDebugHud(); return true;}).cooldown().register();
     public static final ButtonBinding SLOT_DOWN = new Builder("slot_down").buttons(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)
             .action(InputHandlers.handleInventorySlotPad(1)).onlyInInventory().cooldown().register();
     public static final ButtonBinding SLOT_LEFT = new Builder("slot_left").buttons(GLFW_GAMEPAD_BUTTON_DPAD_LEFT)

@@ -21,8 +21,8 @@
     "WorldRendererMixin",
     "KeyBindingRegistryImplAccessor",
     "KeyBindingIDAccessor",
-    "ScreenAccessor",
-    "TabNavigationWidgetAccessor"
+    "TabNavigationWidgetAccessor",
+    "ScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

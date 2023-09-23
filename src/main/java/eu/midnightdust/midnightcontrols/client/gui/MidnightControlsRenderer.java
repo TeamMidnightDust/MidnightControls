@@ -21,9 +21,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -234,6 +232,7 @@ public class MidnightControlsRenderer {
         }
 
         //context.getMatrices().push();
+        context.getMatrices().translate(0f, 0f, 999f);
         drawCursor(context, mouseX, mouseY, hoverSlot, client);
         //context.getMatrices().pop();
     }

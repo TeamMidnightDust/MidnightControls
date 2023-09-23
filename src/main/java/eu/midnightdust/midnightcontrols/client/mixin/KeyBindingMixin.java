@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(KeyBinding.class)
-public class KeyBindingMixin implements KeyBindingAccessor {
+public abstract class KeyBindingMixin implements KeyBindingAccessor {
     @Shadow
     private int timesPressed;
 

@@ -92,7 +92,7 @@ public abstract class MouseMixin implements MouseAccessor {
     private void isCursorLocked(CallbackInfoReturnable<Boolean> ci) {
         if (this.client.currentScreen == null) {
             if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.virtualMouse) {
-                ci.setReturnValue(true);
+                //ci.setReturnValue(true);
                 ci.cancel();
             }
         }
@@ -100,8 +100,9 @@ public abstract class MouseMixin implements MouseAccessor {
 
     @Inject(method = "lockCursor", at = @At("HEAD"), cancellable = true)
     private void onCursorLocked(CallbackInfo ci) {
-        if (/*config.getControlsMode() == ControlsMode.TOUCHSCREEN
-                ||*/ (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.virtualMouse))
+        if ((MidnightControlsConfig.eyeTrackerAsMouse && client.isWindowFocused() && !this.cursorLocked)
+                || MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN
+                || (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.virtualMouse))
             ci.cancel();
     }
 
