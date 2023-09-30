@@ -23,4 +23,17 @@ public class SilentTexturedButtonWidget extends SpruceTexturedButtonWidget {
     }
     @Override
     public void playDownSound() {}
+    @Override
+    protected void onRelease(double mouseX, double mouseY) {
+        this.setActive(false);
+        super.onClick(mouseX, mouseY);
+        super.onRelease(mouseX, mouseY);
+        this.setActive(true);
+    }
+    @Override
+    public void onClick(double mouseX, double mouseY) {
+        this.setActive(true);
+        super.onClick(mouseX, mouseY);
+        this.setActive(false);
+    }
 }

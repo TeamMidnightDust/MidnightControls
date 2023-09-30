@@ -1,16 +1,21 @@
 package eu.midnightdust.midnightcontrols.client.compat;
 
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
+import io.github.kosmx.emotes.arch.gui.EmoteMenuImpl;
 import io.github.kosmx.emotes.arch.gui.screen.ingame.FastChosseScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 
 public class EmotecraftCompat {
+    private static final MinecraftClient client = MinecraftClient.getInstance();
+    public static void openEmotecraftScreen(Screen parent) {
+        client.setScreen(new EmoteMenuImpl(parent));
+    }
     public static boolean isEmotecraftScreen(Screen screen) {
         return screen instanceof FastChosseScreen;
     }
     public static void handleEmoteSelector(int index) {
-        MinecraftClient client = MinecraftClient.getInstance();
+
         if (client.currentScreen instanceof FastChosseScreen) {
             int x = client.getWindow().getWidth() / 2;
             int y = client.getWindow().getHeight() / 2;

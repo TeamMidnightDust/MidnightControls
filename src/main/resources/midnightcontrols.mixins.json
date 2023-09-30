@@ -8,8 +8,6 @@
     "ClientPlayerEntityMixin",
     "ControlsOptionsScreenMixin",
     "CreativeInventoryScreenAccessor",
-    "EntryListWidgetAccessor",
-    "GameOptionsMixin",
     "GameRendererMixin",
     "HandledScreenMixin",
     "KeyBindingMixin",

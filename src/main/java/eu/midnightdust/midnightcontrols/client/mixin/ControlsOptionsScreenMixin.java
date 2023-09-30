@@ -33,7 +33,7 @@ public abstract class ControlsOptionsScreenMixin extends GameOptionsScreen {
     @Inject(method = "init", at = @At(value = "INVOKE", ordinal = 1, shift = At.Shift.AFTER, target = "Lnet/minecraft/client/gui/screen/option/ControlsOptionsScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;"))
     private void addControllerButton(CallbackInfo ci) {
         TextIconButtonWidget iconWidget = TextIconButtonWidget.builder(Text.translatable("midnightcontrols.menu.title.controller"), (button -> this.client.setScreen(new MidnightControlsSettingsScreen(this, false))), true)
-                .dimension(20,20).texture(new Identifier("midnightcontrols", "icon/button"), 20, 20).build();
+                .dimension(20,20).texture(new Identifier("midnightcontrols", "icon/controller"), 20, 20).build();
         iconWidget.setPosition(this.width / 2 + 158, this.height / 6 - 12);
         this.addDrawableChild(iconWidget);
     }
