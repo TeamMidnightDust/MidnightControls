@@ -20,7 +20,8 @@
     "KeyBindingRegistryImplAccessor",
     "KeyBindingIDAccessor",
     "TabNavigationWidgetAccessor",
-    "ScreenMixin"
+    "ScreenMixin",
+    "KeyboardMixin"
   ],
   "injectors": {
     "defaultRequire": 1

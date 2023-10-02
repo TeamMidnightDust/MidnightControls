@@ -4,6 +4,8 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.UseAction;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -56,5 +58,9 @@ public class TouchUtils {
                         (float) (displayHeight - y) / displayHeight * viewport[3], (float) d, viewport, target);
 
         return new Vec3d(target.x, target.y, target.z).add(camera.getPos());
+    }
+    public static boolean hasInWorldUseAction(ItemStack stack) {
+        UseAction action = stack.getUseAction();
+        return action == UseAction.BOW || action == UseAction.BRUSH || action == UseAction.SPEAR;
     }
 }

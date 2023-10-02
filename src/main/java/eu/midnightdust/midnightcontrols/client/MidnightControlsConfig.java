@@ -83,12 +83,15 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(category = "screens", name = "Arrow screens") public static List<String> arrowScreens = Lists.newArrayList(ChatScreen.class.getCanonicalName());
     @Entry(category = "screens", name = "WASD screens") public static List<String> wasdScreens = Lists.newArrayList("com.ultreon.devices.core.Laptop");
     @Entry(category = "touch", name = "Screens with close button") public static List<String> closeButtonScreens = Lists.newArrayList(ChatScreen.class.getCanonicalName(), AdvancementsScreen.class.getCanonicalName(), RingScreen.class.getCanonicalName());
-    @Entry(category = "touch", name = "midnightcontrols.menu.touch_speed", isSlider = true, min = 0, max = 150, precision = 10) public static double touchSpeed = 25.0;
+    @Entry(category = "touch", name = "midnightcontrols.menu.touch_speed", isSlider = true, min = 0, max = 150, precision = 10) public static double touchSpeed = 50.0;
+    @Entry(category = "touch", name = "midnightcontrols.menu.invert_touch") public static boolean invertTouch = false;
     @Entry(category = "touch", name = "midnightcontrols.menu.touch_mode") public static TouchMode touchMode = TouchMode.CROSSHAIR;
+    @Entry(category = "touch", name = "midnightcontrols.menu.touch_break_delay", isSlider = true, min = 50, max = 500) public static int touchBreakDelay = 120;
     @Entry(category = "touch", name = "midnightcontrols.menu.touch_transparency", isSlider = true, min = 0, max = 100) public static int touchTransparency = 75;
     @Entry(category = "touch", name = "Touch Outline Color", isColor = true) public static String touchOutlineColorHex = "#ffffff";
     @Entry(category = "touch", name = "Touch Outline Alpha", isSlider = true, min = 0, max = 255) public static int touchOutlineColorAlpha = 150;
-    @Entry(category = "touch", name = "Left Touch button bindings") public static List<String> leftTouchBinds = Lists.newArrayList("controls_ring","debug_screen");
+    @Entry(category = "touch", name = "Left Touch button bindings") public static List<String> leftTouchBinds = Lists.newArrayList("debug_screen", "screenshot","toggle_perspective");
+    @Entry(category = "touch", name = "Right Touch button bindings") public static List<String> rightTouchBinds = Lists.newArrayList("screenshot","toggle_perspective", "use");
 
     @Entry @Hidden public static Map<String, String> BINDING = new HashMap<>();
 

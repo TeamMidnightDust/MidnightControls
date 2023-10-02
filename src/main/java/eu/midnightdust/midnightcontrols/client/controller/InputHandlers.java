@@ -191,6 +191,8 @@ public class InputHandlers {
     }
     public static PressAction handlePage(boolean next) {
         return (client, button, value, action) -> {
+            if (action == ButtonState.RELEASE)
+                return false;
             if (client.currentScreen instanceof CreativeInventoryScreen) {
                 try {
                     return client.currentScreen.children().stream().filter(element -> element instanceof PressableWidget)

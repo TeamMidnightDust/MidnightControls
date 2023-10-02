@@ -1,4 +1,4 @@
-package eu.midnightdust.midnightcontrols.client.gui.widget;
+package eu.midnightdust.midnightcontrols.client.touch.gui;
 
 import dev.lambdaurora.spruceui.Position;
 import dev.lambdaurora.spruceui.widget.SpruceTexturedButtonWidget;

@@ -9,21 +9,15 @@
 
 package eu.midnightdust.midnightcontrols.client.mixin;
 
-import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import eu.midnightdust.midnightcontrols.client.MidnightInput;
-import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsRenderer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
@@ -35,7 +29,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -157,4 +150,10 @@ public abstract class MinecraftClientMixin {
             }
         }
     }
+    // This is always supposed to be located at before the line 'this.profiler.swap("Keybindings");'
+//    @Redirect(method = "tick", at = @At(value = "FIELD",target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;", ordinal = 6))
+//    private Screen midnightcontrols$ignoreTouchOverlay(MinecraftClient instance) {
+//        if (instance.currentScreen instanceof TouchscreenOverlay) return null;
+//        return instance.currentScreen;
+//    }
 }
