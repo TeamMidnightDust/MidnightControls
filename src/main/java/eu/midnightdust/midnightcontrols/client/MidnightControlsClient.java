@@ -47,6 +47,7 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -179,6 +180,7 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         if (lateInitDone) return;
         if (KeyBindingIDAccessor.getKEYS_BY_ID() == null || KeyBindingIDAccessor.getKEYS_BY_ID().isEmpty()) return;
         if (PlatformFunctions.isModLoaded("voxelmap") && !KeyBindingIDAccessor.getKEYS_BY_ID().containsKey("key.minimap.toggleingamewaypoints")) return;
+        if (PlatformFunctions.isModLoaded("wynntils") && KeyBindingIDAccessor.getKEYS_BY_ID().entrySet().stream().noneMatch(b -> Objects.equals(b.getValue().getCategory(), "Wynntils"))) return;
         for (int i = 0; i < KeyBindingIDAccessor.getKEYS_BY_ID().size(); ++i) {
             KeyBinding keyBinding = KeyBindingIDAccessor.getKEYS_BY_ID().entrySet().stream().toList().get(i).getValue();
             if (MidnightControlsConfig.excludedKeybindings.stream().noneMatch(excluded -> keyBinding.getTranslationKey().startsWith(excluded))) {
