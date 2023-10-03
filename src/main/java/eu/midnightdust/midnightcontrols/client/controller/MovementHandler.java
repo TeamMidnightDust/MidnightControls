@@ -12,6 +12,7 @@ package eu.midnightdust.midnightcontrols.client.controller;
 import eu.midnightdust.midnightcontrols.client.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
+import eu.midnightdust.midnightcontrols.client.util.MathUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -43,6 +44,7 @@ public final class MovementHandler implements PressAction {
     private float slowdownFactor = 1.f;
     private float movementForward = 0.f;
     private float movementSideways = 0.f;
+    private MathUtil.PolarUtil polarUtil = new MathUtil.PolarUtil();
 
     private MovementHandler() {
     }
@@ -53,8 +55,6 @@ public final class MovementHandler implements PressAction {
      * @param player The client player.
      */
     public void applyMovement(@NotNull ClientPlayerEntity player) {
-        double movementR, movementTheta;
-
         if (!this.shouldOverrideMovement)
             return;
         player.input.pressingForward = this.pressingForward;
@@ -62,12 +62,9 @@ public final class MovementHandler implements PressAction {
         player.input.pressingLeft = this.pressingLeft;
         player.input.pressingRight = this.pressingRight;
 
-        // Do an implicit square here
-        movementR = this.slowdownFactor * (Math.pow(this.movementSideways, 2) + Math.pow(this.movementForward, 2));
-        movementR = MathHelper.clamp(movementR, 0.f, 1.f);
-        movementTheta = Math.atan2(this.movementForward, this.movementSideways);
-        player.input.movementForward = (float) (movementR * Math.sin(movementTheta));
-        player.input.movementSideways = (float) (movementR * Math.cos(movementTheta));
+        polarUtil.calculate(this.movementSideways, this.movementForward, this.slowdownFactor);
+        player.input.movementForward = polarUtil.polarY;
+        player.input.movementSideways = polarUtil.polarX;
 
         this.shouldOverrideMovement = false;
     }

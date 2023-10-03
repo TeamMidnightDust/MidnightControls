@@ -432,6 +432,7 @@ public class TouchscreenOverlay extends Screen {
             if (result instanceof BlockHitResult blockHit && firstHitResult instanceof BlockHitResult firstBlock && blockHit.getBlockPos().equals(firstBlock.getBlockPos())) {
                 if (MidnightControlsConfig.debug) System.out.println(blockHit.getBlockPos().toString());
                 if (client.interactionManager.updateBlockBreakingProgress(blockHit.getBlockPos(), blockHit.getSide())) {
+                    client.particleManager.addBlockBreakingParticles(blockHit.getBlockPos(), blockHit.getSide());
                     client.player.swingHand(Hand.MAIN_HAND);
                 } else client.interactionManager.cancelBlockBreaking();
                 firstHitResult = TouchUtils.getTargettedObject(mouseX, mouseY);

@@ -63,7 +63,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(category = "controller", name = "midnightcontrols.menu.left_dead_zone", isSlider = true, min = 0.05, max = 1) public static double leftDeadZone = 0.25;
     @Entry(category = "controller", name = "midnightcontrols.menu.invert_right_y_axis") public static boolean invertRightYAxis = false;
     @Entry(category = "controller", name = "midnightcontrols.menu.invert_right_x_axis") public static boolean invertRightXAxis = false;
-    @Entry(category = "controller", name = "midnightcontrols.menu.rotation_speed", isSlider = true, min = 0, max = 100, precision = 10) public static double rotationSpeed = 40.0; //used for x-axis, name kept for compatibility
+    @Entry(category = "controller", name = "midnightcontrols.menu.rotation_speed", isSlider = true, min = 0, max = 100, precision = 10) public static double rotationSpeed = 35.0; //used for x-axis, name kept for compatibility
     @Entry(category = "controller", name = "midnightcontrols.menu.y_axis_rotation_speed", isSlider = true, min = 0, max = 100, precision = 10) public static double yAxisRotationSpeed = rotationSpeed;
     @Entry(category = "screens", name = "midnightcontrols.menu.mouse_speed", isSlider = true, min = 0, max = 150, precision = 10) public static double mouseSpeed = 25.0;
     @Entry(category = "screens", name = "midnightcontrols.menu.joystick_as_mouse") public static boolean joystickAsMouse = false;
@@ -101,7 +101,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(category = "controller", name = "Max analog value: Left Y", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueLeftY = maxAnalogValues[1];
     @Entry(category = "controller", name = "Max analog value: Right X", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightX = maxAnalogValues[2];
     @Entry(category = "controller", name = "Max analog value: Right Y", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightY = maxAnalogValues[3];
-    @Entry(category = "controller", name = "Trigger button fix") public static boolean triggerFix = true;
+    @Entry(category = "controller", name = "Trigger button fix") public static boolean triggerFix = false;
     @Entry(category = "gameplay", name = "Enable Hints") public static boolean enableHints = true;
     @Entry(category = "screens", name = "Enable Shortcut in Controls Options") public static boolean shortcutInControls = true;
     @Entry(category = "misc", name = "Ring Bindings (WIP)") public static List<String> ringBindings = new ArrayList<>();

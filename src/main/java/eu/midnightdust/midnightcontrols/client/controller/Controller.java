@@ -32,6 +32,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.lwjgl.BufferUtils.createByteBuffer;
 
@@ -79,7 +80,7 @@ public record Controller(int id) implements Nameable {
      * @return the controller's name
      */
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         var name = this.isGamepad() ? GLFW.glfwGetGamepadName(this.id) : GLFW.glfwGetJoystickName(this.id);
         return name == null ? String.valueOf(this.id()) : name;
     }
@@ -145,6 +146,9 @@ public record Controller(int id) implements Nameable {
      * Updates the controller mappings.
      */
     public static void updateMappings() {
+        CompletableFuture.supplyAsync(Controller::updateMappingsSync);
+    }
+    private static boolean updateMappingsSync() {
         try {
             MidnightControlsClient.get().log("Updating controller mappings...");
             File databaseFile = new File("config/gamecontrollerdatabase.txt");
@@ -161,7 +165,7 @@ public record Controller(int id) implements Nameable {
             var database = ioResourceToBuffer(databaseFile.getPath(), 1024);
             if (database != null) GLFW.glfwUpdateGamepadMappings(database);
             if (!MidnightControlsClient.MAPPINGS_FILE.exists())
-                return;
+                return false;
             var buffer = ioResourceToBuffer(MidnightControlsClient.MAPPINGS_FILE.getPath(), 1024);
             if (buffer != null) GLFW.glfwUpdateGamepadMappings(buffer);
         } catch (IOException e) {
@@ -199,5 +203,6 @@ public record Controller(int id) implements Nameable {
                         controller.isGamepad()));
             }
         }
+        return true;
     }
 }
