@@ -102,6 +102,9 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(category = "controller", name = "Max analog value: Right X", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightX = maxAnalogValues[2];
     @Entry(category = "controller", name = "Max analog value: Right Y", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightY = maxAnalogValues[3];
     @Entry(category = "controller", name = "Trigger button fix") public static boolean triggerFix = false;
+    @Entry(category = "controller", name = "Excluded Keybindings") public static List<String> excludedKeybindings = Lists.newArrayList("key.forward", "key.left", "key.back", "key.right", "key.jump", "key.sneak", "key.sprint", "key.inventory",
+            "key.swapOffhand", "key.drop", "key.use", "key.attack", "key.chat", "key.playerlist", "key.screenshot", "key.togglePerspective", "key.smoothCamera", "key.fullscreen", "key.saveToolbarActivator", "key.loadToolbarActivator",
+            "key.pickItem", "key.hotbar.1", "key.hotbar.2", "key.hotbar.3", "key.hotbar.4", "key.hotbar.5", "key.hotbar.6", "key.hotbar.7", "key.hotbar.8", "key.hotbar.9");
     @Entry(category = "gameplay", name = "Enable Hints") public static boolean enableHints = true;
     @Entry(category = "screens", name = "Enable Shortcut in Controls Options") public static boolean shortcutInControls = true;
     @Entry(category = "misc", name = "Ring Bindings (WIP)") public static List<String> ringBindings = new ArrayList<>();
