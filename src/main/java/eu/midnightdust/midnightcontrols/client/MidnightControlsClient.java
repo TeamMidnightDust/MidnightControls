@@ -159,10 +159,10 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
             GLFW.glfwSetJoystickCallback((jid, event) -> {
                 if (event == GLFW.GLFW_CONNECTED) {
                     var controller = Controller.byId(jid);
-                    client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, Text.translatable("midnightcontrols.controller.connected", jid),
+                    client.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION, Text.translatable("midnightcontrols.controller.connected", jid),
                             Text.literal(controller.getName())));
                 } else if (event == GLFW.GLFW_DISCONNECTED) {
-                    client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, Text.translatable("midnightcontrols.controller.disconnected", jid),
+                    client.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION, Text.translatable("midnightcontrols.controller.disconnected", jid),
                             null));
                 }
 

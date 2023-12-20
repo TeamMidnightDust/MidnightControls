@@ -180,7 +180,7 @@ public record Controller(int id) implements Nameable {
                 var string = l == 0L ? "" : MemoryUtil.memUTF8(l);
                 var client = MinecraftClient.getInstance();
                 if (client != null) {
-                    client.getToastManager().add(SystemToast.create(client, SystemToast.Type.TUTORIAL_HINT,
+		  client.getToastManager().add(SystemToast.create(client, SystemToast.Type.PERIODIC_NOTIFICATION,
                             Text.translatable("midnightcontrols.controller.mappings.error"), Text.literal(string)));
                     MidnightControls.get().log(I18n.translate("midnightcontrols.controller.mappings.error")+string);
                 }
