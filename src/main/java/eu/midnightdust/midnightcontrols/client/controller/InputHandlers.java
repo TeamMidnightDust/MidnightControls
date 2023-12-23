@@ -11,7 +11,7 @@ package eu.midnightdust.midnightcontrols.client.controller;
 
 import com.google.common.collect.Lists;
 import eu.midnightdust.lib.util.PlatformFunctions;
-import eu.midnightdust.midnightcontrols.client.ButtonState;
+import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;

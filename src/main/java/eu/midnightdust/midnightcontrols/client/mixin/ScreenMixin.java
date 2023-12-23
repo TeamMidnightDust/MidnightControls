@@ -2,7 +2,7 @@ package eu.midnightdust.midnightcontrols.client.mixin;
 
 import dev.lambdaurora.spruceui.Position;
 import eu.midnightdust.midnightcontrols.ControlsMode;
-import eu.midnightdust.midnightcontrols.client.ButtonState;
+import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.InputHandlers;

@@ -7,7 +7,7 @@
  * see the LICENSE file.
  */
 
-package eu.midnightdust.midnightcontrols.client;
+package eu.midnightdust.midnightcontrols.client.enums;
 
 import net.minecraft.text.Text;
 import org.aperlambda.lambdacommon.utils.Nameable;

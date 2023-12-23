@@ -39,24 +39,15 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
-    @Shadow
-    @Nullable
-    public HitResult crosshairTarget;
+    @Shadow @Nullable public HitResult crosshairTarget;
 
-    @Shadow
-    @Nullable
-    public ClientPlayerEntity player;
+    @Shadow @Nullable public ClientPlayerEntity player;
 
-    @Shadow
-    @Nullable
-    public ClientPlayerInteractionManager interactionManager;
+    @Shadow @Nullable public ClientPlayerInteractionManager interactionManager;
 
-    @Shadow
-    @Final
-    public GameRenderer gameRenderer;
+    @Shadow @Final public GameRenderer gameRenderer;
 
-    @Shadow
-    private int itemUseCooldown;
+    @Shadow private int itemUseCooldown;
 
     @Shadow public abstract BufferBuilderStorage getBufferBuilders();
 

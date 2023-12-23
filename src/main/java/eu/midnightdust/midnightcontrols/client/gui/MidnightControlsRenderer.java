@@ -10,7 +10,7 @@
 package eu.midnightdust.midnightcontrols.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import eu.midnightdust.midnightcontrols.client.ControllerType;
+import eu.midnightdust.midnightcontrols.client.enums.ControllerType;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;

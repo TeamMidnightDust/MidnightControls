@@ -33,7 +33,7 @@ public class ReloadControllerMappingsOption {
             Controller.updateMappings();
             if (client.currentScreen instanceof MidnightControlsSettingsScreen)
                 client.currentScreen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
-            client.getToastManager().add(SystemToast.create(client, SystemToast.Type.TUTORIAL_HINT,
+            client.getToastManager().add(SystemToast.create(client, SystemToast.Type.PERIODIC_NOTIFICATION,
                     Text.translatable("midnightcontrols.controller.mappings.updated"), Text.empty()));
         }, Text.translatable("midnightcontrols.tooltip.reload_controller_mappings"));
     }

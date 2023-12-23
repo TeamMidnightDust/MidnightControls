@@ -9,21 +9,12 @@
 
 package eu.midnightdust.midnightcontrols.client.controller;
 
-import eu.midnightdust.midnightcontrols.client.ButtonState;
-import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.util.MathUtil;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.tutorial.MovementTutorialStepHandler;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.enchantment.SoulSpeedEnchantment;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.scanner.SimpleNbtScanner;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 

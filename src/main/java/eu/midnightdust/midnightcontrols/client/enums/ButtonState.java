@@ -7,7 +7,7 @@
  * see the LICENSE file.
  */
 
-package eu.midnightdust.midnightcontrols.client;
+package eu.midnightdust.midnightcontrols.client.enums;
 
 /**
  * Represents a button state.

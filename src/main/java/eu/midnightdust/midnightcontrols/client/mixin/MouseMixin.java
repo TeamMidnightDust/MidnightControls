@@ -12,104 +12,111 @@ package eu.midnightdust.midnightcontrols.client.mixin;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
+import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
+import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
+import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
 import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.GlfwUtil;
 import net.minecraft.client.util.SmoothUtil;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.gen.Accessor;
-import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import eu.midnightdust.midnightcontrols.client.mouse.EyeTrackerHandler;
 
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_HIDDEN;
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Adds extra access to the mouse.
  */
 @Mixin(Mouse.class)
 public abstract class MouseMixin implements MouseAccessor {
-    @Shadow
-    @Final
-    private MinecraftClient client;
+    @Shadow @Final private MinecraftClient client;
 
-    @Shadow
-    private double y;
+    @Shadow private double y;
 
-    @Shadow
-    private double cursorDeltaX;
+    @Shadow private double cursorDeltaX;
 
-    @Shadow
-    private double cursorDeltaY;
+    @Shadow private double cursorDeltaY;
 
-    @Shadow
-    private double x;
+    @Shadow private double x;
 
-    @Shadow
-    private boolean cursorLocked;
+    @Shadow private boolean cursorLocked;
 
-    @Shadow
-    private boolean hasResolutionChanged;
+    @Shadow private boolean hasResolutionChanged;
 
-    @Shadow
-    private double lastMouseUpdateTime;
+    @Shadow private double lastMouseUpdateTime;
 
-    @Shadow
-    @Final
-    private SmoothUtil cursorXSmoother;
+    @Shadow @Final private SmoothUtil cursorXSmoother;
 
-    @Shadow
-    @Final
-    private SmoothUtil cursorYSmoother;
+    @Shadow @Final private SmoothUtil cursorYSmoother;
 
     @Shadow private boolean leftButtonClicked;
 
-    @Accessor
-    public abstract void setLeftButtonClicked(boolean value);
+    @Shadow private int activeButton;
 
-    @Invoker("onCursorPos")
-    public abstract void midnightcontrols$onCursorPos(long window, double x, double y);
+    @Shadow private double glfwTime;
 
-    @Inject(method = "onMouseButton", at = @At(value = "TAIL"))
-    private void onMouseBackButton(long window, int button, int action, int mods, CallbackInfo ci) {
-        if (action == 1 && button == GLFW.GLFW_MOUSE_BUTTON_4 && MinecraftClient.getInstance().currentScreen != null) {
-            if (MidnightControlsClient.get().input.tryGoBack(MinecraftClient.getInstance().currentScreen)) {
-                action = 0;
-            }
+    @Inject(method = "onMouseButton", at = @At(value = "HEAD"), cancellable = true)
+    private void midnightcontrols$onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
+        if (window != this.client.getWindow().getHandle()) return;
+        if (action == 1 && button == GLFW.GLFW_MOUSE_BUTTON_4 && client.currentScreen != null) {
+            MidnightControlsClient.get().input.tryGoBack(client.currentScreen);
         }
+        else if ((client.currentScreen == null || client.currentScreen instanceof TouchscreenOverlay) && client.player != null && button == GLFW_MOUSE_BUTTON_1) {
+            double mouseX = x / client.getWindow().getScaleFactor();
+            double mouseY = y / client.getWindow().getScaleFactor();
+            int centerX = client.getWindow().getScaledWidth() / 2;
+            if (action == 1 && mouseY >= (double) (client.getWindow().getScaledHeight() - 22) && mouseX >= (double) (centerX - 90) && mouseX <= (double) (centerX + 90)) {
+                for (int slot = 0; slot < 9; ++slot) {
+                    int slotX = centerX - 90 + slot * 20 + 2;
+                    if (mouseX >= (double) slotX && mouseX <= (double) (slotX + 20)) {
+                        client.player.getInventory().selectedSlot = slot;
+                        ci.cancel();
+                        return;
+                    }
+                }
+            }
+            if (action == 1) {
+                TouchInput.clickStartTime = System.currentTimeMillis();
+                boolean bl = false;
+                if (client.currentScreen instanceof TouchscreenOverlay overlay) bl = overlay.mouseClicked(mouseX, mouseY, button);
+                if (!bl) TouchInput.firstHitResult = TouchUtils.getTargettedObject(mouseX, mouseY);
+                ci.cancel();
+            }
+            else if (TouchInput.mouseReleased(mouseX, mouseY, button)) ci.cancel();
+        }
+    }
+    @Inject(method = "onCursorPos", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V", shift = At.Shift.BEFORE))
+    private void midnightcontrols$onCursorDrag(long window, double x, double y, CallbackInfo ci) {
+        TouchInput.dragging = this.activeButton == GLFW_MOUSE_BUTTON_1 && this.glfwTime > 0.0;
     }
 
     @Inject(method = "isCursorLocked", at = @At("HEAD"), cancellable = true)
-    private void isCursorLocked(CallbackInfoReturnable<Boolean> ci) {
+    private void midnightcontrols$isCursorLocked(CallbackInfoReturnable<Boolean> ci) {
         if (this.client.currentScreen == null) {
             if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.virtualMouse) {
-                //ci.setReturnValue(true);
                 ci.cancel();
             }
         }
     }
 
     @Inject(method = "lockCursor", at = @At("HEAD"), cancellable = true)
-    private void onCursorLocked(CallbackInfo ci) {
-        if ((MidnightControlsConfig.eyeTrackerAsMouse && client.isWindowFocused() && !this.cursorLocked)
-                || MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN
-                || (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.virtualMouse))
+    private void midnightcontrols$onCursorLocked(CallbackInfo ci) {
+        if (MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN || (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.virtualMouse))
             ci.cancel();
     }
 
     @Inject(method = "updateMouse", at = @At("HEAD"), cancellable = true)
-    private void updateMouse(CallbackInfo ci) {
+    private void midnightcontrols$updateMouse(CallbackInfo ci) {
         if (MidnightControlsConfig.eyeTrackerAsMouse && cursorLocked && client.isWindowFocused()) {
-            //Eye Tracking is only for the camera controlling cursor, we need the normal cursor everywhere else.
+            // Eye Tracking is only for the camera controlling cursor, we need the normal cursor everywhere else.
             if (!client.options.smoothCameraEnabled) {
                 cursorXSmoother.clear();
                 cursorYSmoother.clear();
@@ -121,17 +128,16 @@ public abstract class MouseMixin implements MouseAccessor {
             cursorDeltaY = 0.0;
             ci.cancel();
         }
+        if ((MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.touchInControllerMode) && client.isWindowFocused()) {
+            ci.cancel();
+        }
     }
 
-    @Inject(method = "lockCursor", at = @At("HEAD"), cancellable = true)
-    private void lockCursor(CallbackInfo ci) {
-        if (MidnightControlsConfig.eyeTrackerAsMouse && client.isWindowFocused() && !this.cursorLocked) {
-            if (!MinecraftClient.IS_SYSTEM_MAC) {
-                KeyBinding.updatePressedStates();
-            }
+    @Inject(method = "lockCursor", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/InputUtil;setCursorParameters(JIDD)V",shift = At.Shift.BEFORE), cancellable = true)
+    private void midnightcontrols$lockCursor(CallbackInfo ci) {
+        if ((MidnightControlsConfig.touchInControllerMode || MidnightControlsConfig.eyeTrackerAsMouse)) {
             //In eye tracking mode, we cannot have the cursor locked to the center.
             GLFW.glfwSetInputMode(client.getWindow().getHandle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-            cursorLocked = true; //The game uses this flag for other gameplay checks
             client.setScreen(null);
             hasResolutionChanged = true;
             ci.cancel();

@@ -27,6 +27,7 @@ import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingIDAccessor;
 import eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction;
 import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
 import dev.lambdaurora.spruceui.hud.HudManager;
+import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -159,16 +160,16 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
             GLFW.glfwSetJoystickCallback((jid, event) -> {
                 if (event == GLFW.GLFW_CONNECTED) {
                     var controller = Controller.byId(jid);
-                    client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, Text.translatable("midnightcontrols.controller.connected", jid),
+                    client.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION, Text.translatable("midnightcontrols.controller.connected", jid),
                             Text.literal(controller.getName())));
                 } else if (event == GLFW.GLFW_DISCONNECTED) {
-                    client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, Text.translatable("midnightcontrols.controller.disconnected", jid),
+                    client.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION, Text.translatable("midnightcontrols.controller.disconnected", jid),
                             null));
                 }
 
                 this.switchControlsMode();
             });
-        } catch (Exception e) {e.printStackTrace();}
+        } catch (Exception e) {e.fillInStackTrace();}
 
         MidnightControlsCompat.init(this);
     }
@@ -229,6 +230,7 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
             MidnightControlsConfig.save();
         }
         RainbowColor.tick();
+        TouchInput.tick();
     }
 
     /**

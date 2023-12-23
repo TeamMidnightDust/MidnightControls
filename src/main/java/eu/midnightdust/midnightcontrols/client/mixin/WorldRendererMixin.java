@@ -13,7 +13,7 @@ import eu.midnightdust.lib.util.MidnightColorUtil;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
+import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.touch.TouchMode;
 import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
 import net.minecraft.block.ShapeContext;
@@ -80,16 +80,17 @@ public abstract class WorldRendererMixin {
     )
     private void onOutlineRender(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer,
                                  LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
-        if (MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN && MidnightControlsConfig.touchMode == TouchMode.FINGER_POS && TouchscreenOverlay.instance != null) {
+        if (((MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.touchInControllerMode) || MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN)
+                && MidnightControlsConfig.touchMode == TouchMode.FINGER_POS) {
             this.renderFingerOutline(matrices, camera);
         }
         this.renderReacharoundOutline(matrices, camera);
     }
     @Unique
     private void renderFingerOutline(MatrixStack matrices, Camera camera) {
-        if (TouchscreenOverlay.instance.firstHitResult == null || TouchscreenOverlay.instance.firstHitResult.getType() != HitResult.Type.BLOCK)
+        if (TouchInput.firstHitResult == null || TouchInput.firstHitResult.getType() != HitResult.Type.BLOCK)
             return;
-        BlockHitResult result = (BlockHitResult) TouchscreenOverlay.instance.firstHitResult;
+        BlockHitResult result = (BlockHitResult) TouchInput.firstHitResult;
         var blockPos = result.getBlockPos();
         if (this.world.getWorldBorder().contains(blockPos) && this.client.player != null) {
             var outlineShape = this.world.getBlockState(blockPos).getOutlineShape(this.client.world, blockPos, ShapeContext.of(camera.getFocusedEntity()));

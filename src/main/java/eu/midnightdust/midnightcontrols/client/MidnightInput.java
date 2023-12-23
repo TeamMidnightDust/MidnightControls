@@ -17,6 +17,7 @@ import eu.midnightdust.midnightcontrols.client.compat.*;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
+import eu.midnightdust.midnightcontrols.client.enums.CameraMode;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.gui.widget.ControllerControlsWidget;
@@ -31,6 +32,7 @@ import dev.lambdaurora.spruceui.widget.AbstractSprucePressableButtonWidget;
 import dev.lambdaurora.spruceui.widget.SpruceElement;
 import dev.lambdaurora.spruceui.widget.SpruceLabelWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceParentWidget;
+import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
@@ -149,8 +151,13 @@ public class MidnightInput {
         if (allowInput)
             InputManager.updateBindings(client);
 
-        if (this.controlsInput != null
-                && InputManager.STATES.int2ObjectEntrySet().parallelStream().map(Map.Entry::getValue).allMatch(ButtonState::isUnpressed)) {
+        if (this.controlsInput != null) {
+            InputManager.STATES.forEach((num, button) -> {
+                if (button.isPressed()) System.out.println(num);
+            });
+        }
+        if (this.controlsInput != null && InputManager.STATES.int2ObjectEntrySet().parallelStream().map(Map.Entry::getValue).allMatch(ButtonState::isUnpressed)) {
+            System.out.println("finished");
             if (this.controlsInput.focusedBinding != null && !this.controlsInput.waiting) {
                 int[] buttons = new int[this.controlsInput.currentButtons.size()];
                 for (int i = 0; i < this.controlsInput.currentButtons.size(); i++)
@@ -490,6 +497,7 @@ public class MidnightInput {
         {
             boolean currentPlusState = value > getDeadZoneValue(axis);
             boolean currentMinusState = value < -getDeadZoneValue(axis);
+            if (axis == GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || axis == GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER) currentMinusState = false;
             if (!MidnightControlsConfig.analogMovement && (axis == GLFW_GAMEPAD_AXIS_LEFT_X || axis == GLFW_GAMEPAD_AXIS_LEFT_Y)) {
                 currentPlusState = asButtonState == 1;
                 currentMinusState = asButtonState == 2;
@@ -786,6 +794,28 @@ public class MidnightInput {
      * @param state the state
      */
     public void handleLook(@NotNull MinecraftClient client, int axis, float value, int state) {
+        if (client.player == null) return;
+        // Handles the look direction.
+        if (MidnightControlsConfig.cameraMode == CameraMode.FLAT) {
+            double powValue = Math.pow(value, 2.0);
+            if (axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
+                if (state == 2) {
+                    this.targetPitch = -MidnightControlsConfig.getRightYAxisSign() * (MidnightControlsConfig.yAxisRotationSpeed * powValue) * 0.11D;
+                } else if (state == 1) {
+                    this.targetPitch = MidnightControlsConfig.getRightYAxisSign() * (MidnightControlsConfig.yAxisRotationSpeed * powValue) * 0.11D;
+                }
+            }
+            if (axis == GLFW_GAMEPAD_AXIS_RIGHT_X) {
+                if (state == 2) {
+                    this.targetYaw = -MidnightControlsConfig.getRightXAxisSign() * (MidnightControlsConfig.rotationSpeed * powValue) * 0.11D;
+                } else if (state == 1) {
+                    this.targetYaw = MidnightControlsConfig.getRightXAxisSign() * (MidnightControlsConfig.rotationSpeed * powValue) * 0.11D;
+                }
+            }
+            return;
+        }
+        // Code below runs for adaptive camera mode
+
         // Handles the look direction.
         if (axis == GLFW_GAMEPAD_AXIS_RIGHT_X) {
             xValue = value;
