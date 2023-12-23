@@ -125,6 +125,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption unfocusedInputOption;
     private final SpruceOption invertsRightXAxis;
     private final SpruceOption invertsRightYAxis;
+    private final SpruceOption cameraModeOption;
     private final SpruceOption toggleControllerProfileOption;
     private final SpruceOption rightDeadZoneOption;
     private final SpruceOption leftDeadZoneOption;
@@ -144,6 +145,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         );
     }
     // Touch options
+    private final SpruceOption touchWithControllerOption;
     private final SpruceOption touchSpeedOption;
     private final SpruceOption touchBreakDelayOption;
     private final SpruceOption invertTouchOption;
@@ -268,6 +270,10 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             }
 
         }, Text.translatable(""));
+        this.cameraModeOption = new SpruceCyclingOption("midnightcontrols.menu.camera_mode",
+                amount -> MidnightControlsConfig.cameraMode = MidnightControlsConfig.cameraMode.next(),
+                option -> option.getDisplayText(MidnightControlsConfig.cameraMode.getTranslatedText()),
+                Text.translatable("midnightcontrols.menu.camera_mode.tooltip"));
         this.rightDeadZoneOption = new SpruceDoubleOption("midnightcontrols.menu.right_dead_zone", 0.05, 1.0, .05f,
                 () -> MidnightControlsConfig.rightDeadZone,
                 value -> MidnightControlsConfig.rightDeadZone = value, option -> {
@@ -295,6 +301,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                 amount -> MidnightControlsConfig.touchMode = MidnightControlsConfig.touchMode.next(),
                 option -> option.getDisplayText(MidnightControlsConfig.touchMode.getTranslatedText()),
                 Text.translatable("midnightcontrols.menu.touch_mode.tooltip"));
+        this.touchWithControllerOption = new SpruceToggleBooleanOption("midnightcontrols.menu.touch_with_controller", () -> MidnightControlsConfig.touchInControllerMode,
+                value -> MidnightControlsConfig.touchInControllerMode = value, Text.translatable("midnightcontrols.menu.touch_with_controller.tooltip"));
         this.touchSpeedOption = new SpruceDoubleOption("midnightcontrols.menu.touch_speed", 0.0, 150.0, .5f,
                 () -> MidnightControlsConfig.touchSpeed,
                 value -> MidnightControlsConfig.touchSpeed = value, option -> option.getDisplayText(Text.literal(String.valueOf(option.get()))),
@@ -447,6 +455,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         list.addSingleOptionEntry(this.secondControllerOption);
         list.addSingleOptionEntry(this.toggleControllerProfileOption);
         list.addSingleOptionEntry(this.unfocusedInputOption);
+        list.addSingleOptionEntry(this.cameraModeOption);
         list.addOptionEntry(this.invertsRightXAxis, this.invertsRightYAxis);
         list.addSingleOptionEntry(this.rightDeadZoneOption);
         list.addSingleOptionEntry(this.leftDeadZoneOption);
@@ -462,6 +471,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         var list = new SpruceOptionListWidget(Position.origin(), width, height);
         list.setBackground(new MidnightControlsBackground(130));
         list.addSingleOptionEntry(this.touchSpeedOption);
+        list.addSingleOptionEntry(this.touchWithControllerOption);
         list.addSingleOptionEntry(this.invertTouchOption);
         list.addSingleOptionEntry(new SpruceSeparatorOption("midnightcontrols.menu.title.hud", true, null));
         list.addSingleOptionEntry(this.touchModeOption);

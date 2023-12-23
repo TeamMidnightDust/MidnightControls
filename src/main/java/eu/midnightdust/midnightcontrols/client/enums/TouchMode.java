@@ -1,4 +1,4 @@
-package eu.midnightdust.midnightcontrols.client.touch;
+package eu.midnightdust.midnightcontrols.client.enums;
 
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;

@@ -23,7 +23,7 @@ import eu.midnightdust.midnightcontrols.client.enums.ControllerType;
 import eu.midnightdust.midnightcontrols.client.enums.HudSide;
 import eu.midnightdust.midnightcontrols.client.enums.VirtualMouseSkin;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
-import eu.midnightdust.midnightcontrols.client.touch.TouchMode;
+import eu.midnightdust.midnightcontrols.client.enums.TouchMode;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;

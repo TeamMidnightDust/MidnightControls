@@ -14,7 +14,7 @@ import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
-import eu.midnightdust.midnightcontrols.client.touch.TouchMode;
+import eu.midnightdust.midnightcontrols.client.enums.TouchMode;
 import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;

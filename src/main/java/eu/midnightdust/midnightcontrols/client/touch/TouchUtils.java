@@ -1,6 +1,7 @@
 package eu.midnightdust.midnightcontrols.client.touch;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
+import eu.midnightdust.midnightcontrols.client.enums.TouchMode;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.projectile.ProjectileUtil;
