@@ -1,5 +1,6 @@
 package eu.midnightdust.midnightcontrols.client.touch;
 
+import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.enums.TouchMode;
 import net.minecraft.client.MinecraftClient;
@@ -25,7 +26,7 @@ public class TouchUtils {
     public static final Matrix4f lastProjMat = new Matrix4f();
     public static final Matrix4f lastModMat = new Matrix4f();
     public static HitResult getTargettedObject(double mouseX, double mouseY) {
-        if (MidnightControlsConfig.touchMode == TouchMode.CROSSHAIR) {
+        if (MidnightControlsConfig.touchMode == TouchMode.CROSSHAIR || PlatformFunctions.isModLoaded("vulkanmod")) {
             return client.crosshairTarget;
         }
         Vec3d near = screenSpaceToWorldSpace(mouseX, mouseY, 0);

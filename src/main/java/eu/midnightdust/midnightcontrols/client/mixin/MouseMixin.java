@@ -88,14 +88,10 @@ public abstract class MouseMixin implements MouseAccessor {
                 boolean bl = false;
                 if (client.currentScreen instanceof TouchscreenOverlay overlay) bl = overlay.mouseClicked(mouseX, mouseY, button);
                 if (!bl) TouchInput.firstHitResult = TouchUtils.getTargettedObject(mouseX, mouseY);
-                ci.cancel();
+                if (client.currentScreen == null) ci.cancel();
             }
             else if (TouchInput.mouseReleased(mouseX, mouseY, button)) ci.cancel();
         }
-    }
-    @Inject(method = "onCursorPos", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V", shift = At.Shift.BEFORE))
-    private void midnightcontrols$onCursorDrag(long window, double x, double y, CallbackInfo ci) {
-        TouchInput.dragging = this.activeButton == GLFW_MOUSE_BUTTON_1 && this.glfwTime > 0.0;
     }
 
     @Inject(method = "isCursorLocked", at = @At("HEAD"), cancellable = true)
