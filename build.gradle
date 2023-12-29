@@ -3,25 +3,14 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
-    id 'com.modrinth.minotaur' version '1.2.+'
+    id 'com.modrinth.minotaur' version '2.+'
+    id 'net.darkhax.curseforgegradle' version '1.+'
 }
 
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
-import com.modrinth.minotaur.TaskModrinthUpload
-import com.modrinth.minotaur.request.VersionType
-import com.modrinth.minotaur.responses.ResponseError
-import org.apache.http.client.config.CookieSpecs
-import org.apache.http.client.config.RequestConfig
-import org.apache.http.client.entity.EntityBuilder
-import org.apache.http.client.methods.HttpPatch
-import org.apache.http.entity.ContentType
-import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.http.util.EntityUtils
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
 
 group = project.maven_group
 version = "${project.mod_version}+${getMCVersionString()}"
-archivesBaseName = project.archives_base_name
 
 // This field defines the Java version your mod target.
 def targetJavaVersion = 17
@@ -159,115 +148,39 @@ processResources {
         expand 'version': project.version
     }
 }
-
-task publishModrinth(type: TaskModrinthUpload) {
-    dependsOn(build)
-    onlyIf {
-        System.getenv('MODRINTH_TOKEN')
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN") // Remember to have the MODRINTH_TOKEN environment variable set or else this will fail - just make sure it stays private!
+    projectId = project.archives_base_name // This can be the project ID or the slug. Either will work!
+    versionNumber = project.version // You don't need to set this manually. Will fail if Modrinth has this version already
+    versionName = "MidnightControls " + project.mod_version + " - " + project.minecraft_version
+    versionType = isMCVersionNonRelease() ? "beta" : "release" // Can also be `beta` or `alpha`
+    uploadFile = remapJar // With Loom, this MUST be set to `remapJar` instead of `jar`!
+    gameVersions = [(String) project.minecraft_version] // Must be an array, even with only one version
+    loaders = ["fabric","quilt"] // Must also be an array - no need to specify this if you're using Loom or ForgeGradle
+    dependencies { // A special DSL for creating dependencies
+        // scope.type
+        // The scope can be `required`, `optional`, `incompatible`, or `embedded`
+        // The type can either be `project` or `version`
+        required.project "midnightlib" // Creates a new required dependency on MidnightLib
     }
-
-    token = System.getenv('MODRINTH_TOKEN')
-    projectId = project.modrinth_id
-    versionNumber = version
-    versionName = "midnightcontrols ${project.mod_version} (${getMCVersionString()})"
-    addGameVersion((String) project.minecraft_version)
-    addLoader('fabric')
-    versionType = isMCVersionNonRelease() ? VersionType.BETA : VersionType.RELEASE
-
-    // Changelog fetching
-    def changelogText = file('CHANGELOG.md').text
-    def regexVersion = ((String) project.mod_version).replaceAll('\\.', /\\./).replaceAll('\\+', '\\+')
-    def changelogRegex = ~"###? ${regexVersion}\\n\\n(( *- .+\\n)+)"
-    def matcher = changelogText =~ changelogRegex
-
-    if (matcher.find()) {
-        changelog = matcher.group(1)
-
-        def changelogLines = changelogText.split('\n')
-        def linkRefRegex = ~'^\\[([A-z0-9 _\\-/+.]+)]: '
-        for (int i = changelogLines.length - 1; i > 0; i--) {
-            def line = changelogLines[i]
-            if ((line =~ linkRefRegex).find())
-                changelog += '\n' + line
-            else break
-        }
-    }
-
-    // Readme
-    doFirst {
-        final def client = HttpClientBuilder.create().setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES).build()).build()
-        final def patch = new HttpPatch((String) (apiURL + '/v1/mod/' + projectId))
-        patch.addHeader("Authorization", token)
-
-        var json = new JsonObject()
-        json.addProperty("body", parseReadme())
-        patch.setEntity(EntityBuilder.create()
-                .setText(json.toString())
-                .setContentType(ContentType.APPLICATION_JSON)
-                .build())
-
-        final def response = client.execute(patch)
-        final int status = response.getStatusLine().getStatusCode()
-
-        final def gson = new GsonBuilder().create()
-        if (status == 200) {
-            project.getLogger().lifecycle("Successfully updated readme to ${projectId}.")
-        } else {
-            errorInfo = gson.fromJson(EntityUtils.toString(response.getEntity()), ResponseError.class)
-            project.getLogger().error("Upload failed! Status: ${status} Error: ${errorInfo.getError()} Reason: ${errorInfo.getDescription()}")
-            throw new GradleException("Upload failed! Status: ${status} Reason: ${errorInfo.getDescription()}")
-        }
-    }
+    changelog = project.changelog
 }
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
 
-// configure the maven publication
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
+    // This token is used to authenticate with CurseForge. It should be handled
+    // with the same level of care and security as your actual password. You 
+    // should never share your token with an untrusted source or publish it
+    // publicly to GitHub or embed it within a project. The best practice is to
+    // store this token in an environment variable or a build secret.
+    apiToken = System.getenv("CURSEFORGE_TOKEN")
 
-            pom {
-                name = 'midnightcontrols'
-                description = 'Adds better controls, and controller support.'
-            }
-
-            pom.withXml {
-                def dependenciesNode = asNode().appendNode('dependencies')
-
-                configurations.shadow.allDependencies.each {
-                    def dependencyNode = dependenciesNode.appendNode('dependency')
-
-                    dependencyNode.appendNode('groupId', it.group)
-                    dependencyNode.appendNode('artifactId', it.name)
-                    dependencyNode.appendNode('version', it.version)
-                    dependencyNode.appendNode('scope', 'compile')
-                }
-            }
-        }
-    }
-
-    repositories {
-        mavenLocal()
-        maven {
-            name 'GithubPackages'
-            url uri('https://maven.pkg.github.com/LambdAurora/midnightcontrols')
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
-            }
-        }
-        def midnightcontrolsMaven = System.getenv('midnightcontrols_MAVEN')
-        if (midnightcontrolsMaven) {
-            maven {
-                name 'midnightcontrolsMaven'
-                url uri(midnightcontrolsMaven)
-                credentials {
-                    username = project.findProperty('gpr.user') ?: System.getenv('MAVEN_USERNAME')
-                    password = project.findProperty('gpr.key') ?: System.getenv('MAVEN_PASSWORD')
-                }
-            }
-        }
-    }
+    // Tells CurseForgeGradle to publish the output of the jar task. This will
+    // return a UploadArtifact object that can be used to further configure the
+    // file. 
+    def mainFile = upload(project.curseforge_id, remapJar)
+    mainFile.changelog = project.changelog
+    mainFile.displayName = "MidnightControls " + project.mod_version + " - " + project.minecraft_version
+    mainFile.addModLoader("Fabric", "Quilt")
+    mainFile.addRequirement("midnightlib")
+    mainFile.releaseType = "release"
 }
