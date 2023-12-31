@@ -21,7 +21,7 @@ boolean isMCVersionNonRelease() {
 }
 
 String getMCVersionString() {
-    if (isMCVersionNonRelease() || project.minecraft_version == "1.20.2") {
+    if (isMCVersionNonRelease() || project.minecraft_version == "1.20.4") {
         return project.minecraft_version
     }
     def version = project.minecraft_version.split('\\.')

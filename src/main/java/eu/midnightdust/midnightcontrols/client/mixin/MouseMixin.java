@@ -30,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import eu.midnightdust.midnightcontrols.client.mouse.EyeTrackerHandler;
 
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsConfig.doMixedInput;
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
@@ -59,17 +60,13 @@ public abstract class MouseMixin implements MouseAccessor {
 
     @Shadow private boolean leftButtonClicked;
 
-    @Shadow private int activeButton;
-
-    @Shadow private double glfwTime;
-
     @Inject(method = "onMouseButton", at = @At(value = "HEAD"), cancellable = true)
     private void midnightcontrols$onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
         if (window != this.client.getWindow().getHandle()) return;
         if (action == 1 && button == GLFW.GLFW_MOUSE_BUTTON_4 && client.currentScreen != null) {
             MidnightControlsClient.get().input.tryGoBack(client.currentScreen);
         }
-        else if ((client.currentScreen == null || client.currentScreen instanceof TouchscreenOverlay) && client.player != null && button == GLFW_MOUSE_BUTTON_1) {
+        else if ((doMixedInput() || client.currentScreen instanceof TouchscreenOverlay) && client.player != null && button == GLFW_MOUSE_BUTTON_1) {
             double mouseX = x / client.getWindow().getScaleFactor();
             double mouseY = y / client.getWindow().getScaleFactor();
             int centerX = client.getWindow().getScaledWidth() / 2;
@@ -105,7 +102,7 @@ public abstract class MouseMixin implements MouseAccessor {
 
     @Inject(method = "lockCursor", at = @At("HEAD"), cancellable = true)
     private void midnightcontrols$onCursorLocked(CallbackInfo ci) {
-        if (MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN || (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.virtualMouse))
+        if (MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN || doMixedInput())
             ci.cancel();
     }
 
@@ -124,14 +121,14 @@ public abstract class MouseMixin implements MouseAccessor {
             cursorDeltaY = 0.0;
             ci.cancel();
         }
-        if ((MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.touchInControllerMode) && client.isWindowFocused()) {
+        if (doMixedInput() && client.isWindowFocused()) {
             ci.cancel();
         }
     }
 
     @Inject(method = "lockCursor", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/InputUtil;setCursorParameters(JIDD)V",shift = At.Shift.BEFORE), cancellable = true)
     private void midnightcontrols$lockCursor(CallbackInfo ci) {
-        if ((MidnightControlsConfig.touchInControllerMode || MidnightControlsConfig.eyeTrackerAsMouse)) {
+        if ((doMixedInput() || MidnightControlsConfig.eyeTrackerAsMouse)) {
             //In eye tracking mode, we cannot have the cursor locked to the center.
             GLFW.glfwSetInputMode(client.getWindow().getHandle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
             client.setScreen(null);

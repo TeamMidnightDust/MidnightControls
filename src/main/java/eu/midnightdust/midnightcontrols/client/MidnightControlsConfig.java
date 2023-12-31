@@ -404,4 +404,7 @@ public class MidnightControlsConfig extends MidnightConfig {
         else if (controller.contains("ouya")) return ControllerType.OUYA;
         else return ControllerType.DEFAULT;
     }
+    public static boolean doMixedInput() {
+        return touchInControllerMode && controlsMode == ControlsMode.CONTROLLER;
+    }
 }
