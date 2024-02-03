@@ -12,18 +12,18 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsConfig.doMixedInput;
+
 public class TouchInput {
     private static final MinecraftClient client = MinecraftClient.getInstance();
     public static long clickStartTime;
     public static HitResult firstHitResult = null;
     public static void tick() {
-        if (client.currentScreen != null && !(client.currentScreen instanceof TouchscreenOverlay)) return;
-        double scaleFactor = client.getWindow().getScaleFactor();
-        if (clickStartTime > 0 && System.currentTimeMillis() - clickStartTime >= MidnightControlsConfig.touchBreakDelay) {
-            mouseHeldDown(client.mouse.getX() / scaleFactor, client.mouse.getY() / scaleFactor);
-        }
-        else {
-            if (client.interactionManager != null) client.interactionManager.cancelBlockBreaking();
+        if ((client.currentScreen == null && doMixedInput()) || client.currentScreen instanceof TouchscreenOverlay) {
+            double scaleFactor = client.getWindow().getScaleFactor();
+            if (clickStartTime > 0 && System.currentTimeMillis() - clickStartTime >= MidnightControlsConfig.touchBreakDelay) {
+                mouseHeldDown(client.mouse.getX() / scaleFactor, client.mouse.getY() / scaleFactor);
+            }
         }
     }
     public static void mouseHeldDown(double mouseX, double mouseY) {
@@ -95,6 +95,7 @@ public class TouchInput {
             if (result instanceof EntityHitResult entityHit) {
                 client.interactionManager.attackEntity(client.player, entityHit.getEntity());
                 client.player.swingHand(Hand.MAIN_HAND);
+                return true;
             }
         }
         clickStartTime = -1;
