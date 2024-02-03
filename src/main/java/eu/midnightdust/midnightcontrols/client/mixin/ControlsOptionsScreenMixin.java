@@ -10,10 +10,10 @@
 package eu.midnightdust.midnightcontrols.client.mixin;
 
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsSettingsScreen;
+import eu.midnightdust.midnightcontrols.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
-import net.minecraft.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;

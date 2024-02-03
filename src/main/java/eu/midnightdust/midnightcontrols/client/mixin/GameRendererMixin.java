@@ -39,7 +39,7 @@ public abstract class GameRendererMixin {
             MidnightControlsClient.get().input.onPreRenderScreen(this.client, this.client.currentScreen);
     }
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw()V", shift = At.Shift.BEFORE), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void renderVirtualCursor(float tickDelta, long startTime, boolean tick, CallbackInfo ci, boolean bl, MatrixStack matrixStack, DrawContext drawContext) {
+    private void renderVirtualCursor(float tickDelta, long startTime, boolean tick, CallbackInfo ci, MatrixStack matrixStack, DrawContext drawContext) {
         MidnightControlsRenderer.renderVirtualCursor(drawContext,  client);
         drawContext.draw();
     }

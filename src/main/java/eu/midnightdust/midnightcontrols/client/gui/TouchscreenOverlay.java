@@ -20,6 +20,7 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.compat.EmotecraftCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
+import eu.midnightdust.midnightcontrols.client.gui.widget.TextIconButtonWidget;
 import eu.midnightdust.midnightcontrols.client.touch.gui.ItemUseButtonWidget;
 import eu.midnightdust.midnightcontrols.client.touch.gui.SilentTexturedButtonWidget;
 import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
@@ -27,10 +28,7 @@ import eu.midnightdust.midnightcontrols.client.util.KeyBindingAccessor;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.*;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.texture.MissingSprite;
-import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
@@ -84,7 +82,7 @@ public class TouchscreenOverlay extends Screen {
     }
 
     @Override
-    public void renderInGameBackground(DrawContext context) {}
+    public void renderBackground(DrawContext context) {}
 
     private void pauseGame() {
         assert this.client != null;
@@ -290,12 +288,11 @@ public class TouchscreenOverlay extends Screen {
         assert client != null;
         Identifier emptySprite = new Identifier(MidnightControlsConstants.NAMESPACE, "touch/empty");
         List<String> list = left ? MidnightControlsConfig.leftTouchBinds : MidnightControlsConfig.rightTouchBinds;
-        Sprite missingSprite = client.getGuiAtlasManager().getSprite(MissingSprite.getMissingSpriteId());
         for (int i = 0; i < list.size(); i++) {
             String bindName = list.get(i);
             ButtonBinding binding = InputManager.getBinding(bindName);
             if (binding == null) continue;
-            boolean hasTexture = client.getGuiAtlasManager().getSprite(new Identifier(MidnightControlsConstants.NAMESPACE, "binding/"+bindName)) != missingSprite;
+            boolean hasTexture = client.getTextureManager().getOrDefault(new Identifier(MidnightControlsConstants.NAMESPACE, "binding/"+bindName), null) != null;
             if (MidnightControlsConfig.debug) System.out.println(left +" "+new Identifier(MidnightControlsConstants.NAMESPACE, "binding/"+bindName)+" "+ hasTexture);
             var button = TextIconButtonWidget.builder(Text.translatable(binding.getTranslationKey()), b -> binding.handle(client, 1, ButtonState.PRESS), hasTexture)
                     .texture(hasTexture ? new Identifier(MidnightControlsConstants.NAMESPACE, "binding/"+bindName) : emptySprite, 20, 20).dimension(20, 20).build();

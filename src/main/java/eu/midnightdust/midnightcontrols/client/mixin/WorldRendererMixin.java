@@ -15,7 +15,6 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.enums.TouchMode;
-import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
@@ -95,7 +94,7 @@ public abstract class WorldRendererMixin {
         if (this.world.getWorldBorder().contains(blockPos) && this.client.player != null) {
             var outlineShape = this.world.getBlockState(blockPos).getOutlineShape(this.client.world, blockPos, ShapeContext.of(camera.getFocusedEntity()));
             Color rgb = MidnightColorUtil.hex2Rgb(MidnightControlsConfig.touchOutlineColorHex);
-            if (MidnightControlsConfig.touchOutlineColorHex.isEmpty()) rgb = RainbowColor.radialRainbow(1,1);
+            if (MidnightControlsConfig.touchOutlineColorHex.isEmpty()) rgb = MidnightColorUtil.radialRainbow(1,1);
             var pos = camera.getPos();
             matrices.push();
             var vertexConsumer = this.bufferBuilders.getEntityVertexConsumers().getBuffer(RenderLayer.getLines());
@@ -130,7 +129,7 @@ public abstract class WorldRendererMixin {
 
             var outlineShape = placementState.getOutlineShape(this.client.world, blockPos, ShapeContext.of(camera.getFocusedEntity()));
             Color rgb = MidnightColorUtil.hex2Rgb(MidnightControlsConfig.reacharoundOutlineColorHex);
-            if (MidnightControlsConfig.reacharoundOutlineColorHex.isEmpty()) rgb = RainbowColor.radialRainbow(1,1);
+            if (MidnightControlsConfig.reacharoundOutlineColorHex.isEmpty()) rgb = MidnightColorUtil.radialRainbow(1,1);
             matrices.push();
             var vertexConsumer = this.bufferBuilders.getEntityVertexConsumers().getBuffer(RenderLayer.getLines());
             drawCuboidShapeOutline(matrices, vertexConsumer, outlineShape,

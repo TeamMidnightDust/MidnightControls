@@ -28,7 +28,6 @@ import eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction;
 import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
 import dev.lambdaurora.spruceui.hud.HudManager;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
-import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -229,7 +228,6 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
             MidnightControlsConfig.enableHints = false;
             MidnightControlsConfig.save();
         }
-        RainbowColor.tick();
         TouchInput.tick();
     }
 

@@ -161,7 +161,7 @@ public class InputHandlers {
                             nextTab = tabs.size() - 1;
                         else if (nextTab >= tabs.size())
                             nextTab = 0;
-                        screen.getAdvancementManager().selectTab(tabs.get(nextTab).getRoot().getAdvancementEntry(), true);
+                        screen.getAdvancementManager().selectTab(tabs.get(nextTab).getRoot(), true);
                         break;
                     }
                 }
@@ -280,7 +280,7 @@ public class InputHandlers {
         if (action == ButtonState.PRESS) {
             // If in game, then pause the game.
             if (client.currentScreen == null || client.currentScreen instanceof RingScreen)
-                client.openGameMenu(false);
+                client.openPauseMenu(false);
             else if (client.currentScreen instanceof HandledScreen && client.player != null) // If the current screen is a container then close it.
                 client.player.closeHandledScreen();
             else // Else just close the current screen.
