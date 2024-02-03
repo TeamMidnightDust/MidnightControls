@@ -9,7 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.controller;
 
-import eu.midnightdust.midnightcontrols.client.ButtonState;
+import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.util.KeyBindingAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.StickyKeyBinding;

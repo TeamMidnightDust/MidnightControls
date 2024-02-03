@@ -10,7 +10,7 @@
 package eu.midnightdust.midnightcontrols.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import eu.midnightdust.midnightcontrols.client.ControllerType;
+import eu.midnightdust.midnightcontrols.client.enums.ControllerType;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
@@ -21,9 +21,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -234,6 +232,7 @@ public class MidnightControlsRenderer {
         }
 
         //context.getMatrices().push();
+        context.getMatrices().translate(0f, 0f, 999f);
         drawCursor(context, mouseX, mouseY, hoverSlot, client);
         //context.getMatrices().pop();
     }

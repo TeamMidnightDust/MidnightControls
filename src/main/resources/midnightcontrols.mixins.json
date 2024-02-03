@@ -8,21 +8,20 @@
     "ClientPlayerEntityMixin",
     "ControlsOptionsScreenMixin",
     "CreativeInventoryScreenAccessor",
-    "EntryListWidgetAccessor",
-    "GameOptionsMixin",
     "GameRendererMixin",
     "HandledScreenMixin",
     "KeyBindingMixin",
     "InputUtilMixin",
     "MinecraftClientMixin",
     "MouseMixin",
+    "MouseAccessor",
     "ChatScreenMixin",
     "RecipeBookWidgetAccessor",
     "WorldRendererMixin",
-    "KeyBindingRegistryImplAccessor",
     "KeyBindingIDAccessor",
-    "ScreenAccessor",
-    "TabNavigationWidgetAccessor"
+    "TabNavigationWidgetAccessor",
+    "ScreenMixin",
+    "KeyboardMixin"
   ],
   "injectors": {
     "defaultRequire": 1

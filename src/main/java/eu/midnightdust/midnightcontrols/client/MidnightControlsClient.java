@@ -10,12 +10,12 @@
 package eu.midnightdust.midnightcontrols.client;
 
 import dev.lambdaurora.spruceui.event.OpenScreenCallback;
+import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
-import eu.midnightdust.midnightcontrols.client.compat.VoxelMapCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
@@ -24,10 +24,11 @@ import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsHud;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingIDAccessor;
-import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingRegistryImplAccessor;
 import eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction;
 import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
 import dev.lambdaurora.spruceui.hud.HudManager;
+import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
+import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -47,6 +48,7 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -59,7 +61,6 @@ import java.util.TimerTask;
  */
 public class MidnightControlsClient extends MidnightControls implements ClientModInitializer {
     public static boolean lateInitDone = false;
-    public static boolean voxelmapInitDone = false;
     private static MidnightControlsClient INSTANCE;
     public static final KeyBinding BINDING_LOOK_UP = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "look_up"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.movement");
@@ -122,20 +123,21 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
                 this.input.onScreenOpen(client, client.getWindow().getWidth(), client.getWindow().getHeight());
             }
         });
+        final MinecraftClient client = MinecraftClient.getInstance();
+        int delay = 0; // delay for 0 sec.
+        int period = 1; // repeat every 0.001 sec. (100 times a second)
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                input.updateCamera(client);
+            }
+        }, delay, period);
 
         HudManager.register(this.hud = new MidnightControlsHud(this));
         FabricLoader.getInstance().getModContainer("midnightcontrols").ifPresent(modContainer -> {
             ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","bedrock"), modContainer, ResourcePackActivationType.NORMAL);
             ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","legacy"), modContainer, ResourcePackActivationType.NORMAL);
         });
-        int delay = 0; // delay for 0 sec.
-        int period = 1; // repeat every 0.001 sec. (100 times a second)
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
-                input.updateCamera(MinecraftClient.getInstance());
-            }
-        }, delay, period);
     }
 
     /**
@@ -154,18 +156,20 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         }
         this.hud.setVisible(MidnightControlsConfig.hudEnable);
         Controller.updateMappings();
-        GLFW.glfwSetJoystickCallback((jid, event) -> {
-            if (event == GLFW.GLFW_CONNECTED) {
-                var controller = Controller.byId(jid);
-                client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, Text.translatable("midnightcontrols.controller.connected", jid),
-                        Text.literal(controller.getName())));
-            } else if (event == GLFW.GLFW_DISCONNECTED) {
-                client.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, Text.translatable("midnightcontrols.controller.disconnected", jid),
-                        null));
-            }
+        try {
+            GLFW.glfwSetJoystickCallback((jid, event) -> {
+                if (event == GLFW.GLFW_CONNECTED) {
+                    var controller = Controller.byId(jid);
+                    client.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION, Text.translatable("midnightcontrols.controller.connected", jid),
+                            Text.literal(controller.getName())));
+                } else if (event == GLFW.GLFW_DISCONNECTED) {
+                    client.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION, Text.translatable("midnightcontrols.controller.disconnected", jid),
+                            null));
+                }
 
-            this.switchControlsMode();
-        });
+                this.switchControlsMode();
+            });
+        } catch (Exception e) {e.fillInStackTrace();}
 
         MidnightControlsCompat.init(this);
     }
@@ -174,30 +178,28 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
      * This method is called to initialize keybindings
      */
     public void initKeybindings() {
-        if (!voxelmapInitDone && FabricLoader.getInstance().isModLoaded("voxelmap") && KeyBindingIDAccessor.getKEYS_BY_ID().containsKey("key.minimap.toggleingamewaypoints")) {
-            this.log("Adding VoxelMap compatibility...");
-            new VoxelMapCompat().handle(this);
-            InputManager.loadButtonBindings();
-            voxelmapInitDone = true;
-        }
         if (lateInitDone) return;
-        if (KeyBindingRegistryImplAccessor.getMODDED_KEY_BINDINGS() == null || KeyBindingRegistryImplAccessor.getMODDED_KEY_BINDINGS().isEmpty()) return;
-        for (int i = 0; i < KeyBindingRegistryImplAccessor.getMODDED_KEY_BINDINGS().size(); ++i) {
-            KeyBinding keyBinding = KeyBindingRegistryImplAccessor.getMODDED_KEY_BINDINGS().get(i);
-            if (!keyBinding.getTranslationKey().contains("midnightcontrols") && !keyBinding.getTranslationKey().contains("ok_zoomer") && !keyBinding.getTranslationKey().contains("okzoomer")) {
-                category = null;
-                InputManager.streamCategories().forEach(buttonCategory -> {
-                    if (buttonCategory.getIdentifier().equals(new org.aperlambda.lambdacommon.Identifier("minecraft", keyBinding.getCategory())))
-                        category = buttonCategory;
-                });
-                if (category == null) {
-                    category = new ButtonCategory(new org.aperlambda.lambdacommon.Identifier("minecraft", keyBinding.getCategory()));
-                    InputManager.registerCategory(category);
-                }
-                ButtonBinding buttonBinding = new ButtonBinding.Builder(keyBinding.getTranslationKey()).category(category).linkKeybind(keyBinding).register();
-                if (MidnightControlsConfig.debug) {
-                    logger.info(keyBinding.getTranslationKey());
-                    logger.info(buttonBinding);
+        if (KeyBindingIDAccessor.getKEYS_BY_ID() == null || KeyBindingIDAccessor.getKEYS_BY_ID().isEmpty()) return;
+        if (PlatformFunctions.isModLoaded("voxelmap") && !KeyBindingIDAccessor.getKEYS_BY_ID().containsKey("key.minimap.toggleingamewaypoints")) return;
+        if (PlatformFunctions.isModLoaded("wynntils") && KeyBindingIDAccessor.getKEYS_BY_ID().entrySet().stream().noneMatch(b -> Objects.equals(b.getValue().getCategory(), "Wynntils"))) return;
+        for (int i = 0; i < KeyBindingIDAccessor.getKEYS_BY_ID().size(); ++i) {
+            KeyBinding keyBinding = KeyBindingIDAccessor.getKEYS_BY_ID().entrySet().stream().toList().get(i).getValue();
+            if (MidnightControlsConfig.excludedKeybindings.stream().noneMatch(excluded -> keyBinding.getTranslationKey().startsWith(excluded))) {
+                if (!keyBinding.getTranslationKey().contains("midnightcontrols") && !keyBinding.getTranslationKey().contains("ok_zoomer") && !keyBinding.getTranslationKey().contains("okzoomer")) {
+                    category = null;
+                    InputManager.streamCategories().forEach(buttonCategory -> {
+                        if (buttonCategory.getIdentifier().equals(new org.aperlambda.lambdacommon.Identifier("minecraft", keyBinding.getCategory())))
+                            category = buttonCategory;
+                    });
+                    if (category == null) {
+                        category = new ButtonCategory(new org.aperlambda.lambdacommon.Identifier("minecraft", keyBinding.getCategory()));
+                        InputManager.registerCategory(category);
+                    }
+                    ButtonBinding buttonBinding = new ButtonBinding.Builder(keyBinding.getTranslationKey()).category(category).linkKeybind(keyBinding).register();
+                    if (MidnightControlsConfig.debug) {
+                        logger.info(keyBinding.getTranslationKey());
+                        logger.info(buttonBinding);
+                    }
                 }
             }
         }
@@ -227,9 +229,8 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
             MidnightControlsConfig.enableHints = false;
             MidnightControlsConfig.save();
         }
-    }
-    public void onRender(MinecraftClient client) {
-        //this.input.onRender(client);
+        RainbowColor.tick();
+        TouchInput.tick();
     }
 
     /**

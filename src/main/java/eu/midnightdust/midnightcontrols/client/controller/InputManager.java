@@ -10,7 +10,7 @@
 package eu.midnightdust.midnightcontrols.client.controller;
 
 import eu.midnightdust.midnightcontrols.ControlsMode;
-import eu.midnightdust.midnightcontrols.client.ButtonState;
+import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
 import it.unimi.dsi.fastutil.ints.*;
@@ -27,7 +27,6 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**

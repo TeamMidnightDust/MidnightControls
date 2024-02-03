@@ -11,7 +11,7 @@ package eu.midnightdust.midnightcontrols.client.gui;
 
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
-import eu.midnightdust.midnightcontrols.client.HudSide;
+import eu.midnightdust.midnightcontrols.client.enums.HudSide;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
@@ -38,7 +38,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class MidnightControlsHud extends Hud {
     private final MidnightControlsClient mod;
-    private MinecraftClient client;
+    private final MinecraftClient client = MinecraftClient.getInstance();
     private int attackWidth = 0;
     private int attackButtonWidth = 0;
     private int dropItemWidth = 0;
@@ -64,7 +64,6 @@ public class MidnightControlsHud extends Hud {
     @Override
     public void init(@NotNull MinecraftClient client, int screenWidth, int screenHeight) {
         super.init(client, screenWidth, screenHeight);
-        this.client = client;
         this.inventoryWidth = this.width(ButtonBinding.INVENTORY);
         this.inventoryButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.INVENTORY);
         this.swapHandsWidth = this.width(ButtonBinding.SWAP_HANDS);
@@ -198,6 +197,7 @@ public class MidnightControlsHud extends Hud {
 
     @Override
     public void tick() {
+        if (this.client == null) return;
         super.tick();
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER) {
             if (this.client.crosshairTarget == null)
