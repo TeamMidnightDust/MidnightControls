@@ -15,7 +15,6 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
-import eu.midnightdust.midnightcontrols.client.util.MouseAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.util.GlfwUtil;
@@ -66,7 +65,7 @@ public abstract class MouseMixin implements MouseAccessor {
         if (action == 1 && button == GLFW.GLFW_MOUSE_BUTTON_4 && client.currentScreen != null) {
             MidnightControlsClient.get().input.tryGoBack(client.currentScreen);
         }
-        else if ((doMixedInput() || client.currentScreen instanceof TouchscreenOverlay) && client.player != null && button == GLFW_MOUSE_BUTTON_1) {
+        else if ((client.currentScreen == null && doMixedInput() || client.currentScreen instanceof TouchscreenOverlay) && client.player != null && button == GLFW_MOUSE_BUTTON_1) {
             double mouseX = x / client.getWindow().getScaleFactor();
             double mouseY = y / client.getWindow().getScaleFactor();
             int centerX = client.getWindow().getScaledWidth() / 2;
@@ -95,6 +94,7 @@ public abstract class MouseMixin implements MouseAccessor {
     private void midnightcontrols$isCursorLocked(CallbackInfoReturnable<Boolean> ci) {
         if (this.client.currentScreen == null) {
             if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.virtualMouse) {
+                ci.setReturnValue(true);
                 ci.cancel();
             }
         }
@@ -102,7 +102,8 @@ public abstract class MouseMixin implements MouseAccessor {
 
     @Inject(method = "lockCursor", at = @At("HEAD"), cancellable = true)
     private void midnightcontrols$onCursorLocked(CallbackInfo ci) {
-        if (MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN || doMixedInput())
+        if ((MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.virtualMouse) ||
+                MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN || doMixedInput())
             ci.cancel();
     }
 
