@@ -64,11 +64,7 @@ After this is done, everything should be built just fine!
 
 ## FAQ:
 ### The controller does not work, and it's name appears in orange, what can I do?  
-Orange controller names indicate a missing controller mapping.  
-Download [GamepadTool](https://generalarcade.com/gamepadtool/), create and copy a mapping, go to MidnightControls' Mappings File Editor and paste the string.  
-Alternatively, you can use [AntiMicroX](https://github.com/AntiMicroX/antimicroX) to create the mappings, in case the Gamepad Tool is not working for you.  
-If that works, you might as well consider submitting the mapping by opening a PR in this repo: https://github.com/gabomdq/SDL_GameControllerDB  
-That will make sure other people using the same controller as you don't have to use gamepad-tool anymore. 
+Create a custom mapping as pointed out in the [wiki](https://midnightdust.eu/wiki/midnightcontrols/)
 
 [Quilt]: https://quiltmc.org
 
