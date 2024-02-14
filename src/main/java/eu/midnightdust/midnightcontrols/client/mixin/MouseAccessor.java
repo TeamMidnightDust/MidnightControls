@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(Mouse.class)
 public interface MouseAccessor {
+    @Invoker("onCursorPos")
+    void midnightcontrols$onCursorPos(long window, double x, double y);
     @Accessor
     void setLeftButtonClicked(boolean value);
 
-    @Invoker("onCursorPos")
-    void midnightcontrols$onCursorPos(long window, double x, double y);
 }
