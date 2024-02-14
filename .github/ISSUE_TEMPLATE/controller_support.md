@@ -1,17 +1,17 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: 'Bug: '
-labels: bug
+name: Controller support
+about: Report a problem related to a specific controller
+title: 'Controller Issues: CONTROLLER NAME HERE'
+labels: controller
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**Describe the current state**
+A clear and concise description of current state of support for the controller and the issues.
 
 **To Reproduce**
-Steps to reproduce the behavior:
+If needed, specify steps to reproduce the behavior:
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -24,6 +24,9 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots or videos to help explain your problem.
 
 **Desktop (please complete the following information):**
+ - Have you checked #263 for your controller? [e.g. Yes/No]
+ - Connection method [e.g. Wired / Bluetooth]
+
  - OS: [e.g. Windows / Linux / MacOS]
  - Minecraft [e.g. 1.20.4]
  - Modloader [e.g. Fabric Loader 0.15.6]
