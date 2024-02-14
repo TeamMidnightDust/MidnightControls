@@ -1,13 +1,12 @@
 package eu.midnightdust.midnightcontrols.client.compat;
 
+import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.config.EmiConfig;
-import dev.emi.emi.screen.EmiScreen;
 import dev.emi.emi.screen.EmiScreenManager;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import org.aperlambda.lambdacommon.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -30,13 +29,13 @@ public class EMICompat implements CompatHandler {
                 .buttons(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
                 .category(category)
                 .action((client,action,value,buttonState)->handleTabs(false)).cooldown()
-                .filter(((client, buttonBinding) -> client.currentScreen instanceof HandledScreen<?> || client.currentScreen instanceof EmiScreen))
+                .filter(((client, buttonBinding) -> EmiApi.getHandledScreen() != null))
                 .register();
         new ButtonBinding.Builder("emi_page_right")
                 .buttons(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
                 .category(category)
                 .action((client,action,value,buttonState)->handleTabs(true)).cooldown()
-                .filter(((client, buttonBinding) -> client.currentScreen instanceof HandledScreen<?> || client.currentScreen instanceof EmiScreen))
+                .filter(((client, buttonBinding) -> EmiApi.getHandledScreen() != null))
                 .register();
     }
     public static boolean isEMIEnabled() {
