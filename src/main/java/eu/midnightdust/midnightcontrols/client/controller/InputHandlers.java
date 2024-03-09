@@ -320,12 +320,12 @@ public class InputHandlers {
             boolean sprintToggled = client.options.getSprintToggled().getValue();
             if (client.player.getAbilities().flying && sprintToggled)
                 client.options.getSprintToggled().setValue(false);
-            else if (MidnightControlsConfig.controllerToggleSneak != sprintToggled)
+            else if (MidnightControlsConfig.controllerToggleSprint != sprintToggled)
                 client.options.getSprintToggled().setValue(!sprintToggled);
             binding.setPressed(button.pressed);
             if (client.player.getAbilities().flying && sprintToggled)
                 client.options.getSprintToggled().setValue(true);
-            else if (MidnightControlsConfig.controllerToggleSneak != sprintToggled)
+            else if (MidnightControlsConfig.controllerToggleSprint != sprintToggled)
                 client.options.getSprintToggled().setValue(sprintToggled);
         });
         return true;
