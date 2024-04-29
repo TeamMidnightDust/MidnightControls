@@ -86,6 +86,9 @@ public class TouchscreenOverlay extends Screen {
     @Override
     public void renderInGameBackground(DrawContext context) {}
 
+    @Override
+    protected void applyBlur(float delta) {}
+
     private void pauseGame() {
         assert this.client != null;
         this.client.setScreen(new GameMenuScreen(true));

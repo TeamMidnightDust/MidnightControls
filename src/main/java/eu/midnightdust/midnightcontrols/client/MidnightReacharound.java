@@ -15,6 +15,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
@@ -74,7 +75,7 @@ public class MidnightReacharound {
     }
 
     public static float getPlayerRange(@NotNull MinecraftClient client) {
-        return client.interactionManager != null ? client.interactionManager.getReachDistance() : 0.f;
+        return client.player != null ? Double.valueOf(client.player.getAttributeValue(EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE)).floatValue() : 0.f;
     }
 
     /**

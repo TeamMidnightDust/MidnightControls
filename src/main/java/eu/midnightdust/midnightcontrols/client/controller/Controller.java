@@ -151,25 +151,17 @@ public record Controller(int id) implements Nameable {
     private static boolean updateMappingsSync() {
         try {
             MidnightControlsClient.get().log("Updating controller mappings...");
-            File databaseFile = new File("config/gamecontrollerdatabase.txt");
-            try {
-                BufferedInputStream in = new BufferedInputStream(new URL("https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt").openStream());
-                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(databaseFile));
-                byte[] dataBuffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                    out.write(dataBuffer, 0, bytesRead);
-                }
-                out.close();
-            } catch (Exception ignored) {/* Just continue when internet connection is not available */}
-            var database = ioResourceToBuffer(databaseFile.getPath(), 1024);
-            if (database != null) GLFW.glfwUpdateGamepadMappings(database);
+            Optional<File> databaseFile = getDatabaseFile();
+            if (databaseFile.isPresent()) {
+                var database = ioResourceToBuffer(databaseFile.get().getPath(), 1024);
+                if (database != null) GLFW.glfwUpdateGamepadMappings(database);
+            }
             if (!MidnightControlsClient.MAPPINGS_FILE.exists())
                 return false;
             var buffer = ioResourceToBuffer(MidnightControlsClient.MAPPINGS_FILE.getPath(), 1024);
             if (buffer != null) GLFW.glfwUpdateGamepadMappings(buffer);
         } catch (IOException e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         }
 
         try (var memoryStack = MemoryStack.stackPush()) {
@@ -182,8 +174,8 @@ public record Controller(int id) implements Nameable {
                 if (client != null) {
                     client.getToastManager().add(SystemToast.create(client, SystemToast.Type.PERIODIC_NOTIFICATION,
                             Text.translatable("midnightcontrols.controller.mappings.error"), Text.literal(string)));
-                    MidnightControls.get().log(I18n.translate("midnightcontrols.controller.mappings.error")+string);
                 }
+                MidnightControls.get().log(I18n.translate("midnightcontrols.controller.mappings.error")+string);
             }
         } catch (Throwable e) {
             /* Ignored :concern: */
@@ -204,5 +196,20 @@ public record Controller(int id) implements Nameable {
             }
         }
         return true;
+    }
+
+    private static Optional<File> getDatabaseFile() {
+        File databaseFile = new File("config/gamecontrollerdatabase.txt");
+        try {
+            BufferedInputStream in = new BufferedInputStream(new URL("https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt").openStream());
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(databaseFile));
+            byte[] dataBuffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                out.write(dataBuffer, 0, bytesRead);
+            }
+            out.close();
+        } catch (Exception e) {return Optional.empty();}
+        return Optional.of(databaseFile);
     }
 }

@@ -29,6 +29,9 @@ import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
 import dev.lambdaurora.spruceui.hud.HudManager;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
+import eu.midnightdust.midnightcontrols.packet.ControlsModePacket;
+import eu.midnightdust.midnightcontrols.packet.FeaturePacket;
+import eu.midnightdust.midnightcontrols.packet.HelloPacket;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -37,6 +40,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.KeyBinding;
@@ -48,9 +52,7 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  * Represents the midnightcontrols client mod.
@@ -94,19 +96,19 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
 
         this.ring.registerAction("buttonbinding", ButtonBindingRingAction.FACTORY);
 
-        ClientPlayNetworking.registerGlobalReceiver(CONTROLS_MODE_CHANNEL, (client, handler, buf, responseSender) ->
-                responseSender.sendPacket(CONTROLS_MODE_CHANNEL, this.makeControlsModeBuffer(MidnightControlsConfig.controlsMode)));
-        ClientPlayNetworking.registerGlobalReceiver(FEATURE_CHANNEL, (client, handler, buf, responseSender) -> {
-            int features = buf.readVarInt();
-            for (int i = 0; i < features; i++) {
-                var name = buf.readString(64);
-                boolean allowed = buf.readBoolean();
-                MidnightControlsFeature.fromName(name).ifPresent(feature -> client.execute(() -> feature.setAllowed(allowed)));
-            }
-        });
+        ClientPlayNetworking.registerGlobalReceiver(CONTROLS_MODE_CHANNEL, (payload, context) ->
+                context.responseSender().sendPacket(new ControlsModePacket(MidnightControlsConfig.controlsMode.getName())));
+        ClientPlayNetworking.registerGlobalReceiver(FeaturePacket.PACKET_ID, ((payload, context) -> {}));
+
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            sender.sendPacket(HELLO_CHANNEL, this.makeHello(MidnightControlsConfig.controlsMode));
-            sender.sendPacket(CONTROLS_MODE_CHANNEL, this.makeControlsModeBuffer(MidnightControlsConfig.controlsMode));
+            var version = "";
+            Optional<ModContainer> container;
+            if ((container = FabricLoader.getInstance().getModContainer(MidnightControlsConstants.NAMESPACE)).isPresent()) {
+                version = container.get().getMetadata().getVersion().getFriendlyString();
+            }
+            var controlsMode = MidnightControlsConfig.controlsMode.getName();
+            sender.sendPacket(new HelloPacket(version, controlsMode));
+            sender.sendPacket(new ControlsModePacket(controlsMode));
         });
         ClientPlayConnectionEvents.DISCONNECT.register(this::onLeave);
 
@@ -255,6 +257,7 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
 
                 MidnightControlsConfig.controlsMode = this.previousControlsMode;
             }
+            ClientPlayNetworking.getSender().sendPacket(new ControlsModePacket(MidnightControlsConfig.controlsMode.getName()));
         }
     }
 

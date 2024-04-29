@@ -489,7 +489,7 @@ public class MidnightInput {
                     state = 1;
                     asButtonState = 1;
                 }
-                if (MidnightControlsConfig.debug) System.out.println(axis + " "+ value + " " + absValue + " " + state);
+                //if (MidnightControlsConfig.debug) System.out.println(axis + " "+ value + " " + absValue + " " + state);
             }
         }
 

@@ -51,7 +51,7 @@ public abstract class MouseMixin implements MouseAccessor {
 
     @Shadow private boolean hasResolutionChanged;
 
-    @Shadow private double lastMouseUpdateTime;
+    @Shadow private double glfwTime;
 
     @Shadow @Final private SmoothUtil cursorXSmoother;
 
@@ -116,8 +116,8 @@ public abstract class MouseMixin implements MouseAccessor {
                 cursorYSmoother.clear();
             }
             EyeTrackerHandler.updateMouseWithEyeTracking(x + cursorDeltaX, y + cursorDeltaY, client,
-                    lastMouseUpdateTime, leftButtonClicked, cursorXSmoother, cursorYSmoother);
-            lastMouseUpdateTime = GlfwUtil.getTime();
+                    glfwTime, leftButtonClicked, cursorXSmoother, cursorYSmoother);
+            glfwTime = GlfwUtil.getTime();
             cursorDeltaX = 0.0;
             cursorDeltaY = 0.0;
             ci.cancel();
