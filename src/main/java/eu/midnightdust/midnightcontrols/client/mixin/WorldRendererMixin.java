@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import eu.midnightdust.lib.util.MidnightColorUtil;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
@@ -61,6 +62,7 @@ public abstract class WorldRendererMixin {
     @Shadow
     private static void drawCuboidShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape shape, double offsetX, double offsetY, double offsetZ, float red, float green, float blue, float alpha) {
     }
+
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/HitResult;getType()Lnet/minecraft/util/hit/HitResult$Type;"))
     private HitResult.Type dontRenderOutline(HitResult instance) {
         if (MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN && MidnightControlsConfig.touchMode == TouchMode.FINGER_POS) {
@@ -78,8 +80,7 @@ public abstract class WorldRendererMixin {
                     shift = At.Shift.AFTER
             )
     )
-    private void onOutlineRender(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer,
-                                 LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
+    private void onOutlineRender(float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci, @Local MatrixStack matrices) {
         if (((MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.touchInControllerMode) || MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN)
                 && MidnightControlsConfig.touchMode == TouchMode.FINGER_POS) {
             this.renderFingerOutline(matrices, camera);

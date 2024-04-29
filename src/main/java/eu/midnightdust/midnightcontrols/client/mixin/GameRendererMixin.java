@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
@@ -18,14 +19,13 @@ import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
@@ -38,15 +38,16 @@ public abstract class GameRendererMixin {
         if (this.client.currentScreen != null && MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER)
             MidnightControlsClient.get().input.onPreRenderScreen(this.client, this.client.currentScreen);
     }
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw()V", shift = At.Shift.BEFORE), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void renderVirtualCursor(float tickDelta, long startTime, boolean tick, CallbackInfo ci, boolean bl, MatrixStack matrixStack, DrawContext drawContext) {
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw()V", shift = At.Shift.BEFORE))
+    private void renderVirtualCursor(float tickDelta, long startTime, boolean tick, CallbackInfo ci, @Local DrawContext drawContext) {
         MidnightControlsRenderer.renderVirtualCursor(drawContext,  client);
         drawContext.draw();
     }
-    @Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z", ordinal = 0), method = "renderWorld")
-    private void postWorldRender(float tickDelta, long limitTime, MatrixStack matrix, CallbackInfo ci) {
+    @Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z"), method = "renderWorld")
+    private void captureProjAndModMatrix(float tickDelta, long limitTime, CallbackInfo ci, @Local(ordinal = 1) Matrix4f matrices) {
         TouchUtils.lastProjMat.set(RenderSystem.getProjectionMatrix());
         TouchUtils.lastModMat.set(RenderSystem.getModelViewMatrix());
-        TouchUtils.lastWorldSpaceMatrix.set(matrix.peek().getPositionMatrix());
+        TouchUtils.lastWorldSpaceMatrix.set(matrices);
     }
+
 }

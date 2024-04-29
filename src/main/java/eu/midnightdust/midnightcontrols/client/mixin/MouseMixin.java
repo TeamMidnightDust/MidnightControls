@@ -51,7 +51,7 @@ public abstract class MouseMixin implements MouseAccessor {
 
     @Shadow private boolean hasResolutionChanged;
 
-    @Shadow private double lastMouseUpdateTime;
+    @Shadow private double glfwTime;
 
     @Shadow @Final private SmoothUtil cursorXSmoother;
 
@@ -123,8 +123,8 @@ public abstract class MouseMixin implements MouseAccessor {
                     ||
                     items.getItem() instanceof net.minecraft.item.ThrowablePotionItem;
             EyeTrackerHandler.updateMouseWithEyeTracking(x + cursorDeltaX, y + cursorDeltaY, client,
-                    lastMouseUpdateTime, leftButtonClicked, isUsingLongRangedTool, cursorXSmoother, cursorYSmoother);
-            lastMouseUpdateTime = GlfwUtil.getTime();
+                    glfwTime, leftButtonClicked, isUsingLongRangedTool, cursorXSmoother, cursorYSmoother);
+            glfwTime = GlfwUtil.getTime();
             cursorDeltaX = 0.0;
             cursorDeltaY = 0.0;
             ci.cancel();

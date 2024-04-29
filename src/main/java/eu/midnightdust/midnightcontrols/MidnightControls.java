@@ -9,15 +9,18 @@
 
 package eu.midnightdust.midnightcontrols;
 
-import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.event.PlayerChangeControlsModeCallback;
+import eu.midnightdust.midnightcontrols.packet.ControlsModePacket;
+import eu.midnightdust.midnightcontrols.packet.FeaturePacket;
+import eu.midnightdust.midnightcontrols.packet.HelloPacket;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.packet.CustomPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -34,9 +37,9 @@ import java.util.Optional;
  */
 public class MidnightControls implements ModInitializer {
     private static MidnightControls INSTANCE;
-    public static final Identifier CONTROLS_MODE_CHANNEL = new Identifier(MidnightControlsConstants.CONTROLS_MODE_CHANNEL.toString());
-    public static final Identifier FEATURE_CHANNEL = new Identifier(MidnightControlsConstants.FEATURE_CHANNEL.toString());
-    public static final Identifier HELLO_CHANNEL = new Identifier(MidnightControlsConstants.HELLO_CHANNEL.toString());
+    public static final CustomPayload.Id<CustomPayload> CONTROLS_MODE_CHANNEL = CustomPayload.id(MidnightControlsConstants.CONTROLS_MODE_CHANNEL.toString());
+    public static final CustomPayload.Id<CustomPayload> FEATURE_CHANNEL = CustomPayload.id(MidnightControlsConstants.FEATURE_CHANNEL.toString());
+    public static final CustomPayload.Id<CustomPayload> HELLO_CHANNEL = CustomPayload.id(MidnightControlsConstants.HELLO_CHANNEL.toString());
     public static boolean isExtrasLoaded;
 
     public final Logger logger = LogManager.getLogger("MidnightControls");
@@ -47,19 +50,19 @@ public class MidnightControls implements ModInitializer {
         isExtrasLoaded = FabricLoader.getInstance().isModLoaded("midnightcontrols-extra");
         this.log("Initializing MidnightControls...");
 
-        ServerPlayNetworking.registerGlobalReceiver(HELLO_CHANNEL, (server, player, handler, buf, responseSender) -> {
-            String version = buf.readString(32);
-            ControlsMode.byId(buf.readString(32))
-                    .ifPresent(controlsMode -> server
-                            .execute(() -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(player, controlsMode)));
-            server.execute(() -> {
-                ServerPlayNetworking.send(player, FEATURE_CHANNEL, this.makeFeatureBuffer(MidnightControlsFeature.HORIZONTAL_REACHAROUND));
-            });
+        PayloadTypeRegistry.playC2S().register(HelloPacket.PACKET_ID, HelloPacket.codec);
+        PayloadTypeRegistry.playC2S().register(ControlsModePacket.PACKET_ID, ControlsModePacket.codec);
+        PayloadTypeRegistry.playS2C().register(ControlsModePacket.PACKET_ID, ControlsModePacket.codec);
+        PayloadTypeRegistry.playS2C().register(FeaturePacket.PACKET_ID, FeaturePacket.codec);
+
+        ServerPlayNetworking.registerGlobalReceiver(HelloPacket.PACKET_ID, (payload, context) -> {
+            ControlsMode.byId(payload.controlsMode())
+                    .ifPresent(controlsMode -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.player(), controlsMode));
+            context.responseSender().sendPacket(new FeaturePacket(MidnightControlsFeature.HORIZONTAL_REACHAROUND));
         });
-        ServerPlayNetworking.registerGlobalReceiver(CONTROLS_MODE_CHANNEL,
-                (server, player, handler, buf, responseSender) -> ControlsMode.byId(buf.readString(32))
-                        .ifPresent(controlsMode -> server
-                                .execute(() -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(player, controlsMode))));
+        ServerPlayNetworking.registerGlobalReceiver(ControlsModePacket.PACKET_ID,
+                (payload, context) -> ControlsMode.byId(payload.controlsMode())
+                        .ifPresent(controlsMode -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.player(), controlsMode)));
     }
 
     /**
@@ -78,44 +81,6 @@ public class MidnightControls implements ModInitializer {
      */
     public void warn(String warning) {
         this.logger.info("[MidnightControls] " + warning);
-    }
-
-    /**
-     * Returns a packet byte buffer made for the midnightcontrols:controls_mode plugin message.
-     *
-     * @param controlsMode the controls mode to send
-     * @return the packet byte buffer
-     */
-    public PacketByteBuf makeControlsModeBuffer(@NotNull ControlsMode controlsMode) {
-        Objects.requireNonNull(controlsMode, "Controls mode cannot be null.");
-        return new PacketByteBuf(Unpooled.buffer()).writeString(controlsMode.getName(), 32);
-    }
-
-    /**
-     * Returns a packet byte buffer made for the midnightcontrols:feature plugin message.
-     *
-     * @param features the features data to send
-     * @return the packet byte buffer
-     */
-    public PacketByteBuf makeFeatureBuffer(MidnightControlsFeature... features) {
-        if (features.length == 0)
-            throw new IllegalArgumentException("At least one feature must be provided.");
-        var buffer = new PacketByteBuf(Unpooled.buffer());
-        buffer.writeVarInt(features.length);
-        for (var feature : features) {
-            buffer.writeString(feature.getName(), 64);
-            buffer.writeBoolean(feature.isAllowed());
-        }
-        return buffer;
-    }
-
-    public PacketByteBuf makeHello(@NotNull ControlsMode controlsMode) {
-        var version = "";
-        Optional<ModContainer> container;
-        if ((container = FabricLoader.getInstance().getModContainer(MidnightControlsConstants.NAMESPACE)).isPresent()) {
-            version = container.get().getMetadata().getVersion().getFriendlyString();
-        }
-        return new PacketByteBuf(Unpooled.buffer()).writeString(version, 32).writeString(controlsMode.getName(), 32);
     }
 
     /**

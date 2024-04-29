@@ -27,6 +27,7 @@ import dev.lambdaurora.spruceui.widget.SpruceLabelWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceOptionListWidget;
 import dev.lambdaurora.spruceui.widget.container.tabbed.SpruceTabbedWidget;
+import eu.midnightdust.midnightcontrols.packet.ControlsModePacket;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -92,6 +93,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                             id = GLFW.GLFW_JOYSTICK_1;
                         id = searchNextAvailableController(id, false);
                         MidnightControlsConfig.setController(Controller.byId(id));
+                        if (MidnightControlsConfig.debug) System.out.println(Controller.byId(id).getName() + "'s Controller GUID: " + Controller.byId(id).getGuid());
                     },
                     option -> {
                         var controller = MidnightControlsConfig.getController();
@@ -182,7 +184,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                     MidnightControlsConfig.save();
 
                     if (this.client != null && this.client.player != null) {
-                        ClientPlayNetworking.getSender().sendPacket(MidnightControls.CONTROLS_MODE_CHANNEL, this.mod.makeControlsModeBuffer(next));
+                        ClientPlayNetworking.getSender().sendPacket(new ControlsModePacket(next.getName()));
                     }
                 }, option -> option.getDisplayText(Text.translatable(MidnightControlsConfig.controlsMode.getTranslationKey())),
                 Text.translatable("midnightcontrols.menu.controls_mode.tooltip"));

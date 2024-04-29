@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.1-SNAPSHOT'
+    id 'fabric-loom' version '1.6-SNAPSHOT'
     id 'java-library'
     id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
@@ -13,7 +13,7 @@ group = project.maven_group
 version = "${project.mod_version}+${getMCVersionString()}"
 
 // This field defines the Java version your mod target.
-def targetJavaVersion = 17
+def targetJavaVersion = 21
 
 boolean isMCVersionNonRelease() {
     return project.minecraft_version.matches('^\\d\\dw\\d\\d[a-z]$')
