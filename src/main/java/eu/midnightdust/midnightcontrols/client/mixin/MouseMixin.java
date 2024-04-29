@@ -19,10 +19,14 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.util.GlfwUtil;
 import net.minecraft.client.util.SmoothUtil;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ThrowablePotionItem;
+import net.minecraft.util.UseAction;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -115,15 +119,8 @@ public abstract class MouseMixin implements MouseAccessor {
                 cursorXSmoother.clear();
                 cursorYSmoother.clear();
             }
-            net.minecraft.item.ItemStack items = client.player != null ? client.player.getActiveItem() : net.minecraft.item.ItemStack.EMPTY;
-            boolean isUsingLongRangedTool = (leftButtonClicked &&
-                    items.getUseAction() == net.minecraft.util.UseAction.BOW &&
-                    items.getUseAction() == net.minecraft.util.UseAction.CROSSBOW &&
-                    items.getUseAction() == net.minecraft.util.UseAction.SPEAR)
-                    ||
-                    items.getItem() instanceof net.minecraft.item.ThrowablePotionItem;
             EyeTrackerHandler.updateMouseWithEyeTracking(x + cursorDeltaX, y + cursorDeltaY, client,
-                    glfwTime, leftButtonClicked, isUsingLongRangedTool, cursorXSmoother, cursorYSmoother);
+                    glfwTime, leftButtonClicked, isUsingLongRangedTool(), cursorXSmoother, cursorYSmoother);
             glfwTime = GlfwUtil.getTime();
             cursorDeltaX = 0.0;
             cursorDeltaY = 0.0;
@@ -132,6 +129,14 @@ public abstract class MouseMixin implements MouseAccessor {
         if (doMixedInput() && client.isWindowFocused()) {
             ci.cancel();
         }
+    }
+
+    @Unique
+    private boolean isUsingLongRangedTool() {
+        if (client.player == null) return false;
+        ItemStack stack = client.player.getActiveItem();
+        return (leftButtonClicked && (stack.getUseAction() == UseAction.BOW || stack.getUseAction() == UseAction.CROSSBOW ||
+                        stack.getUseAction() == UseAction.SPEAR || stack.getItem() instanceof ThrowablePotionItem));
     }
 
     @Inject(method = "lockCursor", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/InputUtil;setCursorParameters(JIDD)V",shift = At.Shift.BEFORE), cancellable = true)
