@@ -15,6 +15,7 @@ public class EyeTrackerHandler {
                                                   MinecraftClient client,
                                                   double lastMouseUpdateTime,
                                                   boolean holdingLeftMouseButton,
+                                                  boolean usingLongRangedTool,
                                                   SmoothUtil smoothX,
                                                   SmoothUtil smoothY
                                              ) {
@@ -45,7 +46,7 @@ public class EyeTrackerHandler {
         } else {
             frameScalar = moveScalar;
         }
-        if(holdingLeftMouseButton){
+        if(holdingLeftMouseButton && !usingLongRangedTool) {
             frameScalar *= 0.5; //Don't move the camera so much while mining. It's annoying.
         }
 
@@ -68,7 +69,8 @@ public class EyeTrackerHandler {
         if (client.options.getInvertYMouse().getValue()) {
             invertY = -1.0;
         }
-        if (client.player != null && moveMagnitude > MidnightControlsConfig.eyeTrackerDeadzone) {
+        boolean notInDeadzone = (moveMagnitude > MidnightControlsConfig.eyeTrackerDeadzone) && !usingLongRangedTool;
+        if (client.player != null && notInDeadzone) {
             client.player.changeLookDirection(moveX, moveY * invertY);
             client.getTutorialManager().onUpdateMouse(moveX, moveY);
         }

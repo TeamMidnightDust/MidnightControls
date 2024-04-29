@@ -115,8 +115,15 @@ public abstract class MouseMixin implements MouseAccessor {
                 cursorXSmoother.clear();
                 cursorYSmoother.clear();
             }
+            net.minecraft.item.ItemStack items = client.player != null ? client.player.getActiveItem() : net.minecraft.item.ItemStack.EMPTY;
+            boolean isUsingLongRangedTool = (leftButtonClicked &&
+                    items.getUseAction() == net.minecraft.util.UseAction.BOW &&
+                    items.getUseAction() == net.minecraft.util.UseAction.CROSSBOW &&
+                    items.getUseAction() == net.minecraft.util.UseAction.SPEAR)
+                    ||
+                    items.getItem() instanceof net.minecraft.item.ThrowablePotionItem;
             EyeTrackerHandler.updateMouseWithEyeTracking(x + cursorDeltaX, y + cursorDeltaY, client,
-                    glfwTime, leftButtonClicked, cursorXSmoother, cursorYSmoother);
+                    glfwTime, leftButtonClicked, isUsingLongRangedTool, cursorXSmoother, cursorYSmoother);
             glfwTime = GlfwUtil.getTime();
             cursorDeltaX = 0.0;
             cursorDeltaY = 0.0;
