@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.compat;
 
+import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.tree.ClassNode;
@@ -22,23 +23,16 @@ import java.util.Set;
 /**
  * This plugin is only present for the conditional mixins.
  *
- * @author LambdAurora
- * @version 1.5.0
+ * @author LambdAurora & Motschen
+ * @version 1.6.0
  * @since 1.2.0
  */
 public class MidnightControlsMixinPlugin implements IMixinConfigPlugin {
-    private final HashMap<String, Boolean> conditionalMixins = new HashMap<>();
-
-    public MidnightControlsMixinPlugin() {
-        //this.putConditionalMixin("SodiumOptionsGUIAccessor", FabricLoader.getInstance().isModLoaded("sodium"));
-    }
-
-    private void putConditionalMixin(@NotNull String path, boolean condition) {
-        this.conditionalMixins.put("eu.midnightdust.midnightcontrols.client.compat.mixin." + path, condition);
-    }
+    private String mixinPackage;
 
     @Override
     public void onLoad(String mixinPackage) {
+        this.mixinPackage = mixinPackage + ".";
     }
 
     @Override
@@ -48,7 +42,13 @@ public class MidnightControlsMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return this.conditionalMixins.getOrDefault(mixinClassName, Boolean.TRUE);
+        final String mixinName = mixinClassName.substring(this.mixinPackage.length());
+        final String packageName = mixinName.substring(0, mixinName.lastIndexOf('.'));
+
+        if (packageName.startsWith("sodium") && !PlatformFunctions.isModLoaded("sodium"))
+            return false;
+
+        return true;
     }
 
     @Override

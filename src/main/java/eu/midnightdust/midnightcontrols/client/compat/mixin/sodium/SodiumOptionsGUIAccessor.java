@@ -1,4 +1,4 @@
-package eu.midnightdust.midnightcontrols.client.compat.mixin;
+package eu.midnightdust.midnightcontrols.client.compat.mixin.sodium;
 
 import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
 import me.jellysquid.mods.sodium.client.gui.options.OptionPage;

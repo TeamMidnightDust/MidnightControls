@@ -2,7 +2,7 @@ package eu.midnightdust.midnightcontrols.client.compat;
 
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import eu.midnightdust.midnightcontrols.client.compat.mixin.SodiumOptionsGUIAccessor;
+import eu.midnightdust.midnightcontrols.client.compat.mixin.sodium.SodiumOptionsGUIAccessor;
 import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
 import net.minecraft.client.gui.screen.Screen;
 
