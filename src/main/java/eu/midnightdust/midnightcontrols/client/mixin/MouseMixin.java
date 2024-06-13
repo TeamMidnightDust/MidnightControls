@@ -18,10 +18,10 @@ import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.util.GlfwUtil;
-import net.minecraft.client.util.SmoothUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ThrowablePotionItem;
 import net.minecraft.util.UseAction;
+import net.minecraft.util.math.Smoother;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -57,9 +57,9 @@ public abstract class MouseMixin implements MouseAccessor {
 
     @Shadow private double glfwTime;
 
-    @Shadow @Final private SmoothUtil cursorXSmoother;
+    @Shadow @Final private Smoother cursorXSmoother;
 
-    @Shadow @Final private SmoothUtil cursorYSmoother;
+    @Shadow @Final private Smoother cursorYSmoother;
 
     @Shadow private boolean leftButtonClicked;
 

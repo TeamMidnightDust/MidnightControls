@@ -23,9 +23,6 @@ import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.mixin.*;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
-import net.fabricmc.fabric.impl.client.itemgroup.CreativeGuiExtensions;
-import net.fabricmc.fabric.impl.client.itemgroup.FabricCreativeGuiComponents;
-import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
@@ -64,11 +61,7 @@ public class InputHandlers {
     private InputHandlers() {
     }
     private static List<ItemGroup> getVisibleGroups(CreativeInventoryScreen screen) {
-        return ItemGroups.getGroups().stream()
-            .filter(itemGroup -> {
-                if (FabricCreativeGuiComponents.COMMON_GROUPS.contains(itemGroup)) return true;
-                return ((CreativeGuiExtensions)screen).fabric_currentPage() == ((FabricItemGroup)itemGroup).getPage() && itemGroup.shouldDisplay();
-            }).toList();
+        return (screen.getItemGroupsOnPage(screen.getCurrentPage()));
     }
 
     public static PressAction handleHotbar(boolean next) {

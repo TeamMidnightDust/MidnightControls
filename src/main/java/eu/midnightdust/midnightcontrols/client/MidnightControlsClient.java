@@ -64,20 +64,20 @@ import java.util.*;
 public class MidnightControlsClient extends MidnightControls implements ClientModInitializer {
     public static boolean lateInitDone = false;
     private static MidnightControlsClient INSTANCE;
-    public static final KeyBinding BINDING_LOOK_UP = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "look_up"),
+    public static final KeyBinding BINDING_LOOK_UP = InputManager.makeKeyBinding(Identifier.of(MidnightControlsConstants.NAMESPACE, "look_up"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.movement");
-    public static final KeyBinding BINDING_LOOK_RIGHT = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "look_right"),
+    public static final KeyBinding BINDING_LOOK_RIGHT = InputManager.makeKeyBinding(Identifier.of(MidnightControlsConstants.NAMESPACE, "look_right"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, "key.categories.movement");
-    public static final KeyBinding BINDING_LOOK_DOWN = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "look_down"),
+    public static final KeyBinding BINDING_LOOK_DOWN = InputManager.makeKeyBinding(Identifier.of(MidnightControlsConstants.NAMESPACE, "look_down"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.movement");
-    public static final KeyBinding BINDING_LOOK_LEFT = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "look_left"),
+    public static final KeyBinding BINDING_LOOK_LEFT = InputManager.makeKeyBinding(Identifier.of(MidnightControlsConstants.NAMESPACE, "look_left"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement");
-    public static final KeyBinding BINDING_RING = InputManager.makeKeyBinding(new Identifier(MidnightControlsConstants.NAMESPACE, "ring"),
+    public static final KeyBinding BINDING_RING = InputManager.makeKeyBinding(Identifier.of(MidnightControlsConstants.NAMESPACE, "ring"),
             InputUtil.Type.KEYSYM, InputUtil.UNKNOWN_KEY.getCode(), "key.categories.misc");
-    public static final Identifier CONTROLLER_BUTTONS = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_buttons.png");
-    public static final Identifier CONTROLLER_EXPANDED = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_expanded.png");
-    public static final Identifier CONTROLLER_AXIS = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_axis.png");
-    public static final Identifier CURSOR_TEXTURE = new Identifier(MidnightControlsConstants.NAMESPACE, "textures/gui/cursor.png");
+    public static final Identifier CONTROLLER_BUTTONS = Identifier.of(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_buttons.png");
+    public static final Identifier CONTROLLER_EXPANDED = Identifier.of(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_expanded.png");
+    public static final Identifier CONTROLLER_AXIS = Identifier.of(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_axis.png");
+    public static final Identifier CURSOR_TEXTURE = Identifier.of(MidnightControlsConstants.NAMESPACE, "textures/gui/cursor.png");
     public final static File MAPPINGS_FILE = new File("config/gamecontrollercustommappings.txt");
     public final MidnightInput input = new MidnightInput();
     public final MidnightRing ring = new MidnightRing(this);
@@ -137,8 +137,8 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
 
         HudManager.register(this.hud = new MidnightControlsHud(this));
         FabricLoader.getInstance().getModContainer("midnightcontrols").ifPresent(modContainer -> {
-            ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","bedrock"), modContainer, ResourcePackActivationType.NORMAL);
-            ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("midnightcontrols","legacy"), modContainer, ResourcePackActivationType.NORMAL);
+            ResourceManagerHelper.registerBuiltinResourcePack(Identifier.of("midnightcontrols","bedrock"), modContainer, ResourcePackActivationType.NORMAL);
+            ResourceManagerHelper.registerBuiltinResourcePack(Identifier.of("midnightcontrols","legacy"), modContainer, ResourcePackActivationType.NORMAL);
         });
     }
 

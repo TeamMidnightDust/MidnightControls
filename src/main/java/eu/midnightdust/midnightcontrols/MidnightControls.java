@@ -13,20 +13,13 @@ import eu.midnightdust.midnightcontrols.event.PlayerChangeControlsModeCallback;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePacket;
 import eu.midnightdust.midnightcontrols.packet.FeaturePacket;
 import eu.midnightdust.midnightcontrols.packet.HelloPacket;
-import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.CustomPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Represents the MidnightControls mod.
@@ -37,9 +30,9 @@ import java.util.Optional;
  */
 public class MidnightControls implements ModInitializer {
     private static MidnightControls INSTANCE;
-    public static final CustomPayload.Id<CustomPayload> CONTROLS_MODE_CHANNEL = CustomPayload.id(MidnightControlsConstants.CONTROLS_MODE_CHANNEL.toString());
-    public static final CustomPayload.Id<CustomPayload> FEATURE_CHANNEL = CustomPayload.id(MidnightControlsConstants.FEATURE_CHANNEL.toString());
-    public static final CustomPayload.Id<CustomPayload> HELLO_CHANNEL = CustomPayload.id(MidnightControlsConstants.HELLO_CHANNEL.toString());
+    public static final CustomPayload.Id<CustomPayload> CONTROLS_MODE_CHANNEL = new CustomPayload.Id<>(MidnightControlsConstants.CONTROLS_MODE_CHANNEL);
+    public static final CustomPayload.Id<CustomPayload> FEATURE_CHANNEL = new CustomPayload.Id<>(MidnightControlsConstants.FEATURE_CHANNEL);
+    public static final CustomPayload.Id<CustomPayload> HELLO_CHANNEL = new CustomPayload.Id<>(MidnightControlsConstants.HELLO_CHANNEL);
     public static boolean isExtrasLoaded;
 
     public final Logger logger = LogManager.getLogger("MidnightControls");

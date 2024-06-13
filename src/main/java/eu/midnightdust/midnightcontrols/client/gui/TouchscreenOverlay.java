@@ -51,7 +51,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
  * Represents the touchscreen overlay
  */
 public class TouchscreenOverlay extends Screen {
-    public static final Identifier WIDGETS_LOCATION = new Identifier("midnightcontrols", "textures/gui/widgets.png");
+    public static final Identifier WIDGETS_LOCATION = Identifier.of("midnightcontrols", "textures/gui/widgets.png");
     private final MidnightControlsClient mod;
     private SilentTexturedButtonWidget inventoryButton;
     private SilentTexturedButtonWidget swapHandsButton;
@@ -168,15 +168,15 @@ public class TouchscreenOverlay extends Screen {
         int emoteOffset = 0;
         if (PlatformFunctions.isModLoaded("emotecraft")) {
             emoteOffset = 10;
-            TextIconButtonWidget emoteButton = TextIconButtonWidget.builder(Text.empty(), btn -> EmotecraftCompat.openEmotecraftScreen(this), true).width(20).texture(new Identifier(MidnightControlsConstants.NAMESPACE, "touch/emote"), 20, 20).build();
+            TextIconButtonWidget emoteButton = TextIconButtonWidget.builder(Text.empty(), btn -> EmotecraftCompat.openEmotecraftScreen(this), true).width(20).texture(Identifier.of(MidnightControlsConstants.NAMESPACE, "touch/emote"), 20, 20).build();
             emoteButton.setPosition(scaledWidth / 2 - 30, 0);
             this.addDrawableChild(emoteButton);
         }
 
-        TextIconButtonWidget chatButton = TextIconButtonWidget.builder(Text.empty(), btn -> this.client.setScreen(new ChatScreen("")), true).width(20).texture(new Identifier(MidnightControlsConstants.NAMESPACE, "touch/chat"), 20, 20).build();
+        TextIconButtonWidget chatButton = TextIconButtonWidget.builder(Text.empty(), btn -> this.client.setScreen(new ChatScreen("")), true).width(20).texture(Identifier.of(MidnightControlsConstants.NAMESPACE, "touch/chat"), 20, 20).build();
         chatButton.setPosition(scaledWidth / 2 - 20 + emoteOffset, 0);
         this.addDrawableChild(chatButton);
-        TextIconButtonWidget pauseButton = TextIconButtonWidget.builder(Text.empty(), btn -> this.pauseGame(), true).width(20).texture(new Identifier(MidnightControlsConstants.NAMESPACE, "touch/pause"), 20, 20).build();
+        TextIconButtonWidget pauseButton = TextIconButtonWidget.builder(Text.empty(), btn -> this.pauseGame(), true).width(20).texture(Identifier.of(MidnightControlsConstants.NAMESPACE, "touch/pause"), 20, 20).build();
         pauseButton.setPosition(scaledWidth / 2 + emoteOffset, 0);
         this.addDrawableChild(pauseButton);
         // Inventory buttons.
@@ -291,17 +291,17 @@ public class TouchscreenOverlay extends Screen {
     }
     private void initCustomButtons(boolean left) {
         assert client != null;
-        Identifier emptySprite = new Identifier(MidnightControlsConstants.NAMESPACE, "touch/empty");
+        Identifier emptySprite = Identifier.of(MidnightControlsConstants.NAMESPACE, "touch/empty");
         List<String> list = left ? MidnightControlsConfig.leftTouchBinds : MidnightControlsConfig.rightTouchBinds;
         Sprite missingSprite = client.getGuiAtlasManager().getSprite(MissingSprite.getMissingSpriteId());
         for (int i = 0; i < list.size(); i++) {
             String bindName = list.get(i);
             ButtonBinding binding = InputManager.getBinding(bindName);
             if (binding == null) continue;
-            boolean hasTexture = client.getGuiAtlasManager().getSprite(new Identifier(MidnightControlsConstants.NAMESPACE, "binding/"+bindName)) != missingSprite;
-            if (MidnightControlsConfig.debug) System.out.println(left +" "+new Identifier(MidnightControlsConstants.NAMESPACE, "binding/"+bindName)+" "+ hasTexture);
+            boolean hasTexture = client.getGuiAtlasManager().getSprite(Identifier.of(MidnightControlsConstants.NAMESPACE, "binding/"+bindName)) != missingSprite;
+            if (MidnightControlsConfig.debug) System.out.println(left +" "+Identifier.of(MidnightControlsConstants.NAMESPACE, "binding/"+bindName)+" "+ hasTexture);
             var button = TextIconButtonWidget.builder(Text.translatable(binding.getTranslationKey()), b -> binding.handle(client, 1, ButtonState.PRESS), hasTexture)
-                    .texture(hasTexture ? new Identifier(MidnightControlsConstants.NAMESPACE, "binding/"+bindName) : emptySprite, 20, 20).dimension(20, 20).build();
+                    .texture(hasTexture ? Identifier.of(MidnightControlsConstants.NAMESPACE, "binding/"+bindName) : emptySprite, 20, 20).dimension(20, 20).build();
             button.setPosition(left ? (3+(i*23)) : this.width-(23+(i*23)), 3);
             button.setAlpha(MidnightControlsConfig.touchTransparency / 100f);
             this.addDrawableChild(button);

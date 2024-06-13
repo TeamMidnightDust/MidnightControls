@@ -19,6 +19,7 @@ import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderTickCounter;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,17 +35,17 @@ public abstract class GameRendererMixin {
     MinecraftClient client;
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Mouse;getX()D", shift = At.Shift.BEFORE))
-    private void onRender(float tickDelta, long startTime, boolean fullRender, CallbackInfo ci) {
+    private void onRender(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci) {
         if (this.client.currentScreen != null && MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER)
             MidnightControlsClient.get().input.onPreRenderScreen(this.client, this.client.currentScreen);
     }
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw()V", shift = At.Shift.BEFORE))
-    private void renderVirtualCursor(float tickDelta, long startTime, boolean tick, CallbackInfo ci, @Local DrawContext drawContext) {
+    private void renderVirtualCursor(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, @Local DrawContext drawContext) {
         MidnightControlsRenderer.renderVirtualCursor(drawContext,  client);
         drawContext.draw();
     }
     @Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z"), method = "renderWorld")
-    private void captureProjAndModMatrix(float tickDelta, long limitTime, CallbackInfo ci, @Local(ordinal = 1) Matrix4f matrices) {
+    private void captureProjAndModMatrix(RenderTickCounter tickCounter, CallbackInfo ci, @Local(ordinal = 1) Matrix4f matrices) {
         TouchUtils.lastProjMat.set(RenderSystem.getProjectionMatrix());
         TouchUtils.lastModMat.set(RenderSystem.getModelViewMatrix());
         TouchUtils.lastWorldSpaceMatrix.set(matrices);

@@ -57,7 +57,7 @@ public class MidnightControlsHud extends Hud {
     private static boolean isCrammed = false;
 
     public MidnightControlsHud(@NotNull MidnightControlsClient mod) {
-        super(new Identifier(MidnightControlsConstants.NAMESPACE, "hud/button_indicator"));
+        super(Identifier.of(MidnightControlsConstants.NAMESPACE, "hud/button_indicator"));
         this.mod = mod;
     }
 

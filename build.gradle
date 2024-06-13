@@ -3,14 +3,11 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
-    id 'com.modrinth.minotaur' version '2.+'
-    id 'net.darkhax.curseforgegradle' version '1.+'
+    id "me.shedaniel.unified-publishing" version "0.1.+"
 }
 
-import net.darkhax.curseforgegradle.TaskPublishCurseForge
-
 group = project.maven_group
-version = "${project.mod_version}+${getMCVersionString()}"
+version = "${project.mod_version}+${project.minecraft_version}"
 
 // This field defines the Java version your mod target.
 def targetJavaVersion = 21
@@ -19,30 +16,6 @@ boolean isMCVersionNonRelease() {
     return project.minecraft_version.matches('^\\d\\dw\\d\\d[a-z]$')
             || project.minecraft_version.matches('\\d+\\.\\d+-(pre|rc)(\\d+)')
 }
-
-String getMCVersionString() {
-    return project.minecraft_version
-}
-
-boolean pingUrl(String address) {
-    try {
-        def conn = (HttpURLConnection) new URL(address).openConnection()
-        int responseCode = conn.getResponseCode()
-        return (200 <= responseCode && responseCode <= 399)
-    } catch (IOException ignored) {
-        return false
-    }
-}
-
-String parseReadme() {
-    def excludeRegex = /(?m)<!-- modrinth_exclude\.start -->(.|\n)*?<!-- modrinth_exclude\.end -->/
-    def linkRegex = /!\[([A-z_ ]+)]\((images\/[A-z.\/_]+)\)/
-
-    def readme = (String) file('README.md').text
-    readme = readme.replaceAll(excludeRegex, '')
-    return readme
-}
-
 
 repositories {
     mavenLocal()
@@ -144,39 +117,55 @@ processResources {
         expand 'version': project.version
     }
 }
-modrinth {
-    token = System.getenv("MODRINTH_TOKEN") // Remember to have the MODRINTH_TOKEN environment variable set or else this will fail - just make sure it stays private!
-    projectId = project.archives_base_name // This can be the project ID or the slug. Either will work!
-    versionNumber = project.version // You don't need to set this manually. Will fail if Modrinth has this version already
-    versionName = "MidnightControls " + project.mod_version + " - " + project.minecraft_version
-    versionType = isMCVersionNonRelease() ? "beta" : "release" // Can also be `beta` or `alpha`
-    uploadFile = remapJar // With Loom, this MUST be set to `remapJar` instead of `jar`!
-    gameVersions = [(String) project.minecraft_version] // Must be an array, even with only one version
-    loaders = ["fabric","quilt"] // Must also be an array - no need to specify this if you're using Loom or ForgeGradle
-    dependencies { // A special DSL for creating dependencies
-        // scope.type
-        // The scope can be `required`, `optional`, `incompatible`, or `embedded`
-        // The type can either be `project` or `version`
-        required.project "midnightlib" // Creates a new required dependency on MidnightLib
+
+ext {
+    releaseChangelog = {
+        def changes = new StringBuilder()
+        changes << "## MidnightControls v$project.version for $project.minecraft_version\n[View the changelog](https://www.github.com/TeamMidnightDust/MidnightControls/commits/)"
+        def proc = "git log --max-count=1 --pretty=format:%s".execute()
+        proc.in.eachLine { line ->
+            def processedLine = line.toString()
+            if (!processedLine.contains("New translations") && !processedLine.contains("Merge") && !processedLine.contains("branch")) {
+                changes << "\n- ${processedLine.capitalize()}"
+            }
+        }
+        proc.waitFor()
+        return changes.toString()
     }
-    changelog = project.changelog
 }
-tasks.register('publishCurseForge', TaskPublishCurseForge) {
 
-    // This token is used to authenticate with CurseForge. It should be handled
-    // with the same level of care and security as your actual password. You 
-    // should never share your token with an untrusted source or publish it
-    // publicly to GitHub or embed it within a project. The best practice is to
-    // store this token in an environment variable or a build secret.
-    apiToken = System.getenv("CURSEFORGE_TOKEN")
+unifiedPublishing {
+    project {
+        displayName = "MidnightControls v$project.version - Fabric $project.minecraft_version"
+        releaseType = "$project.release_type"
+        changelog = releaseChangelog()
+        gameVersions = []
+        gameLoaders = ["fabric","quilt"]
+        mainPublication remapJar
+        relations {
+            includes {
+                curseforge = "midnightlib"
+                modrinth = "midnightlib"
+            }
+        }
 
-    // Tells CurseForgeGradle to publish the output of the jar task. This will
-    // return a UploadArtifact object that can be used to further configure the
-    // file. 
-    def mainFile = upload(project.curseforge_id, remapJar)
-    mainFile.changelog = project.changelog
-    mainFile.displayName = "MidnightControls " + project.mod_version + " - " + project.minecraft_version
-    mainFile.addModLoader("Fabric", "Quilt")
-    mainFile.addRequirement("midnightlib")
-    mainFile.releaseType = "release"
+        var CURSEFORGE_TOKEN = project.findProperty("CURSEFORGE_TOKEN") ?: System.getenv("CURSEFORGE_TOKEN")
+        if (CURSEFORGE_TOKEN != null) {
+            curseforge {
+                token = CURSEFORGE_TOKEN
+                id = rootProject.curseforge_id
+                gameVersions.addAll "Java 21", project.minecraft_version
+            }
+        }
+
+        var MODRINTH_TOKEN = project.findProperty("MODRINTH_TOKEN") ?: System.getenv("MODRINTH_TOKEN")
+        if (MODRINTH_TOKEN != null) {
+            modrinth {
+                token = MODRINTH_TOKEN
+                id = rootProject.modrinth_id
+                version = "$project.version"
+                gameVersions.addAll project.minecraft_version
+            }
+        }
+    }
 }

@@ -14,9 +14,18 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.util.MathUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.item.ItemStack;
+import net.minecraft.predicate.entity.MovementPredicate;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.MathHelper;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.asm.mixin.Unique;
 
 /**
  * Represents the movement handler.
@@ -35,7 +44,7 @@ public final class MovementHandler implements PressAction {
     private float slowdownFactor = 1.f;
     private float movementForward = 0.f;
     private float movementSideways = 0.f;
-    private MathUtil.PolarUtil polarUtil = new MathUtil.PolarUtil();
+    private final MathUtil.PolarUtil polarUtil = new MathUtil.PolarUtil();
 
     private MovementHandler() {
     }
@@ -81,7 +90,7 @@ public final class MovementHandler implements PressAction {
         }
 
         this.slowdownFactor = client.player.shouldSlowDown() ? (MathHelper.clamp(
-            0.3F + EnchantmentHelper.getSwiftSneakSpeedBoost(client.player),
+            0.3F + (float) client.player.getAttributeValue(EntityAttributes.PLAYER_SNEAKING_SPEED),
             0.0F,
             1.0F
         )) : 1.f;

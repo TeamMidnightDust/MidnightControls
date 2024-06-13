@@ -2,8 +2,8 @@ package eu.midnightdust.midnightcontrols.client.mouse;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.GlfwUtil;
-import net.minecraft.client.util.SmoothUtil;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
+import net.minecraft.util.math.Smoother;
 
 public class EyeTrackerHandler {
 
@@ -16,8 +16,8 @@ public class EyeTrackerHandler {
                                                   double lastMouseUpdateTime,
                                                   boolean holdingLeftMouseButton,
                                                   boolean usingLongRangedTool,
-                                                  SmoothUtil smoothX,
-                                                  SmoothUtil smoothY
+                                                  Smoother smoothX,
+                                                  Smoother smoothY
                                              ) {
         // The player wants objects of interest to be moved under the crosshair that is always center of screen.
         // Normal mouse controls operate with the delta values from the direction of mouse movement,

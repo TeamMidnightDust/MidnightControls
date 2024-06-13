@@ -21,7 +21,7 @@ import net.minecraft.util.Identifier;
  */
 public class MidnightControlsConstants {
     public static final String NAMESPACE = "midnightcontrols";
-    public static final Identifier CONTROLS_MODE_CHANNEL = new Identifier(NAMESPACE, "controls_mode");
-    public static final Identifier FEATURE_CHANNEL = new Identifier(NAMESPACE, "feature");
-    public static final Identifier HELLO_CHANNEL = new Identifier("lambdacontrols", "hello");
+    public static final Identifier CONTROLS_MODE_CHANNEL = Identifier.of(NAMESPACE, "controls_mode");
+    public static final Identifier FEATURE_CHANNEL = Identifier.of(NAMESPACE, "feature");
+    public static final Identifier HELLO_CHANNEL = Identifier.of(NAMESPACE, "hello");
 }

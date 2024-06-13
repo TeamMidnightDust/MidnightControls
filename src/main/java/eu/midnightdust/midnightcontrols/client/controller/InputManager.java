@@ -73,8 +73,8 @@ public class InputManager {
     public void updateMousePosition(@NotNull MinecraftClient client) {
         Objects.requireNonNull(client, "Client instance cannot be null.");
         if (this.prevTargetMouseX != this.targetMouseX || this.prevTargetMouseY != this.targetMouseY) {
-            double mouseX = this.prevTargetMouseX + (this.targetMouseX - this.prevTargetMouseX) * client.getTickDelta() + 0.5;
-            double mouseY = this.prevTargetMouseY + (this.targetMouseY - this.prevTargetMouseY) * client.getTickDelta() + 0.5;
+            double mouseX = this.prevTargetMouseX + (this.targetMouseX - this.prevTargetMouseX) * client.getRenderTickCounter().getTickDelta(true) + 0.5;
+            double mouseY = this.prevTargetMouseY + (this.targetMouseY - this.prevTargetMouseY) * client.getRenderTickCounter().getTickDelta(true) + 0.5;
             if (!MidnightControlsConfig.virtualMouse)
                 GLFW.glfwSetCursorPos(client.getWindow().getHandle(), mouseX, mouseY);
             ((MouseAccessor) client.mouse).midnightcontrols$onCursorPos(client.getWindow().getHandle(), mouseX, mouseY);

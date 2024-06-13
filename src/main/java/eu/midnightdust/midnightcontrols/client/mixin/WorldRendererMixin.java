@@ -80,7 +80,7 @@ public abstract class WorldRendererMixin {
                     shift = At.Shift.AFTER
             )
     )
-    private void onOutlineRender(float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci, @Local MatrixStack matrices) {
+    private void onOutlineRender(RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci, @Local MatrixStack matrices) {
         if (((MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.touchInControllerMode) || MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN)
                 && MidnightControlsConfig.touchMode == TouchMode.FINGER_POS) {
             this.renderFingerOutline(matrices, camera);
