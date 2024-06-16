@@ -9,8 +9,8 @@
 
 package eu.midnightdust.midnightcontrols.client.gui;
 
-import dev.lambdaurora.spruceui.Position;
-import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
+import org.thinkingstudio.obsidianui.Position;
+import org.thinkingstudio.obsidianui.widget.SpruceButtonWidget;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;

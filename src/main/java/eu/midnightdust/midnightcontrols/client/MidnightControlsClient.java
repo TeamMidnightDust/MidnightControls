@@ -9,7 +9,6 @@
 
 package eu.midnightdust.midnightcontrols.client;
 
-import dev.lambdaurora.spruceui.event.OpenScreenCallback;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControls;
@@ -26,7 +25,8 @@ import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingIDAccessor;
 import eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction;
 import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
-import dev.lambdaurora.spruceui.hud.HudManager;
+import org.thinkingstudio.obsidianui.fabric.event.OpenScreenCallback;
+import org.thinkingstudio.obsidianui.hud.HudManager;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePacket;
@@ -115,7 +115,7 @@ public class MidnightControlsClient extends MidnightControls implements ClientMo
         ClientTickEvents.START_CLIENT_TICK.register(this.reacharound::tick);
         ClientTickEvents.START_CLIENT_TICK.register(this::onTick);
 
-        OpenScreenCallback.EVENT.register((client, screen) -> {
+        OpenScreenCallback.POST.register((client, screen) -> {
             if (screen == null && MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN) {
                 screen = new TouchscreenOverlay(this);
                 screen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());

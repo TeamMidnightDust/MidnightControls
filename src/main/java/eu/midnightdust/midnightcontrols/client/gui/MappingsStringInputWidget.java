@@ -11,10 +11,10 @@ package eu.midnightdust.midnightcontrols.client.gui;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
-import dev.lambdaurora.spruceui.Position;
-import dev.lambdaurora.spruceui.option.SpruceOption;
-import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
-import dev.lambdaurora.spruceui.widget.text.SpruceTextAreaWidget;
+import org.thinkingstudio.obsidianui.Position;
+import org.thinkingstudio.obsidianui.option.SpruceOption;
+import org.thinkingstudio.obsidianui.widget.container.SpruceContainerWidget;
+import org.thinkingstudio.obsidianui.widget.text.SpruceTextAreaWidget;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
 

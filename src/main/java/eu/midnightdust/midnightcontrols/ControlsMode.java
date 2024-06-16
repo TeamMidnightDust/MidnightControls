@@ -9,8 +9,8 @@
 
 package eu.midnightdust.midnightcontrols;
 
-import dev.lambdaurora.spruceui.util.Nameable;
 import org.jetbrains.annotations.NotNull;
+import org.thinkingstudio.obsidianui.util.Nameable;
 
 import java.util.Arrays;
 import java.util.Optional;

@@ -36,6 +36,9 @@ repositories {
     maven { url 'https://jitpack.io' }
     maven { url "https://api.modrinth.com/maven" }
     maven { url 'https://maven.quiltmc.org/repository/release'}
+    flatDir {
+        dirs("localMaven")
+    }
 }
 
 configurations {
@@ -52,10 +55,7 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation ("dev.lambdaurora:spruceui:${project.spruceui_version}") {
-        exclude(group: "net.fabricmc.fabric-api")
-    }
-    include "dev.lambdaurora:spruceui:${project.spruceui_version}"
+    include modImplementation ("maven.modrinth:obsidianui:${project.obsidianui_version}") {}
     api('org.aperlambda:lambdajcommon:1.8.1') {
         exclude group: 'com.google.code.gson'
         exclude group: 'com.google.guava'

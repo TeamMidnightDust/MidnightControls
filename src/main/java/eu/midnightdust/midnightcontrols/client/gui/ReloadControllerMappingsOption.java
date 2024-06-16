@@ -10,8 +10,8 @@
 package eu.midnightdust.midnightcontrols.client.gui;
 
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
-import dev.lambdaurora.spruceui.option.SpruceSimpleActionOption;
-import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
+import org.thinkingstudio.obsidianui.option.SpruceSimpleActionOption;
+import org.thinkingstudio.obsidianui.widget.SpruceButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;

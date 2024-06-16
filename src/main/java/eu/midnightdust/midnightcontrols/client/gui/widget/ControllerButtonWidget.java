@@ -11,9 +11,9 @@ package eu.midnightdust.midnightcontrols.client.gui.widget;
 
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsRenderer;
-import dev.lambdaurora.spruceui.Position;
-import dev.lambdaurora.spruceui.SpruceTexts;
-import dev.lambdaurora.spruceui.widget.AbstractSpruceIconButtonWidget;
+import org.thinkingstudio.obsidianui.Position;
+import org.thinkingstudio.obsidianui.SpruceTexts;
+import org.thinkingstudio.obsidianui.widget.AbstractSpruceIconButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;

@@ -9,7 +9,7 @@
 
 package eu.midnightdust.midnightcontrols;
 
-import dev.lambdaurora.spruceui.util.Nameable;
+import org.thinkingstudio.obsidianui.util.Nameable;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import org.jetbrains.annotations.NotNull;
 
