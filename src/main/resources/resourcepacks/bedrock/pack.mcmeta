@@ -1,6 +1,7 @@
 {
   "pack": {
-    "pack_format": 13,
+    "pack_format": 15,
+    "supported_formats": [15, 999],
     "description": "Makes controller tooltips use similar icons to Bedrock Edition"
   }
 }

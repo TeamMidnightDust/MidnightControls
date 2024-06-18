@@ -36,8 +36,9 @@ public abstract class ControlsOptionsScreenMixin extends GameOptionsScreen {
     @Unique TextIconButtonWidget button = TextIconButtonWidget.builder(Text.translatable("midnightcontrols.menu.title.controller"), (button -> this.client.setScreen(new MidnightControlsSettingsScreen(this, false))), true)
             .dimension(20,20).texture(Identifier.of("midnightcontrols", "icon/controller"), 20, 20).build();
 
-    @Inject(at = @At("TAIL"), method = "addOptions")
-    public void midnightcontrols$onInit(CallbackInfo ci) {
+    @Override
+    public void init() {
+        super.init();
         this.midnightcontrols$setupButton();
         this.addDrawableChild(button);
     }
