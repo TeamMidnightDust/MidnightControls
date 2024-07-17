@@ -6,7 +6,7 @@
     "ClickableWidgetAccessor",
     "AdvancementsScreenAccessor",
     "ClientPlayerEntityMixin",
-    "ControlsOptionsScreenMixin",
+    "GameOptionsScreenMixin",
     "CreativeInventoryScreenAccessor",
     "GameRendererMixin",
     "HandledScreenMixin",

@@ -4,6 +4,23 @@ architectury {
 loom {
     accessWidenerPath = file("src/main/resources/midnightcontrols.accesswidener")
 }
+repositories {
+    maven {
+        name 'Gegy'
+        url 'https://maven.gegy.dev'
+    }
+    maven {
+        name = "CottonMC"
+        url = "https://server.bbkr.space/artifactory/libs-release"
+    }
+    maven { url "https://maven.terraformersmc.com/releases/" }
+    maven { url 'https://maven.kosmx.dev' }
+    maven { url 'https://maven.isxander.dev/releases' }
+    maven { url 'https://maven.shedaniel.me/' }
+    maven { url 'https://jitpack.io' }
+    maven { url "https://api.modrinth.com/maven" }
+    maven { url 'https://maven.quiltmc.org/repository/release'}
+}
 
 dependencies {
     // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
@@ -14,6 +31,24 @@ dependencies {
     modCompileOnlyApi "maven.modrinth:midnightlib:${rootProject.midnightlib_version}-fabric"
     modCompileOnlyApi "maven.modrinth:obsidianui:${project.obsidianui_version}-fabric"
     include 'org.aperlambda:lambdajcommon:1.8.1'
+    modCompileOnlyApi ("com.terraformersmc:modmenu:${project.modmenu_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+
+    // Compatibility mods
+    modCompileOnlyApi "io.github.cottonmc:LibGui:${project.libgui_version}"
+    modCompileOnlyApi "org.quiltmc:quilt-json5:1.0.0"
+    modCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
+    modCompileOnlyApi "maven.modrinth:emi:${project.emi_version}"
+    modCompileOnlyApi "maven.modrinth:emotecraft:${project.emotecraft_version}"
+    modCompileOnlyApi "io.github.kosmx:bendy-lib:${project.bendylib_version}"
+    modCompileOnlyApi "dev.isxander:yet-another-config-lib:${project.yacl_version}"
+    modCompileOnlyApi "maven.modrinth:inventory-tabs-updated:${project.inventorytabs_version}"
+    modCompileOnlyApi "maven.modrinth:bedrockify:${project.bedrockify_version}"
+    // Required for Inventory Tabs
+    modCompileOnlyApi("me.shedaniel.cloth:cloth-config-fabric:${project.clothconfig_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
 }
 
 publishing {

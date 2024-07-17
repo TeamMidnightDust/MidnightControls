@@ -19,14 +19,15 @@ public class EmotecraftCompat {
         if (client.currentScreen instanceof FastChosseScreen) {
             int x = client.getWindow().getWidth() / 2;
             int y = client.getWindow().getHeight() / 2;
-            if (index == 0) InputManager.queueMousePosition(x-200, y-200);
-            if (index == 1) InputManager.queueMousePosition(x, y-200);
-            if (index == 2) InputManager.queueMousePosition(x+200, y-200);
-            if (index == 3) InputManager.queueMousePosition(x-200, y);
-            if (index == 4) InputManager.queueMousePosition(x+200, y);
-            if (index == 5) InputManager.queueMousePosition(x-200, y+200);
-            if (index == 6) InputManager.queueMousePosition(x, y+200);
-            if (index == 7) InputManager.queueMousePosition(x+200, y+200);
+            switch (index) {
+                case 0, 3, 5 -> x -= 200;
+                case 2, 4, 7 -> x += 200;
+            }
+            switch (index) {
+                case 0, 1, 2 -> y -= 200;
+                case 5, 6, 7 -> y += 200;
+            }
+            InputManager.queueMousePosition(x, y);
 
             InputManager.INPUT_MANAGER.updateMousePosition(client);
         }

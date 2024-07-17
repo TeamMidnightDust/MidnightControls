@@ -3,7 +3,7 @@ package eu.midnightdust.midnightcontrols.fabric;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
-import eu.midnightdust.midnightcontrols.event.PlayerChangeControlsModeCallback;
+import eu.midnightdust.midnightcontrols.fabric.event.PlayerChangeControlsModeCallback;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
 import eu.midnightdust.midnightcontrols.packet.FeaturePayload;
 import eu.midnightdust.midnightcontrols.packet.HelloPayload;
@@ -21,12 +21,11 @@ public class MidnightControlsFabric implements ModInitializer {
         PayloadTypeRegistry.playS2C().register(FeaturePayload.PACKET_ID, FeaturePayload.codec);
 
         ServerPlayNetworking.registerGlobalReceiver(HelloPayload.PACKET_ID, (payload, context) -> {
-            ControlsMode.byId(payload.controlsMode())
-                    .ifPresent(controlsMode -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.player(), controlsMode));
+            ControlsMode.byId(payload.controlsMode()).ifPresent(controlsMode -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.player(), controlsMode));
             context.responseSender().sendPacket(new FeaturePayload(MidnightControlsFeature.HORIZONTAL_REACHAROUND));
         });
-        ServerPlayNetworking.registerGlobalReceiver(ControlsModePayload.PACKET_ID,
-                (payload, context) -> ControlsMode.byId(payload.controlsMode())
-                        .ifPresent(controlsMode -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.player(), controlsMode)));
+        ServerPlayNetworking.registerGlobalReceiver(ControlsModePayload.PACKET_ID, (payload, context) -> {
+            ControlsMode.byId(payload.controlsMode()).ifPresent(controlsMode -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.player(), controlsMode));
+        });
     }
 }

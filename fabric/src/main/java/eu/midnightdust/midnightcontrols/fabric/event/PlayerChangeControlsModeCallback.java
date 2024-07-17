@@ -7,7 +7,7 @@
  * see the LICENSE file.
  */
 
-package eu.midnightdust.midnightcontrols.event;
+package eu.midnightdust.midnightcontrols.fabric.event;
 
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import net.fabricmc.fabric.api.event.Event;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  * Represents an event callback which is fired when a player changes the controls mode.
  *
  * @author LambdAurora
- * @version 1.1.0
+ * @version 1.10.0
  * @since 1.1.0
  */
 @FunctionalInterface

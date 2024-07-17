@@ -1,4 +1,3 @@
 accessWidener   v1  named
 
 #accessible  class   net/minecraft/client/gui/widget/EntryListWidget$MoveDirection
-accessible method net/minecraft/util/Identifier <init> (Ljava/lang/String;Ljava/lang/String;)V

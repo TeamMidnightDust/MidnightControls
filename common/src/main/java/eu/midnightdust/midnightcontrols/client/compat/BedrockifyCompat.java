@@ -10,7 +10,6 @@
 package eu.midnightdust.midnightcontrols.client.compat;
 
 import me.juancarloscp52.bedrockify.client.BedrockifyClient;
-import me.juancarloscp52.bedrockify.client.BedrockifyClientSettings;
 
 /**
  * Represents HQM compatibility handler.

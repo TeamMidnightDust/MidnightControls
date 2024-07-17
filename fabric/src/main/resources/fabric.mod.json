@@ -45,7 +45,6 @@
       "eu.midnightdust.midnightcontrols.client.MidnightControlsModMenu"
     ]
   },
-  "accessWidener": "midnightcontrols.accesswidener",
   "mixins": [
     "midnightcontrols.mixins.json",
     "midnightcontrols_compat.mixins.json"
