@@ -12,6 +12,8 @@ package eu.midnightdust.midnightcontrols;
 
 import net.minecraft.util.Identifier;
 
+import static eu.midnightdust.midnightcontrols.MidnightControls.id;
+
 /**
  * Represents the constants used by MidnightControls.
  *
@@ -21,7 +23,7 @@ import net.minecraft.util.Identifier;
  */
 public class MidnightControlsConstants {
     public static final String NAMESPACE = "midnightcontrols";
-    public static final Identifier CONTROLS_MODE_CHANNEL = Identifier.of(NAMESPACE, "controls_mode");
-    public static final Identifier FEATURE_CHANNEL = Identifier.of(NAMESPACE, "feature");
-    public static final Identifier HELLO_CHANNEL = Identifier.of(NAMESPACE, "hello");
+    public static final Identifier CONTROLS_MODE_CHANNEL = id("controls_mode");
+    public static final Identifier FEATURE_CHANNEL = id("feature");
+    public static final Identifier HELLO_CHANNEL = id("hello");
 }

@@ -12,6 +12,7 @@ package eu.midnightdust.midnightcontrols.client;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControls;
+import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
@@ -103,7 +104,7 @@ public class MidnightControlsClient extends MidnightControls {
             MidnightControlsConfig.mouseScreens.remove("net.minecraft.class_5375");
             MidnightControlsConfig.mouseScreens.remove("net.minecraft.client.gui.screen.pack.PackScreen");
             MidnightControlsConfig.configVersion = 2;
-            MidnightControlsConfig.write("midnightcontrols");
+            MidnightControlsConfig.write(MidnightControlsConstants.NAMESPACE);
         }
         hud.setVisible(MidnightControlsConfig.hudEnable);
         Controller.updateMappings();
@@ -135,7 +136,7 @@ public class MidnightControlsClient extends MidnightControls {
         for (int i = 0; i < KeyBindingIDAccessor.getKEYS_BY_ID().size(); ++i) {
             KeyBinding keyBinding = KeyBindingIDAccessor.getKEYS_BY_ID().entrySet().stream().toList().get(i).getValue();
             if (MidnightControlsConfig.excludedKeybindings.stream().noneMatch(excluded -> keyBinding.getTranslationKey().startsWith(excluded))) {
-                if (!keyBinding.getTranslationKey().contains("midnightcontrols") && !keyBinding.getTranslationKey().contains("ok_zoomer") && !keyBinding.getTranslationKey().contains("okzoomer")) {
+                if (!keyBinding.getTranslationKey().contains(MidnightControlsConstants.NAMESPACE)) {
                     AtomicReference<ButtonCategory> category = new AtomicReference<>();
                     InputManager.streamCategories().forEach(buttonCategory -> {
                         if (buttonCategory.getIdentifier().equals(Identifier.of("minecraft", keyBinding.getCategory())))

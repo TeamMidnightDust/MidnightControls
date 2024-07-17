@@ -10,6 +10,7 @@
 package eu.midnightdust.midnightcontrols.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
 import org.thinkingstudio.obsidianui.background.Background;
@@ -215,7 +216,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             var client = MinecraftClient.getInstance();
             this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
         });
-        this.advancedConfigOption = SpruceSimpleActionOption.of("midnightcontrols.midnightconfig.title", button -> client.setScreen(MidnightControlsConfig.getScreen(this, "midnightcontrols")));
+        this.advancedConfigOption = SpruceSimpleActionOption.of("midnightcontrols.midnightconfig.title", button -> client.setScreen(MidnightControlsConfig.getScreen(this, MidnightControlsConstants.NAMESPACE)));
         // Gameplay options
         this.analogMovementOption = new SpruceToggleBooleanOption("midnightcontrols.menu.analog_movement",
                 () -> MidnightControlsConfig.analogMovement, value -> MidnightControlsConfig.analogMovement = value,

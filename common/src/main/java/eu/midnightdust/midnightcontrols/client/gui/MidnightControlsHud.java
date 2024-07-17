@@ -29,6 +29,8 @@ import net.minecraft.util.hit.HitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static eu.midnightdust.midnightcontrols.MidnightControls.id;
+
 /**
  * Represents the midnightcontrols HUD.
  *
@@ -55,7 +57,7 @@ public class MidnightControlsHud extends Hud {
     private static boolean isCrammed = false;
 
     public MidnightControlsHud() {
-        super(Identifier.of(MidnightControlsConstants.NAMESPACE, "hud/button_indicator"));
+        super(id("hud/button_indicator"));
     }
 
     @Override

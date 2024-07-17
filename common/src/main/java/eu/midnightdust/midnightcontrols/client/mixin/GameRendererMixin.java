@@ -30,26 +30,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
-    @Shadow
-    @Final
-    MinecraftClient client;
+    @Shadow @Final MinecraftClient client;
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Mouse;getX()D", shift = At.Shift.BEFORE))
-    private void onRender(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci) {
+    private void midnigtcontrols$onRender(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci) {
         if (this.client.currentScreen != null && MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER)
             MidnightControlsClient.input.onPreRenderScreen(this.client, this.client.currentScreen);
     }
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw()V", shift = At.Shift.BEFORE))
-    private void renderVirtualCursor(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, @Local DrawContext drawContext) {
+    private void midnigtcontrols$renderVirtualCursor(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, @Local DrawContext drawContext) {
         MidnightControlsRenderer.renderVirtualCursor(drawContext,  client);
         if (MidnightControlsClient.isWayland) MidnightControlsRenderer.renderWaylandCursor(drawContext, client);
         drawContext.draw();
     }
     @Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z"), method = "renderWorld")
-    private void captureProjAndModMatrix(RenderTickCounter tickCounter, CallbackInfo ci, @Local(ordinal = 1) Matrix4f matrices) {
+    private void midnigtcontrols$captureMatrices(RenderTickCounter tickCounter, CallbackInfo ci, @Local(ordinal = 1) Matrix4f matrices) {
         TouchUtils.lastProjMat.set(RenderSystem.getProjectionMatrix());
         TouchUtils.lastModMat.set(RenderSystem.getModelViewMatrix());
         TouchUtils.lastWorldSpaceMatrix.set(matrices);
     }
-
 }

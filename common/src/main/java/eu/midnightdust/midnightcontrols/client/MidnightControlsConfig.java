@@ -15,6 +15,7 @@ import com.mojang.blaze3d.platform.GlDebugInfo;
 import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControls;
+import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
@@ -130,7 +131,7 @@ public class MidnightControlsConfig extends MidnightConfig {
      * Loads the configuration
      */
     public static void load() {
-        MidnightControlsConfig.init("midnightcontrols", MidnightControlsConfig.class);
+        MidnightControlsConfig.init(MidnightControlsConstants.NAMESPACE, MidnightControlsConfig.class);
         MidnightControls.log("Configuration loaded.");
         // Controller controls.
         InputManager.loadButtonBindings();
@@ -140,7 +141,7 @@ public class MidnightControlsConfig extends MidnightConfig {
      * Saves the configuration.
      */
     public static void save() {
-        MidnightControlsConfig.write("midnightcontrols");
+        MidnightControlsConfig.write(MidnightControlsConstants.NAMESPACE);
         MidnightControls.log("Configuration saved.");
         MidnightControlsFeature.refreshEnabled();
     }
@@ -188,7 +189,7 @@ public class MidnightControlsConfig extends MidnightConfig {
      */
     public static void setController(Controller controller) {
         MidnightControlsConfig.controllerID = controller.id();
-        MidnightControlsConfig.write("midnightcontrols");
+        MidnightControlsConfig.write(MidnightControlsConstants.NAMESPACE);
     }
 
     /**

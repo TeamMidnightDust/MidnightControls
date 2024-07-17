@@ -38,6 +38,15 @@ public class ButtonCategory {
     public ButtonCategory(@NotNull Identifier id) {
         this(id, 100);
     }
+    @Deprecated
+    public ButtonCategory(@NotNull org.aperlambda.lambdacommon.Identifier id, int priority) {
+        this(Identifier.of(id.getNamespace(), id.getName()), priority);
+    }
+
+    @Deprecated
+    public ButtonCategory(@NotNull org.aperlambda.lambdacommon.Identifier id) {
+        this(id, 100);
+    }
 
     public void registerBinding(@NotNull ButtonBinding binding) {
         if (this.bindings.contains(binding))

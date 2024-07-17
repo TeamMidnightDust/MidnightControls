@@ -17,11 +17,11 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.util.Identifier;
 import org.thinkingstudio.obsidianui.fabric.event.OpenScreenCallback;
 
 import java.util.Optional;
 
+import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.BINDING_LOOK_DOWN;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.BINDING_LOOK_LEFT;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.BINDING_LOOK_RIGHT;
@@ -65,9 +65,9 @@ public class MidnightControlsClientFabric implements ClientModInitializer {
                 MidnightControlsClient.input.onScreenOpen(client, client.getWindow().getWidth(), client.getWindow().getHeight());
             }
         });
-        FabricLoader.getInstance().getModContainer("midnightcontrols").ifPresent(modContainer -> {
-            ResourceManagerHelper.registerBuiltinResourcePack(Identifier.of("midnightcontrols","bedrock"), modContainer, ResourcePackActivationType.NORMAL);
-            ResourceManagerHelper.registerBuiltinResourcePack(Identifier.of("midnightcontrols","legacy"), modContainer, ResourcePackActivationType.NORMAL);
+        FabricLoader.getInstance().getModContainer(MidnightControlsConstants.NAMESPACE).ifPresent(modContainer -> {
+            ResourceManagerHelper.registerBuiltinResourcePack(id("bedrock"), modContainer, ResourcePackActivationType.NORMAL);
+            ResourceManagerHelper.registerBuiltinResourcePack(id("legacy"), modContainer, ResourcePackActivationType.NORMAL);
         });
         MidnightControlsClient.initClient();
     }

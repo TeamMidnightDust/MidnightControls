@@ -11,7 +11,6 @@ package eu.midnightdust.midnightcontrols.client.compat;
 
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.hit.BlockHitResult;
@@ -39,21 +38,15 @@ public class MidnightControlsCompat {
      * Initializes compatibility with other mods if needed.
      */
     public static void init() {
-        // "okzoomer" is the mod ID used by Fabric-compatible versions of Ok Zoomer. (5.0.0-beta.6 and below.)
-        // "ok_zoomer" is the mod ID used by Quilt-exclusive versions of Ok Zoomer. (5.0.0-beta.7 and above.)
-        if (FabricLoader.getInstance().isModLoaded("okzoomer") || FabricLoader.getInstance().isModLoaded("ok_zoomer")) {
-            log("Adding Ok Zoomer compatibility...");
-            registerCompatHandler(new OkZoomerCompat());
-        }
         if (isEMIPresent()) {
             log("Adding EMI compatibility...");
             registerCompatHandler(new EMICompat());
         }
-        if (FabricLoader.getInstance().isModLoaded("hardcorequesting") && LambdaReflection.doesClassExist(HQMCompat.GUI_BASE_CLASS_PATH)) {
+        if (PlatformFunctions.isModLoaded("hardcorequesting") && LambdaReflection.doesClassExist(HQMCompat.GUI_BASE_CLASS_PATH)) {
             log("Adding HQM compatibility...");
             registerCompatHandler(new HQMCompat());
         }
-        if (FabricLoader.getInstance().isModLoaded("bedrockify")) {
+        if (PlatformFunctions.isModLoaded("bedrockify")) {
             log("Adding Bedrockify compatibility...");
             registerCompatHandler(new BedrockifyCompat());
         }
@@ -208,6 +201,6 @@ public class MidnightControlsCompat {
      * @return true if Emotecraft is present, else false
      */
     public static boolean isEmotecraftPresent() {
-        return FabricLoader.getInstance().isModLoaded("emotecraft");
+        return PlatformFunctions.isModLoaded("emotecraft");
     }
 }

@@ -17,7 +17,6 @@ import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.gui.widget.OptionListWidget;
 import net.minecraft.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,6 +25,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static eu.midnightdust.midnightcontrols.MidnightControls.id;
+
 /**
  * Injects the new controls settings button.
  */
@@ -33,7 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class GameOptionsScreenMixin extends Screen {
     @Shadow @Nullable protected OptionListWidget body;
     @Unique TextIconButtonWidget midnightcontrols$button = TextIconButtonWidget.builder(Text.translatable("midnightcontrols.menu.title.controller"), (button -> this.client.setScreen(new MidnightControlsSettingsScreen(this, false))), true)
-            .dimension(20,20).texture(Identifier.of("midnightcontrols", "icon/controller"), 20, 20).build();
+            .dimension(20,20).texture(id("icon/controller"), 20, 20).build();
 
     protected GameOptionsScreenMixin(Text title) {
         super(title);

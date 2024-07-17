@@ -7,8 +7,9 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
-import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
+
+import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 
 public class EMICompat implements CompatHandler {
     public static boolean handleEmiPages(boolean direction) {
@@ -22,7 +23,7 @@ public class EMICompat implements CompatHandler {
     }
     @Override
     public void handle() {
-        ButtonCategory category = new ButtonCategory(Identifier.of("midnightcontrols","category.emi"));
+        ButtonCategory category = new ButtonCategory(id("category.emi"));
         InputManager.registerCategory(category);
         new ButtonBinding.Builder("emi_page_left")
                 .buttons(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
