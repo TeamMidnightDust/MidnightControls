@@ -81,4 +81,12 @@ public enum VirtualMouseSkin implements Nameable {
     public static @NotNull Optional<VirtualMouseSkin> byId(@NotNull String id) {
         return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();
     }
+    public String getSpritePath() {
+        return switch (this) {
+            case DEFAULT_LIGHT -> "cursor/light/default";
+            case DEFAULT_DARK -> "cursor/dark/default";
+            case SECOND_LIGHT -> "cursor/light/secondary";
+            case SECOND_DARK -> "cursor/dark/secondary";
+        };
+    }
 }

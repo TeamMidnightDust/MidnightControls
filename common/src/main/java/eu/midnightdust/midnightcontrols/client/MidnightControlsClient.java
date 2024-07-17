@@ -12,7 +12,6 @@ package eu.midnightdust.midnightcontrols.client;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControls;
-import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
@@ -51,25 +50,27 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class MidnightControlsClient extends MidnightControls {
     public static boolean lateInitDone = false;
-    public static final KeyBinding BINDING_LOOK_UP = InputManager.makeKeyBinding(Identifier.of(MidnightControlsConstants.NAMESPACE, "look_up"),
+    public static final KeyBinding BINDING_LOOK_UP = InputManager.makeKeyBinding(id("look_up"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.movement");
-    public static final KeyBinding BINDING_LOOK_RIGHT = InputManager.makeKeyBinding(Identifier.of(MidnightControlsConstants.NAMESPACE, "look_right"),
+    public static final KeyBinding BINDING_LOOK_RIGHT = InputManager.makeKeyBinding(id("look_right"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, "key.categories.movement");
-    public static final KeyBinding BINDING_LOOK_DOWN = InputManager.makeKeyBinding(Identifier.of(MidnightControlsConstants.NAMESPACE, "look_down"),
+    public static final KeyBinding BINDING_LOOK_DOWN = InputManager.makeKeyBinding(id("look_down"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.movement");
-    public static final KeyBinding BINDING_LOOK_LEFT = InputManager.makeKeyBinding(Identifier.of(MidnightControlsConstants.NAMESPACE, "look_left"),
+    public static final KeyBinding BINDING_LOOK_LEFT = InputManager.makeKeyBinding(id("look_left"),
             InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement");
-    public static final KeyBinding BINDING_RING = InputManager.makeKeyBinding(Identifier.of(MidnightControlsConstants.NAMESPACE, "ring"),
+    public static final KeyBinding BINDING_RING = InputManager.makeKeyBinding(id("ring"),
             InputUtil.Type.KEYSYM, InputUtil.UNKNOWN_KEY.getCode(), "key.categories.misc");
-    public static final Identifier CONTROLLER_BUTTONS = Identifier.of(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_buttons.png");
-    public static final Identifier CONTROLLER_EXPANDED = Identifier.of(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_expanded.png");
-    public static final Identifier CONTROLLER_AXIS = Identifier.of(MidnightControlsConstants.NAMESPACE, "textures/gui/controller_axis.png");
-    public static final Identifier CURSOR_TEXTURE = Identifier.of(MidnightControlsConstants.NAMESPACE, "textures/gui/cursor.png");
+    public static final Identifier CONTROLLER_BUTTONS = id("textures/gui/controller_buttons.png");
+    public static final Identifier CONTROLLER_EXPANDED = id("textures/gui/controller_expanded.png");
+    public static final Identifier CONTROLLER_AXIS = id("textures/gui/controller_axis.png");
+    public static final Identifier WAYLAND_CURSOR_TEXTURE_LIGHT = id("cursor/light/mouse_pointer");
+    public static final Identifier WAYLAND_CURSOR_TEXTURE_DARK = id("cursor/dark/mouse_pointer");
     public static final File MAPPINGS_FILE = new File("config/gamecontrollercustommappings.txt");
     public static final MinecraftClient client = MinecraftClient.getInstance();
     public static final MidnightInput input = new MidnightInput();
     public static final MidnightRing ring = new MidnightRing();
     public static final MidnightReacharound reacharound = new MidnightReacharound();
+    public static boolean isWayland;
     private static MidnightControlsHud hud;
     private static ControlsMode previousControlsMode;
 
@@ -87,6 +88,7 @@ public class MidnightControlsClient extends MidnightControls {
         }, delay, period);
 
         HudManager.register(hud = new MidnightControlsHud());
+        isWayland = GLFW.glfwGetVersionString().contains("Wayland");
     }
 
     /**

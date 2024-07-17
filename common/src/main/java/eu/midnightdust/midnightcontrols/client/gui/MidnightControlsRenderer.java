@@ -10,20 +10,33 @@
 package eu.midnightdust.midnightcontrols.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.enums.ControllerType;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
+import eu.midnightdust.midnightcontrols.client.enums.VirtualMouseSkin;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
+
+import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 
 /**
  * Represents the midnightcontrols renderer.
@@ -192,14 +205,28 @@ public class MidnightControlsRenderer {
     private static int getButtonTipWidth(@NotNull String action, @NotNull TextRenderer textRenderer) {
         return 15 + 5 + textRenderer.getWidth(action);
     }
+    public static void renderWaylandCursor(@NotNull DrawContext context, @NotNull MinecraftClient client) {
+        if (MidnightControlsConfig.virtualMouse || client.currentScreen == null || MidnightControlsConfig.controlsMode != ControlsMode.CONTROLLER) return;
+
+        float mouseX = (float) client.mouse.getX() * client.getWindow().getScaledWidth() / client.getWindow().getWidth();
+        float mouseY = (float) client.mouse.getY() * client.getWindow().getScaledHeight() / client.getWindow().getHeight();
+
+        try {
+            Identifier spritePath = MidnightControlsClient.WAYLAND_CURSOR_TEXTURE_LIGHT;
+            if (MidnightControlsConfig.virtualMouseSkin == VirtualMouseSkin.DEFAULT_DARK || MidnightControlsConfig.virtualMouseSkin == VirtualMouseSkin.SECOND_DARK)
+                spritePath = MidnightControlsClient.WAYLAND_CURSOR_TEXTURE_DARK;
+            Sprite sprite = client.getGuiAtlasManager().getSprite(spritePath);
+            drawUnalignedTexturedQuad(sprite.getAtlasId(), context, mouseX, mouseX + 8, mouseY, mouseY + 8, 999, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
+        } catch (IllegalStateException ignored) {}
+    }
 
     public static void renderVirtualCursor(@NotNull DrawContext context, @NotNull MinecraftClient client) {
         if (!MidnightControlsConfig.virtualMouse || (client.currentScreen == null
                 || MidnightInput.isScreenInteractive(client.currentScreen)))
             return;
 
-        int mouseX = (int) (client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth());
-        int mouseY = (int) (client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight());
+        float mouseX = (float) client.mouse.getX() * client.getWindow().getScaledWidth() / client.getWindow().getWidth();
+        float mouseY = (float) client.mouse.getY() * client.getWindow().getScaledHeight() / client.getWindow().getHeight();
 
         boolean hoverSlot = false;
 
@@ -217,7 +244,7 @@ public class MidnightControlsRenderer {
         }
 
         if (!hoverSlot && client.currentScreen != null) {
-            var slot = MidnightControlsCompat.getSlotAt(client.currentScreen, mouseX, mouseY);
+            var slot = MidnightControlsCompat.getSlotAt(client.currentScreen, (int) mouseX, (int) mouseY);
 
             if (slot != null) {
                 mouseX = slot.x();
@@ -231,32 +258,21 @@ public class MidnightControlsRenderer {
             mouseY -= 8;
         }
 
-        //context.getMatrices().push();
-        context.getMatrices().translate(0f, 0f, 999f);
-        drawCursor(context, mouseX, mouseY, hoverSlot, client);
-        //context.getMatrices().pop();
+        try {
+            Sprite sprite = client.getGuiAtlasManager().getSprite(id(MidnightControlsConfig.virtualMouseSkin.getSpritePath() + (hoverSlot ? "_slot" : "")));
+            drawUnalignedTexturedQuad(sprite.getAtlasId(), context, mouseX, mouseX + 16, mouseY, mouseY + 16, 999, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
+        } catch (IllegalStateException ignored) {}
     }
-
-    /**
-     * Draws the virtual cursor.
-     *
-     * @param context the context
-     * @param x x coordinate
-     * @param y y coordinate
-     * @param hoverSlot true if hovering a slot, else false
-     * @param client the client instance
-     */
-    public static void drawCursor(@NotNull DrawContext context, int x, int y, boolean hoverSlot, @NotNull MinecraftClient client) {
-        //RenderSystem.disableDepthTest();
-        //RenderSystem.setShaderColor(1.f, 1.f, 1.f, 1.f);
-        //RenderSystem.disableBlend();
-        //RenderSystem.setShaderTexture(0, MidnightControlsClient.CURSOR_TEXTURE);
-        context.drawTexture(MidnightControlsClient.CURSOR_TEXTURE, x, y,
-                hoverSlot ? 16.f : 0.f, MidnightControlsConfig.virtualMouseSkin.ordinal() * 16.f,
-                16, 16, 32, 64);
-        context.fill(1, 1, x, y, 0xFFFFFF);
-        context.draw();
-        //RenderSystem.enableDepthTest();
+    private static void drawUnalignedTexturedQuad(Identifier texture, DrawContext context, float x1, float x2, float y1, float y2, float z, float u1, float u2, float v1, float v2) {
+        RenderSystem.setShaderTexture(0, texture);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+        Matrix4f matrix4f = context.getMatrices().peek().getPositionMatrix();
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+        bufferBuilder.vertex(matrix4f, x1, y1, z).texture(u1, v1);
+        bufferBuilder.vertex(matrix4f, x1, y2, z).texture(u1, v2);
+        bufferBuilder.vertex(matrix4f, x2, y2, z).texture(u2, v2);
+        bufferBuilder.vertex(matrix4f, x2, y1, z).texture(u2, v1);
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
     }
 
     public record ButtonSize(int length, int height) {

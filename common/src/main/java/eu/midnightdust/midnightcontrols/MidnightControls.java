@@ -10,6 +10,7 @@
 package eu.midnightdust.midnightcontrols;
 
 import eu.midnightdust.lib.util.PlatformFunctions;
+import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,6 +29,9 @@ public class MidnightControls {
     public static void init() {
         isExtrasLoaded = PlatformFunctions.isModLoaded("midnightcontrols-extra");
         log("Initializing MidnightControls...");
+    }
+    public static Identifier id(String path) {
+        return Identifier.of(MidnightControlsConstants.NAMESPACE, path);
     }
 
     /**

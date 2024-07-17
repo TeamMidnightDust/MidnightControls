@@ -42,6 +42,7 @@ public abstract class GameRendererMixin {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw()V", shift = At.Shift.BEFORE))
     private void renderVirtualCursor(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, @Local DrawContext drawContext) {
         MidnightControlsRenderer.renderVirtualCursor(drawContext,  client);
+        if (MidnightControlsClient.isWayland) MidnightControlsRenderer.renderWaylandCursor(drawContext, client);
         drawContext.draw();
     }
     @Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z"), method = "renderWorld")
