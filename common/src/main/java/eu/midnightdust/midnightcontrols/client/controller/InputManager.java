@@ -27,6 +27,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -166,7 +167,7 @@ public class InputManager {
     }
 
     @Deprecated
-    public static @NotNull ButtonBinding registerBinding(@NotNull org.aperlambda.lambdacommon.Identifier id, int[] defaultButton, @NotNull List<PressAction> actions, @NotNull PairPredicate<MinecraftClient, ButtonBinding> filter, boolean hasCooldown) {
+    public static @NotNull ButtonBinding registerBinding(@NotNull org.aperlambda.lambdacommon.Identifier id, int[] defaultButton, @NotNull List<PressAction> actions, @NotNull Predicate<ButtonBinding> filter, boolean hasCooldown) {
         return registerBinding(Identifier.of(id.getNamespace(), id.getName()), defaultButton, actions, filter, hasCooldown);
     }
 
@@ -175,7 +176,7 @@ public class InputManager {
         return registerBinding(id, defaultButton, Collections.emptyList(), InputHandlers::always, hasCooldown);
     }
 
-    public static @NotNull ButtonBinding registerBinding(@NotNull Identifier id, int[] defaultButton, @NotNull List<PressAction> actions, @NotNull PairPredicate<MinecraftClient, ButtonBinding> filter, boolean hasCooldown) {
+    public static @NotNull ButtonBinding registerBinding(@NotNull Identifier id, int[] defaultButton, @NotNull List<PressAction> actions, @NotNull Predicate<ButtonBinding> filter, boolean hasCooldown) {
         return registerBinding(new ButtonBinding(id.getNamespace() + "." + id.getPath(), defaultButton, actions, filter, hasCooldown));
     }
 
@@ -345,7 +346,7 @@ public class InputManager {
         }
         var states = new Object2ObjectOpenHashMap<ButtonBinding, ButtonStateValue>();
         for (var binding : BINDINGS) {
-            var state = binding.isAvailable(client) ? getBindingState(binding) : ButtonState.NONE;
+            var state = binding.isAvailable() ? getBindingState(binding) : ButtonState.NONE;
             if (skipButtons.intStream().anyMatch(btn -> containsButton(binding.getButton(), btn))) {
                 if (binding.isPressed())
                     state = ButtonState.RELEASE;

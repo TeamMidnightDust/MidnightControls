@@ -10,7 +10,6 @@
 package eu.midnightdust.midnightcontrols.client.enums;
 
 import net.minecraft.text.Text;
-import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -22,7 +21,7 @@ import java.util.Optional;
  * @version 1.7.0
  * @since 1.2.0
  */
-public enum VirtualMouseSkin implements Nameable {
+public enum VirtualMouseSkin {
     DEFAULT_LIGHT("default_light"),
     DEFAULT_DARK("default_dark"),
     SECOND_LIGHT("second_light"),
@@ -66,7 +65,6 @@ public enum VirtualMouseSkin implements Nameable {
         return this.text;
     }
 
-    @Override
     public @NotNull String getName() {
         return this.name;
     }

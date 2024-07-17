@@ -29,13 +29,13 @@ public class EMICompat implements CompatHandler {
                 .buttons(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
                 .category(category)
                 .action((client,action,value,buttonState)->handleEmiPages(false)).cooldown()
-                .filter(((client, buttonBinding) -> EmiApi.getHandledScreen() != null))
+                .filter(((buttonBinding) -> EmiApi.getHandledScreen() != null))
                 .register();
         new ButtonBinding.Builder("emi_page_right")
                 .buttons(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
                 .category(category)
                 .action((client,action,value,buttonState)->handleEmiPages(true)).cooldown()
-                .filter(((client, buttonBinding) -> EmiApi.getHandledScreen() != null))
+                .filter(((buttonBinding) -> EmiApi.getHandledScreen() != null))
                 .register();
     }
     public static boolean isEMIEnabled() {

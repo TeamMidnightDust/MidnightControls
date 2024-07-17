@@ -43,7 +43,7 @@ import static org.lwjgl.BufferUtils.createByteBuffer;
  * @version 1.7.0
  * @since 1.0.0
  */
-public record Controller(int id) implements Nameable {
+public record Controller(int id) {
     private static final Map<Integer, Controller> CONTROLLERS = new HashMap<>();
 
     /**
@@ -79,7 +79,6 @@ public record Controller(int id) implements Nameable {
      *
      * @return the controller's name
      */
-    @Override
     public @NotNull String getName() {
         var name = this.isGamepad() ? GLFW.glfwGetGamepadName(this.id) : GLFW.glfwGetJoystickName(this.id);
         return name == null ? String.valueOf(this.id()) : name;

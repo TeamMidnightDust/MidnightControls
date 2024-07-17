@@ -4,33 +4,34 @@ loaderVersion = "[2,)"
 license = "MIT License"
 
 [[mods]]
-modId = "yourmod"
+modId = "midnightcontrols"
 version = "${version}"
-displayName = "Your Mod"
+displayName = "MidnightControls"
 logoFile = "icon.png"
-authors = "You!"
+authors = "Motschen, LambdAurora"
+contributors = "akemin-dayo, DioEgizio, dogtopus, egeesin, EnnuiL, FlashyReese, gyular, Hambaka, Ivanoks, joaoh1, KiskaUWU, Madis0, RaptaG, ronniedude, spudpiggy, TrueHorse"
 description = '''
-An example multiloader mod featuring MidnightLib!
+Adds controller support and enhanced controls overall.
 '''
 
 [[mixins]]
-config = "yourmod.mixins.json"
+config = "midnightcontrols.mixins.json"
 
-[[dependencies.yourmod]]
+[[dependencies.midnightcontrols]]
 modId = "neoforge"
 mandatory = true
 versionRange = "[21.0,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.yourmod]]
+[[dependencies.midnightcontrols]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.21,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.yourmod]]
+[[dependencies.midnightcontrols]]
 modId = "midnightlib"
 mandatory = true
 versionRange = "[1.0,)"

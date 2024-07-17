@@ -5,8 +5,8 @@
   "version": "${version}",
   "description": "Adds controller support and enhanced controls overall.",
   "authors": [
-    "LambdAurora",
-    "Motschen"
+    "Motschen",
+    "LambdAurora"
   ],
   "contributors": [
     "akemin-dayo",

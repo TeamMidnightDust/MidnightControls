@@ -34,7 +34,6 @@ public class ButtonBindingRingAction extends RingAction {
         this.binding = binding;
     }
 
-    @Override
     public @NotNull String getName() {
         return this.binding.getTranslationKey();
     }

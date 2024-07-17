@@ -27,19 +27,10 @@ import java.util.function.Supplier;
  * @version 1.5.0
  * @since 1.4.0
  */
-public abstract class RingAction implements Nameable {
+public abstract class RingAction {
     protected boolean activated = false;
 
     public RingAction() {
-    }
-
-    /**
-     * Gets the text name of the ring action.
-     *
-     * @return the text name
-     */
-    public Text getTextName() {
-        return Text.translatable(this.getName());
     }
 
     /**

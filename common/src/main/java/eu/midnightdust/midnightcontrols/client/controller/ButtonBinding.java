@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.controller;
 
+import com.google.common.base.Predicates;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
@@ -18,14 +19,14 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.aperlambda.lambdacommon.utils.function.PairPredicate;
-import org.aperlambda.lambdacommon.utils.function.Predicates;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
@@ -63,7 +64,7 @@ public class ButtonBinding {
     public static final ButtonBinding HOTBAR_RIGHT = new Builder("hotbar_right").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
             .action(InputHandlers.handleHotbar(true)).onlyInGame().cooldown().register();
     public static final ButtonBinding INVENTORY = new Builder("inventory").buttons(GLFW_GAMEPAD_BUTTON_Y).onlyInGame().cooldown().register();
-    public static final ButtonBinding EXIT = new Builder("exit").buttons(GLFW_GAMEPAD_BUTTON_B).filter((client, buttonBinding) -> client.currentScreen != null && buttonBinding.cooldown == 0 && INVENTORY.cooldown == 0)
+    public static final ButtonBinding EXIT = new Builder("exit").buttons(GLFW_GAMEPAD_BUTTON_B).filter((buttonBinding) -> client.currentScreen != null && buttonBinding.cooldown == 0 && INVENTORY.cooldown == 0)
             .action(InputHandlers.handleExit()).cooldown().register();
     public static final ButtonBinding JUMP = new Builder("jump").buttons(GLFW_GAMEPAD_BUTTON_A).onlyInGame().register();
     public static final ButtonBinding LEFT = new Builder("left").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, false))
@@ -91,9 +92,9 @@ public class ButtonBinding {
             .actions(InputHandlers::handleToggleSprint).onlyInGame().cooldown().register();
     public static final ButtonBinding SWAP_HANDS = new Builder("swap_hands").buttons(GLFW_GAMEPAD_BUTTON_X).onlyInGame().cooldown().register();
     public static final ButtonBinding TAB_LEFT = new Builder("tab_back").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
-            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((client, binding) -> client.currentScreen != null)).cooldown().register();
+            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((binding) -> client.currentScreen != null)).cooldown().register();
     public static final ButtonBinding TAB_RIGHT = new Builder("tab_next").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
-            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((client, binding) -> client.currentScreen != null)).cooldown().register();
+            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((binding) -> client.currentScreen != null)).cooldown().register();
     public static final ButtonBinding PAGE_LEFT = new Builder("page_back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
             .action(InputHandlers.handlePage(false)).filter(InputHandlers::inInventory).cooldown(30).register();
     public static final ButtonBinding PAGE_RIGHT = new Builder("page_next").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
@@ -112,14 +113,14 @@ public class ButtonBinding {
     private final String key;
     private final Text text;
     private KeyBinding mcKeyBinding = null;
-    protected PairPredicate<MinecraftClient, ButtonBinding> filter;
+    protected Predicate<ButtonBinding> filter;
     private final List<PressAction> actions = new ArrayList<>(Collections.singletonList(PressAction.DEFAULT_ACTION));
     private final boolean hasCooldown;
     private int cooldownLength = 5;
     private int cooldown = 0;
     private boolean pressed = false;
 
-    public ButtonBinding(String key, int[] defaultButton, List<PressAction> actions, PairPredicate<MinecraftClient, ButtonBinding> filter, boolean hasCooldown) {
+    public ButtonBinding(String key, int[] defaultButton, List<PressAction> actions, Predicate<ButtonBinding> filter, boolean hasCooldown) {
         this.setButton(this.defaultButton = defaultButton);
         this.key = key;
         this.text = Text.translatable(this.key);
@@ -127,7 +128,7 @@ public class ButtonBinding {
         this.actions.addAll(actions);
         this.hasCooldown = hasCooldown;
     }
-    public ButtonBinding(String key, int[] defaultButton, List<PressAction> actions, PairPredicate<MinecraftClient, ButtonBinding> filter, boolean hasCooldown, int cooldownLength) {
+    public ButtonBinding(String key, int[] defaultButton, List<PressAction> actions, Predicate<ButtonBinding> filter, boolean hasCooldown, int cooldownLength) {
         this.setButton(this.defaultButton = defaultButton);
         this.key = key;
         this.text = Text.translatable(this.key);
@@ -138,10 +139,10 @@ public class ButtonBinding {
     }
 
     public ButtonBinding(String key, int[] defaultButton, boolean hasCooldown) {
-        this(key, defaultButton, Collections.emptyList(), Predicates.pairAlwaysTrue(), hasCooldown);
+        this(key, defaultButton, Collections.emptyList(), Predicates.alwaysTrue(), hasCooldown);
     }
     public ButtonBinding(String key, int[] defaultButton, boolean hasCooldown, int cooldownLength) {
-        this(key, defaultButton, Collections.emptyList(), Predicates.pairAlwaysTrue(), hasCooldown, cooldownLength);
+        this(key, defaultButton, Collections.emptyList(), Predicates.alwaysTrue(), hasCooldown, cooldownLength);
     }
 
     /**
@@ -252,11 +253,10 @@ public class ButtonBinding {
     /**
      * Returns whether the button binding is available in the current context.
      *
-     * @param client the client instance
      * @return true if the button binding is available, else false
      */
-    public boolean isAvailable(@NotNull MinecraftClient client) {
-        return this.filter.test(client, this);
+    public boolean isAvailable() {
+        return this.filter.test(this);
     }
 
     /**
@@ -480,7 +480,7 @@ public class ButtonBinding {
         private final String key;
         private int[] buttons = new int[0];
         private final List<PressAction> actions = new ArrayList<>();
-        private PairPredicate<MinecraftClient, ButtonBinding> filter = Predicates.pairAlwaysTrue();
+        private Predicate<ButtonBinding> filter = Predicates.alwaysTrue();
         private boolean cooldown = false;
         private int cooldownLength = 5;
         private ButtonCategory category = null;
@@ -498,6 +498,10 @@ public class ButtonBinding {
 
         public Builder(@NotNull Identifier identifier) {
             this(identifier.getNamespace() + "." + identifier.getPath());
+        }
+        @Deprecated
+        public Builder(@NotNull org.aperlambda.lambdacommon.Identifier identifier) {
+            this(identifier.getNamespace() + "." + identifier.getName());
         }
 
         /**
@@ -548,7 +552,7 @@ public class ButtonBinding {
          * @param filter the filter
          * @return the builder instance
          */
-        public Builder filter(@NotNull PairPredicate<MinecraftClient, ButtonBinding> filter) {
+        public Builder filter(@NotNull Predicate<ButtonBinding> filter) {
             this.filter = filter;
             return this;
         }
@@ -557,8 +561,8 @@ public class ButtonBinding {
          * Sets the filter of {@link ButtonBinding} to only in game.
          *
          * @return the builder instance
-         * @see #filter(PairPredicate)
-         * @see InputHandlers#inGame(MinecraftClient, ButtonBinding)
+         * @see #filter(Predicate)
+         * @see InputHandlers#inGame(ButtonBinding)
          */
         public Builder onlyInGame() {
             return this.filter(InputHandlers::inGame);
@@ -568,8 +572,8 @@ public class ButtonBinding {
          * Sets the filter of {@link ButtonBinding} to only in inventory.
          *
          * @return the builder instance
-         * @see #filter(PairPredicate)
-         * @see InputHandlers#inInventory(MinecraftClient, ButtonBinding)
+         * @see #filter(Predicate)
+         * @see InputHandlers#inInventory(ButtonBinding)
          */
         public Builder onlyInInventory() {
             return this.filter(InputHandlers::inInventory);

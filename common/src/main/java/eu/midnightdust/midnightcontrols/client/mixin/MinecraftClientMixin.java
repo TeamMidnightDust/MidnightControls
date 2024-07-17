@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
@@ -108,8 +109,8 @@ public abstract class MinecraftClientMixin {
         }
     }
 
-    @Inject(method = "doItemUse()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/HitResult;getType()Lnet/minecraft/util/hit/HitResult$Type;"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true)
-    private void onItemUse(CallbackInfo ci, Hand[] hands, int handCount, int handIndex, Hand hand, ItemStack stackInHand) {
+    @Inject(method = "doItemUse()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/HitResult;getType()Lnet/minecraft/util/hit/HitResult$Type;"), cancellable = true)
+    private void onItemUse(CallbackInfo ci, @Local Hand hand, @Local ItemStack stackInHand) {
         if (player != null && !stackInHand.isEmpty() && this.player.getPitch(0.f) > 35.0F && reacharound.isReacharoundAvailable()) {
             if (this.crosshairTarget != null && this.crosshairTarget.getType() == HitResult.Type.MISS && this.player.isOnGround()) {
                 if (!stackInHand.isEmpty() && stackInHand.getItem() instanceof BlockItem) {

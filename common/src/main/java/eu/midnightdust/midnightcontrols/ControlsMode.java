@@ -22,7 +22,7 @@ import java.util.Optional;
  * @version 1.7.0
  * @since 1.0.0
  */
-public enum ControlsMode implements Nameable {
+public enum ControlsMode {
     DEFAULT,
     CONTROLLER,
     TOUCHSCREEN;
@@ -49,7 +49,6 @@ public enum ControlsMode implements Nameable {
         return "midnightcontrols.controls_mode." + this.getName();
     }
 
-    @Override
     public @NotNull String getName() {
         return this.name().toLowerCase();
     }

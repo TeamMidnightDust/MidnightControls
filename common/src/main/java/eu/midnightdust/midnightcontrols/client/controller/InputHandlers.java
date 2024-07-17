@@ -37,6 +37,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
 
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
 
@@ -268,33 +269,30 @@ public class InputHandlers {
     /**
      * Returns always true to the filter.
      *
-     * @param client the client instance
      * @param binding the affected binding
      * @return true
      */
-    public static boolean always(@NotNull MinecraftClient client, @NotNull ButtonBinding binding) {
+    public static boolean always(@NotNull ButtonBinding binding) {
         return true;
     }
 
     /**
      * Returns whether the client is in game or not.
      *
-     * @param client the client instance
      * @param binding the affected binding
      * @return true if the client is in game, else false
      */
-    public static boolean inGame(@NotNull MinecraftClient client, @NotNull ButtonBinding binding) {
+    public static boolean inGame(@NotNull ButtonBinding binding) {
         return (client.currentScreen == null && MidnightControlsClient.input.screenCloseCooldown <= 0) || client.currentScreen instanceof TouchscreenOverlay || client.currentScreen instanceof RingScreen;
     }
 
     /**
      * Returns whether the client is in a non-interactive screen (which means require mouse input) or not.
      *
-     * @param client the client instance
      * @param binding the affected binding
      * @return true if the client is in a non-interactive screen, else false
      */
-    public static boolean inNonInteractiveScreens(@NotNull MinecraftClient client, @NotNull ButtonBinding binding) {
+    public static boolean inNonInteractiveScreens(@NotNull ButtonBinding binding) {
         if (client.currentScreen == null)
             return false;
         return !MidnightInput.isScreenInteractive(client.currentScreen);
@@ -303,22 +301,20 @@ public class InputHandlers {
     /**
      * Returns whether the client is in an inventory or not.
      *
-     * @param client the client instance
      * @param binding the affected binding
      * @return true if the client is in an inventory, else false
      */
-    public static boolean inInventory(@NotNull MinecraftClient client, @NotNull ButtonBinding binding) {
+    public static boolean inInventory(@NotNull ButtonBinding binding) {
         return client.currentScreen instanceof HandledScreen;
     }
 
     /**
      * Returns whether the client is in the advancements screen or not.
      *
-     * @param client the client instance
      * @param binding the affected binding
      * @return true if the client is in the advancements screen, else false
      */
-    public static boolean inAdvancements(@NotNull MinecraftClient client, @NotNull ButtonBinding binding) {
+    public static boolean inAdvancements(@NotNull ButtonBinding binding) {
         return client.currentScreen instanceof AdvancementsScreen;
     }
 }
