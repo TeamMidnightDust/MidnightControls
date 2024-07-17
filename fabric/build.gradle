@@ -1,0 +1,107 @@
+plugins {
+    id 'com.github.johnrengelman.shadow'
+    id "me.shedaniel.unified-publishing"
+}
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+loom {
+}
+
+configurations {
+    common
+    shadowCommon // Don't use shadow from the shadow plugin since it *excludes* files.
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
+    archivesBaseName = rootProject.archives_base_name + "-fabric"
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+    modImplementation include ("maven.modrinth:midnightlib:${rootProject.midnightlib_version}-fabric")
+    include modImplementation ("maven.modrinth:obsidianui:${project.obsidianui_version}-fabric") {}
+
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+shadowJar {
+    exclude "architectury.common.json"
+
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier = "dev-shadow"
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+}
+
+sourcesJar {
+    def commonSources = project(":common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}
+
+unifiedPublishing {
+    project {
+        displayName = "MidnightControls $project.version - Fabric $project.minecraft_version"
+        releaseType = "$project.release_type"
+        changelog = releaseChangelog()
+        gameVersions = []
+        gameLoaders = ["fabric","quilt"]
+        mainPublication remapJar
+        relations {
+            depends {
+                curseforge = "fabric-api"
+                modrinth = "fabric-api"
+            }
+            includes {
+                curseforge = "midnightlib"
+                modrinth = "midnightlib"
+            }
+            includes {
+                curseforge = "obsidianui"
+                modrinth = "obsidianui"
+            }
+        }
+
+        var CURSEFORGE_TOKEN = project.findProperty("CURSEFORGE_TOKEN") ?: System.getenv("CURSEFORGE_TOKEN")
+        if (CURSEFORGE_TOKEN != null) {
+            curseforge {
+                token = CURSEFORGE_TOKEN
+                id = rootProject.curseforge_id
+                gameVersions.addAll "Java 21", project.minecraft_version
+            }
+        }
+
+        var MODRINTH_TOKEN = project.findProperty("MODRINTH_TOKEN") ?: System.getenv("MODRINTH_TOKEN")
+        if (MODRINTH_TOKEN != null) {
+            modrinth {
+                token = MODRINTH_TOKEN
+                id = rootProject.modrinth_id
+                version = "$project.version-$project.name"
+                gameVersions.addAll project.minecraft_version
+            }
+        }
+    }
+}

@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "id": "midnightcontrols",
+  "name": "MidnightControls",
+  "version": "${version}",
+  "description": "Adds controller support and enhanced controls overall.",
+  "authors": [
+    "LambdAurora",
+    "Motschen"
+  ],
+  "contributors": [
+    "akemin-dayo",
+    "DioEgizio",
+    "dogtopus",
+    "egeesin",
+    "EnnuiL",
+    "FlashyReese",
+    "gyular",
+    "Hambaka",
+    "Ivanoks",
+    "joaoh1",
+    "KiskaUWU",
+    "Madis0",
+    "RaptaG",
+    "ronniedude",
+    "spudpiggy",
+    "TrueHorse"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/midnightcontrols",
+    "sources": "https://github.com/TeamMidnightDust/MidnightControls",
+    "issues": "https://github.com/TeamMidnightDust/MidnightControls/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/midnightcontrols/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "eu.midnightdust.midnightcontrols.fabric.MidnightControlsFabric"
+    ],
+    "client": [
+      "eu.midnightdust.midnightcontrols.fabric.MidnightControlsClientFabric"
+    ],
+    "modmenu": [
+      "eu.midnightdust.midnightcontrols.client.MidnightControlsModMenu"
+    ]
+  },
+  "accessWidener": "midnightcontrols.accesswidener",
+  "mixins": [
+    "midnightcontrols.mixins.json",
+    "midnightcontrols_compat.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": ">=0.71.0",
+    "minecraft": ">=1.20.5",
+    "obsidianui": ">=0.2.5",
+    "java": ">=17"
+  },
+  "suggests": {
+    "kontrolo": "*"
+  },
+  "breaks": {
+    "lambdacontrols": "*",
+    "modmenu": "<1.12.2"
+  }
+}

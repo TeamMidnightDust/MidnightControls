@@ -1,0 +1,38 @@
+modLoader = "javafml"
+loaderVersion = "[2,)"
+#issueTrackerURL = ""
+license = "MIT License"
+
+[[mods]]
+modId = "yourmod"
+version = "${version}"
+displayName = "Your Mod"
+logoFile = "icon.png"
+authors = "You!"
+description = '''
+An example multiloader mod featuring MidnightLib!
+'''
+
+[[mixins]]
+config = "yourmod.mixins.json"
+
+[[dependencies.yourmod]]
+modId = "neoforge"
+mandatory = true
+versionRange = "[21.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.yourmod]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.21,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.yourmod]]
+modId = "midnightlib"
+mandatory = true
+versionRange = "[1.0,)"
+ordering = "AFTER"
+side = "BOTH"
