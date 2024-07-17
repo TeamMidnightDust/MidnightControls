@@ -22,7 +22,6 @@ import org.thinkingstudio.obsidianui.fabric.event.OpenScreenCallback;
 
 import java.util.Optional;
 
-import static eu.midnightdust.midnightcontrols.MidnightControls.CONTROLS_MODE_CHANNEL;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.BINDING_LOOK_DOWN;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.BINDING_LOOK_LEFT;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.BINDING_LOOK_RIGHT;
@@ -37,7 +36,7 @@ public class MidnightControlsClientFabric implements ClientModInitializer {
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_DOWN);
         KeyBindingHelper.registerKeyBinding(BINDING_LOOK_LEFT);
         KeyBindingHelper.registerKeyBinding(BINDING_RING);
-        ClientPlayNetworking.registerGlobalReceiver(CONTROLS_MODE_CHANNEL, (payload, context) ->
+        ClientPlayNetworking.registerGlobalReceiver(ControlsModePayload.PACKET_ID, (payload, context) ->
                 context.responseSender().sendPacket(new ControlsModePayload(MidnightControlsConfig.controlsMode.getName())));
         ClientPlayNetworking.registerGlobalReceiver(FeaturePayload.PACKET_ID, ((payload, context) -> {}));
 

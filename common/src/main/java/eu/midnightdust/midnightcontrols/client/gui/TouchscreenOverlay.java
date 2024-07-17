@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.gui;
 
+import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
 import org.thinkingstudio.obsidianui.Position;
 import org.thinkingstudio.obsidianui.widget.SpruceButtonWidget;
 import eu.midnightdust.lib.util.PlatformFunctions;
@@ -348,13 +349,8 @@ public class TouchscreenOverlay extends Screen {
                 deltaX = -deltaX;
                 deltaY = -deltaY;
             }
-            if (deltaY > 0.01)
-                input.handleLook(this.client, GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) Math.abs((deltaY / 3.0)*MidnightControlsConfig.touchSpeed/100), 2);
-            else input.handleLook(this.client, GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) Math.abs((deltaY / 3.0)*MidnightControlsConfig.touchSpeed/100), 1);
-
-            if (deltaX > 0.01)
-                input.handleLook(this.client, GLFW_GAMEPAD_AXIS_RIGHT_X, (float) Math.abs((deltaX / 3.0)*MidnightControlsConfig.touchSpeed/100), 2);
-            else input.handleLook(this.client, GLFW_GAMEPAD_AXIS_RIGHT_X, (float) Math.abs((deltaX / 3.0)*MidnightControlsConfig.touchSpeed/100), 1);
+            input.handleLook(this.client, new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) Math.abs((deltaY / 3.0)*MidnightControlsConfig.touchSpeed/100), deltaX > 0.01 ? 2 : 1));
+            input.handleLook(this.client, new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_X, (float) Math.abs((deltaX / 3.0)*MidnightControlsConfig.touchSpeed/100), deltaX > 0.01 ? 2 : 1));
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
