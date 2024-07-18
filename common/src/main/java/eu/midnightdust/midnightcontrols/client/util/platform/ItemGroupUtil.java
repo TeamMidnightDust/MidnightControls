@@ -4,6 +4,7 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
 import org.jetbrains.annotations.NotNull;
@@ -15,9 +16,24 @@ public class ItemGroupUtil {
     public static List<ItemGroup> getVisibleGroups(CreativeInventoryScreen screen) {
         throw new AssertionError();
     }
-    @ExpectPlatform
+
     public static boolean cyclePage(boolean next, CreativeInventoryScreen screen) {
-        throw new AssertionError();
+        try {
+            return screen.children().stream().filter(element -> element instanceof PressableWidget)
+                    .map(element -> (PressableWidget) element)
+                    .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
+                    .anyMatch(element -> {
+                        if (next && element.getMessage().getString().equals(">")) {
+                            element.onPress();
+                            return true;
+                        } else if (element.getMessage().getString().equals("<")) {
+                            element.onPress();
+                            return true;
+                        }
+                        return false;
+                    });
+        } catch (Exception ignored) {}
+        return false;
     }
 
     public static @NotNull ItemGroup cycleTab(boolean next, MinecraftClient client) {

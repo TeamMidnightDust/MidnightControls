@@ -52,18 +52,10 @@ public class MidnightControlsClientFabric implements ClientModInitializer {
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> MidnightControlsClient.onLeave());
 
-        ClientTickEvents.START_CLIENT_TICK.register(MidnightControlsClient.reacharound::tick);
         ClientTickEvents.START_CLIENT_TICK.register(MidnightControlsClient::onTick);
 
         OpenScreenCallback.POST.register((client, screen) -> {
-            if (screen == null && MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN) {
-                screen = new TouchscreenOverlay();
-                screen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
-                client.skipGameRender = false;
-                client.currentScreen = screen;
-            } else if (screen != null) {
-                MidnightControlsClient.input.onScreenOpen(client, client.getWindow().getWidth(), client.getWindow().getHeight());
-            }
+            MidnightControlsClient.onScreenOpen(screen);
         });
         FabricLoader.getInstance().getModContainer(MidnightControlsConstants.NAMESPACE).ifPresent(modContainer -> {
             ResourceManagerHelper.registerBuiltinResourcePack(id("bedrock"), modContainer, ResourcePackActivationType.NORMAL);

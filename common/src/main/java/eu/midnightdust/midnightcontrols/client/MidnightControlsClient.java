@@ -21,10 +21,12 @@ import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsHud;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
+import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingIDAccessor;
 import eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction;
 import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
+import net.minecraft.client.gui.screen.Screen;
 import org.thinkingstudio.obsidianui.hud.HudManager;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
@@ -166,6 +168,7 @@ public class MidnightControlsClient extends MidnightControls {
     public static void onTick(@NotNull MinecraftClient client) {
         initKeybindings();
         input.tick(client);
+        reacharound.tick(client);
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && (client.isWindowFocused() || MidnightControlsConfig.unfocusedInput))
             input.tickController(client);
 
@@ -182,6 +185,19 @@ public class MidnightControlsClient extends MidnightControls {
         }
         RainbowColor.tick();
         TouchInput.tick();
+    }
+    /**
+     * Called when opening a screen.
+     */
+    public static void onScreenOpen(Screen screen) {
+        if (screen == null && MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN) {
+            screen = new TouchscreenOverlay();
+            screen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
+            client.skipGameRender = false;
+            client.currentScreen = screen;
+        } else if (screen != null) {
+            MidnightControlsClient.input.onScreenOpen(client, client.getWindow().getWidth(), client.getWindow().getHeight());
+        }
     }
 
     /**

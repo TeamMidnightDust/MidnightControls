@@ -10,6 +10,7 @@
 package eu.midnightdust.midnightcontrols.client;
 
 import com.google.common.collect.ImmutableSet;
+import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.util.Pair;
@@ -35,7 +36,6 @@ import org.thinkingstudio.obsidianui.widget.SpruceElement;
 import org.thinkingstudio.obsidianui.widget.SpruceLabelWidget;
 import org.thinkingstudio.obsidianui.widget.container.SpruceParentWidget;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
@@ -376,7 +376,7 @@ public class MidnightInput {
                             return;
                         }
                     }
-                    else if (FabricLoader.getInstance().isModLoaded("libgui")) LibGuiCompat.handlePress(client.currentScreen);
+                    else if (PlatformFunctions.isModLoaded("libgui")) LibGuiCompat.handlePress(client.currentScreen);
                 }
             }
         }
@@ -697,7 +697,7 @@ public class MidnightInput {
             var childFocused = widget.getFocused();
             if (childFocused != null)
                 return this.handleAButton(screen, childFocused);
-        } else if (FabricLoader.getInstance().isModLoaded("yet-another-config-lib") && YACLCompat.handleAButton(screen, focused)) {
+        } else if (PlatformFunctions.isModLoaded("yet-another-config-lib") && YACLCompat.handleAButton(screen, focused)) {
             return true;
         }
         else pressKeyboardKey(screen, GLFW_KEY_ENTER);
@@ -716,7 +716,7 @@ public class MidnightInput {
             this.actionGuiCooldown = 5;
             return false;
         }
-        if (FabricLoader.getInstance().isModLoaded("yet-another-config-lib") && YACLCompat.handleLeftRight(screen, right)) {
+        if (PlatformFunctions.isModLoaded("yet-another-config-lib") && YACLCompat.handleLeftRight(screen, right)) {
             this.actionGuiCooldown = 5;
             return false;
         }
