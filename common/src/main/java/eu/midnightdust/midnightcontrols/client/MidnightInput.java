@@ -23,7 +23,7 @@ import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.enums.CameraMode;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
-import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
+import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.gui.widget.ControllerControlsWidget;
 import eu.midnightdust.midnightcontrols.client.mixin.*;
 import eu.midnightdust.midnightcontrols.client.ring.RingPage;
@@ -60,6 +60,7 @@ import org.lwjgl.glfw.GLFWGamepadState;
 
 import java.util.*;
 
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
@@ -467,28 +468,28 @@ public class MidnightInput {
                 });
     }
 
-    private void handleAxe(@NotNull MinecraftClient client, AxisStorage axisStorage) {
-        setCurrentPolarities(axisStorage);
+    private void handleAxe(@NotNull MinecraftClient client, AxisStorage storage) {
+        setCurrentPolarities(storage);
 
-        handleMovement(client, axisStorage);
+        handleMovement(client, storage);
 
-        if (handleScreenScrolling(client.currentScreen, axisStorage)) return;
+        if (handleScreenScrolling(client.currentScreen, storage)) return;
 
-        axisStorage.absValue = (float) MathHelper.clamp(axisStorage.absValue / MidnightControlsConfig.getAxisMaxValue(axisStorage.axis), 0.f, 1.f);
+        storage.absValue = (float) MathHelper.clamp(storage.absValue / MidnightControlsConfig.getAxisMaxValue(storage.axis), 0.f, 1.f);
         if (client.currentScreen == null) {
             // Handles the look direction.
-            this.handleLook(client, axisStorage);
+            this.handleLook(client, storage);
         } else {
             boolean allowMouseControl = true;
 
-            if (this.actionGuiCooldown == 0 && MidnightControlsConfig.isMovementAxis(axisStorage.axis) && isScreenInteractive(client.currentScreen)) {
-                if (MidnightControlsConfig.isForwardButton(axisStorage.axis, false, axisStorage.asButtonState)) {
+            if (this.actionGuiCooldown == 0 && MidnightControlsConfig.isMovementAxis(storage.axis) && isScreenInteractive(client.currentScreen)) {
+                if (MidnightControlsConfig.isForwardButton(storage.axis, false, storage.asButtonState)) {
                     allowMouseControl = this.changeFocus(client.currentScreen, NavigationDirection.UP);
-                } else if (MidnightControlsConfig.isBackButton(axisStorage.axis, false, axisStorage.asButtonState)) {
+                } else if (MidnightControlsConfig.isBackButton(storage.axis, false, storage.asButtonState)) {
                     allowMouseControl = this.changeFocus(client.currentScreen, NavigationDirection.DOWN);
-                } else if (MidnightControlsConfig.isLeftButton(axisStorage.axis, false, axisStorage.asButtonState)) {
+                } else if (MidnightControlsConfig.isLeftButton(storage.axis, false, storage.asButtonState)) {
                     allowMouseControl = this.handleLeftRight(client.currentScreen, false);
-                } else if (MidnightControlsConfig.isRightButton(axisStorage.axis, false, axisStorage.asButtonState)) {
+                } else if (MidnightControlsConfig.isRightButton(storage.axis, false, storage.asButtonState)) {
                     allowMouseControl = this.handleLeftRight(client.currentScreen, true);
                 }
             }
@@ -496,14 +497,14 @@ public class MidnightInput {
             float movementX = 0.f;
             float movementY = 0.f;
 
-            if (MidnightControlsConfig.isBackButton(axisStorage.axis, false, (axisStorage.value > 0 ? 1 : 2))) {
-                movementY = axisStorage.absValue;
-            } else if (MidnightControlsConfig.isForwardButton(axisStorage.axis, false, (axisStorage.value > 0 ? 1 : 2))) {
-                movementY = -axisStorage.absValue;
-            } else if (MidnightControlsConfig.isLeftButton(axisStorage.axis, false, (axisStorage.value > 0 ? 1 : 2))) {
-                movementX = -axisStorage.absValue;
-            } else if (MidnightControlsConfig.isRightButton(axisStorage.axis, false, (axisStorage.value > 0 ? 1 : 2))) {
-                movementX = axisStorage.absValue;
+            if (MidnightControlsConfig.isBackButton(storage.axis, false, (storage.value > 0 ? 1 : 2))) {
+                movementY = storage.absValue;
+            } else if (MidnightControlsConfig.isForwardButton(storage.axis, false, (storage.value > 0 ? 1 : 2))) {
+                movementY = -storage.absValue;
+            } else if (MidnightControlsConfig.isLeftButton(storage.axis, false, (storage.value > 0 ? 1 : 2))) {
+                movementX = -storage.absValue;
+            } else if (MidnightControlsConfig.isRightButton(storage.axis, false, (storage.value > 0 ? 1 : 2))) {
+                movementX = storage.absValue;
             }
 
             if (client.currentScreen != null && allowMouseControl) {
@@ -513,7 +514,7 @@ public class MidnightInput {
                     Updates the target mouse position when the initial movement stick movement is detected.
                     It prevents the cursor to jump to the old target mouse position if the user moves the cursor with the mouse.
                  */
-                    if (Math.abs(prevXAxis) < axisStorage.deadZone && Math.abs(prevYAxis) < axisStorage.deadZone) {
+                    if (Math.abs(prevXAxis) < storage.deadZone && Math.abs(prevYAxis) < storage.deadZone) {
                         InputManager.INPUT_MANAGER.resetMouseTarget(client);
                     }
 
@@ -538,16 +539,16 @@ public class MidnightInput {
             this.prevYAxis = movementY;
         }
     }
-    private void setCurrentPolarities(AxisStorage axisStorage) {
-        boolean currentPlusState = axisStorage.value > axisStorage.deadZone;
-        boolean currentMinusState = axisStorage.value < -axisStorage.deadZone;
-        if (axisStorage.axis == GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || axisStorage.axis == GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER) currentMinusState = false;
-        if (!MidnightControlsConfig.analogMovement && (axisStorage.axis == GLFW_GAMEPAD_AXIS_LEFT_X || axisStorage.axis == GLFW_GAMEPAD_AXIS_LEFT_Y)) {
-            currentPlusState = axisStorage.asButtonState == 1;
-            currentMinusState = axisStorage.asButtonState == 2;
+    private void setCurrentPolarities(AxisStorage storage) {
+        boolean currentPlusState = storage.value > storage.deadZone;
+        boolean currentMinusState = storage.value < -storage.deadZone;
+        if (storage.axis == GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER) currentMinusState = false;
+        if (!MidnightControlsConfig.analogMovement && (storage.axis == GLFW_GAMEPAD_AXIS_LEFT_X || storage.axis == GLFW_GAMEPAD_AXIS_LEFT_Y)) {
+            currentPlusState = storage.asButtonState == 1;
+            currentMinusState = storage.asButtonState == 2;
         }
-        var posButton = ButtonBinding.axisAsButton(axisStorage.axis, true);
-        var negButton = ButtonBinding.axisAsButton(axisStorage.axis, false);
+        var posButton = ButtonBinding.axisAsButton(storage.axis, true);
+        var negButton = ButtonBinding.axisAsButton(storage.axis, false);
         var previousPlusState = InputManager.STATES.getOrDefault(posButton, ButtonState.NONE);
         var previousMinusState = InputManager.STATES.getOrDefault(negButton, ButtonState.NONE);
 
@@ -572,32 +573,32 @@ public class MidnightInput {
                 BUTTON_COOLDOWNS.put(negButton, 5);
             }
         }
-        axisStorage.polarity = currentPlusState ? AxisStorage.Polarity.PLUS : currentMinusState ? AxisStorage.Polarity.MINUS : AxisStorage.Polarity.ZERO;
+        storage.polarity = currentPlusState ? AxisStorage.Polarity.PLUS : currentMinusState ? AxisStorage.Polarity.MINUS : AxisStorage.Polarity.ZERO;
     }
 
-    private void handleMovement(@NotNull MinecraftClient client, AxisStorage axisStorage) {
-        float axisValue = axisStorage.absValue;
+    private void handleMovement(@NotNull MinecraftClient client, AxisStorage storage) {
+        float axisValue = storage.absValue;
         if (!MidnightControlsConfig.analogMovement || (client.player != null && client.player.getVehicle() instanceof BoatEntity)) {
-            axisValue = (float) (axisStorage.absValue - axisStorage.deadZone);
-            axisValue /= (float) (1.0 - axisStorage.deadZone);
-            axisValue *= (float) axisStorage.deadZone;
+            axisValue = (float) (storage.absValue - storage.deadZone);
+            axisValue /= (float) (1.0 - storage.deadZone);
+            axisValue *= (float) storage.deadZone;
         }
 
-        axisValue = (float) Math.min(axisValue / MidnightControlsConfig.getAxisMaxValue(axisStorage.axis), 1);
-        InputManager.BUTTON_VALUES.put(ButtonBinding.axisAsButton(axisStorage.axis, true), axisStorage.polarity == AxisStorage.Polarity.PLUS ? axisValue : 0.f);
-        InputManager.BUTTON_VALUES.put(ButtonBinding.axisAsButton(axisStorage.axis, false), axisStorage.polarity == AxisStorage.Polarity.MINUS ? axisValue : 0.f);
+        axisValue = (float) Math.min(axisValue / MidnightControlsConfig.getAxisMaxValue(storage.axis), 1);
+        InputManager.BUTTON_VALUES.put(ButtonBinding.axisAsButton(storage.axis, true), storage.polarity == AxisStorage.Polarity.PLUS ? axisValue : 0.f);
+        InputManager.BUTTON_VALUES.put(ButtonBinding.axisAsButton(storage.axis, false), storage.polarity == AxisStorage.Polarity.MINUS ? axisValue : 0.f);
     }
 
-    private boolean handleScreenScrolling(Screen screen, AxisStorage axisStorage) {
-        if (axisStorage.axis > GLFW_GAMEPAD_AXIS_RIGHT_Y) return false;
+    private boolean handleScreenScrolling(Screen screen, AxisStorage storage) {
+        if (storage.axis > GLFW_GAMEPAD_AXIS_RIGHT_Y) return false;
 
         // @TODO allow rebinding to left stick
         int preferredAxis = true ? GLFW_GAMEPAD_AXIS_RIGHT_Y : GLFW_GAMEPAD_AXIS_LEFT_Y;
 
         if (this.controlsInput != null && this.controlsInput.focusedBinding != null) {
-            if (axisStorage.asButtonState != 0 && !this.controlsInput.currentButtons.contains(ButtonBinding.axisAsButton(axisStorage.axis, axisStorage.asButtonState == 1))) {
+            if (storage.asButtonState != 0 && !this.controlsInput.currentButtons.contains(ButtonBinding.axisAsButton(storage.axis, storage.asButtonState == 1))) {
 
-                this.controlsInput.currentButtons.add(ButtonBinding.axisAsButton(axisStorage.axis, axisStorage.asButtonState == 1));
+                this.controlsInput.currentButtons.add(ButtonBinding.axisAsButton(storage.axis, storage.asButtonState == 1));
 
                 int[] buttons = new int[this.controlsInput.currentButtons.size()];
                 for (int i = 0; i < this.controlsInput.currentButtons.size(); i++)
@@ -607,39 +608,39 @@ public class MidnightInput {
                 this.controlsInput.waiting = false;
             }
             return true;
-        } else if (axisStorage.absValue >= axisStorage.deadZone) {
+        } else if (storage.absValue >= storage.deadZone) {
             if (screen instanceof CreativeInventoryScreen creativeInventoryScreen) {
-                if (axisStorage.axis == preferredAxis) {
+                if (storage.axis == preferredAxis) {
                     var accessor = (CreativeInventoryScreenAccessor) creativeInventoryScreen;
-                    if (accessor.midnightcontrols$hasScrollbar() && axisStorage.absValue >= axisStorage.deadZone) {
-                        creativeInventoryScreen.mouseScrolled(0.0, 0.0, 0, -axisStorage.value);
+                    if (accessor.midnightcontrols$hasScrollbar() && storage.absValue >= storage.deadZone) {
+                        creativeInventoryScreen.mouseScrolled(0.0, 0.0, 0, -storage.value);
                     }
                     return true;
                 }
             } else if (screen instanceof MerchantScreen || screen instanceof StonecutterScreen) {
-                if (axisStorage.axis == preferredAxis) {
-                    screen.mouseScrolled(0.0, 0.0, 0, -(axisStorage.value * 1.5f));
+                if (storage.axis == preferredAxis) {
+                    screen.mouseScrolled(0.0, 0.0, 0, -(storage.value * 1.5f));
                     return true;
                 }
             } else if (screen instanceof AdvancementsScreen advancementsScreen) {
-                if (axisStorage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X || axisStorage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
+                if (storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X || storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
                     var accessor = (AdvancementsScreenAccessor) advancementsScreen;
                     AdvancementTab tab = accessor.getSelectedTab();
-                    tab.move(axisStorage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X ? -axisStorage.value * 5.0 : 0.0, axisStorage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y ? -axisStorage.value * 5.0 : 0.0);
+                    tab.move(storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X ? -storage.value * 5.0 : 0.0, storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y ? -storage.value * 5.0 : 0.0);
                     return true;
                 }
             } else if (screen != null) {
-                if (axisStorage.axis == preferredAxis && !handleListWidgetScrolling(screen.children(), axisStorage.value)) {
-                    screen.mouseScrolled(0.0, 0.0, 0, -(axisStorage.value * 1.5f));
+                if (storage.axis == preferredAxis && !handleListWidgetScrolling(screen.children(), storage.value)) {
+                    screen.mouseScrolled(0.0, 0.0, 0, -(storage.value * 1.5f));
                 } else if (isScreenInteractive(screen)) {
                     if (joystickCooldown == 0) {
-                        switch (axisStorage.axis) {
+                        switch (storage.axis) {
                             case GLFW_GAMEPAD_AXIS_LEFT_Y -> {
-                                this.changeFocus(screen, axisStorage.value > 0 ? NavigationDirection.UP : NavigationDirection.DOWN);
+                                this.changeFocus(screen, storage.value > 0 ? NavigationDirection.UP : NavigationDirection.DOWN);
                                 joystickCooldown = 4;
                             }
                             case GLFW_GAMEPAD_AXIS_LEFT_X -> {
-                                this.handleLeftRight(screen, axisStorage.value > 0);
+                                this.handleLeftRight(screen, storage.value > 0);
                                 joystickCooldown = 4;
                             }
                         }
@@ -765,38 +766,38 @@ public class MidnightInput {
      * Handles the look direction input.
      *
      * @param client the client instance
-     * @param axisStorage the state of the provided axis
+     * @param storage the state of the provided axis
      */
-    public void handleLook(@NotNull MinecraftClient client, AxisStorage axisStorage) {
-        if (client.player == null || !(axisStorage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y || axisStorage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X)) return;
+    public void handleLook(@NotNull MinecraftClient client, AxisStorage storage) {
+        if (client.player == null || !(storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y || storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X)) return;
         // Handles the look direction.
-        if (MidnightControlsConfig.cameraMode == CameraMode.FLAT) {
-            double powValue = Math.pow(axisStorage.value, 2.0);
-            if (axisStorage.polarity != AxisStorage.Polarity.ZERO) {
-                double constant = powValue * 0.11D * (axisStorage.polarity == AxisStorage.Polarity.MINUS ? -1 : 1);
-                double sign = (axisStorage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) ? MidnightControlsConfig.getRightYAxisSign() * MidnightControlsConfig.yAxisRotationSpeed : MidnightControlsConfig.getRightXAxisSign() * MidnightControlsConfig.rotationSpeed;
+        if (MidnightControlsConfig.cameraMode == CameraMode.FLAT) handleFlatLook(storage);
+        else handleAdaptiveLook(storage);
+        
+    }
+    public void handleFlatLook(AxisStorage storage) {
+        if (storage.state != 0) {
+            double powValue = Math.pow(storage.value, 2.0) * (storage.state == 2 ? -1 : 1);
+            double rotation = (storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) ? MidnightControlsConfig.getRightYAxisSign() * MidnightControlsConfig.yAxisRotationSpeed : MidnightControlsConfig.getRightXAxisSign() * MidnightControlsConfig.rotationSpeed * powValue * 0.11D;
 
-                if (axisStorage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) this.targetPitch = sign * constant;
-                else this.targetYaw = sign * constant;
-            }
-            return;
+            if (storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) this.targetPitch = rotation;
+            else this.targetYaw = rotation;
         }
-        // Code below runs for adaptive camera mode
-
-        // Handles the look direction.
-        if (axisStorage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X) {
-            xValue = axisStorage.value;
-            xState = axisStorage.state;
+    }
+    public void handleAdaptiveLook(AxisStorage storage) {
+        if (storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X) {
+            xValue = storage.value;
+            xState = storage.state;
         }
         else {
             double yStep = (MidnightControlsConfig.yAxisRotationSpeed / 100) * 0.6000000238418579 + 0.20000000298023224;
             double xStep = (MidnightControlsConfig.rotationSpeed / 100) * 0.6000000238418579 + 0.20000000298023224;
-            float yValue = axisStorage.value;
-            float yState = axisStorage.state;
+            float yValue = storage.value;
+            float yState = storage.state;
 
             double cursorDeltaX = 2 * xValue - this.prevX;
             double cursorDeltaY = 2 * yValue - this.prevY;
-            boolean slowdown = client.options.getPerspective().isFirstPerson() && client.player.isUsingSpyglass();
+            boolean slowdown = client.options.getPerspective().isFirstPerson() && Objects.requireNonNull(client.player).isUsingSpyglass();
             double x = cursorDeltaX * xStep * (slowdown ? xStep : 1);
             double y = cursorDeltaY * yStep * (slowdown ? yStep : 1);
 
@@ -814,6 +815,14 @@ public class MidnightInput {
 
             this.prevY = yValue;
             this.prevX = xValue;
+        }
+    }
+    public void handleTouchscreenLook(AxisStorage storage) {
+        if (storage.state != 0) {
+            double rotation = storage.value * 0.11D * MidnightControlsConfig.touchSpeed/5;
+
+            if (storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) this.targetPitch = rotation;
+            else this.targetYaw = rotation;
         }
     }
 

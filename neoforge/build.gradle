@@ -41,7 +41,7 @@ configurations {
 dependencies {
     neoForge "net.neoforged:neoforge:$rootProject.neoforge_version"
     modImplementation include ("maven.modrinth:midnightlib:${rootProject.midnightlib_version}-neoforge")
-    include modImplementation ("maven.modrinth:obsidianui:${project.obsidianui_version}-neoforge") {}
+    modImplementation include ("maven.modrinth:obsidianui:${rootProject.obsidianui_version}-neoforge") {}
     shadowBundle('org.aperlambda:lambdajcommon:1.8.1') {
         exclude group: 'com.google.code.gson'
         exclude group: 'com.google.guava'

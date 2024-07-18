@@ -1,6 +1,6 @@
 package eu.midnightdust.midnightcontrols.client.mixin;
 
-import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
+import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;

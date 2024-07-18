@@ -7,8 +7,9 @@
  * see the LICENSE file.
  */
 
-package eu.midnightdust.midnightcontrols.client.gui;
+package eu.midnightdust.midnightcontrols.client.touch.gui;
 
+import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
 import org.thinkingstudio.obsidianui.Position;
 import org.thinkingstudio.obsidianui.widget.SpruceButtonWidget;
@@ -20,8 +21,6 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.compat.EmotecraftCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
-import eu.midnightdust.midnightcontrols.client.touch.gui.ItemUseButtonWidget;
-import eu.midnightdust.midnightcontrols.client.touch.gui.SilentTexturedButtonWidget;
 import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
 import eu.midnightdust.midnightcontrols.client.util.KeyBindingAccessor;
 import net.minecraft.client.gui.DrawContext;
@@ -82,10 +81,7 @@ public class TouchscreenOverlay extends Screen {
     }
 
     @Override
-    public void renderInGameBackground(DrawContext context) {}
-
-    @Override
-    protected void applyBlur(float delta) {}
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {}
 
     private void pauseGame() {
         assert this.client != null;
@@ -346,12 +342,15 @@ public class TouchscreenOverlay extends Screen {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_1 && this.client != null) {
-            if (!MidnightControlsConfig.invertTouch) {
-                deltaX = -deltaX;
-                deltaY = -deltaY;
+            if (TouchInput.isDragging) {
+                if (!MidnightControlsConfig.invertTouch) {
+                    deltaX = -deltaX;
+                    deltaY = -deltaY;
+                }
+                input.handleTouchscreenLook(new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) deltaY, deltaY > 0.01 ? 2 : 1));
+                input.handleTouchscreenLook(new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_X, (float) deltaX, deltaX > 0.01 ? 2 : 1));
             }
-            input.handleLook(this.client, new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) Math.abs((deltaY / 3.0)*MidnightControlsConfig.touchSpeed/100), deltaX > 0.01 ? 2 : 1));
-            input.handleLook(this.client, new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_X, (float) Math.abs((deltaX / 3.0)*MidnightControlsConfig.touchSpeed/100), deltaX > 0.01 ? 2 : 1));
+            else TouchInput.isDragging = true;
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
@@ -360,12 +359,5 @@ public class TouchscreenOverlay extends Screen {
         KeyBinding.onKeyPressed(InputUtil.fromKeyCode(keyCode, scanCode));
         super.keyPressed(keyCode,scanCode,modifiers);
         return true;
-    }
-
-    @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-        context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        context.fill(mouseX-10, mouseY-10, mouseX+10, mouseY+10, 0xFFFFFF);
     }
 }

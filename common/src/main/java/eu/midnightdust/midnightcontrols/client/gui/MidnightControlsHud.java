@@ -16,6 +16,7 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
+import net.minecraft.client.render.RenderTickCounter;
 import org.thinkingstudio.obsidianui.hud.Hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -78,7 +79,7 @@ public class MidnightControlsHud extends Hud {
      * Renders the MidnightControls HUD.
      */
     @Override
-    public void render(DrawContext context, float tickDelta) {
+    public void render(DrawContext context, RenderTickCounter tickCounter) {
         if (this.client == null) return;
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.currentScreen == null) {
             isCrammed = client.getWindow().getScaledWidth() < 520;
@@ -97,7 +98,7 @@ public class MidnightControlsHud extends Hud {
             var window = this.client.getWindow();
             var text = "[  ]";
 
-            float scale = Math.min(5, this.ticksDisplayedCrosshair + tickDelta) / 5F;
+            float scale = Math.min(5, this.ticksDisplayedCrosshair + tickCounter.getTickDelta(true)) / 5F;
             scale *= scale;
             int opacity = ((int) (255 * scale)) << 24;
 

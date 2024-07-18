@@ -21,7 +21,7 @@ import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsHud;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
-import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
+import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingIDAccessor;
 import eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction;
 import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
@@ -41,7 +41,10 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**

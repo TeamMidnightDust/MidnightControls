@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay.WIDGETS_LOCATION;
+import static eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay.WIDGETS_LOCATION;
 
 @Mixin(Screen.class)
 public abstract class ScreenMixin {

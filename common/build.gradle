@@ -29,7 +29,7 @@ dependencies {
     // Using the Fabric version of midnightlib here to create a common config and get useful utilities
     // Just make sure NOT to use classes from the .fabric classpath
     modCompileOnlyApi "maven.modrinth:midnightlib:${rootProject.midnightlib_version}-fabric"
-    modCompileOnlyApi "maven.modrinth:obsidianui:${project.obsidianui_version}-fabric"
+    modCompileOnlyApi "maven.modrinth:obsidianui:${rootProject.obsidianui_version}-fabric"
     include 'org.aperlambda:lambdajcommon:1.8.1'
     modCompileOnlyApi ("com.terraformersmc:modmenu:${project.modmenu_version}") {
         exclude(group: "net.fabricmc.fabric-api")

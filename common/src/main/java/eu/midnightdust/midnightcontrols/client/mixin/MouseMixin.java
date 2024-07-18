@@ -12,7 +12,7 @@ package eu.midnightdust.midnightcontrols.client.mixin;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
+import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
 import net.minecraft.client.MinecraftClient;

@@ -1,10 +1,8 @@
 package eu.midnightdust.midnightcontrols.fabric;
 
-import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
 import eu.midnightdust.midnightcontrols.packet.FeaturePayload;
 import eu.midnightdust.midnightcontrols.packet.HelloPayload;
@@ -54,9 +52,6 @@ public class MidnightControlsClientFabric implements ClientModInitializer {
 
         ClientTickEvents.START_CLIENT_TICK.register(MidnightControlsClient::onTick);
 
-        OpenScreenCallback.POST.register((client, screen) -> {
-            MidnightControlsClient.onScreenOpen(screen);
-        });
         FabricLoader.getInstance().getModContainer(MidnightControlsConstants.NAMESPACE).ifPresent(modContainer -> {
             ResourceManagerHelper.registerBuiltinResourcePack(id("bedrock"), modContainer, ResourcePackActivationType.NORMAL);
             ResourceManagerHelper.registerBuiltinResourcePack(id("legacy"), modContainer, ResourcePackActivationType.NORMAL);

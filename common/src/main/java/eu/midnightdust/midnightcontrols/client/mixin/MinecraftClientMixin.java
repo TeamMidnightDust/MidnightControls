@@ -13,6 +13,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
+import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -36,7 +37,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.reacharound;
 
@@ -51,6 +51,8 @@ public abstract class MinecraftClientMixin {
     @Shadow @Final public GameRenderer gameRenderer;
 
     @Shadow private int itemUseCooldown;
+
+    @Shadow public abstract void setScreen(Screen screen);
 
     @Unique private BlockPos midnightcontrols$lastTargetPos;
     @Unique private Vec3d midnightcontrols$lastPos;
@@ -104,9 +106,10 @@ public abstract class MinecraftClientMixin {
     @Inject(at = @At("TAIL"), method = "setScreen")
     private void setScreen(Screen screen, CallbackInfo info) {
         if (MidnightControlsConfig.hideNormalMouse){
-            if (screen != null) GLFW.glfwSetInputMode(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
+            if (screen != null && !(screen instanceof TouchscreenOverlay)) GLFW.glfwSetInputMode(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
             else GLFW.glfwSetInputMode(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
         }
+        MidnightControlsClient.onScreenOpen(screen);
     }
 
     @Inject(method = "doItemUse()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/HitResult;getType()Lnet/minecraft/util/hit/HitResult$Type;"), cancellable = true)

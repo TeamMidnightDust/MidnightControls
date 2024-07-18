@@ -24,7 +24,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
     modImplementation include ("maven.modrinth:midnightlib:${rootProject.midnightlib_version}-fabric")
-    include modImplementation ("maven.modrinth:obsidianui:${project.obsidianui_version}-fabric") {}
+    modImplementation include ("maven.modrinth:obsidianui:${rootProject.obsidianui_version}-fabric") {}
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }

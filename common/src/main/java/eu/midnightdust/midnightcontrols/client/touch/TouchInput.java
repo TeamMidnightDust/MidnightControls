@@ -1,7 +1,7 @@
 package eu.midnightdust.midnightcontrols.client.touch;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import eu.midnightdust.midnightcontrols.client.gui.TouchscreenOverlay;
+import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
@@ -18,6 +18,7 @@ public class TouchInput {
     private static final MinecraftClient client = MinecraftClient.getInstance();
     public static long clickStartTime;
     public static HitResult firstHitResult = null;
+    public static boolean isDragging = false;
 
     public static void tick() {
         if ((client.currentScreen == null && doMixedInput()) || client.currentScreen instanceof TouchscreenOverlay) {
@@ -58,6 +59,7 @@ public class TouchInput {
         }
     }
     public static boolean mouseReleased(double mouseX, double mouseY, int button) {
+        isDragging = false;
         firstHitResult = null;
         if (client.interactionManager != null) client.interactionManager.cancelBlockBreaking();
         if ((client.currentScreen == null || !client.currentScreen.mouseReleased(mouseX, mouseY, button)) && System.currentTimeMillis() - clickStartTime < MidnightControlsConfig.touchBreakDelay) {

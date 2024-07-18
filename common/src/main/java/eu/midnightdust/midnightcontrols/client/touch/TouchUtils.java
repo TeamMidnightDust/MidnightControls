@@ -32,13 +32,15 @@ public class TouchUtils {
         }
         Vec3d near = screenSpaceToWorldSpace(mouseX, mouseY, 0);
         Vec3d far = screenSpaceToWorldSpace(mouseX, mouseY, 1);
-        EntityHitResult entityCast = ProjectileUtil.raycast(client.player, near, far, Box.from(client.player.getPos()).expand(getPlayerRange(client)), entity -> (!entity.isSpectator() && entity.isAttackable()), getPlayerRange(client) * getPlayerRange(client));
+
+        float playerRange = getPlayerRange(client);
+        EntityHitResult entityCast = ProjectileUtil.raycast(client.player, near, far, Box.from(client.player.getPos()).expand(playerRange), entity -> (!entity.isSpectator() && entity.isAttackable()), playerRange * playerRange);
 
         if (entityCast != null && entityCast.getType() == HitResult.Type.ENTITY) return entityCast;
 
         BlockHitResult result = client.world.raycast(new RaycastContext(near, far, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.ANY, client.player));
 
-        if (client.player.getPos().distanceTo(result.getPos()) > getPlayerRange(client)) return null;
+        if (client.player.getPos().distanceTo(result.getPos()) > playerRange) return null;
         return result;
     }
 
@@ -62,6 +64,7 @@ public class TouchUtils {
 
         return new Vec3d(target.x, target.y, target.z).add(camera.getPos());
     }
+
     public static boolean hasInWorldUseAction(ItemStack stack) {
         UseAction action = stack.getUseAction();
         return action == UseAction.BOW || action == UseAction.BRUSH || action == UseAction.SPEAR;

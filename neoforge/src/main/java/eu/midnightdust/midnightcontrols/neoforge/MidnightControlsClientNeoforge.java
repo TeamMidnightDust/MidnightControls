@@ -21,7 +21,6 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforgespi.locating.IModFile;
 
@@ -90,10 +89,6 @@ public class MidnightControlsClientNeoforge {
         @SubscribeEvent
         public static void startClientTick(ClientTickEvent.Pre event) {
             MidnightControlsClient.onTick(client);
-        }
-        @SubscribeEvent
-        public static void onScreenOpen(ScreenEvent.Opening event) {
-            MidnightControlsClient.onScreenOpen(event.getNewScreen());
         }
     }
 }
