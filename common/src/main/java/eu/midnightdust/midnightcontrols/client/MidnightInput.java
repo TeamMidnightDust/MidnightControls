@@ -12,6 +12,7 @@ package eu.midnightdust.midnightcontrols.client;
 import com.google.common.collect.ImmutableSet;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
+import net.minecraft.client.gui.screen.option.KeybindsScreen;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.util.Pair;
 import org.thinkingstudio.obsidianui.widget.AbstractSpruceWidget;
@@ -811,6 +812,7 @@ public class MidnightInput {
      */
     public boolean tryGoBack(@NotNull Screen screen) {
         var set = ImmutableSet.of("gui.back", "gui.done", "gui.cancel", "gui.toTitle", "gui.toMenu");
+        if (screen instanceof KeybindsScreen) return false;
 
         return screen.children().stream().filter(element -> element instanceof PressableWidget)
                 .map(element -> (PressableWidget) element)
