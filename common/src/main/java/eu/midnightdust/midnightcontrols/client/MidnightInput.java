@@ -103,14 +103,14 @@ public class MidnightInput {
 
         // Handles the key bindings.
         if (MidnightControlsClient.BINDING_LOOK_UP.isPressed()) {
-            this.handleLook(client, new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_Y, 0.8F, 2));
+            this.handleFlatLook(new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_Y, 0.8F, 2));
         } else if (MidnightControlsClient.BINDING_LOOK_DOWN.isPressed()) {
-            this.handleLook(client, new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_Y, 0.8F, 1));
+            this.handleFlatLook(new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_Y, 0.8F, 1));
         }
         if (MidnightControlsClient.BINDING_LOOK_LEFT.isPressed()) {
-            this.handleLook(client, new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_X, 0.8F, 2));
+            this.handleFlatLook(new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_X, 0.8F, 2));
         } else if (MidnightControlsClient.BINDING_LOOK_RIGHT.isPressed()) {
-            this.handleLook(client, new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_X, 0.8F, 1));
+            this.handleFlatLook(new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_X, 0.8F, 1));
         }
 
         InputManager.INPUT_MANAGER.tick(client);
@@ -424,43 +424,13 @@ public class MidnightInput {
             }
         }
     }
-    public void pressKeyboardKey(MinecraftClient client, int key) {
-        client.keyboard.onKey(client.getWindow().getHandle(), key, 0, 1, 0);
-    }
-    public void pressKeyboardKey(Screen screen, int key) {
-        screen.keyPressed(key, 0, 1);
-    }
-    /**
-
-    /**
-     * Tries to go back.
-     *
-     * @param screen the current screen
-     * @return true if successful, else false
-     */
-    public boolean tryGoBack(@NotNull Screen screen) {
-        var set = ImmutableSet.of("gui.back", "gui.done", "gui.cancel", "gui.toTitle", "gui.toMenu");
-
-        return screen.children().stream().filter(element -> element instanceof PressableWidget)
-                .map(element -> (PressableWidget) element)
-                .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
-                .anyMatch(element -> {
-                    if (element.getMessage().getContent() instanceof TranslatableTextContent translatableText) {
-                        if (set.stream().anyMatch(key -> translatableText.getKey().equals(key))) {
-                            element.onPress();
-                            return true;
-                        }
-                    }
-                    return false;
-                });
-    }
 
     private void handleAxe(@NotNull MinecraftClient client, AxisStorage storage) {
-        setCurrentPolarities(storage);
+        this.setCurrentPolarities(storage);
 
-        handleMovement(client, storage);
+        this.handleMovement(client, storage);
 
-        if (handleScreenScrolling(client.currentScreen, storage)) return;
+        if (this.handleScreenScrolling(client.currentScreen, storage)) return;
 
         storage.absValue = (float) MathHelper.clamp(storage.absValue / MidnightControlsConfig.getAxisMaxValue(storage.axis), 0.f, 1.f);
         if (client.currentScreen == null) {
@@ -762,16 +732,15 @@ public class MidnightInput {
         else handleAdaptiveLook(storage);
         
     }
-    public void handleFlatLook(AxisStorage storage) {
+    private void handleFlatLook(AxisStorage storage) {
         if (storage.state != 0) {
-            double powValue = Math.pow(storage.value, 2.0) * (storage.state == 2 ? -1 : 1);
-            double rotation = (storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) ? MidnightControlsConfig.getRightYAxisSign() * MidnightControlsConfig.yAxisRotationSpeed : MidnightControlsConfig.getRightXAxisSign() * MidnightControlsConfig.rotationSpeed * powValue * 0.11D;
+            double rotation = Math.pow(storage.value, 2.0) * 0.11D * (storage.state == 2 ? -1 : 1);
 
-            if (storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) this.targetPitch = rotation;
-            else this.targetYaw = rotation;
+            if (storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) this.targetPitch = rotation * MidnightControlsConfig.getRightYAxisSign() * MidnightControlsConfig.yAxisRotationSpeed;
+            else this.targetYaw = rotation * MidnightControlsConfig.getRightXAxisSign() * MidnightControlsConfig.rotationSpeed;
         }
     }
-    public void handleAdaptiveLook(AxisStorage storage) {
+    private void handleAdaptiveLook(AxisStorage storage) {
         if (storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X) {
             xValue = storage.value;
             xState = storage.state;
@@ -834,10 +803,40 @@ public class MidnightInput {
         return false;
     }
 
+    /**
+     * Tries to go back.
+     *
+     * @param screen the current screen
+     * @return true if successful, else false
+     */
+    public boolean tryGoBack(@NotNull Screen screen) {
+        var set = ImmutableSet.of("gui.back", "gui.done", "gui.cancel", "gui.toTitle", "gui.toMenu");
+
+        return screen.children().stream().filter(element -> element instanceof PressableWidget)
+                .map(element -> (PressableWidget) element)
+                .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
+                .anyMatch(element -> {
+                    if (element.getMessage().getContent() instanceof TranslatableTextContent translatableText) {
+                        if (set.stream().anyMatch(key -> translatableText.getKey().equals(key))) {
+                            element.onPress();
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+    }
+
     public static boolean isScreenInteractive(@NotNull Screen screen) {
         return !(screen instanceof HandledScreen || MidnightControlsConfig.joystickAsMouse || MidnightControlsConfig.mouseScreens.stream().anyMatch(a -> screen.getClass().toString().contains(a))
                 || (screen instanceof SpruceScreen && ((SpruceScreen) screen).requiresCursor())
                 || MidnightControlsCompat.requireMouseOnScreen(screen));
+    }
+
+    public void pressKeyboardKey(MinecraftClient client, int key) {
+        client.keyboard.onKey(client.getWindow().getHandle(), key, 0, 1, 0);
+    }
+    public void pressKeyboardKey(Screen screen, int key) {
+        screen.keyPressed(key, 0, 1);
     }
 
     // Inspired from https://github.com/MrCrayfish/Controllable/blob/1.14.X/src/main/java/com/mrcrayfish/controllable/client/ControllerInput.java#L686.

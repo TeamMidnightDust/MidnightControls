@@ -400,20 +400,6 @@ public class InputManager {
      * @param code the code
      * @param category the category of the key binding
      * @return the key binding
-     * @see #makeKeyBinding(org.aperlambda.lambdacommon.Identifier, InputUtil.Type, int, String)
-     */
-    public static @NotNull KeyBinding makeKeyBinding(@NotNull org.aperlambda.lambdacommon.Identifier id, InputUtil.Type type, int code, @NotNull String category) {
-        return makeKeyBinding(Identifier.of(id.getNamespace(), id.getName()), type, code, category);
-    }
-
-    /**
-     * Returns a new key binding instance.
-     *
-     * @param id the identifier of the key binding
-     * @param type the type
-     * @param code the code
-     * @param category the category of the key binding
-     * @return the key binding
      * @see #makeKeyBinding(Identifier, InputUtil.Type, int, String)
      */
     public static @NotNull KeyBinding makeKeyBinding(@NotNull Identifier id, InputUtil.Type type, int code, @NotNull String category) {

@@ -49,22 +49,22 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Represents the midnightcontrols client mod.
  *
- * @author LambdAurora
- * @version 1.7.0
+ * @author Motschen, LambdAurora
+ * @version 1.10.0
  * @since 1.1.0
  */
 public class MidnightControlsClient extends MidnightControls {
     public static boolean lateInitDone = false;
     public static final KeyBinding BINDING_LOOK_UP = InputManager.makeKeyBinding(id("look_up"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.movement");
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.midnightcontrols");
     public static final KeyBinding BINDING_LOOK_RIGHT = InputManager.makeKeyBinding(id("look_right"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, "key.categories.movement");
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, "key.categories.midnightcontrols");
     public static final KeyBinding BINDING_LOOK_DOWN = InputManager.makeKeyBinding(id("look_down"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.movement");
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.midnightcontrols");
     public static final KeyBinding BINDING_LOOK_LEFT = InputManager.makeKeyBinding(id("look_left"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.movement");
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.midnightcontrols");
     public static final KeyBinding BINDING_RING = InputManager.makeKeyBinding(id("ring"),
-            InputUtil.Type.KEYSYM, InputUtil.UNKNOWN_KEY.getCode(), "key.categories.misc");
+            InputUtil.Type.KEYSYM, InputUtil.UNKNOWN_KEY.getCode(), "key.categories.midnightcontrols");
     public static final Identifier CONTROLLER_BUTTONS = id("textures/gui/controller_buttons.png");
     public static final Identifier CONTROLLER_EXPANDED = id("textures/gui/controller_expanded.png");
     public static final Identifier CONTROLLER_AXIS = id("textures/gui/controller_axis.png");
@@ -143,11 +143,11 @@ public class MidnightControlsClient extends MidnightControls {
                 if (!keyBinding.getTranslationKey().contains(MidnightControlsConstants.NAMESPACE)) {
                     AtomicReference<ButtonCategory> category = new AtomicReference<>();
                     InputManager.streamCategories().forEach(buttonCategory -> {
-                        if (buttonCategory.getIdentifier().equals(Identifier.of("minecraft", keyBinding.getCategory())))
+                        if (buttonCategory.getIdentifier().equals(Identifier.ofVanilla(keyBinding.getCategory())))
                             category.set(buttonCategory);
                     });
                     if (category.get() == null) {
-                        category.set(new ButtonCategory(Identifier.of("minecraft", keyBinding.getCategory())));
+                        category.set(new ButtonCategory(Identifier.ofVanilla(keyBinding.getCategory())));
                         InputManager.registerCategory(category.get());
                     }
                     ButtonBinding buttonBinding = new ButtonBinding.Builder(keyBinding.getTranslationKey()).category(category.get()).linkKeybind(keyBinding).register();
