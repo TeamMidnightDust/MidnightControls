@@ -67,9 +67,10 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
                 y -= 24;
             }
             if (MidnightControlsCompat.isEMIPresent() && EMICompat.isEMIEnabled() && EMICompat.isSearchBarCentered()) {
-                x = client.getWindow().getScaledWidth() - 55 - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.pickup"))
+                x = client.getWindow().getScaledWidth() - 4 - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.pickup"))
                         - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.quick_move"))
-                        - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.TAKE) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.QUICK_MOVE);
+                        - 2 * MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.TAKE) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.QUICK_MOVE);
+                y += 2;
             }
             if (!ButtonBinding.TAKE.isNotBound()) x = MidnightControlsRenderer.drawButtonTip(context, x, y, ButtonBinding.TAKE, true, client);
             if (!ButtonBinding.QUICK_MOVE.isNotBound()) MidnightControlsRenderer.drawButtonTip(context, x, y, ButtonBinding.QUICK_MOVE, true, client);

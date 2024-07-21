@@ -373,7 +373,7 @@ public class MidnightInput {
                     var focused = client.currentScreen.getFocused();
                     if (focused != null && isScreenInteractive(client.currentScreen)) {
                         if (this.handleAButton(client.currentScreen, focused)) {
-                            this.actionGuiCooldown = 5; // Prevent to press too quickly the focused element, so we have to skip 5 ticks.
+                            this.actionGuiCooldown = 5; // Set the cooldown to 5 ticks to avoid unintended button presses.
                             return;
                         }
                     }
@@ -388,28 +388,15 @@ public class MidnightInput {
                     client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth(),
                     client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight()) != null) return;
             if (!this.ignoreNextARelease && client.currentScreen != null) {
-                double mouseX = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
-                double mouseY = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
-                if (action == 0) {
-                    Screen.wrapScreenError(() -> {
-                        ((MouseAccessor) client.mouse).setLeftButtonClicked(false);
-                        client.currentScreen.mouseClicked(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1);
-                            },
-                            "mouseClicked event handler", client.currentScreen.getClass().getCanonicalName());
-                } else if (action == 1) {
-                    Screen.wrapScreenError(() -> {
-                        ((MouseAccessor) client.mouse).setLeftButtonClicked(false);
-                        client.currentScreen.mouseReleased(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_1);
-                            },
-                            "mouseReleased event handler", client.currentScreen.getClass().getCanonicalName());
-                } else if (action == 2) {
-                    Screen.wrapScreenError(() -> {
-                        client.currentScreen.setDragging(true);
-                        ((MouseAccessor) client.mouse).setLeftButtonClicked(true);
-                        ((MouseAccessor) client.mouse).midnightcontrols$onCursorPos(client.getWindow().getHandle(), client.mouse.getX(), client.mouse.getY());
-                        client.currentScreen.setDragging(false);
-                            },
-                            "mouseClicked event handler", client.currentScreen.getClass().getCanonicalName());
+                var accessor = (MouseAccessor) client.mouse;
+                accessor.midnightcontrols$onCursorPos(client.getWindow().getHandle(), client.mouse.getX(), client.mouse.getY());
+                if (action == 0) { // Button pressed
+                    accessor.midnightcontrols$onMouseButton(client.getWindow().getHandle(), GLFW_MOUSE_BUTTON_LEFT, 1, 0);
+                } else if (action == 1) { // Button released
+                    accessor.midnightcontrols$onMouseButton(client.getWindow().getHandle(), GLFW_MOUSE_BUTTON_LEFT, 0, 0);
+                    client.currentScreen.setDragging(false);
+                } else if (action == 2) { // Button held down / dragging
+                    client.currentScreen.setDragging(true);
                 }
                 this.screenCloseCooldown = 5;
             } else {

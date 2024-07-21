@@ -177,7 +177,6 @@ public class InputHandlers {
             int slotId;
             if (slot == null) {
                 if (button.getName().equals("take_all")) {
-                    ((MouseAccessor) client.mouse).setLeftButtonClicked(true);
                     return false;
                 }
                 slotId = accessor.midnightcontrols$isClickOutsideBounds(x, y, accessor.getX(), accessor.getY(), GLFW_MOUSE_BUTTON_1) ? -999 : -1;

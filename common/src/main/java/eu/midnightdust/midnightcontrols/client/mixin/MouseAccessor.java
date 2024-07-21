@@ -11,5 +11,6 @@ public interface MouseAccessor {
     void midnightcontrols$onCursorPos(long window, double x, double y);
     @Accessor
     void setLeftButtonClicked(boolean value);
-
+    @Invoker("onMouseButton")
+    void midnightcontrols$onMouseButton(long window, int button, int action, int mods);
 }
