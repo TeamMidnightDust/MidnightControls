@@ -40,7 +40,7 @@ public abstract class GameOptionsScreenMixin extends Screen {
         super(title);
     }
 
-    @Inject(method = "initTabNavigation", at = @At("HEAD"))
+    @Inject(method = "initTabNavigation", at = @At("TAIL"))
     public void addMidnightButton(CallbackInfo ci) {
         if (this.getClass().toString().equals(ControlsOptionsScreen.class.toString())) {
             this.midnightcontrols$setupButton();
