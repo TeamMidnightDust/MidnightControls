@@ -367,7 +367,7 @@ public class MidnightControlsConfig extends MidnightConfig {
         leftDeadZone = 0.25;
         invertRightYAxis = false;
         invertRightXAxis = false;
-        rotationSpeed = 40.0;
+        rotationSpeed = 35.0;
         yAxisRotationSpeed = rotationSpeed;
         mouseSpeed = 25.0;
         unfocusedInput = false;

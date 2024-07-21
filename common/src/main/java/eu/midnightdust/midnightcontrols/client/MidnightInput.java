@@ -140,13 +140,13 @@ public class MidnightInput {
         if (controller.isConnected()) {
             var state = controller.getState();
             this.fetchButtonInput(client, state, false);
-            this.fetchAxeInput(client, state, false);
+            this.fetchTriggerInput(client, state, false);
         }
         MidnightControlsConfig.getSecondController().filter(Controller::isConnected)
                 .ifPresent(joycon -> {
-                    GLFWGamepadState state = joycon.getState();
+                    var state = joycon.getState();
                     this.fetchButtonInput(client, state, true);
-                    this.fetchAxeInput(client, state, true);
+                    this.fetchTriggerInput(client, state, true);
                 });
 
         boolean allowInput = this.controlsInput == null || this.controlsInput.focusedBinding == null;
@@ -172,6 +172,22 @@ public class MidnightInput {
 
         if (this.inventoryInteractionCooldown > 0)
             this.inventoryInteractionCooldown--;
+    }
+    /**
+     * This method is called 1000 times a second for smooth joystick input
+     *
+     * @param client the client instance
+     */
+    public void tickJoysticks(@NotNull MinecraftClient client) {
+        var controller = MidnightControlsConfig.getController();
+
+        if (controller.isConnected()) {
+            this.fetchJoystickInput(client, controller.getState(), false);
+        }
+        MidnightControlsConfig.getSecondController().filter(Controller::isConnected)
+                .ifPresent(joycon -> {
+                    this.fetchJoystickInput(client, joycon.getState(), true);
+                });
     }
 
     /**
@@ -210,7 +226,6 @@ public class MidnightInput {
                 client.player.getVehicle().onPassengerLookAround(client.player);
             }
             client.getTutorialManager().onUpdateMouse(this.targetPitch, this.targetYaw);
-            MidnightControlsCompat.handleCamera(client, targetYaw, targetPitch);
         }
     }
 
@@ -266,7 +281,7 @@ public class MidnightInput {
     }
     final MathUtil.PolarUtil polarUtil = new MathUtil.PolarUtil();
 
-    private void fetchAxeInput(@NotNull MinecraftClient client, @NotNull GLFWGamepadState gamepadState, boolean leftJoycon) {
+    private void fetchJoystickInput(@NotNull MinecraftClient client, @NotNull GLFWGamepadState gamepadState, boolean leftJoycon) {
         var buffer = gamepadState.axes();
 
         polarUtil.calculate(buffer.get(GLFW_GAMEPAD_AXIS_LEFT_X), buffer.get(GLFW_GAMEPAD_AXIS_LEFT_Y), 1, MidnightControlsConfig.leftDeadZone);
@@ -278,9 +293,9 @@ public class MidnightInput {
 
         boolean isRadialMenu = client.currentScreen instanceof RingScreen || (MidnightControlsCompat.isEmotecraftPresent() && EmotecraftCompat.isEmotecraftScreen(client.currentScreen));
 
-        for (int i = 0; i < buffer.limit(); i++) {
+        for (int i = 0; i < GLFW_GAMEPAD_AXIS_LEFT_TRIGGER; i++) {
             int axis = leftJoycon ? ButtonBinding.controller2Button(i) : i;
-            float value = buffer.get();
+            float value = buffer.get(i);
 
             switch (i) {
                 case GLFW_GAMEPAD_AXIS_LEFT_X -> {if (MidnightControlsConfig.analogMovement) value = leftX;}
@@ -295,7 +310,7 @@ public class MidnightInput {
 
             int state = value > MidnightControlsConfig.rightDeadZone ? 1 : (value < -MidnightControlsConfig.rightDeadZone ? 2 : 0);
             if (!isRadialMenu)
-                this.handleAxe(client, new AxisStorage(axis, value, absValue, state));
+                this.handleJoystickAxis(client, new AxisStorage(axis, value, absValue, state));
         }
         if (isRadialMenu) {
             float x = leftX;
@@ -321,6 +336,19 @@ public class MidnightInput {
             }
             if (client.currentScreen instanceof RingScreen && index > -1) RingPage.selected = index;
             if (MidnightControlsCompat.isEmotecraftPresent() && EmotecraftCompat.isEmotecraftScreen(client.currentScreen)) EmotecraftCompat.handleEmoteSelector(index);
+        }
+    }
+
+    private void fetchTriggerInput(@NotNull MinecraftClient client, @NotNull GLFWGamepadState gamepadState, boolean leftJoycon) {
+        var buffer = gamepadState.axes();
+
+        for (int i = GLFW_GAMEPAD_AXIS_LEFT_TRIGGER; i <= GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER; i++) {
+            int axis = leftJoycon ? ButtonBinding.controller2Button(i) : i;
+            float value = buffer.get(i);
+            float absValue = Math.abs(value);
+
+            int state = value > MidnightControlsConfig.rightDeadZone ? 1 : (value < -MidnightControlsConfig.rightDeadZone ? 2 : 0);
+            this.handleTriggerAxis(client, new AxisStorage(axis, value, absValue, state));
         }
     }
 
@@ -425,8 +453,11 @@ public class MidnightInput {
             }
         }
     }
+    private void handleTriggerAxis(@NotNull MinecraftClient client, AxisStorage storage) {
+        this.setCurrentPolarities(storage);
+    }
 
-    private void handleAxe(@NotNull MinecraftClient client, AxisStorage storage) {
+    private void handleJoystickAxis(@NotNull MinecraftClient client, AxisStorage storage) {
         this.setCurrentPolarities(storage);
 
         this.handleMovement(client, storage);
@@ -497,6 +528,7 @@ public class MidnightInput {
             this.prevYAxis = movementY;
         }
     }
+
     private void setCurrentPolarities(AxisStorage storage) {
         boolean currentPlusState = storage.value > storage.deadZone;
         boolean currentMinusState = storage.value < -storage.deadZone;
@@ -737,8 +769,8 @@ public class MidnightInput {
         if (storage.state != 0) {
             double rotation = Math.pow(storage.value, 2.0) * 0.11D * (storage.state == 2 ? -1 : 1);
 
-            if (storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) this.targetPitch = rotation * MidnightControlsConfig.getRightYAxisSign() * MidnightControlsConfig.yAxisRotationSpeed;
-            else this.targetYaw = rotation * MidnightControlsConfig.getRightXAxisSign() * MidnightControlsConfig.rotationSpeed;
+            if (storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) this.targetPitch = rotation * MidnightControlsConfig.getRightYAxisSign() * MidnightControlsConfig.yAxisRotationSpeed / 2;
+            else this.targetYaw = rotation * MidnightControlsConfig.getRightXAxisSign() * MidnightControlsConfig.rotationSpeed / 2;
         }
     }
     private void handleAdaptiveLook(AxisStorage storage) {
@@ -747,8 +779,8 @@ public class MidnightInput {
             xState = storage.state;
         }
         else {
-            double yStep = (MidnightControlsConfig.yAxisRotationSpeed / 100) * 0.6000000238418579 + 0.20000000298023224;
-            double xStep = (MidnightControlsConfig.rotationSpeed / 100) * 0.6000000238418579 + 0.20000000298023224;
+            double yStep = (MidnightControlsConfig.yAxisRotationSpeed / 50) * 0.6000000238418579 + 0.20000000298023224;
+            double xStep = (MidnightControlsConfig.rotationSpeed / 50) * 0.6000000238418579 + 0.20000000298023224;
             float yValue = storage.value;
             float yState = storage.state;
 

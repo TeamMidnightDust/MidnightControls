@@ -82,13 +82,15 @@ public class MidnightControlsClient extends MidnightControls {
     public static void initClient() {
         ring.registerAction("buttonbinding", ButtonBindingRingAction.FACTORY);
 
-        final MinecraftClient client = MinecraftClient.getInstance();
         int delay = 0; // delay for 0 sec.
-        int period = 1; // repeat every 0.001 sec. (100 times a second)
+        int period = 1; // repeat every 0.001 sec. (1000 times a second)
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                input.updateCamera(client);
+                if (client.isRunning()) {
+                    input.tickJoysticks(client);
+                    input.updateCamera(client);
+                }
             }
         }, delay, period);
 
