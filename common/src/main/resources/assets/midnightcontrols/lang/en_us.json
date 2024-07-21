@@ -145,6 +145,8 @@
   "midnightcontrols.menu.controller_type.tooltip": "The controller type you're using (needed to display the correct buttons)",
   "midnightcontrols.menu.controls_mode": "Mode",
   "midnightcontrols.menu.controls_mode.tooltip": "The controls mode.",
+  "midnightcontrols.menu.copy_controller_guid": "Copy GUID",
+  "midnightcontrols.menu.current_controller_guid": "Current controller's GUID: %s",
   "midnightcontrols.menu.double_tap_to_sprint": "Double-Tap to Sprint",
   "midnightcontrols.menu.double_tap_to_sprint.tooltip": "Toggles whether the Walk Forwards key makes the player sprint when double-tapped quickly",
   "midnightcontrols.menu.fast_block_placing": "Fast Block Placing",

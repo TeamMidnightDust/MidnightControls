@@ -10,10 +10,13 @@
 package eu.midnightdust.midnightcontrols.client.gui;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import org.thinkingstudio.obsidianui.Position;
 import org.thinkingstudio.obsidianui.option.SpruceOption;
+import org.thinkingstudio.obsidianui.option.SpruceSimpleActionOption;
 import org.thinkingstudio.obsidianui.widget.container.SpruceContainerWidget;
 import org.thinkingstudio.obsidianui.widget.text.SpruceTextAreaWidget;
 import net.minecraft.client.toast.SystemToast;
@@ -31,6 +34,7 @@ import java.nio.file.Files;
  * @since 1.4.3
  */
 public class MappingsStringInputWidget extends SpruceContainerWidget {
+    private final SpruceOption copyGuidOption;
     private final SpruceOption reloadMappingsOption;
     private String mappings;
     private SpruceTextAreaWidget textArea;
@@ -42,6 +46,7 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
         this.reloadMappingsOption = ReloadControllerMappingsOption.newOption(btn -> {
             this.writeMappings();
         });
+        this.copyGuidOption = SpruceSimpleActionOption.of("midnightcontrols.menu.copy_controller_guid", button -> client.keyboard.setClipboard(MidnightControlsConfig.getController().getGuid()));
 
         this.init();
     }
@@ -96,10 +101,13 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
         this.textArea.setDisplayedLines(this.textArea.getInnerHeight() / this.client.textRenderer.fontHeight);
         this.addChild(this.textArea);
 
-        this.addChild(this.reloadMappingsOption.createWidget(Position.of(this.width / 2 - 155, this.height - 29), 310));
+        this.addChild(this.reloadMappingsOption.createWidget(Position.of(this.width / 2 - 155, this.height - 29), 257));
+        this.addChild(this.copyGuidOption.createWidget(Position.of(this.width / 2 + 105, this.height - 29), 65));
     }
 
-    //public void renderTitle(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        //this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 16777215);
-    //}
+    @Override
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.renderWidget(context, mouseX, mouseY, delta);
+        context.drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.current_controller_guid", MidnightControlsConfig.getController().getGuid()), this.textArea.getX() + this.textArea.getWidth() / 2, this.height - 21, 0xFFFFFF);
+    }
 }

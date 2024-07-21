@@ -42,7 +42,6 @@ import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;

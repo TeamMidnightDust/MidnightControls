@@ -161,7 +161,9 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private static int searchNextAvailableController(int newId, boolean allowNone) {
         if ((allowNone && newId == -1) || newId == 0) return newId;
 
-        boolean connected = Controller.byId(newId).isConnected();
+        Controller candidate = Controller.byId(newId);
+        boolean connected = candidate.isConnected();
+        if (MidnightControlsConfig.excludedControllers.stream().anyMatch(exclusion -> candidate.getName().matches(exclusion))) connected = false;
         if (!connected) {
             newId++;
         }
