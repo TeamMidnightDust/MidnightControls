@@ -352,8 +352,8 @@ public class TouchscreenOverlay extends Screen {
                     deltaX = -deltaX;
                     deltaY = -deltaY;
                 }
-                input.handleTouchscreenLook(new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) deltaY, 0.25d));
-                input.handleTouchscreenLook(new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_X, (float) deltaX, 0.25d));
+                input.handleTouchscreenLook(AxisStorage.of(GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) deltaY, 0.25d));
+                input.handleTouchscreenLook(AxisStorage.of(GLFW_GAMEPAD_AXIS_RIGHT_X, (float) deltaX, 0.25d));
             }
             else TouchInput.isDragging = true;
         }

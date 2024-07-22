@@ -9,7 +9,11 @@ public class ButtonStorage {
     public final int button;
     public final ButtonState state;
 
-    public ButtonStorage(int button, ButtonState state) {
+    public static ButtonStorage of(int button, ButtonState state) {
+        return new ButtonStorage(button, state);
+    }
+
+    private ButtonStorage(int button, ButtonState state) {
         this.button = button;
         this.state = state;
     }

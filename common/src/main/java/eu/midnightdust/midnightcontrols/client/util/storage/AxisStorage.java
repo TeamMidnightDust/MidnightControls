@@ -21,11 +21,14 @@ public class AxisStorage {
     public final ButtonState buttonState;
 
     // Used for joysticks
-    public AxisStorage(int axis, float value) {
-        this(axis, value, isLeftAxis(axis) ? MidnightControlsConfig.leftDeadZone : MidnightControlsConfig.rightDeadZone);
+    public static AxisStorage of(int axis, float value) {
+        return new AxisStorage(axis, value, isLeftAxis(axis) ? MidnightControlsConfig.leftDeadZone : MidnightControlsConfig.rightDeadZone);
+    }
+    public static AxisStorage of(int axis, float value, double deadZone) {
+        return new AxisStorage(axis, value, deadZone);
     }
 
-    public AxisStorage(int axis, float value, double deadZone) {
+    private AxisStorage(int axis, float value, double deadZone) {
         this.axis = axis;
         this.deadZone = deadZone;
 

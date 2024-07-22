@@ -109,14 +109,14 @@ public class MidnightInput {
 
         // Handles the key bindings.
         if (MidnightControlsClient.BINDING_LOOK_UP.isPressed()) {
-            this.handleFlatLook(new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_Y, -0.8F, 0d));
+            this.handleFlatLook(AxisStorage.of(GLFW_GAMEPAD_AXIS_RIGHT_Y, -0.8F, 0d));
         } else if (MidnightControlsClient.BINDING_LOOK_DOWN.isPressed()) {
-            this.handleFlatLook(new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_Y, 0.8F, 0d));
+            this.handleFlatLook(AxisStorage.of(GLFW_GAMEPAD_AXIS_RIGHT_Y, 0.8F, 0d));
         }
         if (MidnightControlsClient.BINDING_LOOK_LEFT.isPressed()) {
-            this.handleFlatLook(new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_X, -0.8F, 0d));
+            this.handleFlatLook(AxisStorage.of(GLFW_GAMEPAD_AXIS_RIGHT_X, -0.8F, 0d));
         } else if (MidnightControlsClient.BINDING_LOOK_RIGHT.isPressed()) {
-            this.handleFlatLook(new AxisStorage(GLFW_GAMEPAD_AXIS_RIGHT_X, 0.8F, 0d));
+            this.handleFlatLook(AxisStorage.of(GLFW_GAMEPAD_AXIS_RIGHT_X, 0.8F, 0d));
         }
 
         InputManager.INPUT_MANAGER.tick();
@@ -262,14 +262,14 @@ public class MidnightInput {
 
             if (pressed != previousState.isPressed()) {
                 state = pressed ? ButtonState.PRESS : ButtonState.RELEASE;
-                this.handleButton(new ButtonStorage(btn, state));
+                this.handleButton(ButtonStorage.of(btn, state));
                 if (pressed)
                     BUTTON_COOLDOWNS.put(btn, 5);
             } else if (pressed) {
                 state = ButtonState.REPEAT;
                 if (BUTTON_COOLDOWNS.getOrDefault(btn, 0) == 0) {
                     BUTTON_COOLDOWNS.put(btn, 5);
-                    this.handleButton(new ButtonStorage(btn, state));
+                    this.handleButton(ButtonStorage.of(btn, state));
                 }
             }
 
@@ -309,7 +309,7 @@ public class MidnightInput {
                 if (i == GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y)
                     value *= -1.0F;
 
-                this.handleJoystickAxis(new AxisStorage(axis, value));
+                this.handleJoystickAxis(AxisStorage.of(axis, value));
             }
         }
         else {
@@ -325,7 +325,7 @@ public class MidnightInput {
             int axis = leftJoycon ? ButtonBinding.controller2Button(i) : i;
             float value = buffer.get(i);
 
-            this.handleTriggerAxis(new AxisStorage(axis, value, MidnightControlsConfig.triggerDeadZone));
+            this.handleTriggerAxis(AxisStorage.of(axis, value, MidnightControlsConfig.triggerDeadZone));
         }
     }
 
