@@ -30,6 +30,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
+
 /**
  * Represents an input manager for controllers.
  *
@@ -51,17 +53,17 @@ public class InputManager {
     protected InputManager() {
     }
 
-    public void tick(@NotNull MinecraftClient client) {
+    public void tick() {
         if (MidnightControlsConfig.autoSwitchMode && !MidnightControlsConfig.isEditing && MidnightControlsConfig.controlsMode != ControlsMode.TOUCHSCREEN)
             if (MidnightControlsConfig.getController().isConnected() && MidnightControlsConfig.getController().isGamepad())
                  MidnightControlsConfig.controlsMode = ControlsMode.CONTROLLER;
             else MidnightControlsConfig.controlsMode = ControlsMode.DEFAULT;
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER) {
-            this.controllerTick(client);
+            this.controllerTick();
         }
     }
 
-    public void controllerTick(@NotNull MinecraftClient client) {
+    public void controllerTick() {
         this.prevTargetMouseX = this.targetMouseX;
         this.prevTargetMouseY = this.targetMouseY;
     }
@@ -340,7 +342,7 @@ public class InputManager {
         }
     }
 
-    public static void updateBindings(@NotNull MinecraftClient client) {
+    public static void updateBindings() {
         var skipButtons = new IntArrayList();
         record ButtonStateValue(ButtonState state, float value) {
         }

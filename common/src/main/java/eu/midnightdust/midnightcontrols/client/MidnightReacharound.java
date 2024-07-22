@@ -28,6 +28,8 @@ import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
+
 /**
  * Represents the reach-around API of midnightcontrols.
  *
@@ -39,10 +41,10 @@ public class MidnightReacharound {
     private boolean lastReacharoundVertical = false;
     private boolean onSlab = false;
 
-    public void tick(@NotNull MinecraftClient client) {
-        this.lastReacharoundResult = this.tryVerticalReachAround(client);
+    public void tick() {
+        this.lastReacharoundResult = this.tryVerticalReachAround();
         if (this.lastReacharoundResult == null) {
-            this.lastReacharoundResult = this.tryHorizontalReachAround(client);
+            this.lastReacharoundResult = this.tryHorizontalReachAround();
             this.lastReacharoundVertical = false;
         } else this.lastReacharoundVertical = true;
     }
@@ -81,10 +83,9 @@ public class MidnightReacharound {
     /**
      * Returns a nullable block hit result if vertical reach-around is possible.
      *
-     * @param client the client instance
      * @return a block hit result if vertical reach-around is possible, else {@code null}
      */
-    public @Nullable BlockHitResult tryVerticalReachAround(@NotNull MinecraftClient client) {
+    public @Nullable BlockHitResult tryVerticalReachAround() {
         if (!MidnightControlsFeature.VERTICAL_REACHAROUND.isAvailable())
             return null;
         if (client.player == null || client.world == null || client.crosshairTarget == null || client.crosshairTarget.getType() != HitResult.Type.MISS
@@ -113,10 +114,9 @@ public class MidnightReacharound {
     /**
      * Returns a nullable block hit result if horizontal reach-around is possible.
      *
-     * @param client the client instance
      * @return a block hit result if horizontal reach-around is possible
      */
-    public @Nullable BlockHitResult tryHorizontalReachAround(@NotNull MinecraftClient client) {
+    public @Nullable BlockHitResult tryHorizontalReachAround() {
         if (!MidnightControlsFeature.HORIZONTAL_REACHAROUND.isAvailable())
             return null;
 

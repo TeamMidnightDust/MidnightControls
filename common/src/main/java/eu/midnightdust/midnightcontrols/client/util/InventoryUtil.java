@@ -1,14 +1,17 @@
 package eu.midnightdust.midnightcontrols.client.util;
 
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
 import org.aperlambda.lambdacommon.utils.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.input;
 
 public class InventoryUtil {
     // Finds the closest slot in the GUI within 14 pixels.
@@ -59,5 +62,63 @@ public class InventoryUtil {
                 })
                 .min(Comparator.comparingDouble(p -> p.value))
                 .map(p -> p.key);
+    }
+
+    private static int targetMouseX = 0;
+    private static int targetMouseY = 0;
+
+    // Inspired from https://github.com/MrCrayfish/Controllable/blob/1.14.X/src/main/java/com/mrcrayfish/controllable/client/ControllerInput.java#L686.
+    public static void moveMouseToClosestSlot(@Nullable Screen screen) {
+        // Makes the mouse attracted to slots. This helps with selecting items when using a controller.
+        if (screen instanceof HandledScreen<?> inventoryScreen) {
+            var accessor = (HandledScreenAccessor) inventoryScreen;
+            int guiLeft = accessor.getX();
+            int guiTop = accessor.getY();
+            int mouseX = (int) (targetMouseX * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth());
+            int mouseY = (int) (targetMouseY * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight());
+
+            // Finds the closest slot in the GUI within 14 pixels.
+            Optional<net.minecraft.util.Pair<Slot, Double>> closestSlot = inventoryScreen.getScreenHandler().slots.parallelStream()
+                    .map(slot -> {
+                        int x = guiLeft + slot.x + 8;
+                        int y = guiTop + slot.y + 8;
+
+                        // Distance between the slot and the cursor.
+                        double distance = Math.sqrt(Math.pow(x - mouseX, 2) + Math.pow(y - mouseY, 2));
+                        return new net.minecraft.util.Pair<>(slot, distance);
+                    }).filter(entry -> entry.getRight() <= 14.0)
+                    .min(Comparator.comparingDouble(net.minecraft.util.Pair::getRight));
+
+            if (closestSlot.isPresent() && client.player != null) {
+                var slot = closestSlot.get().getLeft();
+                if (slot.hasStack() || !client.player.getInventory().getMainHandStack().isEmpty()) {
+                    int slotCenterXScaled = guiLeft + slot.x + 8;
+                    int slotCenterYScaled = guiTop + slot.y + 8;
+                    int slotCenterX = (int) (slotCenterXScaled / ((double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth()));
+                    int slotCenterY = (int) (slotCenterYScaled / ((double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight()));
+                    double deltaX = slotCenterX - targetMouseX;
+                    double deltaY = slotCenterY - targetMouseY;
+
+                    if (mouseX != slotCenterXScaled || mouseY != slotCenterYScaled) {
+                        targetMouseX += (int) (deltaX * 0.75);
+                        targetMouseY += (int) (deltaY * 0.75);
+                    } else {
+                        input.mouseSpeedX *= 0.3F;
+                        input.mouseSpeedY *= 0.3F;
+                    }
+                    input.mouseSpeedX *= .75F;
+                    input.mouseSpeedY *= .75F;
+                } else {
+                    input.mouseSpeedX *= .1F;
+                    input.mouseSpeedY *= .1F;
+                }
+            } else {
+                input.mouseSpeedX *= .3F;
+                input.mouseSpeedY *= .3F;
+            }
+        } else {
+            input.mouseSpeedX = 0.F;
+            input.mouseSpeedY = 0.F;
+        }
     }
 }

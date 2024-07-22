@@ -87,9 +87,9 @@ public class MidnightControlsClient extends MidnightControls {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                if (client.isRunning()) {
-                    input.tickJoysticks(client);
-                    input.updateCamera(client);
+                if (lateInitDone && client.isRunning()) {
+                    input.tickJoysticks();
+                    input.updateCamera();
                 }
             }
         }, delay, period);
@@ -171,10 +171,10 @@ public class MidnightControlsClient extends MidnightControls {
      */
     public static void onTick(@NotNull MinecraftClient client) {
         initKeybindings();
-        input.tick(client);
-        reacharound.tick(client);
+        input.tick();
+        reacharound.tick();
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && (client.isWindowFocused() || MidnightControlsConfig.unfocusedInput))
-            input.tickController(client);
+            input.tickController();
 
         if (BINDING_RING.wasPressed()) {
             ring.loadFromUnbound();
@@ -200,7 +200,7 @@ public class MidnightControlsClient extends MidnightControls {
             client.skipGameRender = false;
             client.currentScreen = screen;
         } else if (screen != null) {
-            MidnightControlsClient.input.onScreenOpen(client, client.getWindow().getWidth(), client.getWindow().getHeight());
+            MidnightControlsClient.input.onScreenOpen(client.getWindow().getWidth(), client.getWindow().getHeight());
         }
     }
 

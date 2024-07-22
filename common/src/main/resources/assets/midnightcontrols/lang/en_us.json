@@ -184,6 +184,7 @@
   "midnightcontrols.menu.mouse_speed.tooltip": "The controller's emulated mouse speed.",
   "midnightcontrols.menu.move_chat": "Move chat input box to top",
   "midnightcontrols.menu.move_chat.tooltip": "Moves the chat input field to the top, for better input on devices with on-screen keyboards.",
+  "midnightcontrols.menu.multiple_mapping_tip": "(Tip: You can also insert multiple mappings at the same time)",
   "midnightcontrols.menu.reacharound.horizontal": "Front Block Placing",
   "midnightcontrols.menu.reacharound.horizontal.tooltip": "Enables front block placing, §cmight be considered cheating on some servers§r.",
   "midnightcontrols.menu.reacharound.vertical": "Vertical Reacharound",

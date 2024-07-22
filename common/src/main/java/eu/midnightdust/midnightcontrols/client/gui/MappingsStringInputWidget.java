@@ -41,7 +41,6 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
 
     protected MappingsStringInputWidget(Position position, int width, int height) {
         super(position, width, height);
-        //super(new TranslatableText("midnightcontrols.menu.title.mappings.string"));
 
         this.reloadMappingsOption = ReloadControllerMappingsOption.newOption(btn -> {
             this.writeMappings();
@@ -108,6 +107,7 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
     @Override
     public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         super.renderWidget(context, mouseX, mouseY, delta);
+        context.drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.multiple_mapping_tip"), this.textArea.getX() + this.textArea.getWidth() / 2, this.textArea.getY() + this.textArea.getHeight() - 12, 0x888888);
         context.drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.current_controller_guid", MidnightControlsConfig.getController().getGuid()), this.textArea.getX() + this.textArea.getWidth() / 2, this.height - 21, 0xFFFFFF);
     }
 }
