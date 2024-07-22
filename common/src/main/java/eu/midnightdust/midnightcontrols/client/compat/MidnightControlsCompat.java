@@ -11,6 +11,7 @@ package eu.midnightdust.midnightcontrols.client.compat;
 
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
+import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.hit.BlockHitResult;
@@ -39,9 +40,10 @@ public class MidnightControlsCompat {
      * Initializes compatibility with other mods if needed.
      */
     public static void init() {
-        if (isEMIPresent()) {
+        if (PlatformFunctions.isModLoaded("emi")) {
             log("Adding EMI compatibility...");
             registerCompatHandler(new EMICompat());
+            EMICompat.isPresent = true;
         }
         if (PlatformFunctions.isModLoaded("hardcorequesting") && LambdaReflection.doesClassExist(HQMCompat.GUI_BASE_CLASS_PATH)) {
             log("Adding HQM compatibility...");
@@ -62,6 +64,10 @@ public class MidnightControlsCompat {
         if (PlatformFunctions.isModLoaded("inventorytabs")) {
             log("Adding Inventory Tabs compatibility...");
             registerCompatHandler(new InventoryTabsCompat());
+            InventoryTabsCompat.isPresent = true;
+        }
+        if (PlatformFunctions.isModLoaded("emotecraft")) {
+            EmotecraftCompat.isPresent = true;
         }
         HANDLERS.forEach(CompatHandler::handle);
         InputManager.loadButtonBindings();
@@ -102,6 +108,15 @@ public class MidnightControlsCompat {
      */
     public static boolean handleTabs(Screen screen, boolean forward) {
         return streamCompatHandlers().anyMatch(handler -> handler.handleTabs(screen, forward));
+    }
+    /**
+     * Handles custom pages for modded screens
+     *
+     * @param screen the screen
+     * @return true if the handle was fired and succeed, else false
+     */
+    public static boolean handlePages(Screen screen, boolean forward) {
+        return streamCompatHandlers().anyMatch(handler -> handler.handlePages(screen, forward));
     }
 
     /**
@@ -178,29 +193,14 @@ public class MidnightControlsCompat {
     public static void handleCamera(double targetYaw, double targetPitch) {
         MidnightControlsCompat.HANDLERS.forEach(handler -> handler.handleCamera(client, targetYaw, targetPitch));
     }
-
     /**
-     * Returns whether EMI is present.
+     * Handles movement for players as well as vehicles
      *
-     * @return true if EMI is present, else false
+     * @param storage the storage containing info about the current axis
+     * @param adjustedValue the value of the axis, adjusted for max values and non-analogue movement, recommended for player movement
+     * @return true if the handle was fired and succeed, else false
      */
-    public static boolean isEMIPresent() {
-        return PlatformFunctions.isModLoaded("emi");
-    }
-    /**
-     * Returns whether InventoryTabs is present.
-     *
-     * @return true if InventoryTabs is present, else false
-     */
-    public static boolean isInventoryTabsPresent() {
-        return PlatformFunctions.isModLoaded("inventorytabs");
-    }
-    /**
-     * Returns whether Emotecraft is present.
-     *
-     * @return true if Emotecraft is present, else false
-     */
-    public static boolean isEmotecraftPresent() {
-        return PlatformFunctions.isModLoaded("emotecraft");
+    public static boolean handleMovement(AxisStorage storage, float adjustedValue) {
+        return streamCompatHandlers().anyMatch(handler -> handler.handleMovement(client, storage, adjustedValue));
     }
 }

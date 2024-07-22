@@ -6,11 +6,7 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 
 public class InventoryTabsCompat implements CompatHandler {
-    private static InventoryTabsCompat INSTANCE;
-    @Override
-    public void handle() {
-        INSTANCE = this;
-    }
+    protected static boolean isPresent;
 
     @Override
     public boolean handleTabs(Screen screen, boolean next) {
@@ -19,26 +15,39 @@ public class InventoryTabsCompat implements CompatHandler {
             int tabIndex = tabManager.tabs.indexOf(tabManager.currentTab);
             if (next) {
                 if (tabIndex < tabManager.tabs.size() - 1) tabManager.onTabClick(tabManager.tabs.get(tabIndex + 1));
-                else tabManager.onTabClick(tabManager.tabs.get(0));
+                else tabManager.onTabClick(tabManager.tabs.getFirst());
             } else {
                 if (tabIndex > 0) tabManager.onTabClick(tabManager.tabs.get(tabIndex - 1));
-                else tabManager.onTabClick(tabManager.tabs.get(tabManager.tabs.size() - 1));
+                else tabManager.onTabClick(tabManager.tabs.getLast());
             }
             return true;
         }
         return false;
     }
-    public static boolean handleInventoryTabs(Screen screen, boolean next) {
-        return INSTANCE.handleTabs(screen, next);
-    }
-    public static void handleInventoryPage(Screen screen, boolean next) {
+    @Override
+    public boolean handlePages(Screen screen, boolean next) {
         if (screen instanceof HandledScreen<?> && !(screen instanceof CreativeInventoryScreen)) {
             TabManager tabManager = TabManager.getInstance();
             if (next) {
-                if (tabManager.canGoForwardAPage()) tabManager.setCurrentPage(tabManager.currentPage + 1);
+                if (tabManager.canGoForwardAPage()) {
+                    tabManager.setCurrentPage(tabManager.currentPage + 1);
+                    return true;
+                }
             } else {
-                if (tabManager.canGoBackAPage()) tabManager.setCurrentPage(tabManager.currentPage - 1);
+                if (tabManager.canGoBackAPage()) {
+                    tabManager.setCurrentPage(tabManager.currentPage - 1);
+                    return true;
+                }
             }
         }
+        return false;
+    }
+    /**
+     * Returns whether InventoryTabs is present.
+     *
+     * @return true if InventoryTabs is present, else false
+     */
+    public static boolean isPresent() {
+        return isPresent;
     }
 }

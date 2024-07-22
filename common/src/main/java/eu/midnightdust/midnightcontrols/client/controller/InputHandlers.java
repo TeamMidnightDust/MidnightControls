@@ -88,8 +88,7 @@ public class InputHandlers {
                 var tabs = recipeBookAccessor.getTabButtons();
                 var currentTab = recipeBookAccessor.getCurrentTab();
                 if (currentTab == null || !recipeBook.isOpen()) {
-                    if (MidnightControlsCompat.isInventoryTabsPresent()) InventoryTabsCompat.handleInventoryTabs(client.currentScreen, next);
-                    return false;
+                    return MidnightControlsCompat.handleTabs(client.currentScreen, next);
                 }
                 int nextTab = tabs.indexOf(currentTab) + (next ? 1 : -1);
                 if (nextTab < 0)
@@ -144,9 +143,9 @@ public class InputHandlers {
             if (client.currentScreen instanceof CreativeInventoryScreen creativeScreen) {
                 return ItemGroupUtil.cyclePage(next, creativeScreen);
             }
-            if (MidnightControlsCompat.isInventoryTabsPresent()) InventoryTabsCompat.handleInventoryPage(client.currentScreen, next);
 
-            return false;
+
+            return MidnightControlsCompat.handlePages(client.currentScreen, next);
         };
     }
     public static PressAction handleExit() {

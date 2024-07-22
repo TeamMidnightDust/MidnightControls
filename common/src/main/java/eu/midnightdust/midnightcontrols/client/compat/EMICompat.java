@@ -12,6 +12,8 @@ import org.lwjgl.glfw.GLFW;
 import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 
 public class EMICompat implements CompatHandler {
+    protected static boolean isPresent;
+
     public static boolean handleEmiPages(boolean direction) {
         if (isEMIEnabled() && MidnightControlsClient.input.actionGuiCooldown == 0 && EmiScreenManager.getSearchPanel() != null && EmiScreenManager.getSearchPanel().pageLeft != null && EmiScreenManager.getSearchPanel().pageRight != null) {
             if (direction) EmiScreenManager.getSearchPanel().pageRight.onPress();
@@ -37,6 +39,14 @@ public class EMICompat implements CompatHandler {
                 .action((client,action,value,buttonState)->handleEmiPages(true)).cooldown()
                 .filter(((buttonBinding) -> EmiApi.getHandledScreen() != null))
                 .register();
+    }
+    /**
+     * Returns whether EMI is present.
+     *
+     * @return true if EMI is present, else false
+     */
+    public static boolean isPresent() {
+        return isPresent;
     }
     public static boolean isEMIEnabled() {
         return EmiConfig.enabled;

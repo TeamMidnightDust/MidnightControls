@@ -10,6 +10,7 @@
 package eu.midnightdust.midnightcontrols.client.compat;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -49,11 +50,30 @@ public interface CompatHandler {
     default void handleCamera(@NotNull MinecraftClient client, double targetYaw, double targetPitch) {};
 
     /**
+     * Handles movement for players as well as vehicles
+     *
+     * @param storage the storage containing info about the current axis
+     * @param adjustedValue the value of the axis, adjusted for max values and non-analogue movement, recommended for player movement
+     */
+    default boolean handleMovement(@NotNull MinecraftClient client, AxisStorage storage, float adjustedValue) {
+        return false;
+    }
+
+    /**
      * Handles custom tab behavior
      *
      * @param forward whether the direction is forward or backward
      */
     default boolean handleTabs(Screen screen, boolean forward) {
+        return false;
+    };
+
+    /**
+     * Handles custom page behavior
+     *
+     * @param forward whether the direction is forward or backward
+     */
+    default boolean handlePages(Screen screen, boolean forward) {
         return false;
     };
 
