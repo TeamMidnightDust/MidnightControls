@@ -708,7 +708,7 @@ public class MidnightInput {
         // Handles the look direction.
         if (MidnightControlsConfig.cameraMode == CameraMode.FLAT) handleFlatLook(storage);
         else handleAdaptiveLook(storage);
-        
+        MidnightControlsCompat.handleCamera(this.targetYaw, this.targetPitch);
     }
     private void handleFlatLook(AxisStorage storage) {
         if (storage.polarity != AxisStorage.Polarity.ZERO) {

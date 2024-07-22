@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static eu.midnightdust.midnightcontrols.MidnightControls.log;
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 
 /**
  * Represents a compatibility handler.
@@ -171,11 +172,10 @@ public class MidnightControlsCompat {
     /**
      * Handles the camera movement.
      *
-     * @param client the client instance
      * @param targetYaw the target yaw
      * @param targetPitch the target pitch
      */
-    public static void handleCamera(@NotNull MinecraftClient client, double targetYaw, double targetPitch) {
+    public static void handleCamera(double targetYaw, double targetPitch) {
         MidnightControlsCompat.HANDLERS.forEach(handler -> handler.handleCamera(client, targetYaw, targetPitch));
     }
 
