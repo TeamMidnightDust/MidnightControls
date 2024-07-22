@@ -1,15 +1,16 @@
 package eu.midnightdust.midnightcontrols.client.util.storage;
 
+import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
+
 import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP;
 
 public class ButtonStorage {
-    public final int button, action;
-    public final boolean state;
+    public final int button;
+    public final ButtonState state;
 
-    public ButtonStorage(int button, int action, boolean state) {
+    public ButtonStorage(int button, ButtonState state) {
         this.button = button;
-        this.action = action;
         this.state = state;
     }
     public boolean isDpad() {
