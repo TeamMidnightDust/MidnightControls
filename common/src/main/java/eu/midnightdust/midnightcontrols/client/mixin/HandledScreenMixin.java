@@ -57,7 +57,7 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.hudEnable) {
             var client = MinecraftClient.getInstance();
             int x = 2, y = client.getWindow().getScaledHeight() - 2 - MidnightControlsRenderer.ICON_SIZE;
-            if (EMICompat.isPresent() && EMICompat.isEMIEnabled()) {
+            if (PlatformFunctions.isModLoaded("emi") && EMICompat.isEMIEnabled()) {
                 x += 42;
             }
             if (!ButtonBinding.TAKE_ALL.isNotBound()) x = MidnightControlsRenderer.drawButtonTip(context, x, y, ButtonBinding.TAKE_ALL,true, client) + 2;
@@ -66,7 +66,7 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
                 x = 2;
                 y -= 24;
             }
-            if (EMICompat.isPresent() && EMICompat.isEMIEnabled() && EMICompat.isSearchBarCentered()) {
+            if (PlatformFunctions.isModLoaded("emi") && EMICompat.isEMIEnabled() && EMICompat.isSearchBarCentered()) {
                 x = client.getWindow().getScaledWidth() - 4 - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.pickup"))
                         - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.quick_move"))
                         - 2 * MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.TAKE) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.QUICK_MOVE);

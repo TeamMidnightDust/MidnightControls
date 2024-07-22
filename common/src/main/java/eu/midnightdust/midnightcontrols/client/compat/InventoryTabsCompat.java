@@ -6,8 +6,6 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 
 public class InventoryTabsCompat implements CompatHandler {
-    protected static boolean isPresent;
-
     @Override
     public boolean handleTabs(Screen screen, boolean next) {
         if (screen instanceof HandledScreen<?> && !(screen instanceof CreativeInventoryScreen)) {
@@ -41,13 +39,5 @@ public class InventoryTabsCompat implements CompatHandler {
             }
         }
         return false;
-    }
-    /**
-     * Returns whether InventoryTabs is present.
-     *
-     * @return true if InventoryTabs is present, else false
-     */
-    public static boolean isPresent() {
-        return isPresent;
     }
 }

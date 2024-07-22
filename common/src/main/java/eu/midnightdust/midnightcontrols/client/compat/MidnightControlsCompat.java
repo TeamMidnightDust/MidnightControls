@@ -43,7 +43,6 @@ public class MidnightControlsCompat {
         if (PlatformFunctions.isModLoaded("emi")) {
             log("Adding EMI compatibility...");
             registerCompatHandler(new EMICompat());
-            EMICompat.isPresent = true;
         }
         if (PlatformFunctions.isModLoaded("hardcorequesting") && LambdaReflection.doesClassExist(HQMCompat.GUI_BASE_CLASS_PATH)) {
             log("Adding HQM compatibility...");
@@ -64,10 +63,6 @@ public class MidnightControlsCompat {
         if (PlatformFunctions.isModLoaded("inventorytabs")) {
             log("Adding Inventory Tabs compatibility...");
             registerCompatHandler(new InventoryTabsCompat());
-            InventoryTabsCompat.isPresent = true;
-        }
-        if (PlatformFunctions.isModLoaded("emotecraft")) {
-            EmotecraftCompat.isPresent = true;
         }
         HANDLERS.forEach(CompatHandler::handle);
         InputManager.loadButtonBindings();

@@ -7,7 +7,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 
 public class EmotecraftCompat {
-    protected static boolean isPresent;
     private static final MinecraftClient client = MinecraftClient.getInstance();
 
     public static void openEmotecraftScreen(Screen parent) {
@@ -33,14 +32,5 @@ public class EmotecraftCompat {
 
             InputManager.INPUT_MANAGER.updateMousePosition(client);
         }
-    }
-
-    /**
-     * Returns whether Emotecraft is present.
-     *
-     * @return true if Emotecraft is present, else false
-     */
-    public static boolean isPresent() {
-        return isPresent;
     }
 }

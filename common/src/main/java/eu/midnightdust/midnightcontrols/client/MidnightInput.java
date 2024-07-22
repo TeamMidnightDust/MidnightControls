@@ -288,7 +288,7 @@ public class MidnightInput {
         float rightX = polarUtil.polarX;
         float rightY = polarUtil.polarY;
 
-        boolean isRadialMenu = client.currentScreen instanceof RingScreen || (EmotecraftCompat.isPresent() && EmotecraftCompat.isEmotecraftScreen(client.currentScreen));
+        boolean isRadialMenu = client.currentScreen instanceof RingScreen || (PlatformFunctions.isModLoaded("emotecraft") && EmotecraftCompat.isEmotecraftScreen(client.currentScreen));
 
         if (!isRadialMenu) {
             for (int i = 0; i < GLFW_GAMEPAD_AXIS_LEFT_TRIGGER; i++) {
@@ -427,7 +427,7 @@ public class MidnightInput {
     private void handleJoystickAxis(AxisStorage storage) {
         storage.setupButtonStates();
 
-        this.handleMovement(storage);
+        this.handleJoystickMovement(storage);
 
         if (this.handleScreenScrolling(client.currentScreen, storage)) return;
 
@@ -496,7 +496,7 @@ public class MidnightInput {
         }
     }
 
-    private void handleMovement(AxisStorage storage) {
+    private void handleJoystickMovement(AxisStorage storage) {
         float axisValue = storage.absValue;
         if (!MidnightControlsConfig.analogMovement || (client.player != null && client.player.getVehicle() instanceof BoatEntity)) {
             axisValue = (float) (storage.absValue - storage.deadZone);
@@ -505,10 +505,9 @@ public class MidnightInput {
         }
 
         axisValue = (float) Math.min(axisValue / MidnightControlsConfig.getAxisMaxValue(storage.axis), 1);
-        if (!MidnightControlsCompat.handleMovement(storage, axisValue)) {
-            InputManager.BUTTON_VALUES.put(ButtonBinding.axisAsButton(storage.axis, true), storage.polarity == AxisStorage.Polarity.PLUS ? axisValue : 0.f);
-            InputManager.BUTTON_VALUES.put(ButtonBinding.axisAsButton(storage.axis, false), storage.polarity == AxisStorage.Polarity.MINUS ? axisValue : 0.f);
-        }
+        if (AxisStorage.isLeftAxis(storage.axis) && MidnightControlsCompat.handleMovement(storage, axisValue)) return;
+        InputManager.BUTTON_VALUES.put(ButtonBinding.axisAsButton(storage.axis, true), storage.polarity == AxisStorage.Polarity.PLUS ? axisValue : 0.f);
+        InputManager.BUTTON_VALUES.put(ButtonBinding.axisAsButton(storage.axis, false), storage.polarity == AxisStorage.Polarity.MINUS ? axisValue : 0.f);
     }
 
     private boolean handleScreenScrolling(Screen screen, AxisStorage storage) {
@@ -587,7 +586,7 @@ public class MidnightInput {
             else if (y > border) index = 6;
         }
         if (client.currentScreen instanceof RingScreen && index > -1) RingPage.selected = index;
-        if (EmotecraftCompat.isPresent() && EmotecraftCompat.isEmotecraftScreen(client.currentScreen)) EmotecraftCompat.handleEmoteSelector(index);
+        if (PlatformFunctions.isModLoaded("emotecraft") && EmotecraftCompat.isEmotecraftScreen(client.currentScreen)) EmotecraftCompat.handleEmoteSelector(index);
     }
 
     public boolean handleListWidgetScrolling(List<? extends Element> children, float value) {
