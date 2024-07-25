@@ -55,9 +55,7 @@ public interface CompatHandler {
      * @param storage the storage containing info about the current axis
      * @param adjustedValue the value of the axis, adjusted for max values and non-analogue movement, recommended for player movement
      */
-    default boolean handleMovement(@NotNull MinecraftClient client, AxisStorage storage, float adjustedValue) {
-        return false;
-    }
+    default void handleMovement(@NotNull MinecraftClient client, AxisStorage storage, float adjustedValue) {}
 
     /**
      * Handles custom tab behavior

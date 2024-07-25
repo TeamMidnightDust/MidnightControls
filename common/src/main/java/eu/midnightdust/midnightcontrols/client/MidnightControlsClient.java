@@ -86,7 +86,7 @@ public class MidnightControlsClient extends MidnightControls {
         int period = 1; // repeat every 0.001 sec. (1000 times a second)
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
+            public void run() { // TODO: Add a try/catch here after the alpha testing period
                 if (lateInitDone && client.isRunning()) {
                     input.tickJoysticks();
                     input.updateCamera();

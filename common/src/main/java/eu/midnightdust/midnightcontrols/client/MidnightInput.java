@@ -505,7 +505,7 @@ public class MidnightInput {
         }
 
         axisValue = (float) Math.min(axisValue / MidnightControlsConfig.getAxisMaxValue(storage.axis), 1);
-        if (AxisStorage.isLeftAxis(storage.axis) && MidnightControlsCompat.handleMovement(storage, axisValue)) return;
+        if (AxisStorage.isLeftAxis(storage.axis)) MidnightControlsCompat.handleMovement(storage, axisValue);
         InputManager.BUTTON_VALUES.put(ButtonBinding.axisAsButton(storage.axis, true), storage.polarity == AxisStorage.Polarity.PLUS ? axisValue : 0.f);
         InputManager.BUTTON_VALUES.put(ButtonBinding.axisAsButton(storage.axis, false), storage.polarity == AxisStorage.Polarity.MINUS ? axisValue : 0.f);
     }
@@ -532,25 +532,22 @@ public class MidnightInput {
                 if (storage.axis == preferredAxis) {
                     var accessor = (CreativeInventoryScreenAccessor) creativeInventoryScreen;
                     if (accessor.midnightcontrols$hasScrollbar() && storage.absValue >= storage.deadZone) {
-                        creativeInventoryScreen.mouseScrolled(0.0, 0.0, 0, -storage.value);
+                        creativeInventoryScreen.mouseScrolled(0.0, 0.0, 0, -(storage.value * 0.0175f));
                     }
-                    return true;
-                }
-            } else if (screen instanceof MerchantScreen || screen instanceof StonecutterScreen) {
-                if (storage.axis == preferredAxis) {
-                    screen.mouseScrolled(0.0, 0.0, 0, -(storage.value * 1.5f));
                     return true;
                 }
             } else if (screen instanceof AdvancementsScreen advancementsScreen) {
                 if (storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X || storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
                     var accessor = (AdvancementsScreenAccessor) advancementsScreen;
                     AdvancementTab tab = accessor.getSelectedTab();
-                    tab.move(storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X ? -storage.value * 5.0 : 0.0, storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y ? -storage.value * 5.0 : 0.0);
+                    tab.move(storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X ? -storage.value * 1.0 : 0.0, storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y ? -storage.value * 5.0 : 0.0);
                     return true;
                 }
             } else if (screen != null) {
                 if (storage.axis == preferredAxis && !handleListWidgetScrolling(screen.children(), storage.value)) {
-                    screen.mouseScrolled(0.0, 0.0, 0, -(storage.value * 1.5f));
+                    try {
+                        screen.mouseScrolled(0.0, 0.0, 0, -(storage.value * 0.0175f));
+                    } catch (NullPointerException ignored) {}
                 } else if (isScreenInteractive(screen)) {
                     if (joystickCooldown == 0) {
                         switch (storage.axis) {

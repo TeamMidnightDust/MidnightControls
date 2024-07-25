@@ -191,11 +191,10 @@ public class MidnightControlsCompat {
     /**
      * Handles movement for players as well as vehicles
      *
-     * @param storage the storage containing info about the current axis
+     * @param storage       the storage containing info about the current axis
      * @param adjustedValue the value of the axis, adjusted for max values and non-analogue movement, recommended for player movement
-     * @return true if the handle was fired and succeed, else false
      */
-    public static boolean handleMovement(AxisStorage storage, float adjustedValue) {
-        return streamCompatHandlers().anyMatch(handler -> handler.handleMovement(client, storage, adjustedValue));
+    public static void handleMovement(AxisStorage storage, float adjustedValue) {
+        streamCompatHandlers().forEach(handler -> handler.handleMovement(client, storage, adjustedValue));
     }
 }
