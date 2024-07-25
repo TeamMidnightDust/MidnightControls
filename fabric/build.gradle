@@ -25,6 +25,7 @@ dependencies {
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
     modImplementation include ("maven.modrinth:midnightlib:${rootProject.midnightlib_version}-fabric")
     modImplementation include ("maven.modrinth:obsidianui:${rootProject.obsidianui_version}-fabric") {}
+    include 'org.aperlambda:lambdajcommon:1.8.1'
     modImplementation "maven.modrinth:emi:${project.emi_version}"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
