@@ -62,6 +62,6 @@
   "breaks": {
     "lambdacontrols": "*",
     "modmenu": "<1.12.2",
-    "sodium": "<0.6.0"
+    "sodium": "<=0.5.11"
   }
 }
