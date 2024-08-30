@@ -112,11 +112,10 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry @Hidden public static Map<String, String> BINDING = new HashMap<>();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
-    @Deprecated @Hidden @Entry public static double[] maxAnalogValues = new double[]{1, 1, 1, 1};
-    @Entry(category = CONTROLLER, name = "Max analog value: Left X", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueLeftX = maxAnalogValues[0];
-    @Entry(category = CONTROLLER, name = "Max analog value: Left Y", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueLeftY = maxAnalogValues[1];
-    @Entry(category = CONTROLLER, name = "Max analog value: Right X", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightX = maxAnalogValues[2];
-    @Entry(category = CONTROLLER, name = "Max analog value: Right Y", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightY = maxAnalogValues[3];
+    @Entry(category = CONTROLLER, name = "Max analog value: Left X", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueLeftX = 1;
+    @Entry(category = CONTROLLER, name = "Max analog value: Left Y", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueLeftY = 1;
+    @Entry(category = CONTROLLER, name = "Max analog value: Right X", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightX = 1;
+    @Entry(category = CONTROLLER, name = "Max analog value: Right Y", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightY = 1;
     @Entry(category = CONTROLLER, name = "Trigger button fix") public static boolean triggerFix = true;
     @Entry(category = CONTROLLER, name = "Excluded Controllers (Name Regex)") public static List<String> excludedControllers = Lists.newArrayList(".*(Keyboard)$", ".*(Touchpad)$", ".*(Pen)$", ".*(Finger)$");
     @Entry(category = MISC, name = "Excluded Keybindings") public static List<String> excludedKeybindings = Lists.newArrayList("key.forward", "key.left", "key.back", "key.right", "key.jump", "key.sneak", "key.sprint", "key.inventory",

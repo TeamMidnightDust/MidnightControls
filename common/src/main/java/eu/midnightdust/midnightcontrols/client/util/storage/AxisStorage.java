@@ -58,10 +58,19 @@ public class AxisStorage {
         }
         this.polarity = currentPlusState ? AxisStorage.Polarity.PLUS : currentMinusState ? AxisStorage.Polarity.MINUS : AxisStorage.Polarity.ZERO;
     }
+    /**
+     * Returns the specified axis as a button.
+     *
+     * @param positive true if the axis part is positive, else false
+     * @return the axis as a button
+     */
+    public int getButtonId(boolean positive) {
+        return ButtonBinding.axisAsButton(axis, positive);
+    }
 
     public void setupButtonStates() {
-        var posButton = ButtonBinding.axisAsButton(axis, true);
-        var negButton = ButtonBinding.axisAsButton(axis, false);
+        var posButton = getButtonId(true);
+        var negButton = getButtonId(false);
         var previousPlusState = STATES.getOrDefault(posButton, ButtonState.NONE);
         var previousMinusState = STATES.getOrDefault(negButton, ButtonState.NONE);
 

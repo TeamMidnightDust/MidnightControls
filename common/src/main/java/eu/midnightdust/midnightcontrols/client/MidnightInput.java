@@ -144,12 +144,14 @@ public class MidnightInput {
             var state = controller.getState();
             this.fetchButtonInput(state, false);
             this.fetchTriggerInput(state, false);
+            this.fetchJoystickInput(state, false, false);
         }
         MidnightControlsConfig.getSecondController().filter(Controller::isConnected)
                 .ifPresent(joycon -> {
                     var state = joycon.getState();
                     this.fetchButtonInput(state, true);
                     this.fetchTriggerInput(state, true);
+                    this.fetchJoystickInput(state, true, false);
                 });
 
         boolean allowInput = this.controlsInput == null || this.controlsInput.focusedBinding == null;
@@ -177,18 +179,16 @@ public class MidnightInput {
             this.inventoryInteractionCooldown--;
     }
     /**
-     * This method is called 1000 times a second for smooth joystick input
+     * This method is called 1000 times a second for smooth camera input
      */
-    public void tickJoysticks() {
+    public void tickCameraStick() {
         var controller = MidnightControlsConfig.getController();
 
         if (controller.isConnected()) {
-            this.fetchJoystickInput(controller.getState(), false);
+            this.fetchJoystickInput(controller.getState(), false, true);
         }
         MidnightControlsConfig.getSecondController().filter(Controller::isConnected)
-                .ifPresent(joycon -> {
-                    this.fetchJoystickInput(joycon.getState(), true);
-                });
+                .ifPresent(joycon -> this.fetchJoystickInput(joycon.getState(), true, true));
     }
 
     /**
@@ -278,7 +278,7 @@ public class MidnightInput {
     }
     final MathUtil.PolarUtil polarUtil = new MathUtil.PolarUtil();
 
-    private void fetchJoystickInput(@NotNull GLFWGamepadState gamepadState, boolean leftJoycon) {
+    private void fetchJoystickInput(@NotNull GLFWGamepadState gamepadState, boolean leftJoycon, boolean cameraTick) {
         var buffer = gamepadState.axes();
 
         polarUtil.calculate(buffer.get(GLFW_GAMEPAD_AXIS_LEFT_X), buffer.get(GLFW_GAMEPAD_AXIS_LEFT_Y), 1, MidnightControlsConfig.leftDeadZone);
@@ -291,7 +291,7 @@ public class MidnightInput {
         boolean isRadialMenu = client.currentScreen instanceof RingScreen || (PlatformFunctions.isModLoaded("emotecraft") && EmotecraftCompat.isEmotecraftScreen(client.currentScreen));
 
         if (!isRadialMenu) {
-            for (int i = 0; i < GLFW_GAMEPAD_AXIS_LEFT_TRIGGER; i++) {
+            for (int i = cameraTick ? GLFW_GAMEPAD_AXIS_RIGHT_X : 0; i < (cameraTick ? GLFW_GAMEPAD_AXIS_LEFT_TRIGGER : GLFW_GAMEPAD_AXIS_RIGHT_X); i++) {
                 int axis = leftJoycon ? ButtonBinding.controller2Button(i) : i;
                 float value = buffer.get(i);
 
@@ -503,21 +503,22 @@ public class MidnightInput {
             axisValue /= (float) (1.0 - storage.deadZone);
             axisValue *= (float) storage.deadZone;
         }
-
         axisValue = (float) Math.min(axisValue / MidnightControlsConfig.getAxisMaxValue(storage.axis), 1);
         if (AxisStorage.isLeftAxis(storage.axis)) MidnightControlsCompat.handleMovement(storage, axisValue);
-        InputManager.BUTTON_VALUES.put(ButtonBinding.axisAsButton(storage.axis, true), storage.polarity == AxisStorage.Polarity.PLUS ? axisValue : 0.f);
-        InputManager.BUTTON_VALUES.put(ButtonBinding.axisAsButton(storage.axis, false), storage.polarity == AxisStorage.Polarity.MINUS ? axisValue : 0.f);
+        InputManager.BUTTON_VALUES.put(storage.getButtonId(true), storage.polarity == AxisStorage.Polarity.PLUS ? axisValue : 0.f);
+        InputManager.BUTTON_VALUES.put(storage.getButtonId(false), storage.polarity == AxisStorage.Polarity.MINUS ? axisValue : 0.f);
+        storage.absValue = axisValue;
     }
 
     private boolean handleScreenScrolling(Screen screen, AxisStorage storage) {
+        if (screen == null) return false;
         // @TODO allow rebinding to left stick
         int preferredAxis = true ? GLFW_GAMEPAD_AXIS_RIGHT_Y : GLFW_GAMEPAD_AXIS_LEFT_Y;
 
         if (this.controlsInput != null && this.controlsInput.focusedBinding != null) {
-            if (storage.buttonState != ButtonState.NONE && !this.controlsInput.currentButtons.contains(ButtonBinding.axisAsButton(storage.axis, storage.buttonState == ButtonState.PRESS))) {
+            if (storage.buttonState != ButtonState.NONE && !this.controlsInput.currentButtons.contains(storage.getButtonId(storage.buttonState == ButtonState.PRESS))) {
 
-                this.controlsInput.currentButtons.add(ButtonBinding.axisAsButton(storage.axis, storage.buttonState == ButtonState.PRESS));
+                this.controlsInput.currentButtons.add(storage.getButtonId(storage.buttonState == ButtonState.PRESS));
 
                 int[] buttons = new int[this.controlsInput.currentButtons.size()];
                 for (int i = 0; i < this.controlsInput.currentButtons.size(); i++)

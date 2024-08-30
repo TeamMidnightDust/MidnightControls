@@ -88,7 +88,7 @@ public class MidnightControlsClient extends MidnightControls {
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() { // TODO: Add a try/catch here after the alpha testing period
                 if (lateInitDone && client.isRunning()) {
-                    input.tickJoysticks();
+                    input.tickCameraStick();
                     input.updateCamera();
                 }
             }
@@ -145,11 +145,11 @@ public class MidnightControlsClient extends MidnightControls {
                 if (!keyBinding.getTranslationKey().contains(MidnightControlsConstants.NAMESPACE)) {
                     AtomicReference<ButtonCategory> category = new AtomicReference<>();
                     InputManager.streamCategories().forEach(buttonCategory -> {
-                        if (buttonCategory.getIdentifier().equals(Identifier.ofVanilla(keyBinding.getCategory())))
+                        if (buttonCategory.getIdentifier().equals(validVanillaId(keyBinding.getCategory())))
                             category.set(buttonCategory);
                     });
                     if (category.get() == null) {
-                        category.set(new ButtonCategory(Identifier.ofVanilla(keyBinding.getCategory())));
+                        category.set(new ButtonCategory(validVanillaId(keyBinding.getCategory())));
                         InputManager.registerCategory(category.get());
                     }
                     ButtonBinding buttonBinding = new ButtonBinding.Builder(keyBinding.getTranslationKey()).category(category.get()).linkKeybind(keyBinding).register();
@@ -162,6 +162,14 @@ public class MidnightControlsClient extends MidnightControls {
         }
         InputManager.loadButtonBindings();
         lateInitDone = true;
+    }
+    private static Identifier validVanillaId(String path) {
+        for(int i = 0; i < path.length(); ++i) {
+            if (!Identifier.isPathCharacterValid(path.charAt(i))) {
+                path = path.replace(path.charAt(i), '_');
+            }
+        }
+        return Identifier.ofVanilla(path);
     }
 
     /**

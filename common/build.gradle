@@ -37,7 +37,7 @@ dependencies {
     // Compatibility mods
     modCompileOnlyApi "io.github.cottonmc:LibGui:${project.libgui_version}"
     modCompileOnlyApi "org.quiltmc:quilt-json5:1.0.0"
-    modCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
+    modImplementation "maven.modrinth:sodium:${project.sodium_version}-fabric"
     modCompileOnlyApi "maven.modrinth:emi:${project.emi_version}"
     modCompileOnlyApi "maven.modrinth:emotecraft:${project.emotecraft_version}"
     modCompileOnlyApi "io.github.kosmx:bendy-lib:${project.bendylib_version}"
