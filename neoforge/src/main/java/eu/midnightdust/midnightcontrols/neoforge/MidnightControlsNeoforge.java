@@ -27,7 +27,7 @@ public class MidnightControlsNeoforge {
     public class CommonEvents {
         @SubscribeEvent
         public static void registerPayloads(RegisterPayloadHandlersEvent event) {
-            PayloadRegistrar registrar = event.registrar("1");
+            PayloadRegistrar registrar = event.registrar("1").optional();
             registrar.playToServer(HelloPayload.PACKET_ID, HelloPayload.codec, (payload, context) -> {
                 ControlsMode.byId(payload.controlsMode()).ifPresent(controlsMode -> new PlayerChangeControlsModeEvent(context.player(), controlsMode));
                 context.connection().send(new CustomPayloadS2CPacket(new FeaturePayload(MidnightControlsFeature.HORIZONTAL_REACHAROUND)));

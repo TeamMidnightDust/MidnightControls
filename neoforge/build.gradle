@@ -104,7 +104,7 @@ unifiedPublishing {
             curseforge {
                 token = CURSEFORGE_TOKEN
                 id = rootProject.curseforge_id
-                gameVersions.addAll "Java 21", project.minecraft_version
+                gameVersions.addAll "Java 21", project.minecraft_version, project.supported_versions
             }
         }
 
@@ -114,7 +114,7 @@ unifiedPublishing {
                 token = MODRINTH_TOKEN
                 id = rootProject.modrinth_id
                 version = "$project.version-$project.name"
-                gameVersions.addAll project.minecraft_version
+                gameVersions.addAll project.minecraft_version, project.supported_versions
             }
         }
     }
