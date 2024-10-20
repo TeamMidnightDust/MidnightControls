@@ -40,22 +40,22 @@ public abstract class GameOptionsScreenMixin extends Screen {
         super(title);
     }
 
-    @Inject(method = "initTabNavigation", at = @At("TAIL"))
-    public void addMidnightButton(CallbackInfo ci) {
+    @Inject(method = "init", at = @At("TAIL"))
+    public void midnightcontrols$addMCButton(CallbackInfo ci) {
         if (this.getClass().toString().equals(ControlsOptionsScreen.class.toString())) {
-            this.midnightcontrols$setupButton();
+            this.midnightcontrols$setButtonPos();
             this.addDrawableChild(midnightcontrols$button);
         }
     }
 
-    @Override
-    public void resize(MinecraftClient client, int width, int height) {
-        super.resize(client, width, height);
-        this.midnightcontrols$setupButton();
+    @Inject(method = "initTabNavigation", at = @At("TAIL"))
+    public void midnightcontrols$onResize(CallbackInfo ci) {
+        this.midnightcontrols$setButtonPos();
     }
     @Unique
-    public void midnightcontrols$setupButton() {
-        assert body != null;
-        midnightcontrols$button.setPosition(body.getWidth() / 2 + 158, body.getY() + 4);
+    public void midnightcontrols$setButtonPos() {
+        if (body != null) {
+            midnightcontrols$button.setPosition(body.getWidth() / 2 + 158, body.getY() + 4);
+        }
     }
 }

@@ -74,7 +74,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(category = VISUAL, name = "Reacharound Outline Alpha", isSlider = true, min = 0, max = 255) public static int reacharoundOutlineColorAlpha = 102;
     @Entry(category = CONTROLLER, name = "midnightcontrols.menu.right_dead_zone", isSlider = true, min = 0.05, max = 1) public static double rightDeadZone = 0.25;
     @Entry(category = CONTROLLER, name = "midnightcontrols.menu.left_dead_zone", isSlider = true, min = 0.05, max = 1) public static double leftDeadZone = 0.25;
-    @Entry(category = CONTROLLER, name = "midnightcontrols.menu.trigger_dead_zone", isSlider = true, min = 0.05, max = 1) public static double triggerDeadZone = 0.1;
+    @Entry(category = CONTROLLER, name = "Trigger Dead-Zone", isSlider = true, min = 0.05, max = 1) public static double triggerDeadZone = 0.1;
     @Entry(category = CONTROLLER, name = "midnightcontrols.menu.invert_right_y_axis") public static boolean invertRightYAxis = false;
     @Entry(category = CONTROLLER, name = "midnightcontrols.menu.invert_right_x_axis") public static boolean invertRightXAxis = false;
     @Entry(category = CONTROLLER, name = "midnightcontrols.menu.rotation_speed", isSlider = true, min = 0, max = 100, precision = 10) public static double rotationSpeed = 35.0; //used for x-axis, name kept for compatibility
