@@ -34,7 +34,8 @@ import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.cli
  * @since 1.1.0
  */
 public class MidnightControlsCompat {
-    private static final List<CompatHandler> HANDLERS = new ArrayList<>();
+    @Deprecated // INTERNAL -> PLEASE USE streamCompatHandlers() INSTEAD
+    public static final List<CompatHandler> HANDLERS = new ArrayList<>();
 
     /**
      * Initializes compatibility with other mods if needed.
