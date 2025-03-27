@@ -1,11 +1,11 @@
 package eu.midnightdust.midnightcontrols.client.touch.gui;
 
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.consume.UseAction;
 import org.thinkingstudio.obsidianui.Position;
 import org.thinkingstudio.obsidianui.widget.SpruceButtonWidget;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import net.minecraft.item.ArmorItem;
 import net.minecraft.text.Text;
 
 public class ItemUseButtonWidget extends SpruceButtonWidget {
@@ -30,7 +30,7 @@ public class ItemUseButtonWidget extends SpruceButtonWidget {
                 this.setMessage(Text.translatable(MidnightControlsConstants.NAMESPACE+".action.eat"));
             } else if (action == UseAction.DRINK) {
                 this.setMessage(Text.translatable(MidnightControlsConstants.NAMESPACE+".action.drink"));
-            } else if (client.player.getMainHandStack().getItem() instanceof ArmorItem) {
+            } else if (client.player.getMainHandStack().getComponents().contains(DataComponentTypes.EQUIPPABLE)) {
                 this.setMessage(Text.translatable(MidnightControlsConstants.NAMESPACE+".action.equip"));
             } else if (!action.equals(UseAction.NONE)) {
                 this.setMessage(Text.translatable(MidnightControlsConstants.NAMESPACE+".action.use"));

@@ -62,9 +62,9 @@ public class InputHandlers {
                 if (!client.player.isSpectator()) {
                     var inv = client.player.getInventory();
                     if (next)
-                        inv.setSelectedSlot(inv.selectedSlot < 8 ? inv.selectedSlot + 1 : inv.selectedSlot - 8);
+                        inv.setSelectedSlot(inv.getSelectedSlot() < 8 ? inv.getSelectedSlot() + 1 : inv.getSelectedSlot() - 8);
                     else
-                        inv.setSelectedSlot(inv.selectedSlot > 0 ? inv.selectedSlot - 1 : inv.selectedSlot + 8);
+                        inv.setSelectedSlot(inv.getSelectedSlot() > 0 ? inv.getSelectedSlot() - 1 : inv.getSelectedSlot() + 8);
                 }
                 else {
                     if (client.inGameHud.getSpectatorHud().isOpen()) {

@@ -14,7 +14,7 @@ import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ArmorItem;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.consume.UseAction;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
@@ -340,7 +340,7 @@ public class TouchscreenOverlay extends Screen {
             this.forwardLeftButton.setVisible(false);
             this.forwardRightButton.setVisible(false);
         }
-        this.useButton.setVisible(client.player.getMainHandStack() != null && (client.player.getMainHandStack().getUseAction() != UseAction.NONE || client.player.getMainHandStack().getItem() instanceof ArmorItem) && !TouchUtils.hasInWorldUseAction(client.player.getMainHandStack()));
+        this.useButton.setVisible(client.player.getMainHandStack() != null && (client.player.getMainHandStack().getUseAction() != UseAction.NONE || client.player.getMainHandStack().getComponents().contains(DataComponentTypes.EQUIPPABLE)) && !TouchUtils.hasInWorldUseAction(client.player.getMainHandStack()));
         this.updateJumpButtons();
     }
 

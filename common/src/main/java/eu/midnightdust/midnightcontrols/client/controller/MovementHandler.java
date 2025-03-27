@@ -11,12 +11,14 @@ package eu.midnightdust.midnightcontrols.client.controller;
 
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
+import eu.midnightdust.midnightcontrols.client.mixin.InputAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MathUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.util.PlayerInput;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec2f;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -53,8 +55,8 @@ public final class MovementHandler implements PressAction {
                 player.input.playerInput.jump(), player.input.playerInput.sneak(), player.input.playerInput.sprint());
 
         polarUtil.calculate(this.movementSideways, this.movementForward, this.slowdownFactor);
-        player.input.movementForward = polarUtil.polarY;
-        player.input.movementSideways = polarUtil.polarX;
+        Vec2f inputVector = new Vec2f(polarUtil.polarX, polarUtil.polarY);
+        ((InputAccessor)player.input).setMovementVector(inputVector);
 
         this.shouldOverrideMovement = false;
     }

@@ -81,7 +81,7 @@ public abstract class MinecraftClientMixin {
             var side = hitResult.getSide();
 
             boolean sidewaysBlockPlacing = this.midnightcontrols$lastTargetPos == null || !targetPos.equals(this.midnightcontrols$lastTargetPos.offset(this.midnightcontrols$lastTargetSide));
-            boolean backwardsBlockPlacing = this.player.input.movementForward < 0.0f && (this.midnightcontrols$lastTargetPos == null || targetPos.equals(this.midnightcontrols$lastTargetPos.offset(this.midnightcontrols$lastTargetSide)));
+            boolean backwardsBlockPlacing = this.player.input.getMovementInput().y < 0.0f && (this.midnightcontrols$lastTargetPos == null || targetPos.equals(this.midnightcontrols$lastTargetPos.offset(this.midnightcontrols$lastTargetSide)));
 
             if (cooldown > 1
                     && !targetPos.equals(this.midnightcontrols$lastTargetPos)
@@ -129,7 +129,7 @@ public abstract class MinecraftClientMixin {
                     if (result.isAccepted()) {
                         //if (result.shouldSwingHand()) {
                             this.player.swingHand(hand);
-                            if (!stackInHand.isEmpty() && (stackInHand.getCount() != previousStackCount || this.interactionManager.hasCreativeInventory())) {
+                            if (!stackInHand.isEmpty() && (stackInHand.getCount() != previousStackCount || this.player.isInCreativeMode())) {
                                 this.gameRenderer.firstPersonRenderer.resetEquipProgress(hand);
                             }
                         //}

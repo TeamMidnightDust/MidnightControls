@@ -12,6 +12,7 @@
     "GameOptionsScreenMixin",
     "GameRendererMixin",
     "HandledScreenMixin",
+    "InputAccessor",
     "InputUtilMixin",
     "KeyBindingIDAccessor",
     "KeyBindingMixin",
