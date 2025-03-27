@@ -11,7 +11,7 @@ package eu.midnightdust.midnightcontrols.client;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mojang.blaze3d.platform.GlDebugInfo;
+import com.mojang.blaze3d.platform.GLX;
 import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControls;
@@ -400,7 +400,7 @@ public class MidnightControlsConfig extends MidnightConfig {
         String controller = getController().getName().toLowerCase();
         if (controller.contains("xbox 360")) return ControllerType.XBOX_360;
         else if (controller.contains("xbox") || controller.contains("afterglow")) return ControllerType.XBOX;
-        else if (controller.contains("steam") && GlDebugInfo.getCpuInfo().contains("AMD Custom APU")) return ControllerType.STEAM_DECK;
+        else if (controller.contains("steam") && GLX._getCpuInfo().contains("AMD Custom APU")) return ControllerType.STEAM_DECK;
         else if (controller.contains("steam")) return ControllerType.STEAM_CONTROLLER;
         else if (controller.contains("dualsense") || controller.contains("ps5")) return ControllerType.DUALSENSE;
         else if (controller.contains("dualshock") || controller.contains("ps4")  || controller.contains("sony")) return ControllerType.DUALSHOCK;

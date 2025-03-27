@@ -30,9 +30,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
-    @Shadow @Final MinecraftClient client;
+    @Shadow @Final private MinecraftClient client;
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Mouse;getX()D", shift = At.Shift.BEFORE))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Mouse;getScaledX(Lnet/minecraft/client/util/Window;)D", shift = At.Shift.BEFORE))
     private void midnightcontrols$onRender(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci) {
         if (this.client.currentScreen != null && MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER)
             MidnightControlsClient.input.onPreRenderScreen(this.client.currentScreen);

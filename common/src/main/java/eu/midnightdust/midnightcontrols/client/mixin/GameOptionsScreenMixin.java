@@ -33,17 +33,24 @@ import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 @Mixin(GameOptionsScreen.class)
 public abstract class GameOptionsScreenMixin extends Screen {
     @Shadow @Nullable protected OptionListWidget body;
-    @Unique TextIconButtonWidget midnightcontrols$button = TextIconButtonWidget.builder(Text.translatable("midnightcontrols.menu.title.controller"), (button -> this.client.setScreen(new MidnightControlsSettingsScreen(this, false))), true)
+    @Unique TextIconButtonWidget midnightcontrols$button = TextIconButtonWidget.builder(Text.translatable("midnightcontrols.menu.title.controller"),
+                    (button -> this.client.setScreen(new MidnightControlsSettingsScreen(this, false))), true)
             .dimension(20,20).texture(id("icon/controller"), 20, 20).build();
 
     protected GameOptionsScreenMixin(Text title) {
         super(title);
     }
 
-    @Inject(method = "init", at = @At("TAIL"))
+    @Inject(method = "initBody", at = @At("TAIL"))
     public void midnightcontrols$addMCButton(CallbackInfo ci) {
         if (this.getClass().toString().equals(ControlsOptionsScreen.class.toString())) {
             this.midnightcontrols$setButtonPos();
+            this.addSelectableChild(midnightcontrols$button);
+        }
+    }
+    @Inject(method = "init", at = @At("TAIL"))
+    public void midnightcontrols$drawMCButton(CallbackInfo ci) {
+        if (this.getClass().toString().equals(ControlsOptionsScreen.class.toString())) {
             this.addDrawableChild(midnightcontrols$button);
         }
     }

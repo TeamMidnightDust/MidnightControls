@@ -77,7 +77,7 @@ public abstract class MouseMixin implements MouseAccessor {
                 for (int slot = 0; slot < 9; ++slot) {
                     int slotX = centerX - 90 + slot * 20 + 2;
                     if (mouseX >= (double) slotX && mouseX <= (double) (slotX + 20)) {
-                        client.player.getInventory().selectedSlot = slot;
+                        client.player.getInventory().setSelectedSlot(slot);
                         ci.cancel();
                         return;
                     }

@@ -86,12 +86,16 @@ public class MidnightControlsClient extends MidnightControls {
         int period = 1; // repeat every 0.001 sec. (1000 times a second)
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
-            public void run() { // TODO: Add a try/catch here after the alpha testing period
-                if (lateInitDone && client.isRunning()) {
-                    if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && (client.isWindowFocused() || MidnightControlsConfig.unfocusedInput)) {
-                        input.tickCameraStick();
-                        input.updateCamera();
+            public void run() {
+                try {
+                    if (lateInitDone && client.isRunning()) {
+                        if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && (client.isWindowFocused() || MidnightControlsConfig.unfocusedInput)) {
+                            input.tickCameraStick();
+                            input.updateCamera();
+                        }
                     }
+                } catch (Exception | Error e) {
+                    MidnightControls.logger.error("Exception encountered in camera loop: ",e);
                 }
             }
         }, delay, period);

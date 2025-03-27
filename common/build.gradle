@@ -39,7 +39,7 @@ dependencies {
     modCompileOnlyApi "org.quiltmc:quilt-json5:1.0.0"
     modImplementation "maven.modrinth:sodium:${project.sodium_version}-fabric"
     modCompileOnlyApi "maven.modrinth:emi:${project.emi_version}"
-    modCompileOnlyApi "maven.modrinth:emotecraft:${project.emotecraft_version}"
+    modImplementation "maven.modrinth:emotecraft:${project.emotecraft_version}"
     modCompileOnlyApi "io.github.kosmx:bendy-lib:${project.bendylib_version}"
     modCompileOnlyApi "dev.isxander:yet-another-config-lib:${project.yacl_version}"
     modCompileOnlyApi "maven.modrinth:inventory-tabs-updated:${project.inventorytabs_version}"
