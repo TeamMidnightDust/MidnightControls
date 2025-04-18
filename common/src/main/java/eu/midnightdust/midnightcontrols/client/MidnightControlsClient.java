@@ -204,6 +204,7 @@ public class MidnightControlsClient extends MidnightControls {
         RainbowColor.tick();
         TouchInput.tick();
     }
+
     /**
      * Called when opening a screen.
      */
