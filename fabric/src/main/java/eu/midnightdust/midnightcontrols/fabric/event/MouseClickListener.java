@@ -95,6 +95,7 @@ public class MouseClickListener implements ScreenMouseEvents.AllowMouseClick {
             virtualKeyboardScreen = new VirtualKeyboardScreen(accessor.midnightcontrols$getCurrentPageContent(), (text) -> {
                 client.setScreen(bookEditScreen);
                 accessor.midnightcontrols$setPageContent(text);
+                accessor.midnightcontrols$getCurrentPageSelectionManager().putCursorAtEnd();
             });
         }
 
