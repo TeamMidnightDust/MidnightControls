@@ -1,10 +1,9 @@
 package eu.midnightdust.midnightcontrols.fabric.event;
-import eu.midnightdust.midnightcontrols.client.gui.VirtualKeyboardScreen;
+import eu.midnightdust.midnightcontrols.client.gui.virtualkeyboard.VirtualKeyboardScreen;
 import eu.midnightdust.midnightcontrols.client.mixin.AbstractSignEditScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.BookEditScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
-import net.minecraft.block.entity.SignText;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -18,7 +17,6 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static eu.midnightdust.midnightcontrols.MidnightControls.logger;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
@@ -89,14 +87,14 @@ public class MouseClickListener implements ScreenMouseEvents.AllowMouseClick {
             virtualKeyboardScreen = new VirtualKeyboardScreen(accessor.midnightcontrols$getTitle(), (text) -> {
                 client.setScreen(bookEditScreen);
                 accessor.midnightcontrols$setTitle(text);
-            });
+            }, true);
         }
         else {
             virtualKeyboardScreen = new VirtualKeyboardScreen(accessor.midnightcontrols$getCurrentPageContent(), (text) -> {
                 client.setScreen(bookEditScreen);
                 accessor.midnightcontrols$setPageContent(text);
                 accessor.midnightcontrols$getCurrentPageSelectionManager().putCursorAtEnd();
-            });
+            }, true);
         }
 
         client.setScreen(virtualKeyboardScreen);
@@ -109,7 +107,7 @@ public class MouseClickListener implements ScreenMouseEvents.AllowMouseClick {
 
     private void handleTextFieldClick(TextFieldWidget textField) {
         this.link = new ScreenLink(screen, calculatePathToElement(screen, textField));
-        var virtualKeyboardScreen = new VirtualKeyboardScreen(textField.getText(), this::handleKeyboardClose);
+        var virtualKeyboardScreen = new VirtualKeyboardScreen(textField.getText(), this::handleKeyboardClose, false);
         client.setScreen(virtualKeyboardScreen);
     }
 
@@ -125,7 +123,6 @@ public class MouseClickListener implements ScreenMouseEvents.AllowMouseClick {
         }
 
         txtField.setText(newText);
-
 
         switch (this.link.screen()) {
             case CreativeInventoryScreen creativeInventoryScreen -> {
