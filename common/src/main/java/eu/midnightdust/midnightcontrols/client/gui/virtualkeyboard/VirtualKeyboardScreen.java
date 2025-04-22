@@ -74,7 +74,6 @@ public class VirtualKeyboardScreen extends SpruceScreen {
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
-        drawContext.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 15, 0xFFFFFF);
         super.render(drawContext, mouseX, mouseY, delta);
     }
 
@@ -96,10 +95,10 @@ public class VirtualKeyboardScreen extends SpruceScreen {
             this.remove(this.keyboardContainer);
         }
 
-        var keys = getActiveKeyLayout();
-        var keyboardContainer = createKeyboardContainer(keys);
+        var layoutKeys = getActiveKeyLayout();
+        var keyboardContainer = createKeyboardContainer(layoutKeys);
 
-        addLetterRows(keyboardContainer, keys);
+        addLayoutRows(keyboardContainer, layoutKeys);
         addFunctionKeys(keyboardContainer);
         addBottomRow(keyboardContainer);
 
@@ -107,7 +106,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
         this.addDrawableChild(this.keyboardContainer);
     }
 
-    private SpruceContainerWidget createKeyboardContainer(List<List<KeyInfo>> layoutKeys) {
+    private SpruceContainerWidget createKeyboardContainer(List<List<String>> layoutKeys) {
         int containerWidth = this.width;
         int totalKeyboardHeight = calculateKeyboardHeight(layoutKeys);
         int keyboardY = this.bufferDisplayArea.getY() + this.bufferDisplayArea.getHeight() + VERTICAL_SPACING * 2;
@@ -141,44 +140,42 @@ public class VirtualKeyboardScreen extends SpruceScreen {
         return bufferDisplay;
     }
 
-    private int calculateKeyboardHeight(List<List<KeyInfo>> keyRows) {
+    private int calculateKeyboardHeight(List<List<String>> keyRows) {
         return keyRows.size() * (KEY_HEIGHT + VERTICAL_SPACING) +
                 (KEY_HEIGHT + VERTICAL_SPACING) + // space for bottom row
                 CONTAINER_PADDING * 2; // top and bottom padding
     }
 
-    private void addLetterRows(SpruceContainerWidget container, List<List<KeyInfo>> keyRows) {
+    private void addLayoutRows(SpruceContainerWidget container, List<List<String>> keyLayoutRows) {
         int currentY = CONTAINER_PADDING;
 
-        for (List<KeyInfo> row : keyRows) {
+        for (List<String> row : keyLayoutRows) {
             int rowWidth = calculateRowWidth(row);
             // center row
             int currentX = (container.getWidth() - rowWidth) / 2;
 
-            for (KeyInfo keyInfo : row) {
-                int keyWidth = (int) (STANDARD_KEY_WIDTH * keyInfo.widthFactor());
-                String displayText = getKeyDisplayText(keyInfo);
+            for (String key : row) {
+                String displayText = (this.capsMode && !this.symbolMode) ? key.toUpperCase() : key;
                 container.addChild(
                         new SpruceButtonWidget(
                                 Position.of(currentX, currentY),
-                                keyWidth,
+                                STANDARD_KEY_WIDTH,
                                 KEY_HEIGHT,
                                 Text.literal(displayText),
                                 btn -> handleKeyPress(displayText)
                         )
                 );
 
-                currentX += keyWidth + HORIZONTAL_SPACING;
+                currentX += STANDARD_KEY_WIDTH + HORIZONTAL_SPACING;
             }
 
             currentY += KEY_HEIGHT + VERTICAL_SPACING;
         }
     }
 
-    private int calculateRowWidth(List<KeyInfo> row) {
+    private int calculateRowWidth(List<String> row) {
         int rowWidth = 0;
         for (int i = 0; i < row.size(); i++) {
-            rowWidth += (int) (STANDARD_KEY_WIDTH * row.get(i).widthFactor());
             if (i < row.size() - 1) {
                 rowWidth += HORIZONTAL_SPACING;
             }
@@ -187,7 +184,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
     }
 
     private void addFunctionKeys(SpruceContainerWidget container) {
-        List<KeyInfo> firstRow = getActiveKeyLayout().get(0);
+        List<String> firstRow = getActiveKeyLayout().get(0);
         int firstRowWidth = calculateRowWidth(firstRow);
 
         // position backspace at the right of the first row
@@ -207,7 +204,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
 
         if (this.newLineSupport) {
             // position newline at the right of the second row
-            List<KeyInfo> secondRow = getActiveKeyLayout().get(1);
+            List<String> secondRow = getActiveKeyLayout().get(1);
             int newlineWidth = (int) (STANDARD_KEY_WIDTH * 1.5);
             int secondRowWidth = calculateRowWidth(secondRow);
             int newlineX = (container.getWidth() + secondRowWidth) / 2 + HORIZONTAL_SPACING;
@@ -284,15 +281,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
         }
     }
 
-    private String getKeyDisplayText(KeyInfo keyInfo) {
-        if(this.capsMode && !this.symbolMode) {
-            return keyInfo.displayText().toUpperCase();
-        }
-
-        return keyInfo.displayText();
-    }
-
-    private List<List<KeyInfo>> getActiveKeyLayout() {
+    private List<List<String>> getActiveKeyLayout() {
         return this.symbolMode ? this.layout.getSymbols() : this.layout.getLetters();
     }
 
