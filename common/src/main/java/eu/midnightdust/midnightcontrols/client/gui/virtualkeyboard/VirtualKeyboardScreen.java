@@ -176,6 +176,8 @@ public class VirtualKeyboardScreen extends SpruceScreen {
     private int calculateRowWidth(List<String> row) {
         int rowWidth = 0;
         for (int i = 0; i < row.size(); i++) {
+            rowWidth += STANDARD_KEY_WIDTH;
+            // padding
             if (i < row.size() - 1) {
                 rowWidth += HORIZONTAL_SPACING;
             }
