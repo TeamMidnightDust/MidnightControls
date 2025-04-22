@@ -19,7 +19,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
     }
 
     private static final int STANDARD_KEY_WIDTH = 20;
-    public static final int SPECIAL_KEY_WIDTH = (int) (STANDARD_KEY_WIDTH * 1.5);
+    private static final int SPECIAL_KEY_WIDTH = (int) (STANDARD_KEY_WIDTH * 1.5);
     private static final int KEY_HEIGHT = 20;
     private static final int HORIZONTAL_SPACING = 2;
     private static final int VERTICAL_SPACING = 4;
