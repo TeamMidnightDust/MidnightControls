@@ -220,6 +220,8 @@
   "midnightcontrols.menu.virtual_mouse": "Virtual Mouse",
   "midnightcontrols.menu.virtual_mouse.tooltip": "Enables the virtual mouse, which is useful during splitscreen.",
   "midnightcontrols.menu.virtual_mouse.skin": "Virtual Mouse Skin",
+  "midnightcontrols.menu.virtual_keyboard": "Virtual Keyboard",
+  "midnightcontrols.menu.virtual_keyboard_tooltip": "Enables a virtual on-screen keyboard",
   "midnightcontrols.menu.hide_cursor": "Hide Normal Mouse Cursor",
   "midnightcontrols.menu.hide_cursor.tooltip": "Hides the normal mouse cursor, leaving only the virtual mouse visible.",
   "midnightcontrols.narrator.unbound": "Unbound %s",

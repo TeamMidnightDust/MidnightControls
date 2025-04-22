@@ -96,7 +96,7 @@ public class MidnightControlsClientNeoforge {
         }
         @SubscribeEvent
         public static void onMouseButtonPressed(ScreenEvent.MouseButtonPressed.Pre event) {
-            if (!event.isCanceled()) {
+            if (MidnightControlsConfig.virtualKeyboard && !event.isCanceled()) {
                 Screen screen = event.getScreen();
                 double mouseX = event.getMouseX();
                 double mouseY = event.getMouseY();

@@ -1,4 +1,5 @@
 package eu.midnightdust.midnightcontrols.fabric.event;
+import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.client.gui.screen.Screen;
 
@@ -13,7 +14,9 @@ public class MouseClickListener implements ScreenMouseEvents.AllowMouseClick {
 
     @Override
     public boolean allowMouseClick(Screen screen, double mouseX, double mouseY, int button) {
-        clickInterceptor.intercept(screen, mouseX, mouseY);
+        if(MidnightControlsConfig.virtualKeyboard) {
+            clickInterceptor.intercept(screen, mouseX, mouseY);
+        }
         return true;
     }
 
