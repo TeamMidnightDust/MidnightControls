@@ -1,10 +1,9 @@
 package eu.midnightdust.midnightcontrols.client.virtualkeyboard;
 
-import com.google.common.collect.ImmutableMap;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler.AbstractScreenClickHandler;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler.BookEditScreenClickHandler;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler.DefaultScreenClickHandler;
-import eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler.SignEditScreenHandler;
+import eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler.SignEditScreenClickHandler;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.BookEditScreen;
 import net.minecraft.client.gui.screen.ingame.SignEditScreen;
@@ -20,7 +19,7 @@ public class MouseClickInterceptor {
     public MouseClickInterceptor() {
         this.clickHandlers = new HashMap<>();
         this.clickHandlers.put(BookEditScreen.class, new BookEditScreenClickHandler());
-        this.clickHandlers.put(SignEditScreen.class, new SignEditScreenHandler());
+        this.clickHandlers.put(SignEditScreen.class, new SignEditScreenClickHandler());
         this.clickHandlers.put(Screen.class, new DefaultScreenClickHandler());
     }
 
