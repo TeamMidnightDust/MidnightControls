@@ -301,7 +301,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         this.virtualMouseOption = new SpruceToggleBooleanOption("midnightcontrols.menu.virtual_mouse", () -> MidnightControlsConfig.virtualMouse,
                 value -> MidnightControlsConfig.virtualMouse = value, Text.translatable("midnightcontrols.menu.virtual_mouse.tooltip"));
         this.virtualKeyboardOption = new SpruceToggleBooleanOption("midnightcontrols.menu.virtual_keyboard", () -> MidnightControlsConfig.virtualMouse,
-                value -> MidnightControlsConfig.virtualMouse = value, Text.translatable("midnightcontrols.menu.virtual_keyboard.tooltip"));
+                value -> MidnightControlsConfig.virtualKeyboard = value, Text.translatable("midnightcontrols.menu.virtual_keyboard.tooltip"));
         this.hideCursorOption = new SpruceToggleBooleanOption("midnightcontrols.menu.hide_cursor", () -> MidnightControlsConfig.hideNormalMouse,
                 value -> MidnightControlsConfig.hideNormalMouse = value, Text.translatable("midnightcontrols.menu.hide_cursor.tooltip"));
         // Touch options
