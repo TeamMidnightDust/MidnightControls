@@ -1,4 +1,4 @@
-package eu.midnightdust.midnightcontrols.client.gui.virtualkeyboard;
+package eu.midnightdust.midnightcontrols.client.virtualkeyboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;

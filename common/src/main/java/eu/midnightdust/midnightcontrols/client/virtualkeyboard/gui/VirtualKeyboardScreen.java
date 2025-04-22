@@ -1,5 +1,6 @@
-package eu.midnightdust.midnightcontrols.client.gui.virtualkeyboard;
+package eu.midnightdust.midnightcontrols.client.virtualkeyboard.gui;
 
+import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayout;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import org.thinkingstudio.obsidianui.Position;
