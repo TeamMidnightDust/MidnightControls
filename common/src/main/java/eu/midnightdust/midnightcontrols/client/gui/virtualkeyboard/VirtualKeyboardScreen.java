@@ -119,7 +119,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
     }
 
     private SpruceTextAreaWidget createBufferDisplayArea() {
-        int lineCount = this.newLineSupport ? 3 : 1;
+        int lineCount = this.newLineSupport ? 4 : 1;
         int bufferX = this.width / 2 - 100;
         int bufferY = this.height / 4 - VERTICAL_SPACING * 5 - 5;
         int bufferWidth = 200;
