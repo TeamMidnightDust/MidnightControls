@@ -3,7 +3,7 @@ package eu.midnightdust.midnightcontrols.client.util.platform.neoforge;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 
@@ -19,7 +19,7 @@ public class NetworkUtilImpl {
             handler.send(packet);
     }
     public static void sendPayloadC2S(CustomPayload payload) {
-        if (handler != null && client.world != null)
-            handler.send(new CustomPayloadC2SPacket(payload));
+        if (handler != null && client.world != null && handler.hasChannel(payload.getId().id()))
+            PacketDistributor.sendToServer(payload);
     }
 }
