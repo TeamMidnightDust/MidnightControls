@@ -36,6 +36,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.reacharound;
@@ -145,9 +146,9 @@ public abstract class MinecraftClientMixin {
         }
     }
     // This is always supposed to be located at before the line 'this.profiler.swap("Keybindings");'
-//    @Redirect(method = "tick", at = @At(value = "FIELD",target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;", ordinal = 6))
-//    private Screen midnightcontrols$ignoreTouchOverlay(MinecraftClient instance) {
-//        if (instance.currentScreen instanceof TouchscreenOverlay) return null;
-//        return instance.currentScreen;
-//    }
+    @Redirect(method = "tick", at = @At(value = "FIELD",target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;", ordinal = 6))
+    private Screen midnightcontrols$keybindsIgnoreTouchOverlay(MinecraftClient instance) {
+        if (instance.currentScreen instanceof TouchscreenOverlay) return null;
+        return instance.currentScreen;
+    }
 }

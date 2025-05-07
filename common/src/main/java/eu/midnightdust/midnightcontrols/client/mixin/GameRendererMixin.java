@@ -44,7 +44,7 @@ public abstract class GameRendererMixin {
         drawContext.draw();
     }
     @Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z"), method = "renderWorld")
-    private void midnigtcontrols$captureMatrices(RenderTickCounter tickCounter, CallbackInfo ci, @Local(ordinal = 1) Matrix4f matrices) {
+    private void midnigtcontrols$captureMatrices(RenderTickCounter tickCounter, CallbackInfo ci, @Local(ordinal = 2) Matrix4f matrices) {
         TouchUtils.lastProjMat.set(RenderSystem.getProjectionMatrix());
         TouchUtils.lastModMat.set(RenderSystem.getModelViewMatrix());
         TouchUtils.lastWorldSpaceMatrix.set(matrices);
