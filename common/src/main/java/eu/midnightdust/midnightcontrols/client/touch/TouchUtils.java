@@ -38,7 +38,7 @@ public class TouchUtils {
 
         if (entityCast != null && entityCast.getType() == HitResult.Type.ENTITY) return entityCast;
 
-        BlockHitResult result = client.world.raycast(new RaycastContext(near, far, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.ANY, client.player));
+        BlockHitResult result = client.world.raycast(new RaycastContext(near, far, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, client.player));
 
         if (client.player.getPos().distanceTo(result.getPos()) > playerRange) return null;
         return result;

@@ -9,8 +9,10 @@
 
 package eu.midnightdust.midnightcontrols.client.touch.gui;
 
+import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingIDAccessor;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -298,7 +300,13 @@ public class TouchscreenOverlay extends Screen {
             if (binding == null) continue;
             boolean hasTexture = client.getGuiAtlasManager().getSprite(id("binding/"+bindName)) != missingSprite;
             if (MidnightControlsConfig.debug) System.out.println(left +" "+id("binding/"+bindName)+" "+ hasTexture);
-            var button = TextIconButtonWidget.builder(Text.translatable(binding.getTranslationKey()), b -> binding.handle(client, 1, ButtonState.PRESS), hasTexture)
+            var button = TextIconButtonWidget.builder(Text.translatable(binding.getTranslationKey()), b -> {
+                    binding.handle(client, 1.0f, ButtonState.PRESS);
+                    if (binding.asKeyBinding().isPresent()) {
+                        binding.asKeyBinding().get().setPressed(true);
+                        ((KeyBindingAccessor)binding.asKeyBinding().get()).midnightcontrols$press();
+                    }
+                }, hasTexture)
                     .texture(hasTexture ? id("binding/"+bindName) : emptySprite, 20, 20).dimension(20, 20).build();
             button.setPosition(left ? (3+(i*23)) : this.width-(23+(i*23)), 3);
             button.setAlpha(MidnightControlsConfig.touchTransparency / 100f);
@@ -358,11 +366,5 @@ public class TouchscreenOverlay extends Screen {
             else TouchInput.isDragging = true;
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-    }
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        KeyBinding.onKeyPressed(InputUtil.fromKeyCode(keyCode, scanCode));
-        super.keyPressed(keyCode,scanCode,modifiers);
-        return true;
     }
 }

@@ -1,5 +1,6 @@
 package eu.midnightdust.midnightcontrols.client.touch.gui;
 
+import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import org.thinkingstudio.obsidianui.Position;
 import org.thinkingstudio.obsidianui.widget.SpruceTexturedButtonWidget;
 import net.minecraft.text.Text;
@@ -34,6 +35,7 @@ public class SilentTexturedButtonWidget extends SpruceTexturedButtonWidget {
     public void onClick(double mouseX, double mouseY) {
         this.setActive(true);
         super.onClick(mouseX, mouseY);
+        TouchInput.clickStartTime = -1;
         this.setActive(false);
     }
 }

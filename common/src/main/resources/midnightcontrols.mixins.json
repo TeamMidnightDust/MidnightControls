@@ -24,7 +24,8 @@
     "RecipeBookWidgetAccessor",
     "ScreenMixin",
     "TabNavigationWidgetAccessor",
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "AbstractBlockAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
