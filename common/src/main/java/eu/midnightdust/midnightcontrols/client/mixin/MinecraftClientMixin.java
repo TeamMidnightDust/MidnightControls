@@ -28,6 +28,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.profiler.Profiler;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
@@ -38,6 +39,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.reacharound;
 
 @Mixin(MinecraftClient.class)
@@ -53,6 +55,10 @@ public abstract class MinecraftClientMixin {
     @Shadow private int itemUseCooldown;
 
     @Shadow public abstract void setScreen(Screen screen);
+
+    @Shadow public int attackCooldown;
+
+    @Shadow protected abstract void handleInputEvents();
 
     @Unique private BlockPos midnightcontrols$lastTargetPos;
     @Unique private Vec3d midnightcontrols$lastPos;
@@ -81,7 +87,7 @@ public abstract class MinecraftClientMixin {
             var side = hitResult.getSide();
 
             boolean sidewaysBlockPlacing = this.midnightcontrols$lastTargetPos == null || !targetPos.equals(this.midnightcontrols$lastTargetPos.offset(this.midnightcontrols$lastTargetSide));
-            boolean backwardsBlockPlacing = this.player.input.movementForward < 0.0f && (this.midnightcontrols$lastTargetPos == null || targetPos.equals(this.midnightcontrols$lastTargetPos.offset(this.midnightcontrols$lastTargetSide)));
+            boolean backwardsBlockPlacing = this.player.input.getMovementInput().y < 0.0f && (this.midnightcontrols$lastTargetPos == null || targetPos.equals(this.midnightcontrols$lastTargetPos.offset(this.midnightcontrols$lastTargetSide)));
 
             if (cooldown > 1
                     && !targetPos.equals(this.midnightcontrols$lastTargetPos)
@@ -129,7 +135,7 @@ public abstract class MinecraftClientMixin {
                     if (result.isAccepted()) {
                         //if (result.shouldSwingHand()) {
                             this.player.swingHand(hand);
-                            if (!stackInHand.isEmpty() && (stackInHand.getCount() != previousStackCount || this.interactionManager.hasCreativeInventory())) {
+                            if (!stackInHand.isEmpty() && (stackInHand.getCount() != previousStackCount || this.player.isInCreativeMode())) {
                                 this.gameRenderer.firstPersonRenderer.resetEquipProgress(hand);
                             }
                         //}
@@ -144,10 +150,21 @@ public abstract class MinecraftClientMixin {
             }
         }
     }
-    // This is always supposed to be located at before the line 'this.profiler.swap("Keybindings");'
-//    @Redirect(method = "tick", at = @At(value = "FIELD",target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;", ordinal = 6))
-//    private Screen midnightcontrols$ignoreTouchOverlay(MinecraftClient instance) {
-//        if (instance.currentScreen instanceof TouchscreenOverlay) return null;
-//        return instance.currentScreen;
-//    }
+    // TODO: Replace this with MixinExtras' Expressions once that's officially released
+    @Inject(method = "tick", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowDebugHud()Z"))
+    private void midnightcontrols$handleKeybindsWithTouchOverlay(CallbackInfo ci, @Local Profiler profiler) {
+        if (client.currentScreen instanceof TouchscreenOverlay) {
+            profiler.swap("Keybindings");
+            this.handleInputEvents();
+            if (this.attackCooldown > 0) {
+                --this.attackCooldown;
+            }
+        }
+    }
+
+    // Needed, as it will cause item actions not to work in touchscreen mode otherwise with the above method
+    @Inject(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"), cancellable = true)
+    private void midnightcontrols$dontHandleItemAndBlockInteractions(CallbackInfo ci) {
+        if (client.currentScreen instanceof TouchscreenOverlay) ci.cancel();
+    }
 }

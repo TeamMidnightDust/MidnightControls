@@ -214,10 +214,10 @@ public class MidnightInput {
             return;
 
         if (this.targetYaw != 0.f || this.targetPitch != 0.f) {
-            float rotationYaw = (float) (client.player.prevYaw + (this.targetYaw * 0.175));
-            float rotationPitch = (float) (client.player.prevPitch + (this.targetPitch * 0.175));
-            client.player.prevYaw = rotationYaw;
-            client.player.prevPitch = MathHelper.clamp(rotationPitch, -90.f, 90.f);
+            float rotationYaw = (float) (client.player.lastYaw + (this.targetYaw * 0.175));
+            float rotationPitch = (float) (client.player.lastPitch + (this.targetPitch * 0.175));
+            client.player.lastYaw = rotationYaw;
+            client.player.lastPitch = MathHelper.clamp(rotationPitch, -90.f, 90.f);
             client.player.setYaw(rotationYaw);
             client.player.setPitch(MathHelper.clamp(rotationPitch, -90.f, 90.f));
             if (client.player.isRiding() && client.player.getVehicle() != null) {

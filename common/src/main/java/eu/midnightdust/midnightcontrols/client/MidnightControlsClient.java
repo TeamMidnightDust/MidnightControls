@@ -91,8 +91,8 @@ public class MidnightControlsClient extends MidnightControls {
             public void run() {
                 try {
                     if (lateInitDone && client.isRunning()) {
-                        if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && (client.isWindowFocused() || MidnightControlsConfig.unfocusedInput)) {
-                            input.tickCameraStick();
+                        if (MidnightControlsConfig.controlsMode != ControlsMode.DEFAULT && (client.isWindowFocused() || MidnightControlsConfig.unfocusedInput)) {
+                            if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER) input.tickCameraStick();
                             input.updateCamera();
                         }
                     }

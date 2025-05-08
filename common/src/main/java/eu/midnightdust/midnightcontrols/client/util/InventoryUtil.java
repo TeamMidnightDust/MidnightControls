@@ -91,7 +91,7 @@ public class InventoryUtil {
 
             if (closestSlot.isPresent() && client.player != null) {
                 var slot = closestSlot.get().getLeft();
-                if (slot.hasStack() || !client.player.getInventory().getMainHandStack().isEmpty()) {
+                if (slot.hasStack() || !client.player.getInventory().getSelectedStack().isEmpty()) {
                     int slotCenterXScaled = guiLeft + slot.x + 8;
                     int slotCenterYScaled = guiTop + slot.y + 8;
                     int slotCenterX = (int) (slotCenterXScaled / ((double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth()));

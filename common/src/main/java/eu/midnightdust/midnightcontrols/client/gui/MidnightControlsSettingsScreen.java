@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.gui;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
@@ -516,13 +517,13 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             float g = (float)(color.getGreen()) / 255.0F;
             float b = (float)(color.getBlue()) / 255.0F;
             float t = (float)(transparency) / 255.0F;
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
+            GlStateManager._enableBlend();
+            //GlStateManager._defaultBlendFunc();
             vertexConsumer.vertex((float)x1, (float)y2, 0.0F).color(r, g, b, t);
             vertexConsumer.vertex((float)x2, (float)y2, 0.0F).color(r, g, b, t);
             vertexConsumer.vertex((float)x2, (float)y1, 0.0F).color(r, g, b, t);
             vertexConsumer.vertex((float)x1, (float)y1, 0.0F).color(r, g, b, t);
-            RenderSystem.disableBlend();
+            GlStateManager._disableBlend();
             context.draw();
         }
     }

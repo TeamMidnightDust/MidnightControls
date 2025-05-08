@@ -11,7 +11,7 @@ package eu.midnightdust.midnightcontrols.client;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mojang.blaze3d.platform.GlDebugInfo;
+import com.mojang.blaze3d.platform.GLX;
 import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControls;
@@ -52,79 +52,107 @@ public class MidnightControlsConfig extends MidnightConfig {
     public static boolean isEditing = false;
     @Hidden @Entry public static int configVersion = 2;
     // General
+    @Comment(category = CONTROLLER, centered = true, name="\uD83C\uDFAE General") public static Comment _general;
     @Entry(category = CONTROLLER, name = "midnightcontrols.menu.controls_mode") public static ControlsMode controlsMode = ControlsMode.DEFAULT;
     @Entry(category = CONTROLLER, name = "midnightcontrols.menu.auto_switch_mode") public static boolean autoSwitchMode = true;
-    @Entry(category = MISC, name = "Debug") public static boolean debug = false;
     // HUD
+    @Comment(category = VISUAL, centered = true, name="\uD83D\uDDB9 Hud") public static Comment _hud;
     @Entry(category = VISUAL, name = "midnightcontrols.menu.hud_enable") public static boolean hudEnable = true;
     @Entry(category = VISUAL, name = "midnightcontrols.menu.hud_side") public static HudSide hudSide = HudSide.LEFT;
-    @Entry(category = SCREENS, name = "midnightcontrols.menu.move_chat") public static boolean moveChat = false;
+    @Entry(category = VISUAL, name = "midnightcontrols.menu.controller_type") public static ControllerType controllerType = ControllerType.DEFAULT;
     // Gameplay
+    @Comment(category = GAMEPLAY, centered = true, name="\uD83D\uDECB Comfort") public static Comment _comfort;
+    @Entry(category = GAMEPLAY, name = "Enable Hints") public static boolean enableHints = true;
     @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.analog_movement") public static boolean analogMovement = true;
     @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.double_tap_to_sprint") public static boolean doubleTapToSprint = true;
     @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.controller_toggle_sneak") public static boolean controllerToggleSneak = MinecraftClient.getInstance().options.getSneakToggled().getValue();
     @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.controller_toggle_sprint") public static boolean controllerToggleSprint = MinecraftClient.getInstance().options.getSprintToggled().getValue();
+
+    @Condition(requiredModId = "midnightcontrols-extra")
+    @Comment(category = GAMEPLAY, centered = true, name="✨ Extras") public static Comment _extras;
+    @Condition(requiredModId = "midnightcontrols-extra")
     @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.fast_block_placing") public static boolean fastBlockPlacing = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
+    @Condition(requiredModId = "midnightcontrols-extra")
     @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.fly_drifting") public static boolean flyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers. It can also conflict with some other mods.
+    @Condition(requiredModId = "midnightcontrols-extra")
     @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.fly_drifting_vertical") public static boolean verticalFlyDrifting = true; // Enabled by default as disabling this behaviour can be considered cheating on multiplayer servers.
+    @Condition(requiredModId = "midnightcontrols-extra")
     @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.reacharound.horizontal") public static boolean horizontalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
+    @Condition(requiredModId = "midnightcontrols-extra")
     @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.reacharound.vertical") public static boolean verticalReacharound = false; // Disabled by default as this behaviour can be considered cheating on multiplayer servers.
+    @Condition(requiredModId = "midnightcontrols-extra")
+    @Comment(category = VISUAL, centered = true, name="⊽ Reacharound") public static Comment _reacharoundOutline;
+    @Condition(requiredModId = "midnightcontrols-extra")
     @Entry(category = VISUAL, name = "Reacharound Outline") public static boolean shouldRenderReacharoundOutline = true;
+    @Condition(requiredModId = "midnightcontrols-extra", requiredOption = "shouldRenderReacharoundOutline")
     @Entry(category = VISUAL, name = "Reacharound Outline Color", isColor = true) public static String reacharoundOutlineColorHex = "#ffffff";
+    @Condition(requiredModId = "midnightcontrols-extra", requiredOption = "shouldRenderReacharoundOutline")
     @Entry(category = VISUAL, name = "Reacharound Outline Alpha", isSlider = true, min = 0, max = 255) public static int reacharoundOutlineColorAlpha = 102;
-    @Entry(category = CONTROLLER, name = "midnightcontrols.menu.right_dead_zone", isSlider = true, min = 0.05, max = 1) public static double rightDeadZone = 0.25;
-    @Entry(category = CONTROLLER, name = "midnightcontrols.menu.left_dead_zone", isSlider = true, min = 0.05, max = 1) public static double leftDeadZone = 0.25;
-    @Entry(category = CONTROLLER, name = "Trigger Dead-Zone", isSlider = true, min = 0.05, max = 1) public static double triggerDeadZone = 0.1;
+    @Comment(category = CONTROLLER, centered = true, name="\uD83D\uDCF7 Camera Settings") public static Comment _cameraSettings;
     @Entry(category = CONTROLLER, name = "midnightcontrols.menu.invert_right_y_axis") public static boolean invertRightYAxis = false;
     @Entry(category = CONTROLLER, name = "midnightcontrols.menu.invert_right_x_axis") public static boolean invertRightXAxis = false;
     @Entry(category = CONTROLLER, name = "midnightcontrols.menu.rotation_speed", isSlider = true, min = 0, max = 100, precision = 10) public static double rotationSpeed = 35.0; //used for x-axis, name kept for compatibility
     @Entry(category = CONTROLLER, name = "midnightcontrols.menu.y_axis_rotation_speed", isSlider = true, min = 0, max = 100, precision = 10) public static double yAxisRotationSpeed = rotationSpeed;
     @Entry(category = CONTROLLER, name = "midnightcontrols.menu.camera_mode") public static CameraMode cameraMode = CameraMode.FLAT;
+    @Comment(category = SCREENS, centered = true, name="\uD83D\uDDB1 Mouse Behaviour") public static Comment _mouseBehaviour;
     @Entry(category = SCREENS, name = "midnightcontrols.menu.mouse_speed", isSlider = true, min = 0, max = 150, precision = 10) public static double mouseSpeed = 25.0;
     @Entry(category = SCREENS, name = "midnightcontrols.menu.joystick_as_mouse") public static boolean joystickAsMouse = false;
-    @Entry(category = SCREENS, name = "midnightcontrols.menu.eye_tracker_as_mouse") public static boolean eyeTrackerAsMouse = false;
-    @Entry(category = SCREENS, name = "midnightcontrols.menu.eye_tracker_deadzone", isSlider = true, min = 0, max = 0.4) public static double eyeTrackerDeadzone = 0.05;
-    @Entry(category = CONTROLLER, name = "midnightcontrols.menu.unfocused_input") public static boolean unfocusedInput = false;
-    @Entry(category = SCREENS, name = "midnightcontrols.menu.virtual_mouse") public static boolean virtualMouse = false;
-    @Entry(category = SCREENS, name = "midnightcontrols.menu.virtual_mouse.skin") public static VirtualMouseSkin virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
-    @Entry(category = SCREENS, name = "midnightcontrols.menu.hide_cursor") public static boolean hideNormalMouse = false;
-    @Entry(category = SCREENS, name = "midnightcontrols.menu.virtual_keyboard") public static boolean virtualKeyboard = false;
-    @Entry(category = CONTROLLER, name = "Controller ID") @Hidden public static Object controllerID = 0;
-    @Entry(category = CONTROLLER, name = "2nd Controller ID") @Hidden public static Object secondControllerID = -1;
-    @Entry(category = VISUAL, name = "midnightcontrols.menu.controller_type") public static ControllerType controllerType = ControllerType.DEFAULT;
     @Entry(category = SCREENS, name = "Mouse screens") public static List<String> mouseScreens = Lists.newArrayList("net.minecraft.client.gui.screen.advancement",
             "net.minecraft.class_457", "net.minecraft.class_408", "net.minecraft.class_3872", "me.flashyreese.mods.reeses_sodium_options.client.gui", "dev.emi.emi.screen",
             "hardcorequesting.client.interfaces.GuiQuestBook", "hardcorequesting.client.interfaces.GuiReward", "hardcorequesting.client.interfaces.EditTrackerScreen",
             "me.shedaniel.clothconfig2.gui.ClothConfigScreen", "com.mamiyaotaru.voxelmap.gui.GuiWaypoints", "com.mamiyaotaru.voxelmap.gui.GuiPersistentMap");
     @Entry(category = SCREENS, name = "Arrow screens") public static List<String> arrowScreens = Lists.newArrayList(ChatScreen.class.getCanonicalName());
     @Entry(category = SCREENS, name = "WASD screens") public static List<String> wasdScreens = Lists.newArrayList("com.ultreon.devices.core.Laptop");
-    @Entry(category = TOUCH, name = "Screens with close button") public static List<String> closeButtonScreens = Lists.newArrayList(ChatScreen.class.getCanonicalName(), AdvancementsScreen.class.getCanonicalName(), RingScreen.class.getCanonicalName());
+    @Comment(category = CONTROLLER, centered = true, name="\uD83D\uDC40 Eye Tracking") public static Comment _eyeTracker;
+    @Entry(category = CONTROLLER, name = "midnightcontrols.menu.eye_tracker_as_mouse") public static boolean eyeTrackerAsMouse = false;
+    @Entry(category = CONTROLLER, name = "midnightcontrols.menu.eye_tracker_deadzone", isSlider = true, min = 0, max = 0.4) public static double eyeTrackerDeadzone = 0.05;
+    @Entry(category = CONTROLLER, name = "midnightcontrols.menu.unfocused_input") public static boolean unfocusedInput = false;
+    @Comment(category = SCREENS, centered = true, name="\uD83D\uDC46 Virtual Mouse") public static Comment _virtualMouse;
+    @Entry(category = SCREENS, name = "midnightcontrols.menu.virtual_mouse") public static boolean virtualMouse = false;
+    @Condition(requiredOption = "virtualMouse", visibleButLocked = true)
+    @Entry(category = SCREENS, name = "midnightcontrols.menu.virtual_mouse.skin") public static VirtualMouseSkin virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
+    @Entry(category = SCREENS, name = "midnightcontrols.menu.hide_cursor") public static boolean hideNormalMouse = false;
+    @Entry(category = SCREENS, name = "midnightcontrols.menu.virtual_keyboard") public static boolean virtualKeyboard = false;
+    @Entry(category = CONTROLLER, name = "Controller ID") @Hidden public static Object controllerID = 0;
+    @Entry(category = CONTROLLER, name = "2nd Controller ID") @Hidden public static Object secondControllerID = -1;
+    @Comment(category = TOUCH, centered = true, name="\uD83E\uDE84 Behaviour") public static Comment _touchBehaviour;
     @Entry(category = TOUCH, name = "midnightcontrols.menu.touch_with_controller") public static boolean touchInControllerMode = false;
     @Entry(category = TOUCH, name = "midnightcontrols.menu.touch_speed", isSlider = true, min = 0, max = 150, precision = 10) public static double touchSpeed = 50.0;
     @Entry(category = TOUCH, name = "midnightcontrols.menu.invert_touch") public static boolean invertTouch = false;
     @Entry(category = TOUCH, name = "midnightcontrols.menu.touch_mode") public static TouchMode touchMode = TouchMode.CROSSHAIR;
     @Entry(category = TOUCH, name = "midnightcontrols.menu.touch_break_delay", isSlider = true, min = 50, max = 500) public static int touchBreakDelay = 120;
+    @Comment(category = TOUCH, centered = true, name="\uD83D\uDCA1 Visuals") public static Comment _visuals;
     @Entry(category = TOUCH, name = "midnightcontrols.menu.touch_transparency", isSlider = true, min = 0, max = 100) public static int touchTransparency = 75;
     @Entry(category = TOUCH, name = "Touch Outline Color", isColor = true) public static String touchOutlineColorHex = "#ffffff";
     @Entry(category = TOUCH, name = "Touch Outline Alpha", isSlider = true, min = 0, max = 255) public static int touchOutlineColorAlpha = 150;
+    @Comment(category = TOUCH, centered = true, name="\uD83E\uDDEA Advanced") public static Comment _advanced;
+    @Entry(category = TOUCH, name = "Screens with close button") public static List<String> closeButtonScreens = Lists.newArrayList(ChatScreen.class.getCanonicalName(), AdvancementsScreen.class.getCanonicalName(), RingScreen.class.getCanonicalName());
     @Entry(category = TOUCH, name = "Left Touch button bindings") public static List<String> leftTouchBinds = Lists.newArrayList("debug_screen", "screenshot","toggle_perspective");
     @Entry(category = TOUCH, name = "Right Touch button bindings") public static List<String> rightTouchBinds = Lists.newArrayList("screenshot","toggle_perspective", "use");
 
     @Entry @Hidden public static Map<String, String> BINDING = new HashMap<>();
 
     private static final Pattern BUTTON_BINDING_PATTERN = Pattern.compile("(-?\\d+)\\+?");
+    @Comment(category = CONTROLLER, centered = true, name="\uD83D\uDD79 Max Analog Stick Values") public static Comment _maxAnalogValues;
     @Entry(category = CONTROLLER, name = "Max analog value: Left X", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueLeftX = 1;
     @Entry(category = CONTROLLER, name = "Max analog value: Left Y", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueLeftY = 1;
     @Entry(category = CONTROLLER, name = "Max analog value: Right X", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightX = 1;
     @Entry(category = CONTROLLER, name = "Max analog value: Right Y", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightY = 1;
+    @Comment(category = CONTROLLER, centered = true, name="☠ Dead Zones") public static Comment _deadZones;
+    @Entry(category = CONTROLLER, name = "midnightcontrols.menu.right_dead_zone", isSlider = true, min = 0.05, max = 1) public static double rightDeadZone = 0.25;
+    @Entry(category = CONTROLLER, name = "midnightcontrols.menu.left_dead_zone", isSlider = true, min = 0.05, max = 1) public static double leftDeadZone = 0.25;
+    @Entry(category = CONTROLLER, name = "Trigger Dead-Zone", isSlider = true, min = 0.05, max = 1) public static double triggerDeadZone = 0.1;
+    @Comment(category = CONTROLLER, centered = true, name="☆ Other Options") public static Comment _otherOptions;
     @Entry(category = CONTROLLER, name = "Trigger button fix") public static boolean triggerFix = true;
     @Entry(category = CONTROLLER, name = "Excluded Controllers (Name Regex)") public static List<String> excludedControllers = Lists.newArrayList(".*(Keyboard)$", ".*(Touchpad)$", ".*(Pen)$", ".*(Finger)$");
+    @Comment(category = SCREENS, centered = true, name="\uD83D\uDD27 UI Modifications") public static Comment _uiMods;
+    @Entry(category = SCREENS, name = "midnightcontrols.menu.move_chat") public static boolean moveChat = false;
+    @Entry(category = SCREENS, name = "Enable Shortcut in Controls Options") public static boolean shortcutInControls = true;
+    @Entry(category = MISC, name = "Debug") public static boolean debug = false;
     @Entry(category = MISC, name = "Excluded Keybindings") public static List<String> excludedKeybindings = Lists.newArrayList("key.forward", "key.left", "key.back", "key.right", "key.jump", "key.sneak", "key.sprint", "key.inventory",
             "key.swapOffhand", "key.drop", "key.use", "key.attack", "key.chat", "key.playerlist", "key.screenshot", "key.togglePerspective", "key.smoothCamera", "key.fullscreen", "key.saveToolbarActivator", "key.loadToolbarActivator",
             "key.pickItem", "key.hotbar.1", "key.hotbar.2", "key.hotbar.3", "key.hotbar.4", "key.hotbar.5", "key.hotbar.6", "key.hotbar.7", "key.hotbar.8", "key.hotbar.9");
-    @Entry(category = GAMEPLAY, name = "Enable Hints") public static boolean enableHints = true;
-    @Entry(category = SCREENS, name = "Enable Shortcut in Controls Options") public static boolean shortcutInControls = true;
-    @Entry(category = MISC, name = "Ring Bindings (WIP)") public static List<String> ringBindings = new ArrayList<>();
+    @Entry(category = MISC, name = "Ring Bindings (WIP)") @Hidden public static List<String> ringBindings = new ArrayList<>();
     @Entry(category = MISC, name = "Ignored Unbound Keys") public static List<String> ignoredUnboundKeys = Lists.newArrayList("inventorytabs.key.next_tab");
     @Entry @Hidden public static Map<String, Map<String, String>> controllerBindingProfiles = new HashMap<>();
     private static Map<String, String> currentBindingProfile = new HashMap<>();
@@ -402,7 +430,7 @@ public class MidnightControlsConfig extends MidnightConfig {
         String controller = getController().getName().toLowerCase();
         if (controller.contains("xbox 360")) return ControllerType.XBOX_360;
         else if (controller.contains("xbox") || controller.contains("afterglow")) return ControllerType.XBOX;
-        else if (controller.contains("steam") && GlDebugInfo.getCpuInfo().contains("AMD Custom APU")) return ControllerType.STEAM_DECK;
+        else if (controller.contains("steam") && GLX._getCpuInfo().contains("AMD Custom APU")) return ControllerType.STEAM_DECK;
         else if (controller.contains("steam")) return ControllerType.STEAM_CONTROLLER;
         else if (controller.contains("dualsense") || controller.contains("ps5")) return ControllerType.DUALSENSE;
         else if (controller.contains("dualshock") || controller.contains("ps4")  || controller.contains("sony")) return ControllerType.DUALSHOCK;

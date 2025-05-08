@@ -13,6 +13,7 @@
     "GameOptionsScreenMixin",
     "GameRendererMixin",
     "HandledScreenMixin",
+    "InputAccessor",
     "InputUtilMixin",
     "KeyBindingIDAccessor",
     "KeyBindingMixin",
@@ -25,7 +26,8 @@
     "ScreenMixin",
     "AbstractSignEditScreenAccessor",
     "TabNavigationWidgetAccessor",
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "AbstractBlockAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

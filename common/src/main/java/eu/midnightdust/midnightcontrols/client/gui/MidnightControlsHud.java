@@ -98,7 +98,7 @@ public class MidnightControlsHud extends Hud {
             var window = this.client.getWindow();
             var text = "[  ]";
 
-            float scale = Math.min(5, this.ticksDisplayedCrosshair + tickCounter.getTickDelta(true)) / 5F;
+            float scale = Math.min(5, this.ticksDisplayedCrosshair + tickCounter.getTickProgress(true)) / 5F;
             scale *= scale;
             int opacity = ((int) (255 * scale)) << 24;
 
