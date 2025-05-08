@@ -3,6 +3,7 @@ package eu.midnightdust.midnightcontrols.fabric;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
+import eu.midnightdust.midnightcontrols.fabric.event.MouseClickListener;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
 import eu.midnightdust.midnightcontrols.packet.FeaturePayload;
 import eu.midnightdust.midnightcontrols.packet.HelloPayload;
@@ -11,11 +12,12 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import org.thinkingstudio.obsidianui.fabric.event.OpenScreenCallback;
 
 import java.util.Optional;
 
@@ -51,6 +53,9 @@ public class MidnightControlsClientFabric implements ClientModInitializer {
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> MidnightControlsClient.onLeave());
 
         ClientTickEvents.START_CLIENT_TICK.register(MidnightControlsClient::onTick);
+        ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+            ScreenMouseEvents.allowMouseClick(screen).register(new MouseClickListener(screen));
+        });
 
         FabricLoader.getInstance().getModContainer(MidnightControlsConstants.NAMESPACE).ifPresent(modContainer -> {
             ResourceManagerHelper.registerBuiltinResourcePack(id("bedrock"), modContainer, ResourcePackActivationType.NORMAL);

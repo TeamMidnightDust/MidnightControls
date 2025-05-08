@@ -65,6 +65,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption eyeTrackingAsMouseOption;
     private final SpruceOption eyeTrackingDeadzone;
     private final SpruceOption virtualMouseOption;
+    private final SpruceOption virtualKeyboardOption;
     private final SpruceOption hideCursorOption;
     private final SpruceOption resetOption;
     private final SpruceOption advancedConfigOption;
@@ -300,6 +301,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                 value -> MidnightControlsConfig.unfocusedInput = value, Text.translatable("midnightcontrols.menu.unfocused_input.tooltip"));
         this.virtualMouseOption = new SpruceToggleBooleanOption("midnightcontrols.menu.virtual_mouse", () -> MidnightControlsConfig.virtualMouse,
                 value -> MidnightControlsConfig.virtualMouse = value, Text.translatable("midnightcontrols.menu.virtual_mouse.tooltip"));
+        this.virtualKeyboardOption = new SpruceToggleBooleanOption("midnightcontrols.menu.virtual_keyboard", () -> MidnightControlsConfig.virtualMouse,
+                value -> MidnightControlsConfig.virtualKeyboard = value, Text.translatable("midnightcontrols.menu.virtual_keyboard.tooltip"));
         this.hideCursorOption = new SpruceToggleBooleanOption("midnightcontrols.menu.hide_cursor", () -> MidnightControlsConfig.hideNormalMouse,
                 value -> MidnightControlsConfig.hideNormalMouse = value, Text.translatable("midnightcontrols.menu.hide_cursor.tooltip"));
         // Touch options
@@ -391,6 +394,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         list.addSingleOptionEntry(this.yAxisRotationSpeedOption);
         list.addSingleOptionEntry(this.mouseSpeedOption);
         list.addSingleOptionEntry(this.virtualMouseOption);
+        list.addSingleOptionEntry(this.virtualKeyboardOption);
         list.addSingleOptionEntry(this.hideCursorOption);
         list.addSingleOptionEntry(this.joystickAsMouseOption);
         list.addSingleOptionEntry(this.eyeTrackingAsMouseOption);

@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "AdvancementsScreenAccessor",
+    "BookEditScreenAccessor",
     "ChatScreenMixin",
     "ClickableWidgetAccessor",
     "ClientPlayerEntityMixin",
@@ -23,6 +24,7 @@
     "RecipeBookScreenAccessor",
     "RecipeBookWidgetAccessor",
     "ScreenMixin",
+    "AbstractSignEditScreenAccessor",
     "TabNavigationWidgetAccessor",
     "WorldRendererMixin",
     "AbstractBlockAccessor"
