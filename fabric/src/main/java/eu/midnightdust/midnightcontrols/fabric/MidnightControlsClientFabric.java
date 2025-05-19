@@ -3,6 +3,7 @@ package eu.midnightdust.midnightcontrols.fabric;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
+import eu.midnightdust.midnightcontrols.client.MidnightControlsReloadListener;
 import eu.midnightdust.midnightcontrols.fabric.event.MouseClickListener;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
 import eu.midnightdust.midnightcontrols.packet.FeaturePayload;
@@ -16,8 +17,12 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceType;
+import net.minecraft.util.Identifier;
 
 import java.util.Optional;
 
@@ -62,5 +67,16 @@ public class MidnightControlsClientFabric implements ClientModInitializer {
             ResourceManagerHelper.registerBuiltinResourcePack(id("legacy"), modContainer, ResourcePackActivationType.NORMAL);
         });
         MidnightControlsClient.initClient();
+
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+            @Override
+            public Identifier getFabricId() {
+                return id("keyboard_layouts");
+            }
+            @Override
+            public void reload(ResourceManager manager) {
+                MidnightControlsReloadListener.INSTANCE.reload(manager);
+            }
+        });
     }
 }

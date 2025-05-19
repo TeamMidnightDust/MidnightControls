@@ -8,35 +8,32 @@ import java.util.List;
 
 public class KeyboardLayout {
 
-    public static KeyboardLayout QWERTY = new KeyboardLayout("US (Qwerty)", "en-US", createQwertyLetterLayout(), createSymbolLayout());
-    public static final List<KeyboardLayout> KEYBOARD_LAYOUTS = new ArrayList<>();
+    public static KeyboardLayout QWERTY = new KeyboardLayout("en_US:qwerty", createQwertyLetterLayout(), createSymbolLayout());
 
-    private final String name;
-    private final String locale;
+    private final String id;
     private final List<List<String>> letters;
     private final List<List<String>> symbols;
 
-    private KeyboardLayout(String name, String locale, List<List<String>> letters, List<List<String>> symbols) {
-        this.name = name;
-        this.locale = locale;
+    private KeyboardLayout(String id, List<List<String>> letters, List<List<String>> symbols) {
+        this.id = id;
         this.letters = letters;
         this.symbols = symbols;
     }
 
-    public KeyboardLayout fromJson(JsonObject json) {
+    public static KeyboardLayout fromJson(JsonObject json) {
         try {
-            return new KeyboardLayout(json.get("metadata").getAsJsonObject().get("name").getAsString(), json.get("metadata").getAsJsonObject().get("locale").getAsString(), getFromJson(json, true), getFromJson(json, false));
+            return new KeyboardLayout(json.get("id").getAsString(), getFromJson(json, true), getFromJson(json, false));
         } catch (Exception e) {
             throw new RuntimeException("Error loading keyboard definition: %s".formatted(e));
         }
     }
-    public List<List<String>> getFromJson(JsonObject json, boolean letters) {
+    private static List<List<String>> getFromJson(JsonObject json, boolean letters) {
         String type = letters ? "letters" : "symbols";
         List<List<String>> arr = new ArrayList<>();
         if (json.has(type)) {
             JsonObject lettersJson = json.get(type).getAsJsonObject();
             for (int i = 0; ; i++) {
-                if (!lettersJson.has("row%s".formatted(i))) break;
+                if (!lettersJson.has("row"+i)) break;
                 var rowJson = lettersJson.get("row%s".formatted(i)).getAsJsonArray();
                 List<String> row = new ArrayList<>();
                 for (int j = 0; j < rowJson.size(); j++) {
@@ -51,12 +48,8 @@ public class KeyboardLayout {
         }
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getLocale() {
-        return locale;
+    public String getId() {
+        return id;
     }
 
     public List<List<String>> getLetters() {

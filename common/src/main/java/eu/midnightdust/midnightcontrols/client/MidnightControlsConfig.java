@@ -148,6 +148,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Comment(category = SCREENS, centered = true, name="\uD83D\uDD27 UI Modifications") public static Comment _uiMods;
     @Entry(category = SCREENS, name = "midnightcontrols.menu.move_chat") public static boolean moveChat = false;
     @Entry(category = SCREENS, name = "Enable Shortcut in Controls Options") public static boolean shortcutInControls = true;
+    @Entry(category = MISC, name = "midnightcontrols.menu.virtual_keyboard_layout") public static String keyboardLayout = "en_US:qwerty";
     @Entry(category = MISC, name = "Debug") public static boolean debug = false;
     @Entry(category = MISC, name = "Excluded Keybindings") public static List<String> excludedKeybindings = Lists.newArrayList("key.forward", "key.left", "key.back", "key.right", "key.jump", "key.sneak", "key.sprint", "key.inventory",
             "key.swapOffhand", "key.drop", "key.use", "key.attack", "key.chat", "key.playerlist", "key.screenshot", "key.togglePerspective", "key.smoothCamera", "key.fullscreen", "key.saveToolbarActivator", "key.loadToolbarActivator",

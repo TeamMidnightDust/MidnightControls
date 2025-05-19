@@ -2,6 +2,7 @@ package eu.midnightdust.midnightcontrols.neoforge;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
+import eu.midnightdust.midnightcontrols.client.MidnightControlsReloadListener;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
 import eu.midnightdust.midnightcontrols.packet.HelloPayload;
@@ -19,10 +20,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforgespi.locating.IModFile;
 
@@ -74,6 +72,10 @@ public class MidnightControlsClientNeoforge {
                     }
                 } catch (NullPointerException e) {e.fillInStackTrace();}
             }));
+        }
+        @SubscribeEvent
+        public static void onResourceReload(AddClientReloadListenersEvent event) {
+            event.addListener(id("keyboard-layouts"), MidnightControlsReloadListener.INSTANCE);
         }
     }
 

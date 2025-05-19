@@ -1,6 +1,8 @@
 package eu.midnightdust.midnightcontrols.client.virtualkeyboard.gui;
 
+import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayout;
+import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutManager;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import org.thinkingstudio.obsidianui.Position;
@@ -42,10 +44,10 @@ public class VirtualKeyboardScreen extends SpruceScreen {
     private SpruceContainerWidget keyboardContainer;
 
     public VirtualKeyboardScreen(String initialText, CloseCallback closeCallback, boolean newLineSupport) {
-        super(Text.literal("Virtual Keyboard"));
+        super(Text.translatable("midnightcontrols.virtual_keyboard.screen"));
         this.buffer = new StringBuilder(initialText);
         this.closeCallback = closeCallback;
-        this.layout = KeyboardLayout.QWERTY;
+        this.layout = KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout);
         this.capsMode = false;
         this.symbolMode = false;
         this.newLineSupport = newLineSupport;
@@ -187,7 +189,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
     }
 
     private void addFunctionKeys(SpruceContainerWidget container) {
-        List<String> firstRow = getActiveKeyLayout().get(0);
+        List<String> firstRow = getActiveKeyLayout().getFirst();
         int firstRowWidth = calculateRowWidth(firstRow);
 
         // position backspace at the right of the first row
@@ -239,7 +241,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
                         Position.of(spaceX, rowY),
                         spaceKeyWidth,
                         KEY_HEIGHT,
-                        Text.literal("Space"),
+                        Text.translatable("midnightcontrols.virtual_keyboard.keyboard.space"),
                         btn -> handleKeyPress(SPACE_SYMBOL)
                 )
         );
