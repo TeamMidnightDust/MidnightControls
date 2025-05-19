@@ -52,6 +52,12 @@ public class KeyboardLayout {
         return id;
     }
 
+    public String getTranslationKey() {
+        String[] identifier = id.split(":");
+        if (identifier.length != 2) return "Invalid Keyboard ID: %s".formatted(id);
+        return "midnightcontrols.virtual_keyboard.layout.%s.%s".formatted(identifier[0], identifier[1]);
+    }
+
     public List<List<String>> getLetters() {
         return letters;
     }

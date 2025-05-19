@@ -24,4 +24,13 @@ public class KeyboardLayoutManager {
     public static KeyboardLayout getById(String id) {
         return KEYBOARD_LAYOUTS.get(id) == null ? KeyboardLayout.QWERTY : KEYBOARD_LAYOUTS.get(id);
     }
+    public static KeyboardLayout getNext(KeyboardLayout current) {
+        KeyboardLayout[] layouts = KEYBOARD_LAYOUTS.values().toArray(KeyboardLayout[]::new);
+        int currentIndex = -1;
+        for (int i = 0; i < layouts.length; i++) {
+            if (layouts[i] == current) currentIndex = i;
+        }
+        currentIndex = currentIndex+1 >= layouts.length ? 0 : currentIndex + 1;
+        return layouts[currentIndex];
+    }
 }
