@@ -528,13 +528,10 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             float g = (float)(color.getGreen()) / 255.0F;
             float b = (float)(color.getBlue()) / 255.0F;
             float t = (float)(transparency) / 255.0F;
-            GlStateManager._enableBlend();
-            //GlStateManager._defaultBlendFunc();
             vertexConsumer.vertex((float)x1, (float)y2, 0.0F).color(r, g, b, t);
             vertexConsumer.vertex((float)x2, (float)y2, 0.0F).color(r, g, b, t);
             vertexConsumer.vertex((float)x2, (float)y1, 0.0F).color(r, g, b, t);
             vertexConsumer.vertex((float)x1, (float)y1, 0.0F).color(r, g, b, t);
-            GlStateManager._disableBlend();
             context.draw();
         }
     }

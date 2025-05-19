@@ -9,8 +9,6 @@
 
 package eu.midnightdust.midnightcontrols.client.gui;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.systems.RenderSystem;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.enums.ControllerType;
@@ -171,8 +169,6 @@ public class MidnightControlsRenderer {
             case GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER + 100, GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER + 200 -> buttonOffset = 10 * 15;
         }
 
-        GlStateManager._disableDepthTest();
-
         int assetSize = axis || (button >= 15 && button <= 18) ? AXIS_SIZE : BUTTON_SIZE;
 
         RenderSystem.setShaderColor(1.f, second ? 0.f : 1.f, 1.f, 1.f);
@@ -181,7 +177,6 @@ public class MidnightControlsRenderer {
                 (float) buttonOffset, (float) (controllerType * assetSize),
                 assetSize, assetSize,
                 256, 256);
-        GlStateManager._enableDepthTest();
 
         return ICON_SIZE;
     }
