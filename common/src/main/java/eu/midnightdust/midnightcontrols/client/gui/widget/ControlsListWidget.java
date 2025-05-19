@@ -14,11 +14,14 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.util.Identifier;
 import org.thinkingstudio.obsidianui.Position;
 import org.thinkingstudio.obsidianui.SpruceTexts;
 import org.thinkingstudio.obsidianui.navigation.NavigationDirection;
 import org.thinkingstudio.obsidianui.navigation.NavigationUtils;
 import org.thinkingstudio.obsidianui.widget.SpruceButtonWidget;
+import org.thinkingstudio.obsidianui.widget.SpruceIconButtonWidget;
 import org.thinkingstudio.obsidianui.widget.SpruceSeparatorWidget;
 import org.thinkingstudio.obsidianui.widget.SpruceWidget;
 import org.thinkingstudio.obsidianui.widget.container.SpruceEntryListWidget;
@@ -86,7 +89,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
             super(parent);
             this.binding = binding;
             this.bindingName = I18n.translate(this.binding.getTranslationKey());
-            this.editButton = new ControllerButtonWidget(Position.of(this, parent.getWidth() / 2 - 8, 0), 110, this.binding, btn -> {
+            this.editButton = new ControllerButtonWidget(Position.of(this, parent.getWidth() / 2 - 8, 0), 120, this.binding, btn -> {
                 gui.focusedBinding = binding;
                 MidnightControlsClient.input.beginControlsInput(gui);
             }) {
@@ -96,12 +99,23 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                 }
             };
             this.children.add(editButton);
-            this.resetButton = new SpruceButtonWidget(Position.of(this,
+            this.resetButton = new SpruceIconButtonWidget(Position.of(this,
                     this.editButton.getPosition().getRelativeX() + this.editButton.getWidth() + 2, 0),
-                    44, 20, Text.translatable("controls.reset"),
+                    37, 20, Text.empty(),
                     btn -> MidnightControlsConfig.setButtonBinding(binding, binding.getDefaultButton())) {
                 protected Text getNarrationMessage() {
                     return Text.translatable("narrator.controls.reset", bindingName);
+                }
+
+                private final Identifier resetTexture = Identifier.of("midnightlib","icon/reset");
+
+                @Override
+                protected int renderIcon(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+                    int size = 12;
+                    int x = this.getX() + this.getWidth() / 2 - size / 2;
+                    int y = this.getY() + this.getHeight() / 2 - size / 2;
+                    drawContext.drawGuiTexture(RenderLayer::getGuiTextured, resetTexture, x, y, size, size);
+                    return 1;
                 }
             };
             this.children.add(this.resetButton);
