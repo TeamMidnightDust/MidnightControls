@@ -26,6 +26,7 @@ import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingIDAccessor;
 import eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction;
 import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
+import eu.midnightdust.midnightcontrols.client.virtualkeyboard.MouseClickInterceptor;
 import net.minecraft.client.gui.screen.Screen;
 import org.thinkingstudio.obsidianui.hud.HudManager;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
@@ -75,6 +76,7 @@ public class MidnightControlsClient extends MidnightControls {
     public static final MidnightInput input = new MidnightInput();
     public static final MidnightRing ring = new MidnightRing();
     public static final MidnightReacharound reacharound = new MidnightReacharound();
+    public static final MouseClickInterceptor clickInterceptor = new MouseClickInterceptor();
     public static boolean isWayland;
     private static MidnightControlsHud hud;
     private static ControlsMode previousControlsMode;
@@ -204,6 +206,7 @@ public class MidnightControlsClient extends MidnightControls {
         RainbowColor.tick();
         TouchInput.tick();
     }
+
     /**
      * Called when opening a screen.
      */

@@ -14,6 +14,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
+import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutManager;
 import org.thinkingstudio.obsidianui.background.Background;
 import org.thinkingstudio.obsidianui.mixin.DrawContextAccessor;
 import org.thinkingstudio.obsidianui.widget.SpruceWidget;
@@ -65,6 +66,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption eyeTrackingAsMouseOption;
     private final SpruceOption eyeTrackingDeadzone;
     private final SpruceOption virtualMouseOption;
+    private final SpruceOption virtualKeyboardOption;
     private final SpruceOption hideCursorOption;
     private final SpruceOption resetOption;
     private final SpruceOption advancedConfigOption;
@@ -139,6 +141,15 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             maxAnalogValueOption("midnightcontrols.menu.max_right_x_value", GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X),
             maxAnalogValueOption("midnightcontrols.menu.max_right_y_value", GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y)
     };
+    // Controller options
+    public final static SpruceOption virtualKeyboardLayoutOption =
+            new SpruceCyclingOption("midnightcontrols.menu.virtual_keyboard_layout",
+                    amount -> {
+                        MidnightControlsConfig.keyboardLayout = KeyboardLayoutManager.getNext(KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout)).getId();
+                    },
+                    option -> {
+                        return option.getDisplayText(Text.translatable(KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout).getTranslationKey()));
+                    }, null);
 
     private static SpruceOption maxAnalogValueOption(String key, int axis) {
         return new SpruceDoubleOption(key, .25f, 1.f, 0.05f,
@@ -300,6 +311,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                 value -> MidnightControlsConfig.unfocusedInput = value, Text.translatable("midnightcontrols.menu.unfocused_input.tooltip"));
         this.virtualMouseOption = new SpruceToggleBooleanOption("midnightcontrols.menu.virtual_mouse", () -> MidnightControlsConfig.virtualMouse,
                 value -> MidnightControlsConfig.virtualMouse = value, Text.translatable("midnightcontrols.menu.virtual_mouse.tooltip"));
+        this.virtualKeyboardOption = new SpruceToggleBooleanOption("midnightcontrols.menu.virtual_keyboard", () -> MidnightControlsConfig.virtualMouse,
+                value -> MidnightControlsConfig.virtualKeyboard = value, Text.translatable("midnightcontrols.menu.virtual_keyboard.tooltip"));
         this.hideCursorOption = new SpruceToggleBooleanOption("midnightcontrols.menu.hide_cursor", () -> MidnightControlsConfig.hideNormalMouse,
                 value -> MidnightControlsConfig.hideNormalMouse = value, Text.translatable("midnightcontrols.menu.hide_cursor.tooltip"));
         // Touch options
@@ -391,6 +404,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         list.addSingleOptionEntry(this.yAxisRotationSpeedOption);
         list.addSingleOptionEntry(this.mouseSpeedOption);
         list.addSingleOptionEntry(this.virtualMouseOption);
+        list.addSingleOptionEntry(this.virtualKeyboardOption);
+        list.addSingleOptionEntry(this.virtualKeyboardLayoutOption);
         list.addSingleOptionEntry(this.hideCursorOption);
         list.addSingleOptionEntry(this.joystickAsMouseOption);
         list.addSingleOptionEntry(this.eyeTrackingAsMouseOption);

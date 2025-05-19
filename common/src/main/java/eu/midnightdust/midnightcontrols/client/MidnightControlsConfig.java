@@ -112,6 +112,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Condition(requiredOption = "virtualMouse", visibleButLocked = true)
     @Entry(category = SCREENS, name = "midnightcontrols.menu.virtual_mouse.skin") public static VirtualMouseSkin virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
     @Entry(category = SCREENS, name = "midnightcontrols.menu.hide_cursor") public static boolean hideNormalMouse = false;
+    @Entry(category = SCREENS, name = "midnightcontrols.menu.virtual_keyboard") public static boolean virtualKeyboard = false;
     @Entry(category = CONTROLLER, name = "Controller ID") @Hidden public static Object controllerID = 0;
     @Entry(category = CONTROLLER, name = "2nd Controller ID") @Hidden public static Object secondControllerID = -1;
     @Comment(category = TOUCH, centered = true, name="\uD83E\uDE84 Behaviour") public static Comment _touchBehaviour;
@@ -147,6 +148,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Comment(category = SCREENS, centered = true, name="\uD83D\uDD27 UI Modifications") public static Comment _uiMods;
     @Entry(category = SCREENS, name = "midnightcontrols.menu.move_chat") public static boolean moveChat = false;
     @Entry(category = SCREENS, name = "Enable Shortcut in Controls Options") public static boolean shortcutInControls = true;
+    @Entry(category = MISC, name = "midnightcontrols.menu.virtual_keyboard_layout") public static String keyboardLayout = "en_US:qwerty";
     @Entry(category = MISC, name = "Debug") public static boolean debug = false;
     @Entry(category = MISC, name = "Excluded Keybindings") public static List<String> excludedKeybindings = Lists.newArrayList("key.forward", "key.left", "key.back", "key.right", "key.jump", "key.sneak", "key.sprint", "key.inventory",
             "key.swapOffhand", "key.drop", "key.use", "key.attack", "key.chat", "key.playerlist", "key.screenshot", "key.togglePerspective", "key.smoothCamera", "key.fullscreen", "key.saveToolbarActivator", "key.loadToolbarActivator",
@@ -402,6 +404,7 @@ public class MidnightControlsConfig extends MidnightConfig {
         unfocusedInput = false;
         virtualMouse = false;
         virtualMouseSkin = VirtualMouseSkin.DEFAULT_LIGHT;
+        virtualKeyboard = false;
         controllerID = 0;
         secondControllerID = -1;
         controllerType = ControllerType.DEFAULT;

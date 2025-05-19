@@ -58,4 +58,10 @@ public interface CreativeInventoryScreenAccessor {
      */
     @Invoker("hasScrollbar")
     boolean midnightcontrols$hasScrollbar();
+
+    /**
+     * Triggers searching the creative inventory from the current value of the internal {@link net.minecraft.client.gui.widget.TextFieldWidget}
+     */
+    @Invoker("search")
+    void midnightcontrols$search();
 }
