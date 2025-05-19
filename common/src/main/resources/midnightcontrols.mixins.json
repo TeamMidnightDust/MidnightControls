@@ -3,6 +3,8 @@
   "package": "eu.midnightdust.midnightcontrols.client.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "AbstractBlockAccessor",
+    "AbstractSignEditScreenMixin",
     "AdvancementsScreenAccessor",
     "BookEditScreenAccessor",
     "ChatScreenMixin",
@@ -24,10 +26,8 @@
     "RecipeBookScreenAccessor",
     "RecipeBookWidgetAccessor",
     "ScreenMixin",
-    "AbstractSignEditScreenAccessor",
     "TabNavigationWidgetAccessor",
-    "WorldRendererMixin",
-    "AbstractBlockAccessor"
+    "WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
