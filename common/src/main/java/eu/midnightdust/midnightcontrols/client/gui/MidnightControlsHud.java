@@ -10,7 +10,6 @@
 package eu.midnightdust.midnightcontrols.client.gui;
 
 import eu.midnightdust.midnightcontrols.ControlsMode;
-import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.enums.HudSide;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
@@ -24,7 +23,6 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +38,7 @@ import static eu.midnightdust.midnightcontrols.MidnightControls.id;
  * @since 1.0.0
  */
 public class MidnightControlsHud extends Hud {
-    private final MinecraftClient client = MinecraftClient.getInstance();
+    private MinecraftClient client = MinecraftClient.getInstance();
     private int attackWidth = 0;
     private int attackButtonWidth = 0;
     private int dropItemWidth = 0;
@@ -63,6 +61,7 @@ public class MidnightControlsHud extends Hud {
 
     @Override
     public void init(@NotNull MinecraftClient client, int screenWidth, int screenHeight) {
+        this.client = MinecraftClient.getInstance();
         super.init(client, screenWidth, screenHeight);
         this.inventoryWidth = this.width(ButtonBinding.INVENTORY);
         this.inventoryButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.INVENTORY);

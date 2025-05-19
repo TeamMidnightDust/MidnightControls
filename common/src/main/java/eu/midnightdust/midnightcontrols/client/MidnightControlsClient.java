@@ -72,7 +72,7 @@ public class MidnightControlsClient extends MidnightControls {
     public static final Identifier WAYLAND_CURSOR_TEXTURE_LIGHT = id("cursor/light/mouse_pointer");
     public static final Identifier WAYLAND_CURSOR_TEXTURE_DARK = id("cursor/dark/mouse_pointer");
     public static final File MAPPINGS_FILE = new File("config/gamecontrollercustommappings.txt");
-    public static final MinecraftClient client = MinecraftClient.getInstance();
+    public static MinecraftClient client = MinecraftClient.getInstance();
     public static final MidnightInput input = new MidnightInput();
     public static final MidnightRing ring = new MidnightRing();
     public static final MidnightReacharound reacharound = new MidnightReacharound();
@@ -82,6 +82,7 @@ public class MidnightControlsClient extends MidnightControls {
     private static ControlsMode previousControlsMode;
 
     public static void initClient() {
+        client = MinecraftClient.getInstance();
         ring.registerAction("buttonbinding", ButtonBindingRingAction.FACTORY);
 
         int delay = 0; // delay for 0 sec.
@@ -211,6 +212,7 @@ public class MidnightControlsClient extends MidnightControls {
      * Called when opening a screen.
      */
     public static void onScreenOpen(Screen screen) {
+        client = MinecraftClient.getInstance();
         if (screen == null && MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN) {
             screen = new TouchscreenOverlay();
             screen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
