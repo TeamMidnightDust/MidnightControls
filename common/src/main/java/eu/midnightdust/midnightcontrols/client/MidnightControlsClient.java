@@ -88,7 +88,7 @@ public class MidnightControlsClient extends MidnightControls {
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() { // TODO: Add a try/catch here after the alpha testing period
                 if (lateInitDone && client.isRunning()) {
-                    if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && (client.isWindowFocused() || MidnightControlsConfig.unfocusedInput)) {
+                    if (MidnightControlsConfig.controlsMode != ControlsMode.DEFAULT && (client.isWindowFocused() || MidnightControlsConfig.unfocusedInput)) {
                         input.tickCameraStick();
                         input.updateCamera();
                     }
