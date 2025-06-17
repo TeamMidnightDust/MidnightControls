@@ -45,6 +45,7 @@ import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 import net.minecraft.client.gui.screen.ingame.StonecutterScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
+import net.minecraft.client.gui.screen.option.KeybindsScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.screen.slot.Slot;
@@ -452,6 +453,7 @@ public class MidnightInput {
      */
     public boolean tryGoBack(@NotNull Screen screen) {
         var set = ImmutableSet.of("gui.back", "gui.done", "gui.cancel", "gui.toTitle", "gui.toMenu");
+        if (screen instanceof KeybindsScreen) return false;
 
         return screen.children().stream().filter(element -> element instanceof PressableWidget)
                 .map(element -> (PressableWidget) element)
