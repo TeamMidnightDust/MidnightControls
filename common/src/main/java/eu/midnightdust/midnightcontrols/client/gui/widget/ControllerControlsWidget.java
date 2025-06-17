@@ -56,7 +56,7 @@ public class ControllerControlsWidget extends SpruceContainerWidget {
     @Override
     public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         context.drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.title.controller_controls"),
-                this.getX() + this.width / 2, this.getY() + 4, 16777215);
+                this.getX() + this.width / 2, this.getY() + 4, 0xFFFFFFFF);
         this.resetButton.setActive(InputManager.streamBindings().anyMatch(Predicates.not(ButtonBinding::isDefault)));
         super.renderWidget(context, mouseX, mouseY, delta);
     }

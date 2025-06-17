@@ -15,6 +15,8 @@ import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutManager;
+import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.util.math.ColorHelper;
 import org.thinkingstudio.obsidianui.background.Background;
 import org.thinkingstudio.obsidianui.mixin.DrawContextAccessor;
 import org.thinkingstudio.obsidianui.widget.SpruceWidget;
@@ -507,7 +509,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
 
     @Override
     public void renderTitle(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.drawCenteredTextWithShadow(this.textRenderer, I18n.translate("midnightcontrols.menu.title"), this.width / 2, 8, 16777215);
+        context.drawCenteredTextWithShadow(this.textRenderer, I18n.translate("midnightcontrols.menu.title"), this.width / 2, 8, 0xFFFFFFFF);
     }
 
     public static class MidnightControlsBackground implements Background {
@@ -518,21 +520,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         }
         @Override
         public void render(DrawContext context, SpruceWidget widget, int vOffset, int mouseX, int mouseY, float delta) {
-            fill(context, widget.getX(), widget.getY(), widget.getX() + widget.getWidth(), widget.getY() + widget.getHeight(), Color.black);
-        }
-        private static void fill(DrawContext context, int x2, int y2, int x1, int y1, Color color) {
-            RenderLayer renderLayer = RenderLayer.getGui();
-            VertexConsumer vertexConsumer = ((DrawContextAccessor)context).getVertexConsumers().getBuffer(renderLayer);
-
-            float r = (float)(color.getRed()) / 255.0F;
-            float g = (float)(color.getGreen()) / 255.0F;
-            float b = (float)(color.getBlue()) / 255.0F;
-            float t = (float)(transparency) / 255.0F;
-            vertexConsumer.vertex((float)x1, (float)y2, 0.0F).color(r, g, b, t);
-            vertexConsumer.vertex((float)x2, (float)y2, 0.0F).color(r, g, b, t);
-            vertexConsumer.vertex((float)x2, (float)y1, 0.0F).color(r, g, b, t);
-            vertexConsumer.vertex((float)x1, (float)y1, 0.0F).color(r, g, b, t);
-            context.draw();
+            context.fill(widget.getX(), widget.getY(), widget.getX() + widget.getWidth(), widget.getY() + widget.getHeight(), ColorHelper.getArgb(transparency, 0, 0, 0));
         }
     }
 }

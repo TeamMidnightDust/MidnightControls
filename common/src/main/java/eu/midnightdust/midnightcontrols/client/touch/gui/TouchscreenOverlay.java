@@ -9,10 +9,8 @@
 
 package eu.midnightdust.midnightcontrols.client.touch.gui;
 
-import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingIDAccessor;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -36,10 +34,8 @@ import eu.midnightdust.midnightcontrols.client.util.KeyBindingAccessor;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.TextIconButtonWidget;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.texture.MissingSprite;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -94,7 +90,7 @@ public class TouchscreenOverlay extends Screen {
         assert this.client != null;
         this.client.setScreen(new GameMenuScreen(true));
         if (this.client.isIntegratedServerRunning() && !Objects.requireNonNull(this.client.getServer()).isRemote()) {
-            this.client.getSoundManager().pauseAll();
+            this.client.getSoundManager().pauseAllExcept();
         }
     }
 

@@ -16,11 +16,11 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import net.minecraft.client.render.RenderTickCounter;
+import org.joml.Matrix3x2fStack;
 import org.thinkingstudio.obsidianui.hud.Hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
@@ -83,13 +83,13 @@ public class MidnightControlsHud extends Hud {
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.currentScreen == null) {
             isCrammed = client.getWindow().getScaledWidth() < 520;
             int y = bottom(2);
-            MatrixStack matrices = context.getMatrices();
-            matrices.push();
+            Matrix3x2fStack matrices = context.getMatrices();
+            matrices.pushMatrix();
             this.renderFirstIcons(context, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
             this.renderSecondIcons(context, MidnightControlsConfig.hudSide == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);
             this.renderFirstSection(context, MidnightControlsConfig.hudSide == HudSide.LEFT ? 2 : client.getWindow().getScaledWidth() - 2, y);
             this.renderSecondSection(context, MidnightControlsConfig.hudSide == HudSide.RIGHT ? 2 : client.getWindow().getScaledWidth() - 2, y);
-            matrices.pop();
+            matrices.popMatrix();
         }
 
         if (MidnightControlsClient.reacharound.isLastReacharoundVertical()) {
@@ -102,7 +102,7 @@ public class MidnightControlsHud extends Hud {
             int opacity = ((int) (255 * scale)) << 24;
 
             context.drawText(client.textRenderer, text, (int) (window.getScaledWidth() / 2.f - this.client.textRenderer.getWidth(text) / 2.f),
-                    (int) (window.getScaledHeight() / 2.f - 4), 0xCCCCCC | opacity, false);
+                    (int) (window.getScaledHeight() / 2.f - 4), 0xFFCCCCCC | opacity, false);
         }
     }
 
@@ -298,6 +298,6 @@ public class MidnightControlsHud extends Hud {
             return;
         var translatedAction = I18n.translate(action);
         int textY = (MidnightControlsRenderer.ICON_SIZE / 2 - this.client.textRenderer.fontHeight / 2) + 1;
-        context.drawText(this.client.textRenderer, translatedAction, x, (y + textY), 14737632, false);
+        context.drawText(this.client.textRenderer, translatedAction, x, (y + textY), 0xFFFFFFFF, false);
     }
 }

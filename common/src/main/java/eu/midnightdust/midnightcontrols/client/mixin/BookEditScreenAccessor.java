@@ -6,23 +6,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
+import java.util.List;
+
 @Mixin(BookEditScreen.class)
 public interface BookEditScreenAccessor {
-    @Accessor("signing")
-    boolean midnightcontrols$isSigning();
+    @Accessor("pages")
+    List<String> midnightcontrols$getPages();
 
-    @Accessor("title")
-    String midnightcontrols$getTitle();
-
-    @Accessor("title")
-    void midnightcontrols$setTitle(String title);
-
-    @Accessor("currentPageSelectionManager")
-    SelectionManager midnightcontrols$getCurrentPageSelectionManager();
-
-    @Invoker("getCurrentPageContent")
-    String midnightcontrols$getCurrentPageContent();
-
-    @Invoker("setPageContent")
-    void midnightcontrols$setPageContent(String newContent);
+    @Accessor("currentPage")
+    int midnightcontrols$getCurrentPage();
 }

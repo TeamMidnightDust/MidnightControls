@@ -9,7 +9,9 @@
 
 package eu.midnightdust.midnightcontrols.client.gui;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTextureView;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.enums.ControllerType;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
@@ -18,24 +20,31 @@ import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.enums.VirtualMouseSkin;
+import eu.midnightdust.midnightcontrols.client.gui.render.UnalignedTexturedQuadGuiElementRenderState;
 import eu.midnightdust.midnightcontrols.client.mixin.DrawContextAccessor;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState;
 import net.minecraft.client.render.*;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix3x2f;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Function;
 
 import static eu.midnightdust.midnightcontrols.MidnightControls.id;
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 
 /**
  * Represents the midnightcontrols renderer.
@@ -171,8 +180,8 @@ public class MidnightControlsRenderer {
 
         int assetSize = axis || (button >= 15 && button <= 18) ? AXIS_SIZE : BUTTON_SIZE;
 
-        RenderSystem.setShaderColor(1.f, second ? 0.f : 1.f, 1.f, 1.f);
-        context.drawTexture(RenderLayer::getGuiTextured, axis ? MidnightControlsClient.CONTROLLER_AXIS : button >= 15 && button <= 19 ? MidnightControlsClient.CONTROLLER_EXPANDED :MidnightControlsClient.CONTROLLER_BUTTONS
+        //RenderSystem.setShaderColor(1.f, second ? 0.f : 1.f, 1.f, 1.f);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, axis ? MidnightControlsClient.CONTROLLER_AXIS : button >= 15 && button <= 19 ? MidnightControlsClient.CONTROLLER_EXPANDED :MidnightControlsClient.CONTROLLER_BUTTONS
                 , x + (ICON_SIZE / 2 - assetSize / 2), y + (ICON_SIZE / 2 - assetSize / 2),
                 (float) buttonOffset, (float) (controllerType * assetSize),
                 assetSize, assetSize,
@@ -192,7 +201,8 @@ public class MidnightControlsRenderer {
             var translatedAction = I18n.translate(action);
             int textY = (MidnightControlsRenderer.ICON_SIZE / 2 - client.textRenderer.fontHeight / 2) + 1;
 
-            return context.drawTextWithShadow(client.textRenderer, translatedAction, (x + buttonWidth + 2), (y + textY), 14737632);
+            context.drawTextWithShadow(client.textRenderer, translatedAction, (x + buttonWidth + 2), (y + textY), 0xFFFFFFFF);
+            return (x + buttonWidth + 2) + client.textRenderer.getWidth(translatedAction);
         }
 
         return -10;
@@ -212,7 +222,7 @@ public class MidnightControlsRenderer {
             if (MidnightControlsConfig.virtualMouseSkin == VirtualMouseSkin.DEFAULT_DARK || MidnightControlsConfig.virtualMouseSkin == VirtualMouseSkin.SECOND_DARK)
                 spritePath = MidnightControlsClient.WAYLAND_CURSOR_TEXTURE_DARK;
             Sprite sprite = client.getGuiAtlasManager().getSprite(spritePath);
-            drawUnalignedTexturedQuad(RenderLayer::getGuiTextured, sprite.getAtlasId(), context, mouseX, mouseX + 8, mouseY, mouseY + 8, 999, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
+            drawUnalignedTexturedQuad(RenderPipelines.GUI_TEXTURED, sprite.getAtlasId(), context, mouseX, mouseX + 8, mouseY, mouseY + 8, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
         } catch (IllegalStateException ignored) {}
     }
 
@@ -256,20 +266,12 @@ public class MidnightControlsRenderer {
 
         try {
             Sprite sprite = client.getGuiAtlasManager().getSprite(id(MidnightControlsConfig.virtualMouseSkin.getSpritePath() + (hoverSlot ? "_slot" : "")));
-            drawUnalignedTexturedQuad(RenderLayer::getGuiTextured, sprite.getAtlasId(), context, mouseX, mouseX + 16, mouseY, mouseY + 16, 999, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
+            drawUnalignedTexturedQuad(RenderPipelines.GUI_TEXTURED, sprite.getAtlasId(), context, mouseX, mouseX + 16, mouseY, mouseY + 16, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
         } catch (IllegalStateException ignored) {}
     }
-    private static void drawUnalignedTexturedQuad(Function<Identifier, RenderLayer> renderLayers, Identifier texture, DrawContext context, float x1, float x2, float y1, float y2, float z, float u1, float u2, float v1, float v2) {
-        RenderLayer renderLayer = renderLayers.apply(texture);
-        //RenderSystem.setShaderTexture(0, texture);
-        Matrix4f matrix4f = context.getMatrices().peek().getPositionMatrix();
-        //BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-        VertexConsumer vertexConsumer = ((DrawContextAccessor)context).getVertexConsumers().getBuffer(renderLayer);
-        vertexConsumer.vertex(matrix4f, x1, y1, z).texture(u1, v1).color(ColorHelper.getWhite(1.0f));
-        vertexConsumer.vertex(matrix4f, x1, y2, z).texture(u1, v2).color(ColorHelper.getWhite(1.0f));
-        vertexConsumer.vertex(matrix4f, x2, y2, z).texture(u2, v2).color(ColorHelper.getWhite(1.0f));
-        vertexConsumer.vertex(matrix4f, x2, y1, z).texture(u2, v1).color(ColorHelper.getWhite(1.0f));
-        context.draw();
+    private static void drawUnalignedTexturedQuad(RenderPipeline pipeline, Identifier texture, DrawContext context, float x1, float x2, float y1, float y2, float u1, float u2, float v1, float v2) {
+        DrawContextAccessor accessor = (DrawContextAccessor) context;
+        accessor.getState().addSimpleElement(new UnalignedTexturedQuadGuiElementRenderState(pipeline, TextureSetup.withoutGlTexture(client.getTextureManager().getTexture(texture).getGlTextureView()), new Matrix3x2f(context.getMatrices()), x1, y1, x2, y2, u1, u2, v1, v2, 0xffffffff, accessor.getScissorStack().peekLast()));
     }
 
     public record ButtonSize(int length, int height) {

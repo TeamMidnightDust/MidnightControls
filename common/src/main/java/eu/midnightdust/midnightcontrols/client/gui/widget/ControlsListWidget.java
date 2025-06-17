@@ -14,6 +14,7 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.Identifier;
 import org.thinkingstudio.obsidianui.Position;
@@ -114,7 +115,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                     int size = 12;
                     int x = this.getX() + this.getWidth() / 2 - size / 2;
                     int y = this.getY() + this.getHeight() / 2 - size / 2;
-                    drawContext.drawGuiTexture(RenderLayer::getGuiTextured, resetTexture, x, y, size, size);
+                    drawContext.drawGuiTexture(RenderPipelines.GUI_TEXTURED, resetTexture, x, y, size, size);
                     return 1;
                 }
             };
@@ -247,7 +248,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
             int height = this.getHeight();
             //float textX = (float) (this.getX() + 70 - ControlsListWidget.this.maxTextLength);
             int textY = this.getY() + height / 2;
-            context.drawText(textRenderer, this.bindingName, this.getX(), (textY - 9 / 2), 16777215, true);
+            context.drawText(textRenderer, this.bindingName, this.getX(), (textY - 9 / 2), 0xFFFFFFFF, true);
 
             this.resetButton.setVisible(!focused);
             this.unbindButton.setVisible(focused);

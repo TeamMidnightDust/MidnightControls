@@ -17,19 +17,20 @@ public class BookEditScreenClickHandler extends AbstractScreenClickHandler<BookE
         var accessor = (BookEditScreenAccessor) screen;
 
         VirtualKeyboardScreen virtualKeyboardScreen;
-        if(accessor.midnightcontrols$isSigning()) {
-            virtualKeyboardScreen = new VirtualKeyboardScreen(accessor.midnightcontrols$getTitle(), (text) -> {
+//        if(accessor.midnightcontrols$isSigning()) {
+//            virtualKeyboardScreen = new VirtualKeyboardScreen(accessor.midnightcontrols$getTitle(), (text) -> {
+//                client.setScreen(screen);
+//                accessor.midnightcontrols$setTitle(text);
+//            }, true);
+//        }
+//        else {
+            virtualKeyboardScreen = new VirtualKeyboardScreen(accessor.midnightcontrols$getPages().get(accessor.midnightcontrols$getCurrentPage()), (text) -> {
                 client.setScreen(screen);
-                accessor.midnightcontrols$setTitle(text);
+                accessor.midnightcontrols$getPages().add(accessor.midnightcontrols$getCurrentPage(), text);
+                accessor.midnightcontrols$getPages().remove(accessor.midnightcontrols$getCurrentPage()+1);
+                //accessor.midnightcontrols$getCurrentPageSelectionManager().putCursorAtEnd();
             }, true);
-        }
-        else {
-            virtualKeyboardScreen = new VirtualKeyboardScreen(accessor.midnightcontrols$getCurrentPageContent(), (text) -> {
-                client.setScreen(screen);
-                accessor.midnightcontrols$setPageContent(text);
-                accessor.midnightcontrols$getCurrentPageSelectionManager().putCursorAtEnd();
-            }, true);
-        }
+        //}
 
         client.setScreen(virtualKeyboardScreen);
     }

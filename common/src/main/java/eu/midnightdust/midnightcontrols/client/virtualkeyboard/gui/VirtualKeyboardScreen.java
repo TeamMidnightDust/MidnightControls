@@ -75,12 +75,6 @@ public class VirtualKeyboardScreen extends SpruceScreen {
     }
 
     @Override
-    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext, mouseX, mouseY, delta);
-        super.render(drawContext, mouseX, mouseY, delta);
-    }
-
-    @Override
     public boolean shouldPause() {
         return false;
     }
