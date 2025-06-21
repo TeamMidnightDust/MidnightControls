@@ -9,18 +9,13 @@
 
 package eu.midnightdust.midnightcontrols.client.gui;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutManager;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.util.math.ColorHelper;
 import org.thinkingstudio.obsidianui.background.Background;
-import org.thinkingstudio.obsidianui.mixin.DrawContextAccessor;
 import org.thinkingstudio.obsidianui.widget.SpruceWidget;
-import eu.midnightdust.lib.util.MidnightColorUtil;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
@@ -39,17 +34,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.*;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
-
-import java.awt.*;
 
 /**
  * Represents the midnightcontrols settings screen.
