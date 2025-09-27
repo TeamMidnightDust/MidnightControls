@@ -18,6 +18,7 @@ import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.state.WorldRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.BlockItem;
@@ -58,24 +59,23 @@ public abstract class WorldRendererMixin {
     @Final
     private BufferBuilderStorage bufferBuilders;
 
-    @Redirect(method = "renderTargetBlockOutline", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/BlockHitResult;getType()Lnet/minecraft/util/hit/HitResult$Type;"))
-    private HitResult.Type dontRenderOutline(BlockHitResult instance) {
+    @Inject(method = "renderTargetBlockOutline", at = @At("HEAD"), cancellable = true)
+    private void dontRenderOutline(VertexConsumerProvider.Immediate immediate, MatrixStack matrices, boolean renderBlockOutline, WorldRenderState renderStates, CallbackInfo ci) {
         if (MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN && MidnightControlsConfig.touchMode == TouchMode.FINGER_POS) {
-            return HitResult.Type.MISS;
+            ci.cancel();
         }
-        return instance.getType();
     }
 
     @Inject(
             method = "renderTargetBlockOutline",
             at = @At("HEAD")
     )
-    private void onOutlineRender(Camera camera, VertexConsumerProvider.Immediate vertexConsumers, MatrixStack matrices, boolean translucent, CallbackInfo ci) {
+    private void onOutlineRender(VertexConsumerProvider.Immediate immediate, MatrixStack matrices, boolean renderBlockOutline, WorldRenderState renderStates, CallbackInfo ci) {
         if (((MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.touchInControllerMode) || MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN)
                 && MidnightControlsConfig.touchMode == TouchMode.FINGER_POS) {
-            this.midnightcontrols$renderFingerOutline(matrices, camera);
+            this.midnightcontrols$renderFingerOutline(matrices, client.gameRenderer.getCamera());
         }
-        this.midnightcontrols$renderReacharoundOutline(matrices, camera);
+        this.midnightcontrols$renderReacharoundOutline(matrices, client.gameRenderer.getCamera());
     }
     @Unique
     private void midnightcontrols$renderFingerOutline(MatrixStack matrices, Camera camera) {

@@ -60,7 +60,7 @@ public class EyeTrackerHandler {
         // The player entity's needs their facing rotated.
         double invertY = 1.0;
         double moveMagnitude = Math.sqrt(normalizedX*normalizedX + normalizedY*normalizedY);
-        if (client.options.getInvertYMouse().getValue()) {
+        if (client.options.getInvertMouseY().getValue()) {
             invertY = -1.0;
         }
         boolean notInDeadzone = (moveMagnitude > MidnightControlsConfig.eyeTrackerDeadzone) && !usingLongRangedTool;

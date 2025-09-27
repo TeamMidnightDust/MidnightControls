@@ -5,6 +5,7 @@ import dev.isxander.yacl.gui.OptionListWidget;
 import dev.isxander.yacl.gui.YACLScreen;
 import dev.isxander.yacl.gui.controllers.ControllerWidget;
 import dev.isxander.yacl.gui.controllers.slider.SliderControllerElement;
+import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import org.lwjgl.glfw.GLFW;
@@ -13,7 +14,7 @@ public class YACLCompat implements CompatHandler {
     public static boolean handleAButton(Screen screen, Element element) {
         if (element instanceof AbstractWidget abstractWidget) {
             // imitate enter key press
-            return abstractWidget.keyPressed(GLFW.GLFW_KEY_ENTER, 0, 0);
+            return abstractWidget.keyPressed(MidnightInput.ENTER_KEY_INPUT);
         }
         return false;
     }

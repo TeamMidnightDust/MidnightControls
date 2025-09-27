@@ -177,7 +177,7 @@ public class InputHandlers {
                 if (button.getName().equals("take_all")) {
                     return false;
                 }
-                slotId = accessor.midnightcontrols$isClickOutsideBounds(x, y, accessor.getX(), accessor.getY(), GLFW_MOUSE_BUTTON_1) ? -999 : -1;
+                slotId = accessor.midnightcontrols$isClickOutsideBounds(x, y, accessor.getX(), accessor.getY()) ? -999 : -1;
             } else {
                 slotId = slot.id;
             }

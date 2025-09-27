@@ -423,6 +423,15 @@ public class InputManager {
      * @see #makeKeyBinding(Identifier, InputUtil.Type, int, String)
      */
     public static @NotNull KeyBinding makeKeyBinding(@NotNull Identifier id, InputUtil.Type type, int code, @NotNull String category) {
-        return new KeyBinding(String.format("key.%s.%s", id.getNamespace(), id.getPath()), type, code, category);
+        return new KeyBinding(String.format("key.%s.%s", id.getNamespace(), id.getPath()), type, code, new KeyBinding.Category(validVanillaId(category)));
+    }
+
+    private static Identifier validVanillaId(String path) {
+        for(int i = 0; i < path.length(); ++i) {
+            if (!Identifier.isPathCharacterValid(path.charAt(i))) {
+                path = path.replace(path.charAt(i), '_');
+            }
+        }
+        return Identifier.ofVanilla(path);
     }
 }

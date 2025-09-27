@@ -12,6 +12,7 @@ package eu.midnightdust.midnightcontrols.client.gui;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.ring.RingButtonMode;
 import eu.midnightdust.midnightcontrols.client.ring.RingPage;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -79,8 +80,8 @@ public class RingScreen extends Screen {
 //    }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (ring.getCurrentPage().onClick(width, height, (int) mouseX, (int) mouseY)) {
+    public boolean mouseReleased(Click click) {
+        if (ring.getCurrentPage().onClick(width, height, (int) click.x(), (int) click.y())) {
             this.close();
             return true;
         }

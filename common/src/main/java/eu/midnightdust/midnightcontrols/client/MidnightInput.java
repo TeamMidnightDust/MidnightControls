@@ -17,14 +17,18 @@ import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.YACLCompat;
 import eu.midnightdust.midnightcontrols.client.mixin.AdvancementsScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
+import eu.midnightdust.midnightcontrols.client.mixin.KeyboardAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.MouseAccessor;
 import eu.midnightdust.midnightcontrols.client.util.InventoryUtil;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
 import eu.midnightdust.midnightcontrols.client.util.storage.ButtonStorage;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.option.KeybindsScreen;
 import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.entity.vehicle.BoatEntity;
 import org.thinkingstudio.obsidianui.widget.AbstractSpruceWidget;
 import org.thinkingstudio.obsidianui.widget.container.SpruceEntryListWidget;
@@ -82,6 +86,7 @@ import static org.lwjgl.glfw.GLFW.*;
  */
 public class MidnightInput {
     public static final Map<Integer, Integer> BUTTON_COOLDOWNS = new HashMap<>();
+    public static final KeyInput ENTER_KEY_INPUT = new KeyInput(GLFW_KEY_ENTER, 0, 0);
     // Cooldowns
     public int actionGuiCooldown = 0;
     public int joystickCooldown = 0;
@@ -393,9 +398,9 @@ public class MidnightInput {
                 accessor.midnightcontrols$onCursorPos(client.getWindow().getHandle(), client.mouse.getX(), client.mouse.getY());
                 switch (storage.state) {
                     // Button pressed
-                    case PRESS -> accessor.midnightcontrols$onMouseButton(client.getWindow().getHandle(), GLFW_MOUSE_BUTTON_LEFT, 1, 0);
+                    case PRESS -> accessor.midnightcontrols$onMouseButton(client.getWindow().getHandle(), new MouseInput(GLFW_MOUSE_BUTTON_LEFT, 1), 0);
                     case RELEASE -> { // Button released
-                        accessor.midnightcontrols$onMouseButton(client.getWindow().getHandle(), GLFW_MOUSE_BUTTON_LEFT, 0, 0);
+                        accessor.midnightcontrols$onMouseButton(client.getWindow().getHandle(), new MouseInput(GLFW_MOUSE_BUTTON_LEFT, 0), 0);
                         client.currentScreen.setDragging(false);
                     }
                     case REPEAT -> client.currentScreen.setDragging(true); // Button held down / dragging
@@ -412,8 +417,8 @@ public class MidnightInput {
             if (client.currentScreen instanceof HandledScreen<?> handledScreen && ((HandledScreenAccessor) handledScreen).midnightcontrols$getSlotAt(
                     mouseX, mouseY) != null) return;
             if (!this.ignoreNextXRelease && client.currentScreen != null) {
-                if (storage.state == ButtonState.PRESS) client.currentScreen.mouseClicked(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_2);
-                else if (storage.state == ButtonState.RELEASE) client.currentScreen.mouseReleased(mouseX, mouseY, GLFW.GLFW_MOUSE_BUTTON_2);
+                if (storage.state == ButtonState.PRESS) client.currentScreen.mouseClicked(new Click(mouseX, mouseY, new MouseInput(GLFW.GLFW_MOUSE_BUTTON_2, 1)), false);
+                else if (storage.state == ButtonState.RELEASE) client.currentScreen.mouseReleased(new Click(mouseX, mouseY, new MouseInput(GLFW.GLFW_MOUSE_BUTTON_2, 0)));
                 this.screenCloseCooldown = 5;
             } else {
                 this.ignoreNextXRelease = false;
@@ -607,7 +612,7 @@ public class MidnightInput {
     public boolean handleAButton(@NotNull Screen screen, @NotNull Element focused) {
         if (focused instanceof PressableWidget widget) {
             widget.playDownSound(MinecraftClient.getInstance().getSoundManager());
-            widget.onPress();
+            widget.onPress(ENTER_KEY_INPUT);
             return true;
         } else if (focused instanceof AbstractSprucePressableButtonWidget widget) {
             widget.playDownSound();
@@ -622,8 +627,8 @@ public class MidnightInput {
         } else if (focused instanceof MultiplayerServerListWidget list) {
             var entry = list.getSelectedOrNull();
             if (entry instanceof MultiplayerServerListWidget.LanServerEntry || entry instanceof MultiplayerServerListWidget.ServerEntry) {
-                ((MultiplayerScreen) screen).select(entry);
-                ((MultiplayerScreen) screen).connect();
+                //((MultiplayerScreen) screen).select(entry);
+                entry.connect();
             }
         } else if (focused instanceof SpruceParentWidget) {
             var childFocused = ((SpruceParentWidget<?>) focused).getFocused();
@@ -672,7 +677,7 @@ public class MidnightInput {
             }
             case SliderWidget slider -> {
                 if (slider.active) {
-                    slider.keyPressed(right ? 262 : 263, 0, 0);
+                    slider.keyPressed(new KeyInput(right ? 262 : 263, 0, 0));
                     this.actionGuiCooldown = 2; // Prevent to press too quickly the focused element, so we have to skip 5 ticks.
                     return true;
                 }
@@ -796,7 +801,7 @@ public class MidnightInput {
                 .anyMatch(element -> {
                     if (element.getMessage().getContent() instanceof TranslatableTextContent translatableText) {
                         if (set.stream().anyMatch(key -> translatableText.getKey().equals(key))) {
-                            element.onPress();
+                            element.onPress(ENTER_KEY_INPUT);
                             return true;
                         }
                     }
@@ -811,9 +816,9 @@ public class MidnightInput {
     }
 
     public void pressKeyboardKey(MinecraftClient client, int key) {
-        client.keyboard.onKey(client.getWindow().getHandle(), key, 0, 1, 0);
+        ((KeyboardAccessor) client.keyboard).midnightcontrols$onKey(client.getWindow().getHandle(), 1, new KeyInput(key, 0, 0));
     }
     public void pressKeyboardKey(Screen screen, int key) {
-        screen.keyPressed(key, 0, 1);
+        screen.keyPressed(new KeyInput(key, 0, 1));
     }
 }

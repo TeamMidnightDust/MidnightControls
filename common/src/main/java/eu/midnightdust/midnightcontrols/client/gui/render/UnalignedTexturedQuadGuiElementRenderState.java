@@ -17,11 +17,11 @@ public record UnalignedTexturedQuadGuiElementRenderState(RenderPipeline pipeline
     }
 
     @Override
-    public void setupVertices(VertexConsumer vertices, float depth) {
-        vertices.vertex(pose(), x1(), y1(), depth).texture(u1(), v1()).color(color());
-        vertices.vertex(pose(), x1(), y2(), depth).texture(u1(), v2()).color(color());
-        vertices.vertex(pose(), x2(), y2(), depth).texture(u2(), v2()).color(color());
-        vertices.vertex(pose(), x2(), y1(), depth).texture(u2(), v1()).color(color());
+    public void setupVertices(VertexConsumer vertices) {
+        vertices.vertex(pose(), x1(), y1()).texture(u1(), v1()).color(color());
+        vertices.vertex(pose(), x1(), y2()).texture(u1(), v2()).color(color());
+        vertices.vertex(pose(), x2(), y2()).texture(u2(), v2()).color(color());
+        vertices.vertex(pose(), x2(), y1()).texture(u2(), v1()).color(color());
     }
 
     @Nullable

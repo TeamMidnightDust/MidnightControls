@@ -1,6 +1,7 @@
 package eu.midnightdust.midnightcontrols.client.util.platform;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
@@ -10,6 +11,8 @@ import net.minecraft.item.ItemGroups;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+
+import static eu.midnightdust.midnightcontrols.client.MidnightInput.ENTER_KEY_INPUT;
 
 public class ItemGroupUtil {
     @ExpectPlatform
@@ -24,10 +27,10 @@ public class ItemGroupUtil {
                     .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
                     .anyMatch(element -> {
                         if (next && element.getMessage().getString().equals(">")) {
-                            element.onPress();
+                            element.onPress(ENTER_KEY_INPUT);
                             return true;
                         } else if (element.getMessage().getString().equals("<")) {
-                            element.onPress();
+                            element.onPress(ENTER_KEY_INPUT);
                             return true;
                         }
                         return false;

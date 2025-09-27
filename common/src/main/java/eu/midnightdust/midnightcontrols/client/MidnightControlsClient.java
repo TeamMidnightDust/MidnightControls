@@ -150,20 +150,20 @@ public class MidnightControlsClient extends MidnightControls {
         if (PlatformFunctions.isModLoaded("wynntils") && KeyBindingIDAccessor.getKEYS_BY_ID().entrySet().stream().noneMatch(b -> Objects.equals(b.getValue().getCategory(), "Wynntils"))) return;
         for (int i = 0; i < KeyBindingIDAccessor.getKEYS_BY_ID().size(); ++i) {
             KeyBinding keyBinding = KeyBindingIDAccessor.getKEYS_BY_ID().entrySet().stream().toList().get(i).getValue();
-            if (MidnightControlsConfig.excludedKeybindings.stream().noneMatch(excluded -> keyBinding.getTranslationKey().startsWith(excluded))) {
-                if (!keyBinding.getTranslationKey().contains(MidnightControlsConstants.NAMESPACE)) {
+            if (MidnightControlsConfig.excludedKeybindings.stream().noneMatch(excluded -> keyBinding.getId().startsWith(excluded))) {
+                if (!keyBinding.getId().contains(MidnightControlsConstants.NAMESPACE)) {
                     AtomicReference<ButtonCategory> category = new AtomicReference<>();
                     InputManager.streamCategories().forEach(buttonCategory -> {
-                        if (buttonCategory.getIdentifier().equals(validVanillaId(keyBinding.getCategory())))
+                        if (buttonCategory.getIdentifier().equals(keyBinding.getCategory().id()))
                             category.set(buttonCategory);
                     });
                     if (category.get() == null) {
-                        category.set(new ButtonCategory(validVanillaId(keyBinding.getCategory())));
+                        category.set(new ButtonCategory(keyBinding.getCategory().id()));
                         InputManager.registerCategory(category.get());
                     }
-                    ButtonBinding buttonBinding = new ButtonBinding.Builder(keyBinding.getTranslationKey()).category(category.get()).linkKeybind(keyBinding).register();
+                    ButtonBinding buttonBinding = new ButtonBinding.Builder(keyBinding.getId()).category(category.get()).linkKeybind(keyBinding).register();
                     if (MidnightControlsConfig.debug) {
-                        MidnightControls.log(keyBinding.getTranslationKey());
+                        MidnightControls.log(keyBinding.getId());
                         MidnightControls.log(String.valueOf(buttonBinding));
                     }
                 }
@@ -171,14 +171,6 @@ public class MidnightControlsClient extends MidnightControls {
         }
         InputManager.loadButtonBindings();
         lateInitDone = true;
-    }
-    private static Identifier validVanillaId(String path) {
-        for(int i = 0; i < path.length(); ++i) {
-            if (!Identifier.isPathCharacterValid(path.charAt(i))) {
-                path = path.replace(path.charAt(i), '_');
-            }
-        }
-        return Identifier.ofVanilla(path);
     }
 
     /**

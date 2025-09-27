@@ -34,13 +34,13 @@ public class TouchUtils {
         Vec3d far = screenSpaceToWorldSpace(mouseX, mouseY, 1);
 
         float playerRange = getPlayerRange(client);
-        EntityHitResult entityCast = ProjectileUtil.raycast(client.player, near, far, Box.from(client.player.getPos()).expand(playerRange), entity -> (!entity.isSpectator() && entity.isAttackable()), playerRange * playerRange);
+        EntityHitResult entityCast = ProjectileUtil.raycast(client.player, near, far, Box.from(client.player.getEntityPos()).expand(playerRange), entity -> (!entity.isSpectator() && entity.isAttackable()), playerRange * playerRange);
 
         if (entityCast != null && entityCast.getType() == HitResult.Type.ENTITY) return entityCast;
 
         BlockHitResult result = client.world.raycast(new RaycastContext(near, far, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, client.player));
 
-        if (client.player.getPos().distanceTo(result.getPos()) > playerRange) return null;
+        if (client.player.getEntityPos().distanceTo(result.getPos()) > playerRange) return null;
         return result;
     }
 

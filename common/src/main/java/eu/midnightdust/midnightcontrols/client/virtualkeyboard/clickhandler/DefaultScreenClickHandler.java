@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
+import static eu.midnightdust.midnightcontrols.client.MidnightInput.ENTER_KEY_INPUT;
 
 public class DefaultScreenClickHandler extends AbstractScreenClickHandler<Screen> {
 
@@ -54,7 +55,7 @@ public class DefaultScreenClickHandler extends AbstractScreenClickHandler<Screen
             }
             case ChatScreen chatScreen -> {
                 // send the chat message
-                chatScreen.keyPressed(GLFW.GLFW_KEY_ENTER, 0, 0);
+                chatScreen.keyPressed(ENTER_KEY_INPUT);
             }
             default -> {
             }

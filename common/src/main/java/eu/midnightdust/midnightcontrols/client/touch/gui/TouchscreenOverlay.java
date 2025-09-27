@@ -11,12 +11,15 @@ package eu.midnightdust.midnightcontrols.client.touch.gui;
 
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.consume.UseAction;
 import net.minecraft.util.Arm;
+import net.minecraft.util.Atlases;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import org.thinkingstudio.obsidianui.Position;
@@ -170,7 +173,7 @@ public class TouchscreenOverlay extends Screen {
             this.addDrawableChild(emoteButton);
         }
 
-        TextIconButtonWidget chatButton = TextIconButtonWidget.builder(Text.empty(), btn -> this.client.setScreen(new ChatScreen("")), true).width(20).texture(id("touch/chat"), 20, 20).build();
+        TextIconButtonWidget chatButton = TextIconButtonWidget.builder(Text.empty(), btn -> this.client.setScreen(new ChatScreen("", true)), true).width(20).texture(id("touch/chat"), 20, 20).build();
         chatButton.setPosition(scaledWidth / 2 - 20 + emoteOffset, 0);
         this.addDrawableChild(chatButton);
         TextIconButtonWidget pauseButton = TextIconButtonWidget.builder(Text.empty(), btn -> this.pauseGame(), true).width(20).texture(id("touch/pause"), 20, 20).build();
@@ -289,12 +292,12 @@ public class TouchscreenOverlay extends Screen {
         assert client != null;
         Identifier emptySprite = id("touch/empty");
         List<String> list = left ? MidnightControlsConfig.leftTouchBinds : MidnightControlsConfig.rightTouchBinds;
-        Sprite missingSprite = client.getGuiAtlasManager().getSprite(MissingSprite.getMissingSpriteId());
+        Sprite missingSprite = client.getAtlasManager().getAtlasTexture(Atlases.GUI).getMissingSprite();
         for (int i = 0; i < list.size(); i++) {
             String bindName = list.get(i);
             ButtonBinding binding = InputManager.getBinding(bindName);
             if (binding == null) continue;
-            boolean hasTexture = client.getGuiAtlasManager().getSprite(id("binding/"+bindName)) != missingSprite;
+            boolean hasTexture = client.getAtlasManager().getAtlasTexture(Atlases.GUI).getSprite(id("binding/"+bindName)) != missingSprite;
             if (MidnightControlsConfig.debug) System.out.println(left +" "+id("binding/"+bindName)+" "+ hasTexture);
             var button = TextIconButtonWidget.builder(Text.translatable(binding.getTranslationKey()), b -> {
                     binding.handle(client, 1.0f, ButtonState.PRESS);
@@ -349,8 +352,8 @@ public class TouchscreenOverlay extends Screen {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (button == GLFW.GLFW_MOUSE_BUTTON_1 && this.client != null) {
+    public boolean mouseDragged(Click click, double deltaX, double deltaY) {
+        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_1 && this.client != null) {
             if (TouchInput.isDragging) {
                 if (!MidnightControlsConfig.invertTouch) {
                     deltaX = -deltaX;
@@ -361,6 +364,6 @@ public class TouchscreenOverlay extends Screen {
             }
             else TouchInput.isDragging = true;
         }
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return super.mouseDragged(click, deltaX, deltaY);
     }
 }

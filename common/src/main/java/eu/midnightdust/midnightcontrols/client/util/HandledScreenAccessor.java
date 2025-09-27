@@ -40,7 +40,7 @@ public interface HandledScreenAccessor {
      */
     Slot midnightcontrols$getSlotAt(double posX, double posY);
 
-    boolean midnightcontrols$isClickOutsideBounds(double mouseX, double mouseY, int x, int y, int button);
+    boolean midnightcontrols$isClickOutsideBounds(double mouseX, double mouseY, int left, int top);
 
     /**
      * Handles a mouse click on the specified slot.

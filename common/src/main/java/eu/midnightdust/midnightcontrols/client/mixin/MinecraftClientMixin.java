@@ -77,7 +77,7 @@ public abstract class MinecraftClientMixin {
         if (!MidnightControlsFeature.FAST_BLOCK_PLACING.isAvailable())
             return;
         if (this.midnightcontrols$lastPos == null)
-            this.midnightcontrols$lastPos = this.player.getPos();
+            this.midnightcontrols$lastPos = this.player.getEntityPos();
 
         int cooldown = this.itemUseCooldown;
         BlockHitResult hitResult;
@@ -106,7 +106,7 @@ public abstract class MinecraftClientMixin {
 //                    this.itemUseCooldown = 0;
 //            }
 //        }
-        this.midnightcontrols$lastPos = this.player.getPos();
+        this.midnightcontrols$lastPos = this.player.getEntityPos();
     }
 
     @Inject(at = @At("TAIL"), method = "setScreen")

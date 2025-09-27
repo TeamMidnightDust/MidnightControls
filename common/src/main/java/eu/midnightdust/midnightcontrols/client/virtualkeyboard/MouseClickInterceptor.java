@@ -4,6 +4,7 @@ import eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler.Abst
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler.BookEditScreenClickHandler;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler.DefaultScreenClickHandler;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler.SignEditScreenClickHandler;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.BookEditScreen;
 import net.minecraft.client.gui.screen.ingame.BookSigningScreen;
@@ -26,13 +27,13 @@ public class MouseClickInterceptor {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Screen> void intercept(T screen, double mouseX, double mouseY) {
+    public <T extends Screen> void intercept(T screen, Click click) {
         AbstractScreenClickHandler<T> handler = (AbstractScreenClickHandler<T>) clickHandlers.get(screen.getClass());
 
         if (handler == null) {
             handler = (AbstractScreenClickHandler<T>) clickHandlers.get(Screen.class);
         }
 
-        handler.handle(screen, mouseX, mouseY);
+        handler.handle(screen, click.x(), click.y());
     }
 }

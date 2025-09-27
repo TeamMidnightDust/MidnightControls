@@ -32,8 +32,10 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.TextureSetup;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
+import net.minecraft.util.Atlases;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import org.jetbrains.annotations.NotNull;
@@ -221,7 +223,8 @@ public class MidnightControlsRenderer {
             Identifier spritePath = MidnightControlsClient.WAYLAND_CURSOR_TEXTURE_LIGHT;
             if (MidnightControlsConfig.virtualMouseSkin == VirtualMouseSkin.DEFAULT_DARK || MidnightControlsConfig.virtualMouseSkin == VirtualMouseSkin.SECOND_DARK)
                 spritePath = MidnightControlsClient.WAYLAND_CURSOR_TEXTURE_DARK;
-            Sprite sprite = client.getGuiAtlasManager().getSprite(spritePath);
+
+            Sprite sprite = client.getAtlasManager().getAtlasTexture(Atlases.GUI).getSprite(spritePath);
             drawUnalignedTexturedQuad(RenderPipelines.GUI_TEXTURED, sprite.getAtlasId(), context, mouseX, mouseX + 8, mouseY, mouseY + 8, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
         } catch (IllegalStateException ignored) {}
     }
@@ -265,7 +268,7 @@ public class MidnightControlsRenderer {
         }
 
         try {
-            Sprite sprite = client.getGuiAtlasManager().getSprite(id(MidnightControlsConfig.virtualMouseSkin.getSpritePath() + (hoverSlot ? "_slot" : "")));
+            Sprite sprite = client.getAtlasManager().getAtlasTexture(Atlases.GUI).getSprite(id(MidnightControlsConfig.virtualMouseSkin.getSpritePath() + (hoverSlot ? "_slot" : "")));
             drawUnalignedTexturedQuad(RenderPipelines.GUI_TEXTURED, sprite.getAtlasId(), context, mouseX, mouseX + 16, mouseY, mouseY + 16, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
         } catch (IllegalStateException ignored) {}
     }

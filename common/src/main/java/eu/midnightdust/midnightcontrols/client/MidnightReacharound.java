@@ -125,7 +125,7 @@ public class MidnightReacharound {
             if (client.player.isRiding())
                 return null;
             // Temporary pos, do not use
-            Vec3d playerPosi = client.player.getPos();
+            Vec3d playerPosi = client.player.getEntityPos();
 
             // Imitates var playerPos = client.player.getBlockPos().down();
             Vec3d playerPos = new Vec3d(playerPosi.getX(), playerPosi.getY() - 1.0, playerPosi.getZ());

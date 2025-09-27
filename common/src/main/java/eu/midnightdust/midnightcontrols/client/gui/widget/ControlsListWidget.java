@@ -15,6 +15,9 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.Click;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.Identifier;
 import org.thinkingstudio.obsidianui.Position;
@@ -175,7 +178,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                 }
 
                 element = it.next();
-            } while (!element.mouseClicked(mouseX, mouseY, button));
+            } while (!element.mouseClicked(new Click(mouseX, mouseY, new MouseInput(button, 0)), false));
 
             this.setFocused(element);
             if (button == GLFW.GLFW_MOUSE_BUTTON_1)
@@ -187,18 +190,18 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         @Override
         protected boolean onMouseRelease(double mouseX, double mouseY, int button) {
             this.dragging = false;
-            return this.hoveredElement(mouseX, mouseY).filter(element -> element.mouseReleased(mouseX, mouseY, button)).isPresent();
+            return this.hoveredElement(mouseX, mouseY).filter(element -> element.mouseReleased(new Click(mouseX, mouseY, new MouseInput(button, 0)))).isPresent();
         }
 
         @Override
         protected boolean onMouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
             return this.getFocused() != null && this.dragging && button == GLFW.GLFW_MOUSE_BUTTON_1
-                    && this.getFocused().mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+                    && this.getFocused().mouseDragged(new Click(mouseX, mouseY, new MouseInput(button, 0)), deltaX, deltaY);
         }
 
         @Override
         protected boolean onKeyPress(int keyCode, int scanCode, int modifiers) {
-            return this.focused != null && this.focused.keyPressed(keyCode, scanCode, modifiers);
+            return this.focused != null && this.focused.keyPressed(new KeyInput(keyCode, scanCode, modifiers));
         }
 
         /* Navigation */

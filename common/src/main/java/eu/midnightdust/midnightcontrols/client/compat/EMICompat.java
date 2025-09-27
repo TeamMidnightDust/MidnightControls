@@ -4,6 +4,7 @@ import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.screen.EmiScreenManager;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
@@ -14,8 +15,8 @@ import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 public class EMICompat implements CompatHandler {
     public static boolean handleEmiPages(boolean direction) {
         if (isEMIEnabled() && MidnightControlsClient.input.actionGuiCooldown == 0 && EmiScreenManager.getSearchPanel() != null && EmiScreenManager.getSearchPanel().pageLeft != null && EmiScreenManager.getSearchPanel().pageRight != null) {
-            if (direction) EmiScreenManager.getSearchPanel().pageRight.onPress();
-            else EmiScreenManager.getSearchPanel().pageLeft.onPress();
+            if (direction) EmiScreenManager.getSearchPanel().pageRight.onPress(MidnightInput.ENTER_KEY_INPUT);
+            else EmiScreenManager.getSearchPanel().pageLeft.onPress(MidnightInput.ENTER_KEY_INPUT);
             MidnightControlsClient.input.actionGuiCooldown = 5;
             return true;
         }

@@ -4,6 +4,9 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
+import net.minecraft.client.input.MouseInput;
+import net.minecraft.client.particle.BlockDustParticle;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -46,7 +49,7 @@ public class TouchInput {
         if (result instanceof BlockHitResult blockHit && firstHitResult instanceof BlockHitResult firstBlock && blockHit.getBlockPos().equals(firstBlock.getBlockPos())) {
             if (MidnightControlsConfig.debug) System.out.println(blockHit.getBlockPos().toString());
             if (client.interactionManager.updateBlockBreakingProgress(blockHit.getBlockPos(), blockHit.getSide())) {
-                client.particleManager.addBlockBreakingParticles(blockHit.getBlockPos(), blockHit.getSide());
+                //client.particleManager.addBlockBreakingParticles(blockHit.getBlockPos(), blockHit.getSide()); // TODO Re-implement block breaking particles!!!
                 client.player.swingHand(Hand.MAIN_HAND);
             } else client.interactionManager.cancelBlockBreaking();
             firstHitResult = TouchUtils.getTargetedObject(mouseX, mouseY);
@@ -62,7 +65,7 @@ public class TouchInput {
         isDragging = false;
         firstHitResult = null;
         if (client.interactionManager != null) client.interactionManager.cancelBlockBreaking();
-        if ((client.currentScreen == null || !client.currentScreen.mouseReleased(mouseX, mouseY, button)) && System.currentTimeMillis() - clickStartTime < MidnightControlsConfig.touchBreakDelay) {
+        if ((client.currentScreen == null || !client.currentScreen.mouseReleased(new Click(mouseX, mouseY, new MouseInput(button, 0)))) && System.currentTimeMillis() - clickStartTime < MidnightControlsConfig.touchBreakDelay) {
             assert client.player != null;
             assert client.world != null;
             assert client.interactionManager != null;

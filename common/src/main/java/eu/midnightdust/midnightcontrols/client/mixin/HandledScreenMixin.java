@@ -46,7 +46,7 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
     public abstract Slot midnightcontrols$getSlotAt(double posX, double posY);
 
     @Invoker("isClickOutsideBounds")
-    public abstract boolean midnightcontrols$isClickOutsideBounds(double mouseX, double mouseY, int x, int y, int button);
+    public abstract boolean midnightcontrols$isClickOutsideBounds(double mouseX, double mouseY, int left, int top);
 
 
     @Invoker("onMouseClick")
