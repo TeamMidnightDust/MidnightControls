@@ -54,10 +54,6 @@ allprojects {
 
     repositories {
         maven { url 'https://aperlambda.github.io/maven' }
-        maven {
-            name "MidnightDust Snapshots"
-            url "https://maven.midnightdust.eu/snapshots"
-        }
     }
     dependencies {
         implementation('org.aperlambda:lambdajcommon:1.8.1') {
