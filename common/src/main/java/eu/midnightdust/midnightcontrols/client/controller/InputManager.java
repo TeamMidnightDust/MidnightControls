@@ -41,7 +41,7 @@ import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.cli
  */
 public class InputManager {
     public static final InputManager INPUT_MANAGER = new InputManager();
-    private static final List<ButtonBinding> BINDINGS = new ArrayList<>();
+    private static final List<ButtonBinding> BINDINGS = Collections.synchronizedList(new ArrayList<>());
     private static final List<ButtonCategory> CATEGORIES = new ArrayList<>();
     public static final Int2ObjectMap<ButtonState> STATES = new Int2ObjectOpenHashMap<>();
     public static final Int2FloatMap BUTTON_VALUES = new Int2FloatOpenHashMap();
@@ -109,7 +109,9 @@ public class InputManager {
      * @return true if the binding is registered, else false
      */
     public static boolean hasBinding(@NotNull ButtonBinding binding) {
-        return BINDINGS.contains(binding);
+        synchronized (BINDINGS) {
+            return BINDINGS.contains(binding);
+        }
     }
 
     /**
@@ -119,7 +121,9 @@ public class InputManager {
      * @return true if the binding is registered, else false
      */
     public static boolean hasBinding(@NotNull String name) {
-        return BINDINGS.parallelStream().map(ButtonBinding::getName).anyMatch(binding -> binding.equalsIgnoreCase(name));
+        synchronized (BINDINGS) {
+            return BINDINGS.parallelStream().map(ButtonBinding::getName).anyMatch(binding -> binding.equalsIgnoreCase(name));
+        }
     }
 
     /**
@@ -139,18 +143,22 @@ public class InputManager {
      * @return true if the binding is registered, else false
      */
     public static ButtonBinding getBinding(@NotNull String name) {
-        if (BINDINGS.parallelStream().map(ButtonBinding::getName).anyMatch(binding -> binding.equalsIgnoreCase(name)))
-            BINDINGS.forEach(binding -> {
-                if (binding.getName().equalsIgnoreCase(name)) InputManager.tempBinding = binding;
-            });
+        synchronized (BINDINGS) {
+            if (BINDINGS.parallelStream().map(ButtonBinding::getName).anyMatch(binding -> binding.equalsIgnoreCase(name)))
+                BINDINGS.forEach(binding -> {
+                    if (binding.getName().equalsIgnoreCase(name)) InputManager.tempBinding = binding;
+                });
+        }
         return tempBinding;
     }
     private static List<ButtonBinding> unboundBindings;
     public static List<ButtonBinding> getUnboundBindings() {
         unboundBindings = new ArrayList<>();
-        BINDINGS.forEach(binding -> {
-            if (binding.isNotBound() && !MidnightControlsConfig.ignoredUnboundKeys.contains(binding.getTranslationKey())) unboundBindings.add(binding);
-        });
+        synchronized (BINDINGS) {
+            BINDINGS.forEach(binding -> {
+                if (binding.isNotBound() && !MidnightControlsConfig.ignoredUnboundKeys.contains(binding.getTranslationKey())) unboundBindings.add(binding);
+            });
+        }
         unboundBindings.sort(Comparator.comparing(s -> I18n.translate(s.getTranslationKey())));
         return unboundBindings;
     }
@@ -162,9 +170,11 @@ public class InputManager {
      * @return the registered binding
      */
     public static @NotNull ButtonBinding registerBinding(@NotNull ButtonBinding binding) {
-        if (hasBinding(binding))
-            throw new IllegalStateException("Cannot register twice a button binding in the registry.");
-        BINDINGS.add(binding);
+        synchronized (BINDINGS) {
+            if (BINDINGS.contains(binding))
+                throw new IllegalStateException("Cannot register twice a button binding in the registry.");
+            BINDINGS.add(binding);
+        }
         return binding;
     }
 
@@ -284,7 +294,9 @@ public class InputManager {
      * @return true if the button has duplicated bindings, else false
      */
     public static boolean hasDuplicatedBindings(int[] button) {
-        return BINDINGS.parallelStream().filter(binding -> areButtonsEquivalent(binding.getButton(), button)).count() > 1;
+        synchronized (BINDINGS) {
+            return BINDINGS.parallelStream().filter(binding -> areButtonsEquivalent(binding.getButton(), button)).count() > 1;
+        }
     }
 
     /**
@@ -294,7 +306,9 @@ public class InputManager {
      * @return true if the button has duplicated bindings, else false
      */
     public static boolean hasDuplicatedBindings(ButtonBinding binding) {
-        return BINDINGS.parallelStream().filter(other -> areButtonsEquivalent(other.getButton(), binding.getButton()) && other.filter.equals(binding.filter)).count() > 1;
+        synchronized (BINDINGS) {
+            return BINDINGS.parallelStream().filter(other -> areButtonsEquivalent(other.getButton(), binding.getButton()) && other.filter.equals(binding.filter)).count() > 1;
+        }
     }
 
     /**
@@ -347,7 +361,8 @@ public class InputManager {
         record ButtonStateValue(ButtonState state, float value) {
         }
         var states = new Object2ObjectOpenHashMap<ButtonBinding, ButtonStateValue>();
-        for (var binding : BINDINGS) {
+        synchronized (BINDINGS) {
+            for (var binding : BINDINGS) {
             var state = binding.isAvailable() ? getBindingState(binding) : ButtonState.NONE;
             if (skipButtons.intStream().anyMatch(btn -> containsButton(binding.getButton(), btn))) {
                 if (binding.isPressed())
@@ -368,6 +383,7 @@ public class InputManager {
             float value = getBindingValue(binding, state);
 
             states.put(binding, new ButtonStateValue(state, value));
+            }
         }
 
         states.forEach((binding, state) -> {
@@ -387,7 +403,9 @@ public class InputManager {
     }
 
     public static @NotNull Stream<ButtonBinding> streamBindings() {
-        return BINDINGS.stream();
+        synchronized (BINDINGS) {
+            return BINDINGS.stream();
+        }
     }
 
     public static @NotNull Stream<ButtonCategory> streamCategories() {
