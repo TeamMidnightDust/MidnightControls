@@ -15,6 +15,8 @@ import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsRenderer;
+import eu.midnightdust.midnightcontrols.client.gui.cursor.VirtualCursorRenderer;
+import eu.midnightdust.midnightcontrols.client.gui.cursor.WaylandCursorRenderer;
 import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -39,8 +41,8 @@ public abstract class GameRendererMixin {
     }
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;renderWithTooltip(Lnet/minecraft/client/gui/DrawContext;IIF)V", shift = At.Shift.AFTER))
     private void midnightcontrols$renderVirtualCursor(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, @Local DrawContext drawContext) {
-        MidnightControlsRenderer.renderVirtualCursor(drawContext,  client);
-        if (MidnightControlsClient.isWayland) MidnightControlsRenderer.renderWaylandCursor(drawContext, client);
+        VirtualCursorRenderer.getInstance().renderCursor(drawContext,  client);
+        if (MidnightControlsClient.isWayland) WaylandCursorRenderer.getInstance().renderCursor(drawContext, client);
         //drawContext.draw();
     }
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(FZLorg/joml/Matrix4f;)V"), method = "renderWorld")

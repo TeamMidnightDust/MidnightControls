@@ -69,8 +69,6 @@ public class MidnightControlsClient extends MidnightControls {
     public static final Identifier CONTROLLER_BUTTONS = id("textures/gui/controller_buttons.png");
     public static final Identifier CONTROLLER_EXPANDED = id("textures/gui/controller_expanded.png");
     public static final Identifier CONTROLLER_AXIS = id("textures/gui/controller_axis.png");
-    public static final Identifier WAYLAND_CURSOR_TEXTURE_LIGHT = id("cursor/light/mouse_pointer");
-    public static final Identifier WAYLAND_CURSOR_TEXTURE_DARK = id("cursor/dark/mouse_pointer");
     public static final File MAPPINGS_FILE = new File("config/gamecontrollercustommappings.txt");
     public static MinecraftClient client = MinecraftClient.getInstance();
     public static final MidnightInput input = new MidnightInput();

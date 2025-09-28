@@ -9,44 +9,25 @@
 
 package eu.midnightdust.midnightcontrols.client.gui;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTextureView;
-import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.enums.ControllerType;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
-import eu.midnightdust.midnightcontrols.client.enums.VirtualMouseSkin;
-import eu.midnightdust.midnightcontrols.client.gui.render.UnalignedTexturedQuadGuiElementRenderState;
-import eu.midnightdust.midnightcontrols.client.mixin.DrawContextAccessor;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState;
-import net.minecraft.client.render.*;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.TextureSetup;
-import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.Text;
 import net.minecraft.util.Atlases;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Matrix3x2f;
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.function.Function;
-
 import static eu.midnightdust.midnightcontrols.MidnightControls.id;
-import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 
 /**
  * Represents the midnightcontrols renderer.
@@ -212,69 +193,6 @@ public class MidnightControlsRenderer {
 
     private static int getButtonTipWidth(@NotNull String action, @NotNull TextRenderer textRenderer) {
         return 15 + 5 + textRenderer.getWidth(action);
-    }
-    public static void renderWaylandCursor(@NotNull DrawContext context, @NotNull MinecraftClient client) {
-        if (MidnightControlsConfig.virtualMouse || client.currentScreen == null || MidnightControlsConfig.controlsMode != ControlsMode.CONTROLLER) return;
-
-        float mouseX = (float) client.mouse.getX() * client.getWindow().getScaledWidth() / client.getWindow().getWidth();
-        float mouseY = (float) client.mouse.getY() * client.getWindow().getScaledHeight() / client.getWindow().getHeight();
-
-        try {
-            Identifier spritePath = MidnightControlsClient.WAYLAND_CURSOR_TEXTURE_LIGHT;
-            if (MidnightControlsConfig.virtualMouseSkin == VirtualMouseSkin.DEFAULT_DARK || MidnightControlsConfig.virtualMouseSkin == VirtualMouseSkin.SECOND_DARK)
-                spritePath = MidnightControlsClient.WAYLAND_CURSOR_TEXTURE_DARK;
-
-            Sprite sprite = client.getAtlasManager().getAtlasTexture(Atlases.GUI).getSprite(spritePath);
-            drawUnalignedTexturedQuad(RenderPipelines.GUI_TEXTURED, sprite.getAtlasId(), context, mouseX, mouseX + 8, mouseY, mouseY + 8, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
-        } catch (IllegalStateException ignored) {}
-    }
-
-    public static void renderVirtualCursor(@NotNull DrawContext context, @NotNull MinecraftClient client) {
-        if (!MidnightControlsConfig.virtualMouse || (client.currentScreen == null
-                || MidnightInput.isScreenInteractive(client.currentScreen)))
-            return;
-
-        float mouseX = (float) client.mouse.getX() * client.getWindow().getScaledWidth() / client.getWindow().getWidth();
-        float mouseY = (float) client.mouse.getY() * client.getWindow().getScaledHeight() / client.getWindow().getHeight();
-
-        boolean hoverSlot = false;
-
-        if (client.currentScreen instanceof HandledScreenAccessor inventoryScreen) {
-            int guiLeft = inventoryScreen.getX();
-            int guiTop = inventoryScreen.getY();
-
-            Slot slot = inventoryScreen.midnightcontrols$getSlotAt(mouseX, mouseY);
-
-            if (slot != null) {
-                mouseX = guiLeft + slot.x;
-                mouseY = guiTop + slot.y;
-                hoverSlot = true;
-            }
-        }
-
-        if (!hoverSlot && client.currentScreen != null) {
-            var slot = MidnightControlsCompat.getSlotAt(client.currentScreen, (int) mouseX, (int) mouseY);
-
-            if (slot != null) {
-                mouseX = slot.x();
-                mouseY = slot.y();
-                hoverSlot = true;
-            }
-        }
-
-        if (!hoverSlot) {
-            mouseX -= 8;
-            mouseY -= 8;
-        }
-
-        try {
-            Sprite sprite = client.getAtlasManager().getAtlasTexture(Atlases.GUI).getSprite(id(MidnightControlsConfig.virtualMouseSkin.getSpritePath() + (hoverSlot ? "_slot" : "")));
-            drawUnalignedTexturedQuad(RenderPipelines.GUI_TEXTURED, sprite.getAtlasId(), context, mouseX, mouseX + 16, mouseY, mouseY + 16, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
-        } catch (IllegalStateException ignored) {}
-    }
-    private static void drawUnalignedTexturedQuad(RenderPipeline pipeline, Identifier texture, DrawContext context, float x1, float x2, float y1, float y2, float u1, float u2, float v1, float v2) {
-        DrawContextAccessor accessor = (DrawContextAccessor) context;
-        accessor.getState().addSimpleElement(new UnalignedTexturedQuadGuiElementRenderState(pipeline, TextureSetup.withoutGlTexture(client.getTextureManager().getTexture(texture).getGlTextureView()), new Matrix3x2f(context.getMatrices()), x1, y1, x2, y2, u1, u2, v1, v2, 0xffffffff, accessor.getScissorStack().peekLast()));
     }
 
     public record ButtonSize(int length, int height) {

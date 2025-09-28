@@ -1,4 +1,4 @@
-package eu.midnightdust.midnightcontrols.client.gui.render;
+package eu.midnightdust.midnightcontrols.client.gui.cursor;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.fabricmc.api.EnvType;
