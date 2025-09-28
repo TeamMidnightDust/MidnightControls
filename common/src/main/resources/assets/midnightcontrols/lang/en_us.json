@@ -23,7 +23,7 @@
   "midnightcontrols.midnightconfig.enum.TouchMode.FINGER_POS": "Finger Position",
   "midnightcontrols.midnightconfig.enum.CameraMode.FLAT": "Flat",
   "midnightcontrols.midnightconfig.enum.CameraMode.ADAPTIVE": "Adaptive",
-  "key.categories.midnightcontrols": "MidnightControls",
+  "key.category.midnightcontrols.keybinds": "MidnightControls",
   "key.midnightcontrols.look_down": "Look Down",
   "key.midnightcontrols.look_left": "Look Left",
   "key.midnightcontrols.look_right": "Look Right",

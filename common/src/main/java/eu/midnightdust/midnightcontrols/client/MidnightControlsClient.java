@@ -56,16 +56,17 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class MidnightControlsClient extends MidnightControls {
     public static boolean lateInitDone = false;
+    public static final KeyBinding.Category MIDNIGHTCONTROLS_CATEGORY = KeyBinding.Category.create(Identifier.of("midnightcontrols", "keybinds"));
     public static final KeyBinding BINDING_LOOK_UP = InputManager.makeKeyBinding(id("look_up"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, "key.categories.midnightcontrols");
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, MIDNIGHTCONTROLS_CATEGORY);
     public static final KeyBinding BINDING_LOOK_RIGHT = InputManager.makeKeyBinding(id("look_right"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, "key.categories.midnightcontrols");
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, MIDNIGHTCONTROLS_CATEGORY);
     public static final KeyBinding BINDING_LOOK_DOWN = InputManager.makeKeyBinding(id("look_down"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, "key.categories.midnightcontrols");
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, MIDNIGHTCONTROLS_CATEGORY);
     public static final KeyBinding BINDING_LOOK_LEFT = InputManager.makeKeyBinding(id("look_left"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, "key.categories.midnightcontrols");
+            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, MIDNIGHTCONTROLS_CATEGORY);
     public static final KeyBinding BINDING_RING = InputManager.makeKeyBinding(id("ring"),
-            InputUtil.Type.KEYSYM, InputUtil.UNKNOWN_KEY.getCode(), "key.categories.midnightcontrols");
+            InputUtil.Type.KEYSYM, InputUtil.UNKNOWN_KEY.getCode(), MIDNIGHTCONTROLS_CATEGORY);
     public static final Identifier CONTROLLER_BUTTONS = id("textures/gui/controller_buttons.png");
     public static final Identifier CONTROLLER_EXPANDED = id("textures/gui/controller_expanded.png");
     public static final Identifier CONTROLLER_AXIS = id("textures/gui/controller_axis.png");
