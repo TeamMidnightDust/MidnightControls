@@ -396,7 +396,7 @@ public class MidnightInput {
                 accessor.midnightcontrols$onCursorPos(client.getWindow().getHandle(), client.mouse.getX(), client.mouse.getY());
                 switch (storage.state) {
                     // Button pressed
-                    case PRESS -> accessor.midnightcontrols$onMouseButton(client.getWindow().getHandle(), new MouseInput(GLFW_MOUSE_BUTTON_LEFT, 1), 0);
+                    case PRESS -> accessor.midnightcontrols$onMouseButton(client.getWindow().getHandle(), new MouseInput(GLFW_MOUSE_BUTTON_LEFT, 0), 1);
                     case RELEASE -> { // Button released
                         accessor.midnightcontrols$onMouseButton(client.getWindow().getHandle(), new MouseInput(GLFW_MOUSE_BUTTON_LEFT, 0), 0);
                         client.currentScreen.setDragging(false);

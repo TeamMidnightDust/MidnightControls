@@ -29,7 +29,7 @@ public class EmotecraftCompat {
                 InputManager.INPUT_MANAGER.updateMousePosition(client);
 
                 if (stickReleased) {
-                    ((MouseAccessor) client.mouse).midnightcontrols$onMouseButton(client.getWindow().getHandle(), new MouseInput(GLFW.GLFW_MOUSE_BUTTON_LEFT, GLFW.GLFW_PRESS), 0);
+                    ((MouseAccessor) client.mouse).midnightcontrols$onMouseButton(client.getWindow().getHandle(), new MouseInput(GLFW.GLFW_MOUSE_BUTTON_LEFT, 0), GLFW.GLFW_PRESS);
                     prevIndex = -1;
                 }
                 else prevIndex = index;
