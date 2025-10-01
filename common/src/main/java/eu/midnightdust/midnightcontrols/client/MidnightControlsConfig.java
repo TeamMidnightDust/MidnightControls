@@ -21,6 +21,7 @@ import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
+import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
@@ -30,17 +31,29 @@ import eu.midnightdust.midnightcontrols.client.enums.HudSide;
 import eu.midnightdust.midnightcontrols.client.enums.VirtualMouseSkin;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.enums.TouchMode;
+import eu.midnightdust.midnightcontrols.client.gui.config.ControllerBindingButton;
+import eu.midnightdust.midnightcontrols.client.gui.config.ControllerSelectionButton;
+import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.PressableTextWidget;
+import net.minecraft.client.gui.widget.PressableWidget;
+import net.minecraft.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
+import static eu.midnightdust.midnightcontrols.client.gui.MidnightControlsSettingsScreen.searchNextAvailableController;
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
@@ -53,6 +66,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     public static final String SCREENS = "screens";
     public static final String VISUAL = "visual";
     public static final String MISC = "misc";
+    public static final String BUTTONS = "buttons";
     public static boolean isEditing = false;
     @Hidden @Entry public static int configVersion = 2;
     // General
@@ -152,7 +166,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Comment(category = SCREENS, centered = true, name="\uD83D\uDD27 UI Modifications") public static Comment _uiMods;
     @Entry(category = SCREENS, name = "midnightcontrols.menu.move_chat") public static boolean moveChat = false;
     @Entry(category = SCREENS, name = "Enable Shortcut in Controls Options") public static boolean shortcutInControls = true;
-    @Entry(category = MISC, name = "midnightcontrols.menu.virtual_keyboard_layout") public static String keyboardLayout = "en_US:qwerty";
+    @Entry(category = MISC) @Hidden public static String keyboardLayout = "en_US:qwerty";
     @Entry(category = MISC, name = "Debug") public static boolean debug = false;
     @Entry(category = MISC, name = "Excluded Keybindings") public static List<String> excludedKeybindings = Lists.newArrayList("key.forward", "key.left", "key.back", "key.right", "key.jump", "key.sneak", "key.sprint", "key.inventory",
             "key.swapOffhand", "key.drop", "key.use", "key.attack", "key.chat", "key.playerlist", "key.screenshot", "key.togglePerspective", "key.smoothCamera", "key.fullscreen", "key.saveToolbarActivator", "key.loadToolbarActivator",
@@ -162,6 +176,55 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry @Hidden public static Map<String, Map<String, String>> controllerBindingProfiles = new HashMap<>();
     private static Map<String, String> currentBindingProfile = new HashMap<>();
     private static Controller prevController;
+
+    @Comment(category = BUTTONS) @Condition(requiredModId = "thisModDoesNotExist") public static Comment this_spacer_will_never_be_visible;
+    public void onTabInit(String tabName, MidnightConfigListWidget list, MidnightConfigScreen screen) {
+        EntryInfo centeredComment = new EntryInfo(null, "midnightcontrols");
+        centeredComment.comment = new Comment() {
+            public Class<? extends Annotation> annotationType() {return null;}
+            public String category() {return "";}
+            public String name() {return "";}
+            public String url() {return "";}
+            public String requiredMod() {return "";}
+
+            @Override
+            public boolean centered() {
+                return true;
+            }
+        };
+        if (BUTTONS.equals(tabName)) {
+            InputManager.streamCategories()
+                    .sorted(Comparator.comparingInt(ButtonCategory::getPriority))
+                    .forEach(category -> {
+
+                        list.addButton(Lists.newArrayList(), Text.literal(category.getTranslatedName()), centeredComment);
+
+                        category.getBindings().forEach(binding -> {
+                            ControllerBindingButton.add(binding, list, screen);
+                        });
+                    });
+        }
+        if (MISC.equals(tabName)) {
+            TextIconButtonWidget resetButton = TextIconButtonWidget.builder(Text.translatable("controls.reset"), (button -> {
+                MidnightControlsConfig.keyboardLayout = "en_US:qwerty";
+                screen.updateList();
+            }), true).texture(Identifier.of("midnightlib","icon/reset"), 12, 12).dimension(20, 20).build();
+            resetButton.setPosition(screen.width - 205 + 150 + 25, 0);
+            ButtonWidget editButton = ButtonWidget.builder(Text.translatable(KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout).getTranslationKey()),
+                    button -> {
+                        MidnightControlsConfig.keyboardLayout = KeyboardLayoutManager.getNext(KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout)).getId();
+                        resetButton.active = !MidnightControlsConfig.keyboardLayout.equals("en_US:qwerty");
+                        button.setMessage(Text.translatable(KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout).getTranslationKey()));
+                    }).dimensions(screen.width - 185, 0, 150, 20).build();
+            resetButton.active = !MidnightControlsConfig.keyboardLayout.equals("en_US:qwerty");
+
+            list.addButton(List.of(editButton, resetButton), Text.translatable("midnightcontrols.menu.virtual_keyboard_layout"), new EntryInfo(null, screen.modid));
+        }
+        if (CONTROLLER.equals(tabName)) {
+            ControllerSelectionButton.add(list, screen, false);
+            ControllerSelectionButton.add(list, screen, true);
+        }
+    }
 
     /**
      * Loads the configuration

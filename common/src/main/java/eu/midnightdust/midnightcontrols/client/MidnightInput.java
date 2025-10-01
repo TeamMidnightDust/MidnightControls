@@ -15,6 +15,7 @@ import eu.midnightdust.midnightcontrols.client.compat.EmotecraftCompat;
 import eu.midnightdust.midnightcontrols.client.compat.LibGuiCompat;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.YACLCompat;
+import eu.midnightdust.midnightcontrols.client.gui.config.ControlsInput;
 import eu.midnightdust.midnightcontrols.client.mixin.AdvancementsScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.KeyboardAccessor;
@@ -98,7 +99,7 @@ public class MidnightInput {
     public int inventoryInteractionCooldown = 0;
     public int screenCloseCooldown = 0;
 
-    private ControllerControlsWidget controlsInput = null;
+    private ControlsInput controlsInput = null;
 
     public MidnightInput() {}
 
@@ -156,7 +157,7 @@ public class MidnightInput {
                     this.fetchJoystickInput(state, true, false);
                 });
 
-        boolean allowInput = this.controlsInput == null || this.controlsInput.focusedBinding == null;
+        boolean allowInput = this.controlsInput == null || this.controlsInput.getFocusedBinding() == null;
 
         if (allowInput)
             InputManager.updateBindings();
@@ -167,11 +168,11 @@ public class MidnightInput {
             });
         }
         if (this.controlsInput != null && InputManager.STATES.int2ObjectEntrySet().parallelStream().map(Map.Entry::getValue).allMatch(ButtonState::isUnpressed)) {
-            if (MidnightControlsConfig.debug) MidnightControls.log("Starting MidnightInput Button Edit");
-            if (this.controlsInput.focusedBinding != null && !this.controlsInput.waiting) {
-                int[] buttons = new int[this.controlsInput.currentButtons.size()];
-                for (int i = 0; i < this.controlsInput.currentButtons.size(); i++)
-                    buttons[i] = this.controlsInput.currentButtons.get(i);
+            //if (MidnightControlsConfig.debug) MidnightControls.log("Starting MidnightInput Button Edit");
+            if (this.controlsInput.getFocusedBinding() != null && !this.controlsInput.isWaiting()) {
+                int[] buttons = new int[this.controlsInput.getCurrentButtons().size()];
+                for (int i = 0; i < this.controlsInput.getCurrentButtons().size(); i++)
+                    buttons[i] = this.controlsInput.getCurrentButtons().get(i);
                 this.controlsInput.finishBindingEdit(buttons);
                 this.controlsInput = null;
             }
@@ -246,11 +247,11 @@ public class MidnightInput {
         this.inventoryInteractionCooldown = 5;
     }
 
-    public void beginControlsInput(ControllerControlsWidget widget) {
+    public void beginControlsInput(ControlsInput widget) {
         this.controlsInput = widget;
         if (widget != null) {
-            this.controlsInput.currentButtons.clear();
-            this.controlsInput.waiting = true;
+            this.controlsInput.getCurrentButtons().clear();
+            this.controlsInput.setWaiting(true);
         }
     }
 
@@ -332,16 +333,17 @@ public class MidnightInput {
     }
 
     public void handleButton(ButtonStorage storage) {
-        if (this.controlsInput != null && this.controlsInput.focusedBinding != null) {
-            if (storage.state == ButtonState.PRESS && !this.controlsInput.currentButtons.contains(storage.button)) {
-                this.controlsInput.currentButtons.add(storage.button);
+        if (this.controlsInput != null && this.controlsInput.getFocusedBinding() != null) {
+            if (storage.state == ButtonState.PRESS && !this.controlsInput.getCurrentButtons().contains(storage.button)) {
+                this.controlsInput.getCurrentButtons().add(storage.button);
 
-                var buttons = new int[this.controlsInput.currentButtons.size()];
-                for (int i = 0; i < this.controlsInput.currentButtons.size(); i++)
-                    buttons[i] = this.controlsInput.currentButtons.get(i);
-                this.controlsInput.focusedBinding.setButton(buttons);
+                var buttons = new int[this.controlsInput.getCurrentButtons().size()];
+                for (int i = 0; i < this.controlsInput.getCurrentButtons().size(); i++)
+                    buttons[i] = this.controlsInput.getCurrentButtons().get(i);
+                this.controlsInput.getFocusedBinding().setButton(buttons);
+                this.controlsInput.update();
 
-                this.controlsInput.waiting = false;
+                this.controlsInput.setWaiting(false);
             }
             return;
         }
@@ -517,17 +519,18 @@ public class MidnightInput {
         // @TODO allow rebinding to left stick
         int preferredAxis = true ? GLFW_GAMEPAD_AXIS_RIGHT_Y : GLFW_GAMEPAD_AXIS_LEFT_Y;
 
-        if (this.controlsInput != null && this.controlsInput.focusedBinding != null) {
-            if (storage.buttonState != ButtonState.NONE && !this.controlsInput.currentButtons.contains(storage.getButtonId(storage.buttonState == ButtonState.PRESS))) {
+        if (this.controlsInput != null && this.controlsInput.getFocusedBinding() != null) {
+            if (storage.buttonState != ButtonState.NONE && !this.controlsInput.getCurrentButtons().contains(storage.getButtonId(storage.buttonState == ButtonState.PRESS))) {
 
-                this.controlsInput.currentButtons.add(storage.getButtonId(storage.buttonState == ButtonState.PRESS));
+                this.controlsInput.getCurrentButtons().add(storage.getButtonId(storage.buttonState == ButtonState.PRESS));
 
-                int[] buttons = new int[this.controlsInput.currentButtons.size()];
-                for (int i = 0; i < this.controlsInput.currentButtons.size(); i++)
-                    buttons[i] = this.controlsInput.currentButtons.get(i);
-                this.controlsInput.focusedBinding.setButton(buttons);
+                int[] buttons = new int[this.controlsInput.getCurrentButtons().size()];
+                for (int i = 0; i < this.controlsInput.getCurrentButtons().size(); i++)
+                    buttons[i] = this.controlsInput.getCurrentButtons().get(i);
+                this.controlsInput.getFocusedBinding().setButton(buttons);
+                this.controlsInput.update();
 
-                this.controlsInput.waiting = false;
+                this.controlsInput.setWaiting(false);
             }
             return true;
         } else if (storage.absValue >= storage.deadZone) {

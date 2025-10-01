@@ -163,7 +163,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             .append(Text.literal(GAMEPAD_TOOL_URL).formatted(Formatting.GOLD))
             .append("),");
 
-    private static int searchNextAvailableController(int newId, boolean allowNone) {
+    public static int searchNextAvailableController(int newId, boolean allowNone) {
         if ((allowNone && newId == -1) || newId == 0) return newId;
 
         Controller candidate = Controller.byId(newId);

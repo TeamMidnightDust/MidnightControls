@@ -12,6 +12,7 @@ package eu.midnightdust.midnightcontrols.client.gui.widget;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
+import eu.midnightdust.midnightcontrols.client.gui.config.ControlsInput;
 import org.thinkingstudio.obsidianui.Position;
 import org.thinkingstudio.obsidianui.SpruceTexts;
 import org.thinkingstudio.obsidianui.widget.SpruceButtonWidget;
@@ -29,11 +30,11 @@ import java.util.stream.Collectors;
 /**
  * Represents the controls screen.
  */
-public class ControllerControlsWidget extends SpruceContainerWidget {
+public class ControllerControlsWidget extends SpruceContainerWidget implements ControlsInput {
     private SpruceButtonWidget resetButton;
-    public ButtonBinding focusedBinding;
-    public boolean waiting = false;
-    public List<Integer> currentButtons = new ArrayList<>();
+    ButtonBinding focusedBinding = null;
+    boolean waiting = false;
+    List<Integer> currentButtons = new ArrayList<>();
 
     public ControllerControlsWidget(Position position, int width, int height) {
         super(position, width, height);
@@ -65,5 +66,25 @@ public class ControllerControlsWidget extends SpruceContainerWidget {
         if (this.focusedBinding == null) return;
         MidnightControlsConfig.setButtonBinding(this.focusedBinding, buttons);
         this.focusedBinding = null;
+    }
+
+    @Override
+    public void setWaiting(boolean value) {
+        this.waiting = value;
+    }
+
+    @Override
+    public boolean isWaiting() {
+        return this.waiting;
+    }
+
+    @Override
+    public List<Integer> getCurrentButtons() {
+        return currentButtons;
+    }
+
+    @Override
+    public ButtonBinding getFocusedBinding() {
+        return focusedBinding;
     }
 }
