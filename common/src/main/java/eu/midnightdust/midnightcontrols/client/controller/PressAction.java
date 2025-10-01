@@ -28,7 +28,7 @@ public interface PressAction {
         if (action == ButtonState.REPEAT || client.currentScreen != null)
             return false;
         button.asKeyBinding().ifPresent(binding -> {
-            if (binding instanceof StickyKeyBinding)
+            if (binding instanceof StickyKeyBinding && binding != client.options.attackKey) // TODO: Properly fix sticky keys so the attack key doesn't need to be a hardcoded exception
                 binding.setPressed(button.isPressed());
             else
                 ((KeyBindingAccessor) binding).midnightcontrols$handlePressState(button.isPressed());
