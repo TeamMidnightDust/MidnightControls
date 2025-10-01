@@ -23,6 +23,12 @@ public class WaylandCursorRenderer extends CursorRenderer {
     public static final Identifier WAYLAND_CURSOR_POINTING_DARK = id("cursor/dark/mouse_pointing_hand");
     public static final Identifier WAYLAND_CURSOR_IBEAM_LIGHT = id("cursor/light/mouse_ibeam");
     public static final Identifier WAYLAND_CURSOR_IBEAM_DARK = id("cursor/dark/mouse_ibeam");
+    public static final Identifier WAYLAND_CURSOR_RESIZE_VERTICAL_LIGHT = id("cursor/light/mouse_resize_vertical");
+    public static final Identifier WAYLAND_CURSOR_REZIZE_VERTICAL_DARK = id("cursor/dark/mouse_resize_vertical");
+    public static final Identifier WAYLAND_CURSOR_RESIZE_HORIZONTAL_LIGHT = id("cursor/light/mouse_resize_horizontal");
+    public static final Identifier WAYLAND_CURSOR_REZIZE_HORIZONTAL_DARK = id("cursor/dark/mouse_resize_horizontal");
+    public static final Identifier WAYLAND_CURSOR_NOT_ALLOWED_LIGHT = id("cursor/light/mouse_not_allowed");
+    public static final Identifier WAYLAND_CURSOR_NOT_ALLOWED_DARK = id("cursor/dark/mouse_not_allowed");
 
     public static WaylandCursorRenderer getInstance() {
         return INSTANCE;
@@ -45,6 +51,9 @@ public class WaylandCursorRenderer extends CursorRenderer {
         Identifier spritePath;
         if (CursorRenderer.currentCursorStyle == StandardCursors.POINTING_HAND) spritePath = isDark ? WAYLAND_CURSOR_POINTING_DARK : WAYLAND_CURSOR_POINTING_LIGHT;
         else if (CursorRenderer.currentCursorStyle == StandardCursors.IBEAM) spritePath = isDark ? WAYLAND_CURSOR_IBEAM_DARK : WAYLAND_CURSOR_IBEAM_LIGHT;
+        else if (CursorRenderer.currentCursorStyle == StandardCursors.RESIZE_NS) spritePath = isDark ? WAYLAND_CURSOR_REZIZE_VERTICAL_DARK : WAYLAND_CURSOR_RESIZE_VERTICAL_LIGHT;
+        else if (CursorRenderer.currentCursorStyle == StandardCursors.RESIZE_EW) spritePath = isDark ? WAYLAND_CURSOR_REZIZE_HORIZONTAL_DARK : WAYLAND_CURSOR_RESIZE_HORIZONTAL_LIGHT;
+        else if (CursorRenderer.currentCursorStyle == StandardCursors.NOT_ALLOWED) spritePath = isDark ? WAYLAND_CURSOR_NOT_ALLOWED_DARK : WAYLAND_CURSOR_NOT_ALLOWED_LIGHT;
         else spritePath = isDark ? WAYLAND_CURSOR_ARROW_DARK : WAYLAND_CURSOR_ARROW_LIGHT;
 
         return client.getAtlasManager().getAtlasTexture(Atlases.GUI).getSprite(spritePath);
