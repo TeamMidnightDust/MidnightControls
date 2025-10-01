@@ -413,7 +413,7 @@ public class ButtonBinding {
     }
 
     static {
-        MOVEMENT_CATEGORY = InputManager.registerDefaultCategory("key.categories.movement", category -> category.registerAllBindings(
+        MOVEMENT_CATEGORY = InputManager.registerDefaultCategory("movement", category -> category.registerAllBindings(
                 ButtonBinding.FORWARD,
                 ButtonBinding.BACK,
                 ButtonBinding.LEFT,
@@ -421,12 +421,12 @@ public class ButtonBinding {
                 ButtonBinding.JUMP,
                 ButtonBinding.SNEAK,
                 ButtonBinding.SPRINT));
-        GAMEPLAY_CATEGORY = InputManager.registerDefaultCategory("key.categories.gameplay", category -> category.registerAllBindings(
+        GAMEPLAY_CATEGORY = InputManager.registerDefaultCategory("gameplay", category -> category.registerAllBindings(
                 ButtonBinding.ATTACK,
                 ButtonBinding.PICK_BLOCK,
                 ButtonBinding.USE
         ));
-        INVENTORY_CATEGORY = InputManager.registerDefaultCategory("key.categories.inventory", category -> category.registerAllBindings(
+        INVENTORY_CATEGORY = InputManager.registerDefaultCategory("inventory", category -> category.registerAllBindings(
                 ButtonBinding.EXIT,
                 ButtonBinding.DROP_ITEM,
                 ButtonBinding.HOTBAR_LEFT,
@@ -445,9 +445,9 @@ public class ButtonBinding {
                 ButtonBinding.SLOT_LEFT,
                 ButtonBinding.SLOT_RIGHT
         ));
-        MULTIPLAYER_CATEGORY = InputManager.registerDefaultCategory("key.categories.multiplayer",
+        MULTIPLAYER_CATEGORY = InputManager.registerDefaultCategory("multiplayer",
                 category -> category.registerAllBindings(ButtonBinding.CHAT, ButtonBinding.PLAYER_LIST));
-        MISC_CATEGORY = InputManager.registerDefaultCategory("key.categories.misc", category -> category.registerAllBindings(
+        MISC_CATEGORY = InputManager.registerDefaultCategory("misc", category -> category.registerAllBindings(
                 ButtonBinding.SCREENSHOT,
                 ButtonBinding.TOGGLE_PERSPECTIVE,
                 ButtonBinding.PAUSE_GAME,

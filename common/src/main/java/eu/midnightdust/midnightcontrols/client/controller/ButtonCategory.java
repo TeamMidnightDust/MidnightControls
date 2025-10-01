@@ -38,15 +38,6 @@ public class ButtonCategory {
     public ButtonCategory(@NotNull Identifier id) {
         this(id, 100);
     }
-    @Deprecated
-    public ButtonCategory(@NotNull org.aperlambda.lambdacommon.Identifier id, int priority) {
-        this(Identifier.of(id.getNamespace(), id.getName()), priority);
-    }
-
-    @Deprecated
-    public ButtonCategory(@NotNull org.aperlambda.lambdacommon.Identifier id) {
-        this(id, 100);
-    }
 
     public void registerBinding(@NotNull ButtonBinding binding) {
         if (this.bindings.contains(binding))
@@ -74,15 +65,12 @@ public class ButtonCategory {
     /**
      * Gets the translated name of this category.
      * <p>
-     * The translation key should be `modid.identifier_name`.
+     * The translation key should be `key.category.modid.identifier_name`.
      *
      * @return the translated name
      */
     public @NotNull String getTranslatedName() {
-        if (this.id.getNamespace().equals("minecraft"))
-            return I18n.translate(this.id.getPath());
-        else
-            return I18n.translate(this.id.getNamespace() + "." + this.id.getPath());
+        return I18n.translate("key.category.%s.%s".formatted(id.getNamespace(), id.getPath()));
     }
 
     /**
