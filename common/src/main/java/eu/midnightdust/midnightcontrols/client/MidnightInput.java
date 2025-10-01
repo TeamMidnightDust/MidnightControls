@@ -40,7 +40,6 @@ import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.enums.CameraMode;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
-import eu.midnightdust.midnightcontrols.client.gui.widget.ControllerControlsWidget;
 import eu.midnightdust.midnightcontrols.client.ring.RingPage;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MathUtil;
@@ -819,6 +818,6 @@ public class MidnightInput {
         ((KeyboardAccessor) client.keyboard).midnightcontrols$onKey(client.getWindow().getHandle(), 1, new KeyInput(key, 0, 0));
     }
     public void pressKeyboardKey(Screen screen, int key) {
-        screen.keyPressed(new KeyInput(key, 0, 1));
+        screen.keyPressed(new KeyInput(key, 0, 0));
     }
 }
