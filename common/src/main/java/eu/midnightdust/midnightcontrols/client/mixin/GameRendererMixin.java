@@ -14,7 +14,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsRenderer;
 import eu.midnightdust.midnightcontrols.client.gui.cursor.VirtualCursorRenderer;
 import eu.midnightdust.midnightcontrols.client.gui.cursor.WaylandCursorRenderer;
 import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
@@ -43,10 +42,9 @@ public abstract class GameRendererMixin {
     private void midnightcontrols$renderVirtualCursor(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, @Local DrawContext drawContext) {
         VirtualCursorRenderer.getInstance().renderCursor(drawContext,  client);
         if (MidnightControlsClient.isWayland) WaylandCursorRenderer.getInstance().renderCursor(drawContext, client);
-        //drawContext.draw();
     }
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(FZLorg/joml/Matrix4f;)V"), method = "renderWorld")
-    private void midnigtcontrols$captureMatrices(RenderTickCounter tickCounter, CallbackInfo ci, @Local(ordinal = 1) Matrix4f projectionMatrix, @Local(ordinal = 1) Matrix4f worldSpaceMatrix) {
+    private void midnigtcontrols$captureMatrices(RenderTickCounter tickCounter, CallbackInfo ci, @Local(ordinal = 0) Matrix4f projectionMatrix, @Local(ordinal = 1) Matrix4f worldSpaceMatrix) {
         TouchUtils.lastProjMat.set(projectionMatrix);
         TouchUtils.lastModMat.set(RenderSystem.getModelViewMatrix());
         TouchUtils.lastWorldSpaceMatrix.set(worldSpaceMatrix);

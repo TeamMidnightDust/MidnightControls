@@ -56,7 +56,7 @@ public abstract class MinecraftClientMixin {
 
     @Shadow public abstract void setScreen(Screen screen);
 
-    @Shadow public int attackCooldown;
+    @Shadow protected int attackCooldown;
 
     @Shadow protected abstract void handleInputEvents();
 

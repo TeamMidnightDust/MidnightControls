@@ -34,7 +34,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.awt.*;
@@ -55,30 +54,21 @@ public abstract class WorldRendererMixin {
     @Shadow
     private ClientWorld world;
 
-    @Shadow
-    @Final
-    private BufferBuilderStorage bufferBuilders;
-
-    @Inject(method = "renderTargetBlockOutline", at = @At("HEAD"), cancellable = true)
-    private void dontRenderOutline(VertexConsumerProvider.Immediate immediate, MatrixStack matrices, boolean renderBlockOutline, WorldRenderState renderStates, CallbackInfo ci) {
-        if (MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN && MidnightControlsConfig.touchMode == TouchMode.FINGER_POS) {
-            ci.cancel();
-        }
-    }
-
     @Inject(
             method = "renderTargetBlockOutline",
-            at = @At("HEAD")
+            at = @At("HEAD"),
+            cancellable = true
     )
     private void onOutlineRender(VertexConsumerProvider.Immediate immediate, MatrixStack matrices, boolean renderBlockOutline, WorldRenderState renderStates, CallbackInfo ci) {
         if (((MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.touchInControllerMode) || MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN)
                 && MidnightControlsConfig.touchMode == TouchMode.FINGER_POS) {
-            this.midnightcontrols$renderFingerOutline(matrices, client.gameRenderer.getCamera());
+            this.midnightcontrols$renderFingerOutline(immediate, matrices, client.gameRenderer.getCamera());
+            ci.cancel();
         }
-        this.midnightcontrols$renderReacharoundOutline(matrices, client.gameRenderer.getCamera());
+        this.midnightcontrols$renderReacharoundOutline(immediate, matrices, client.gameRenderer.getCamera());
     }
     @Unique
-    private void midnightcontrols$renderFingerOutline(MatrixStack matrices, Camera camera) {
+    private void midnightcontrols$renderFingerOutline(VertexConsumerProvider.Immediate immediate, MatrixStack matrices, Camera camera) {
         if (TouchInput.firstHitResult == null || TouchInput.firstHitResult.getType() != HitResult.Type.BLOCK)
             return;
         BlockHitResult result = (BlockHitResult) TouchInput.firstHitResult;
@@ -89,14 +79,14 @@ public abstract class WorldRendererMixin {
             if (MidnightControlsConfig.touchOutlineColorHex.isEmpty()) rgb = RainbowColor.radialRainbow(1,1);
             var pos = camera.getPos();
             matrices.push();
-            var vertexConsumer = this.bufferBuilders.getEntityVertexConsumers().getBuffer(RenderLayer.getLines());
+            var vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
             VertexRendering.drawOutline(matrices, vertexConsumer, outlineShape, blockPos.getX() - pos.getX(), blockPos.getY() - pos.getY(), blockPos.getZ() - pos.getZ(),
                     ColorHelper.withAlpha(MidnightControlsConfig.touchOutlineColorAlpha, rgb.getRGB()));
             matrices.pop();
         }
     }
     @Unique
-    private void midnightcontrols$renderReacharoundOutline(MatrixStack matrices, Camera camera) {
+    private void midnightcontrols$renderReacharoundOutline(VertexConsumerProvider.Immediate immediate, MatrixStack matrices, Camera camera) {
         if (this.client.crosshairTarget == null || this.client.crosshairTarget.getType() != HitResult.Type.MISS || !MidnightControlsConfig.shouldRenderReacharoundOutline)
             return;
         var result = reacharound.getLastReacharoundResult();
@@ -121,7 +111,7 @@ public abstract class WorldRendererMixin {
             Color rgb = MidnightColorUtil.hex2Rgb(MidnightControlsConfig.reacharoundOutlineColorHex);
             if (MidnightControlsConfig.reacharoundOutlineColorHex.isEmpty()) rgb = RainbowColor.radialRainbow(1,1);
             matrices.push();
-            var vertexConsumer = this.bufferBuilders.getEntityVertexConsumers().getBuffer(RenderLayer.getLines());
+            var vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
             VertexRendering.drawOutline(matrices, vertexConsumer, outlineShape, blockPos.getX() - pos.getX(), blockPos.getY() - pos.getY(), blockPos.getZ() - pos.getZ(),
                     ColorHelper.withAlpha(MidnightControlsConfig.touchOutlineColorAlpha, rgb.getRGB()));
             matrices.pop();
