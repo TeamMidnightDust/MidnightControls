@@ -1,5 +1,5 @@
 {
-  "midnightcontrols.midnightconfig.title": "MidnightControls Advanced Config",
+  "midnightcontrols.midnightconfig.title": "MidnightControls Config",
   "midnightcontrols.midnightconfig.enum.VirtualMouseSkin.DEFAULT_LIGHT": "Default Light",
   "midnightcontrols.midnightconfig.enum.VirtualMouseSkin.DEFAULT_DARK": "Default Dark",
   "midnightcontrols.midnightconfig.enum.VirtualMouseSkin.SECOND_LIGHT": "Second Light",
@@ -237,6 +237,7 @@
   "midnightcontrols.virtual_mouse.skin.second_light": "Second Light",
   "midnightcontrols.virtual_mouse.skin.second_dark": "Second Dark",
   "midnightcontrols.midnightconfig.category.controller": "Controller",
+  "midnightcontrols.midnightconfig.category.buttons": "Buttons",
   "midnightcontrols.midnightconfig.category.misc": "Miscellaneous",
   "midnightcontrols.midnightconfig.category.screens": "Screens",
   "midnightcontrols.midnightconfig.category.gameplay": "Gameplay",

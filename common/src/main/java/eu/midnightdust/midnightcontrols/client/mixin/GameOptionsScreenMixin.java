@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.mixin;
 
+import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsSettingsScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -34,7 +35,7 @@ import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 public abstract class GameOptionsScreenMixin extends Screen {
     @Shadow @Nullable protected OptionListWidget body;
     @Unique TextIconButtonWidget midnightcontrols$button = TextIconButtonWidget.builder(Text.translatable("midnightcontrols.menu.title.controller"),
-                    (button -> this.client.setScreen(new MidnightControlsSettingsScreen(this, false))), true)
+                    (button -> this.client.setScreen(MidnightControlsConfig.getScreen(this, "midnightcontrols"))), true)
             .dimension(20,20).texture(id("icon/controller"), 20, 20).build();
 
     protected GameOptionsScreenMixin(Text title) {

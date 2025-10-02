@@ -21,8 +21,8 @@ import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsSettingsScree
  * @since 1.1.0
  */
 public class MidnightControlsModMenu implements ModMenuApi {
-    @Override
-    public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return parent -> new MidnightControlsSettingsScreen(parent, false);
-    }
+//    @Override
+//    public ConfigScreenFactory<?> getModConfigScreenFactory() {
+//        return parent -> new MidnightControlsSettingsScreen(parent, false);
+//    }
 }
