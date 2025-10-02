@@ -9,11 +9,19 @@
 
 package eu.midnightdust.midnightcontrols;
 
+import net.minecraft.text.Text;
+import net.minecraft.text.object.AtlasTextObjectContents;
+import net.minecraft.text.object.TextObjectContents;
+import net.minecraft.util.Atlases;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.TranslatableOption;
 import org.jetbrains.annotations.NotNull;
 import org.thinkingstudio.obsidianui.util.Nameable;
 
 import java.util.Arrays;
 import java.util.Optional;
+
+import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 
 /**
  * Represents the controls mode.
@@ -22,10 +30,15 @@ import java.util.Optional;
  * @version 1.7.0
  * @since 1.0.0
  */
-public enum ControlsMode {
-    DEFAULT,
-    CONTROLLER,
-    TOUCHSCREEN;
+public enum ControlsMode implements TranslatableOption {
+    DEFAULT("icon/keyboard_mouse"),
+    CONTROLLER("icon/controller"),
+    TOUCHSCREEN("icon/touchscreen");
+    final String emoji;
+
+    ControlsMode(String emoji) {
+        this.emoji = emoji;
+    }
 
     /**
      * Returns the next controls mode available.
@@ -39,6 +52,16 @@ public enum ControlsMode {
         return v[this.ordinal() + 1];
     }
 
+    @Override
+    public int getId() {
+        return this.ordinal();
+    }
+
+    @Override
+    public Text getText() {
+        return Text.object(new AtlasTextObjectContents(Atlases.GUI, id(emoji))).append(" ").append(Text.translatable(getTranslationKey()));
+    }
+
     /**
      * Gets the translation key of this controls mode.
      *
@@ -48,6 +71,7 @@ public enum ControlsMode {
     public String getTranslationKey() {
         return "midnightcontrols.controls_mode." + this.getName();
     }
+
 
     public @NotNull String getName() {
         return this.name().toLowerCase();
