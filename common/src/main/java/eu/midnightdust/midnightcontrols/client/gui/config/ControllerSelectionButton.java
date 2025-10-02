@@ -5,6 +5,7 @@ import eu.midnightdust.lib.config.MidnightConfigListWidget;
 import eu.midnightdust.lib.config.MidnightConfigScreen;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.text.Text;
@@ -43,6 +44,7 @@ public class ControllerSelectionButton {
                     button.setMessage(getControllerName(second));
                 }).dimensions(screen.width - 185, 0, 150, 20).build();
         resetButton.active = second ? MidnightControlsConfig.getSecondController().isPresent() : false;
+        if (second) editButton.setTooltip(Tooltip.of(Text.translatable("midnightcontrols.menu.controller2.tooltip")));
 
         list.addButton(List.of(editButton, resetButton), Text.translatable(second ? "midnightcontrols.menu.controller2" : "midnightcontrols.menu.controller"), new EntryInfo(null, screen.modid));
     }

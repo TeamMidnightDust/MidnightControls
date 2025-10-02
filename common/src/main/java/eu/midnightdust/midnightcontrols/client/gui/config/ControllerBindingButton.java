@@ -38,7 +38,8 @@ public class ControllerBindingButton extends ButtonWidget implements ControlsInp
         ControllerBindingButton editButton = new ControllerBindingButton(screen.width - 185 + 22, 0, 128, 20, binding);
         TextIconButtonWidget resetButton = TextIconButtonWidget.builder(Text.translatable("controls.reset"), (button -> {
             MidnightControlsConfig.setButtonBinding(binding, binding.getDefaultButton());
-            screen.updateList();
+            MidnightControlsClient.input.beginControlsInput(null);
+            editButton.updateMessage(false);
         }), true).texture(Identifier.of("midnightlib","icon/reset"), 12, 12).dimension(20, 20).build();
         resetButton.setPosition(screen.width - 205 + 150 + 25, 0);
         editButton.resetButton = resetButton;
@@ -47,16 +48,20 @@ public class ControllerBindingButton extends ButtonWidget implements ControlsInp
 
         TextIconButtonWidget unbindButton = TextIconButtonWidget.builder(Text.translatable("midnightcontrols.narrator.unbound", binding.getText()), (button -> {
             MidnightControlsConfig.setButtonBinding(binding, UNBOUND);
-            screen.updateList();
+            MidnightControlsClient.input.beginControlsInput(null);
+            editButton.updateMessage(false);
         }), true).texture(Identifier.of("midnightcontrols","icon/unbind"), 12, 12).dimension(20, 20).build();
         unbindButton.setPosition(screen.width - 205 + 20, 0);
         unbindButton.setTooltip(Tooltip.of(SpruceTexts.GUI_UNBIND));
+        unbindButton.active = !binding.isNotBound();
+        editButton.unbindButton = unbindButton;
 
         list.addButton(Lists.newArrayList(editButton, resetButton, unbindButton), Text.translatable(binding.getTranslationKey()), info);
     }
 
     private final ButtonBinding binding;
     private @Nullable ClickableWidget resetButton;
+    private @Nullable ClickableWidget unbindButton;
     public ControllerBindingButton(int x, int y, int width, int height, ButtonBinding binding) {
         super(x, y, width, height, binding.getText(), (button) -> {},
                 (textSupplier) -> binding.isNotBound() ? Text.translatable("narrator.controls.unbound", binding.getTranslationKey()) : Text.translatable("narrator.controls.bound", binding.getTranslationKey(), textSupplier.get()));
@@ -91,6 +96,7 @@ public class ControllerBindingButton extends ButtonWidget implements ControlsInp
         }
 
         if (this.resetButton != null) this.resetButton.active = !this.binding.isDefault();
+        if (this.unbindButton != null) this.unbindButton.active = !binding.isNotBound();
 
         if (hasConflicts.get()) {
             this.setMessage(Text.literal("[ ").append(this.getMessage().copy().formatted(Formatting.WHITE)).append(" ]").formatted(Formatting.RED));
