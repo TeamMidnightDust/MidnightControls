@@ -56,12 +56,9 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     @Shadow
     protected abstract boolean isCamera();
 
-    @Shadow protected int ticksLeftToDoubleTapSprint;
-
 
     @Inject(method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"))
     public void onMove(MovementType type, Vec3d movement, CallbackInfo ci) {
-        if (!MidnightControlsConfig.doubleTapToSprint) ticksLeftToDoubleTapSprint = 0;
         if (!MidnightControls.isExtrasLoaded) return;
         if (type == MovementType.SELF) {
             if (this.getAbilities().flying && (!MidnightControlsConfig.flyDrifting || !MidnightControlsConfig.verticalFlyDrifting)) {

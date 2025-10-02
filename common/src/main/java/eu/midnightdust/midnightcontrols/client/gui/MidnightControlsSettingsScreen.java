@@ -64,7 +64,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption advancedConfigOption;
     // Gameplay options
     private final SpruceOption analogMovementOption;
-    private final SpruceOption doubleTapToSprintOption;
     private final SpruceOption autoJumpOption;
     private final SpruceOption controllerToggleSneakOption;
     private final SpruceOption controllerToggleSprintOption;
@@ -228,9 +227,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         this.analogMovementOption = new SpruceToggleBooleanOption("midnightcontrols.menu.analog_movement",
                 () -> MidnightControlsConfig.analogMovement, value -> MidnightControlsConfig.analogMovement = value,
                 Text.translatable("midnightcontrols.menu.analog_movement.tooltip"));
-        this.doubleTapToSprintOption = new SpruceToggleBooleanOption("midnightcontrols.menu.double_tap_to_sprint",
-                () -> MidnightControlsConfig.doubleTapToSprint, value -> MidnightControlsConfig.doubleTapToSprint = value,
-                Text.translatable("midnightcontrols.menu.double_tap_to_sprint.tooltip"));
         this.autoJumpOption = new SpruceToggleBooleanOption("options.autoJump",
                 () -> this.client.options.getAutoJump().getValue(),
                 newValue -> this.client.options.getAutoJump().setValue(newValue),
@@ -409,7 +405,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         var list = new SpruceOptionListWidget(Position.origin(), width, height);
         list.setBackground(new MidnightControlsBackground(130));
         list.addSingleOptionEntry(this.analogMovementOption);
-        list.addSingleOptionEntry(this.doubleTapToSprintOption);
         list.addSingleOptionEntry(this.controllerToggleSneakOption);
         list.addSingleOptionEntry(this.controllerToggleSprintOption);
         if (MidnightControls.isExtrasLoaded) list.addSingleOptionEntry(this.fastBlockPlacingOption);

@@ -118,7 +118,6 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Comment(category = GAMEPLAY, centered = true, name="\uD83D\uDECB Comfort") public static Comment _comfort;
     @Entry(category = GAMEPLAY, name = "Enable Hints") public static boolean enableHints = true;
     @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.analog_movement") public static boolean analogMovement = true;
-    @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.double_tap_to_sprint") public static boolean doubleTapToSprint = true;
     @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.controller_toggle_sneak") public static boolean controllerToggleSneak = MinecraftClient.getInstance().options.getSneakToggled().getValue();
     @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.controller_toggle_sprint") public static boolean controllerToggleSprint = MinecraftClient.getInstance().options.getSprintToggled().getValue();
 
@@ -464,7 +463,6 @@ public class MidnightControlsConfig extends MidnightConfig {
         hudEnable = true;
         hudSide = HudSide.LEFT;
         analogMovement = true;
-        doubleTapToSprint = true;
         controllerToggleSneak = MinecraftClient.getInstance().options.getSneakToggled().getValue();
         controllerToggleSprint = MinecraftClient.getInstance().options.getSprintToggled().getValue();
         fastBlockPlacing = false;
