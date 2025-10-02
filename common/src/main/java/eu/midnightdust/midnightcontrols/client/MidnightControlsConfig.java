@@ -91,8 +91,8 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(category = CONTROLLER, name = "Max analog value: Right X", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightX = 1;
     @Entry(category = CONTROLLER, name = "Max analog value: Right Y", isSlider = true, min = .25f, max = 1.f) public static double maxAnalogValueRightY = 1;
     @Comment(category = CONTROLLER, centered = true, name="☠ Dead Zones") public static Comment _deadZones;
-    @Entry(category = CONTROLLER, name = "midnightcontrols.menu.right_dead_zone", isSlider = true, min = 0.05, max = 1) public static double rightDeadZone = 0.25;
-    @Entry(category = CONTROLLER, name = "midnightcontrols.menu.left_dead_zone", isSlider = true, min = 0.05, max = 1) public static double leftDeadZone = 0.25;
+    @Entry(category = CONTROLLER, name = "midnightcontrols.menu.right_dead_zone", isSlider = true, min = 0.05, max = 1) public static double rightDeadZone = 0.15;
+    @Entry(category = CONTROLLER, name = "midnightcontrols.menu.left_dead_zone", isSlider = true, min = 0.05, max = 1) public static double leftDeadZone = 0.15;
     @Entry(category = CONTROLLER, name = "Trigger Dead-Zone", isSlider = true, min = 0.05, max = 1) public static double triggerDeadZone = 0.1;
 
     // Init button binding tab (see #onTabInit())
