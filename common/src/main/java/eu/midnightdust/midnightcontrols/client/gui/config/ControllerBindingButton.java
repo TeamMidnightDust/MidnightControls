@@ -1,6 +1,7 @@
 package eu.midnightdust.midnightcontrols.client.gui.config;
 
 import com.google.common.collect.Lists;
+import dev.lambdaurora.spruceui.SpruceTexts;
 import eu.midnightdust.lib.config.EntryInfo;
 import eu.midnightdust.lib.config.MidnightConfigListWidget;
 import eu.midnightdust.lib.config.MidnightConfigScreen;
@@ -22,7 +23,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
-import org.thinkingstudio.obsidianui.SpruceTexts;
 
 import java.util.ArrayList;
 import java.util.List;

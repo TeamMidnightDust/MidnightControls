@@ -28,7 +28,6 @@ import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.MouseClickInterceptor;
 import net.minecraft.client.gui.screen.Screen;
-import org.thinkingstudio.obsidianui.hud.HudManager;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
@@ -102,7 +101,6 @@ public class MidnightControlsClient extends MidnightControls {
             }
         }, delay, period);
 
-        HudManager.register(hud = new MidnightControlsHud());
         isWayland = GLFW.glfwGetVersionString().contains("Wayland");
     }
 
@@ -120,7 +118,7 @@ public class MidnightControlsClient extends MidnightControls {
             MidnightControlsConfig.configVersion = 2;
             MidnightControlsConfig.write(MidnightControlsConstants.NAMESPACE);
         }
-        hud.setVisible(MidnightControlsConfig.hudEnable);
+        MidnightControlsHud.isVisible = MidnightControlsConfig.hudEnable;
         Controller.updateMappings();
         try {
             GLFW.glfwSetJoystickCallback((jid, event) -> {
@@ -247,7 +245,7 @@ public class MidnightControlsClient extends MidnightControls {
      */
     public static void setHudEnabled(boolean enabled) {
         MidnightControlsConfig.hudEnable = enabled;
-        hud.setVisible(enabled);
+        MidnightControlsHud.isVisible = enabled;
     }
 
     private static final MidnightControlsClient INSTANCE = new MidnightControlsClient();

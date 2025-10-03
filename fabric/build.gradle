@@ -24,7 +24,8 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
     modImplementation include ("maven.modrinth:midnightlib:${rootProject.midnightlib_version}-fabric")
-    modImplementation include ("maven.modrinth:obsidianui:${rootProject.obsidianui_version}-fabric")
+    modImplementation include ("dev.lambdaurora:spruceui:${project.spruceui_version}")
+    include("dev.yumi.mc.core:yumi-mc-foundation:1.0.0-alpha.15+1.21.1")
     include 'org.aperlambda:lambdajcommon:1.8.1'
     modCompileOnly "maven.modrinth:emi:${project.emi_version}"
 

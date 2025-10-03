@@ -17,7 +17,6 @@ import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import net.minecraft.client.render.RenderTickCounter;
 import org.joml.Matrix3x2fStack;
-import org.thinkingstudio.obsidianui.hud.Hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.resource.language.I18n;
@@ -28,8 +27,6 @@ import net.minecraft.util.hit.HitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static eu.midnightdust.midnightcontrols.MidnightControls.id;
-
 /**
  * Represents the midnightcontrols HUD.
  *
@@ -37,7 +34,7 @@ import static eu.midnightdust.midnightcontrols.MidnightControls.id;
  * @version 1.7.0
  * @since 1.0.0
  */
-public class MidnightControlsHud extends Hud {
+public class MidnightControlsHud {
     private MinecraftClient client = MinecraftClient.getInstance();
     private int attackWidth = 0;
     private int attackButtonWidth = 0;
@@ -54,15 +51,15 @@ public class MidnightControlsHud extends Hud {
     private String placeAction = "";
     private int ticksDisplayedCrosshair = 0;
     private static boolean isCrammed = false;
+    public static boolean isVisible = false;
+    private static final MidnightControlsHud INSTANCE = new MidnightControlsHud();
 
-    public MidnightControlsHud() {
-        super(id("hud/button_indicator"));
+    public static MidnightControlsHud getInstance() {
+        return INSTANCE;
     }
 
-    @Override
-    public void init(@NotNull MinecraftClient client, int screenWidth, int screenHeight) {
-        this.client = MinecraftClient.getInstance();
-        super.init(client, screenWidth, screenHeight);
+    public void init() {
+        this.client = MidnightControlsClient.client;
         this.inventoryWidth = this.width(ButtonBinding.INVENTORY);
         this.inventoryButtonWidth = MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.INVENTORY);
         this.swapHandsWidth = this.width(ButtonBinding.SWAP_HANDS);
@@ -77,9 +74,8 @@ public class MidnightControlsHud extends Hud {
     /**
      * Renders the MidnightControls HUD.
      */
-    @Override
     public void render(DrawContext context, RenderTickCounter tickCounter) {
-        if (this.client == null) return;
+        if (this.client == null || !isVisible) return;
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.currentScreen == null) {
             isCrammed = client.getWindow().getScaledWidth() < 520;
             int y = bottom(2);
@@ -195,10 +191,8 @@ public class MidnightControlsHud extends Hud {
         if (!ButtonBinding.ATTACK.isNotBound()) this.drawTip(context, currentX, y, this.attackAction, this.attackWidth != 0);
     }
 
-    @Override
     public void tick() {
         if (this.client == null) return;
-        super.tick();
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER) {
             if (this.client.crosshairTarget == null)
                 return;
@@ -255,7 +249,7 @@ public class MidnightControlsHud extends Hud {
                 placeAction = customUseAction;
 
             this.placeAction = placeAction;
-            this.showSwapHandsAction = !this.client.player.getMainHandStack().isEmpty() || !this.client.player.getOffHandStack().isEmpty();
+            this.showSwapHandsAction = this.client.player != null && (!this.client.player.getMainHandStack().isEmpty() || !this.client.player.getOffHandStack().isEmpty());
 
             // Cache the "Use" tip width.
             if (this.placeAction.isEmpty())
@@ -263,11 +257,6 @@ public class MidnightControlsHud extends Hud {
             else
                 this.useWidth = this.width(this.placeAction);
         }
-    }
-
-    @Override
-    public boolean hasTicks() {
-        return true;
     }
 
     private int bottom(int y) {

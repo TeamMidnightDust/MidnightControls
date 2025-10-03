@@ -29,10 +29,12 @@ import eu.midnightdust.midnightcontrols.client.enums.CameraMode;
 import eu.midnightdust.midnightcontrols.client.enums.ControllerType;
 import eu.midnightdust.midnightcontrols.client.enums.HudSide;
 import eu.midnightdust.midnightcontrols.client.enums.VirtualMouseSkin;
+import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsSettingsScreen;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.enums.TouchMode;
 import eu.midnightdust.midnightcontrols.client.gui.config.ControllerBindingButton;
 import eu.midnightdust.midnightcontrols.client.gui.config.ControllerSelectionButton;
+import eu.midnightdust.midnightcontrols.client.gui.config.MappingsStringInputWidget;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -49,6 +51,7 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
@@ -62,6 +65,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     public static final String VISUAL = "visual";
     public static final String MISC = "misc";
     public static final String BUTTONS = "buttons";
+    public static final String MAPPING = "mapping";
     public static boolean isEditing = false;
     @Hidden @Entry public static int configVersion = 2;
 
@@ -186,7 +190,12 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Comment(category = MISC, centered = true, name="☆ Other Options") public static Comment _otherOptions;
     @Entry(category = MISC, name = "Trigger button fix") public static boolean triggerFix = true;
     @Entry(category = MISC, name = "Excluded Controllers (Name Regex)") public static List<String> excludedControllers = Lists.newArrayList(".*(Keyboard)$", ".*(Touchpad)$", ".*(Pen)$", ".*(Finger)$");
+
+    // Init mapping tab (see #onTabInit())
+    @Comment(category = MAPPING) @Condition(requiredModId = "thisModDoesNotExist") public static Comment this_spacer_will_never_be_visible_as_well;
+
     @Entry @Hidden public static Map<String, Map<String, String>> controllerBindingProfiles = new HashMap<>();
+
     private static Map<String, String> currentBindingProfile = new HashMap<>();
     private static Controller prevController;
 
@@ -236,6 +245,15 @@ public class MidnightControlsConfig extends MidnightConfig {
             list.addButton(List.of(), Text.of("\uD83C\uDFAE General"), centeredComment);
             ControllerSelectionButton.add(list, screen, false);
             ControllerSelectionButton.add(list, screen, true);
+
+            ButtonWidget editButton = ButtonWidget.builder(Text.of("OPEN"),
+                    button -> {
+                        client.setScreen(new MidnightControlsSettingsScreen(client.currentScreen, false));
+                    }).dimensions(screen.width - 185, 0, 175, 20).build();
+            list.addButton(List.of(editButton), Text.of("Legacy Config UI"), new EntryInfo(null, screen.modid));
+        }
+        if (MAPPING.equals(tabName)) {
+            MappingsStringInputWidget.add(centeredComment, list, screen);
         }
     }
 
@@ -507,17 +525,23 @@ public class MidnightControlsConfig extends MidnightConfig {
      * @return the controller name matches a type, else empty
      */
     public static @NotNull ControllerType matchControllerToType() {
-        String controller = getController().getName().toLowerCase();
-        if (controller.contains("xbox 360")) return ControllerType.XBOX_360;
-        else if (controller.contains("xbox") || controller.contains("afterglow")) return ControllerType.XBOX;
-        else if (controller.contains("steam") && GLX._getCpuInfo().contains("AMD Custom APU")) return ControllerType.STEAM_DECK;
-        else if (controller.contains("steam")) return ControllerType.STEAM_CONTROLLER;
-        else if (controller.contains("dualsense") || controller.contains("ps5")) return ControllerType.DUALSENSE;
-        else if (controller.contains("dualshock") || controller.contains("ps4")  || controller.contains("sony")) return ControllerType.DUALSHOCK;
-        else if (controller.contains("switch") || controller.contains("joy-con")  || controller.contains("wii") || controller.contains("nintendo")) return ControllerType.SWITCH;
-        else if (controller.contains("ouya")) return ControllerType.OUYA;
+        String name = getController().getName().toLowerCase();
+        if (containsAny(name, "xbox 360")) return ControllerType.XBOX_360;
+        else if (containsAny(name, "xbox") || name.contains("afterglow")) return ControllerType.XBOX;
+        else if (containsAny(name, "steam") && GLX._getCpuInfo().contains("AMD Custom APU")) return ControllerType.STEAM_DECK;
+        else if (containsAny(name, "steam")) return ControllerType.STEAM_CONTROLLER;
+        else if (containsAny(name, "dualsense", "ps5")) return ControllerType.DUALSENSE;
+        else if (containsAny(name, "dualshock", "ps4", "sony")) return ControllerType.DUALSHOCK;
+        else if (containsAny(name, "switch", "joy-con", "wii", "nintendo")) return ControllerType.SWITCH;
+        else if (containsAny(name, "ouya")) return ControllerType.OUYA;
         else return ControllerType.DEFAULT;
     }
+
+    private static boolean containsAny(String controller, String... substring) {
+        for (String s : substring) if (controller.contains(s)) return true;
+        return false;
+    }
+
     public static boolean doMixedInput() {
         return touchInControllerMode && controlsMode == ControlsMode.CONTROLLER;
     }

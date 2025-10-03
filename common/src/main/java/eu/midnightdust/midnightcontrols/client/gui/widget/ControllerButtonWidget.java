@@ -9,11 +9,12 @@
 
 package eu.midnightdust.midnightcontrols.client.gui.widget;
 
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.SpruceTexts;
+import dev.lambdaurora.spruceui.render.SpruceGuiGraphics;
+import dev.lambdaurora.spruceui.widget.AbstractSpruceIconButtonWidget;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsRenderer;
-import org.thinkingstudio.obsidianui.Position;
-import org.thinkingstudio.obsidianui.SpruceTexts;
-import org.thinkingstudio.obsidianui.widget.AbstractSpruceIconButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
@@ -45,12 +46,12 @@ public class ControllerButtonWidget extends AbstractSpruceIconButtonWidget {
     }
 
     @Override
-    protected int renderIcon(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected int renderIcon(SpruceGuiGraphics spruceGuiGraphics, int mouseX, int mouseY, float delta) {
         int x = this.getX();
         if (this.binding.getButton().length > 1) {
             x += (this.width / 2 - this.iconWidth / 2) - 4;
         }
-        var size = MidnightControlsRenderer.drawButton(context, x, this.getY(), this.binding, MinecraftClient.getInstance());
+        var size = MidnightControlsRenderer.drawButton(spruceGuiGraphics.vanilla(), x, this.getY(), this.binding, MinecraftClient.getInstance());
         this.iconWidth = size.length();
         return size.height();
     }

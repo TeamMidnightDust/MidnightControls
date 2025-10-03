@@ -1,6 +1,6 @@
 package eu.midnightdust.midnightcontrols.client.mixin;
 
-import org.thinkingstudio.obsidianui.Position;
+import dev.lambdaurora.spruceui.Position;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;

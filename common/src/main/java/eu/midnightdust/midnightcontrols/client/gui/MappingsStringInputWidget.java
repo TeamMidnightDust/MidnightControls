@@ -9,16 +9,16 @@
 
 package eu.midnightdust.midnightcontrols.client.gui;
 
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.option.SpruceOption;
+import dev.lambdaurora.spruceui.option.SpruceSimpleActionOption;
+import dev.lambdaurora.spruceui.render.SpruceGuiGraphics;
+import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
+import dev.lambdaurora.spruceui.widget.text.SpruceTextAreaWidget;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
-import org.thinkingstudio.obsidianui.Position;
-import org.thinkingstudio.obsidianui.option.SpruceOption;
-import org.thinkingstudio.obsidianui.option.SpruceSimpleActionOption;
-import org.thinkingstudio.obsidianui.widget.container.SpruceContainerWidget;
-import org.thinkingstudio.obsidianui.widget.text.SpruceTextAreaWidget;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
 
@@ -105,9 +105,9 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
     }
 
     @Override
-    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void renderWidget(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
         super.renderWidget(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.multiple_mapping_tip"), this.textArea.getX() + this.textArea.getWidth() / 2, this.textArea.getY() + this.textArea.getHeight() - 12, 0xFF888888);
-        context.drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.current_controller_guid", MidnightControlsConfig.getController().getGuid()), this.textArea.getX() + this.textArea.getWidth() / 2, this.height - 21, 0xFFFFFFFF);
+        context.vanilla().drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.multiple_mapping_tip"), this.textArea.getX() + this.textArea.getWidth() / 2, this.textArea.getY() + this.textArea.getHeight() - 12, 0xFF888888);
+        context.vanilla().drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.current_controller_guid", MidnightControlsConfig.getController().getGuid()), this.textArea.getX() + this.textArea.getWidth() / 2, this.height - 21, 0xFFFFFFFF);
     }
 }

@@ -9,8 +9,8 @@
 
 package eu.midnightdust.midnightcontrols;
 
-import org.thinkingstudio.obsidianui.util.Nameable;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
+import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

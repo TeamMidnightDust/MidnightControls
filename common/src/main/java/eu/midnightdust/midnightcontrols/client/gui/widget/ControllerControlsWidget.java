@@ -9,14 +9,15 @@
 
 package eu.midnightdust.midnightcontrols.client.gui.widget;
 
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.SpruceTexts;
+import dev.lambdaurora.spruceui.render.SpruceGuiGraphics;
+import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
+import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.gui.config.ControlsInput;
-import org.thinkingstudio.obsidianui.Position;
-import org.thinkingstudio.obsidianui.SpruceTexts;
-import org.thinkingstudio.obsidianui.widget.SpruceButtonWidget;
-import org.thinkingstudio.obsidianui.widget.container.SpruceContainerWidget;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsSettingsScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
@@ -55,8 +56,8 @@ public class ControllerControlsWidget extends SpruceContainerWidget implements C
     }
 
     @Override
-    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.title.controller_controls"),
+    public void renderWidget(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
+        context.vanilla().drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.title.controller_controls"),
                 this.getX() + this.width / 2, this.getY() + 4, 0xFFFFFFFF);
         this.resetButton.setActive(InputManager.streamBindings().anyMatch(Predicates.not(ButtonBinding::isDefault)));
         super.renderWidget(context, mouseX, mouseY, delta);

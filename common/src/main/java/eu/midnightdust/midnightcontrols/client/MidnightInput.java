@@ -10,6 +10,14 @@
 package eu.midnightdust.midnightcontrols.client;
 
 import com.google.common.collect.ImmutableSet;
+import dev.lambdaurora.spruceui.navigation.NavigationEvent;
+import dev.lambdaurora.spruceui.screen.SpruceScreen;
+import dev.lambdaurora.spruceui.widget.AbstractSprucePressableButtonWidget;
+import dev.lambdaurora.spruceui.widget.AbstractSpruceWidget;
+import dev.lambdaurora.spruceui.widget.SpruceElement;
+import dev.lambdaurora.spruceui.widget.SpruceLabelWidget;
+import dev.lambdaurora.spruceui.widget.container.SpruceEntryListWidget;
+import dev.lambdaurora.spruceui.widget.container.SpruceParentWidget;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.client.compat.EmotecraftCompat;
 import eu.midnightdust.midnightcontrols.client.compat.LibGuiCompat;
@@ -24,6 +32,7 @@ import eu.midnightdust.midnightcontrols.client.util.InventoryUtil;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
 import eu.midnightdust.midnightcontrols.client.util.storage.ButtonStorage;
 import net.minecraft.client.gui.Click;
+import net.minecraft.client.gui.navigation.NavigationDirection;
 import net.minecraft.client.gui.screen.option.KeybindsScreen;
 import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
@@ -31,8 +40,6 @@ import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.input.MouseInput;
 import net.minecraft.entity.vehicle.BoatEntity;
-import org.thinkingstudio.obsidianui.widget.AbstractSpruceWidget;
-import org.thinkingstudio.obsidianui.widget.container.SpruceEntryListWidget;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
@@ -43,12 +50,6 @@ import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.ring.RingPage;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MathUtil;
-import org.thinkingstudio.obsidianui.navigation.NavigationDirection;
-import org.thinkingstudio.obsidianui.screen.SpruceScreen;
-import org.thinkingstudio.obsidianui.widget.AbstractSprucePressableButtonWidget;
-import org.thinkingstudio.obsidianui.widget.SpruceElement;
-import org.thinkingstudio.obsidianui.widget.SpruceLabelWidget;
-import org.thinkingstudio.obsidianui.widget.container.SpruceParentWidget;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
@@ -603,7 +604,7 @@ public class MidnightInput {
                     .map(element -> (EntryListWidget<?>) element)
                     .filter(element -> element.getType().isFocused())
                     .anyMatch(element -> {
-                        element.mouseScrolled(0.0, 0.0, 0, -value);
+                        element.mouseScrolled(0.0, 0.0, 0, -value / 30);
                         return true;
                     });
     }
@@ -652,7 +653,7 @@ public class MidnightInput {
      */
     private boolean handleLeftRight(@NotNull Screen screen, boolean right) {
         if (screen instanceof SpruceScreen spruceScreen) {
-            spruceScreen.onNavigation(right ? NavigationDirection.RIGHT : NavigationDirection.LEFT, false);
+            spruceScreen.onNavigation(new NavigationEvent(right ? NavigationDirection.RIGHT : NavigationDirection.LEFT, false, false));
             this.actionGuiCooldown = 5;
             return false;
         }
@@ -672,7 +673,7 @@ public class MidnightInput {
             case SpruceElement spruceElement -> {
                 if (spruceElement.requiresCursor())
                     return true;
-                return !spruceElement.onNavigation(right ? NavigationDirection.RIGHT : NavigationDirection.LEFT, false);
+                return !spruceElement.onNavigation(new NavigationEvent(right ? NavigationDirection.RIGHT : NavigationDirection.LEFT, false, false));
             }
             case SliderWidget slider -> {
                 if (slider.active) {
@@ -767,7 +768,7 @@ public class MidnightInput {
         if (!isScreenInteractive(screen) && !screen.getClass().getCanonicalName().contains("me.jellysquid.mods.sodium.client.gui")) return false;
         try {
             if (screen instanceof SpruceScreen spruceScreen) {
-                if (spruceScreen.onNavigation(direction, false)) {
+                if (spruceScreen.onNavigation(new NavigationEvent(direction, false, false))) {
                     this.actionGuiCooldown = 5;
                 }
                 return true;

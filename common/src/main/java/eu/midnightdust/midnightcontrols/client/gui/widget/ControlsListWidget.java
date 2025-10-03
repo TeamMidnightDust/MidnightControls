@@ -9,6 +9,17 @@
 
 package eu.midnightdust.midnightcontrols.client.gui.widget;
 
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.SpruceTexts;
+import dev.lambdaurora.spruceui.navigation.NavigationEvent;
+import dev.lambdaurora.spruceui.navigation.NavigationUtils;
+import dev.lambdaurora.spruceui.render.SpruceGuiGraphics;
+import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
+import dev.lambdaurora.spruceui.widget.SpruceIconButtonWidget;
+import dev.lambdaurora.spruceui.widget.SpruceSeparatorWidget;
+import dev.lambdaurora.spruceui.widget.SpruceWidget;
+import dev.lambdaurora.spruceui.widget.container.SpruceEntryListWidget;
+import dev.lambdaurora.spruceui.widget.container.SpruceParentWidget;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
@@ -16,20 +27,11 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.Click;
+import net.minecraft.client.gui.navigation.NavigationAxis;
+import net.minecraft.client.gui.navigation.NavigationDirection;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.input.MouseInput;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.Identifier;
-import org.thinkingstudio.obsidianui.Position;
-import org.thinkingstudio.obsidianui.SpruceTexts;
-import org.thinkingstudio.obsidianui.navigation.NavigationDirection;
-import org.thinkingstudio.obsidianui.navigation.NavigationUtils;
-import org.thinkingstudio.obsidianui.widget.SpruceButtonWidget;
-import org.thinkingstudio.obsidianui.widget.SpruceIconButtonWidget;
-import org.thinkingstudio.obsidianui.widget.SpruceSeparatorWidget;
-import org.thinkingstudio.obsidianui.widget.SpruceWidget;
-import org.thinkingstudio.obsidianui.widget.container.SpruceEntryListWidget;
-import org.thinkingstudio.obsidianui.widget.container.SpruceParentWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
@@ -114,11 +116,11 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                 private final Identifier resetTexture = Identifier.of("midnightlib","icon/reset");
 
                 @Override
-                protected int renderIcon(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+                protected int renderIcon(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
                     int size = 12;
                     int x = this.getX() + this.getWidth() / 2 - size / 2;
                     int y = this.getY() + this.getHeight() / 2 - size / 2;
-                    drawContext.drawGuiTexture(RenderPipelines.GUI_TEXTURED, resetTexture, x, y, size, size);
+                    context.vanilla().drawGuiTexture(RenderPipelines.GUI_TEXTURED, resetTexture, x, y, size, size);
                     return 1;
                 }
             };
@@ -168,7 +170,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         /* Input */
 
         @Override
-        protected boolean onMouseClick(double mouseX, double mouseY, int button) {
+        protected boolean onMouseClick(Click click, boolean doubleClick) {
             var it = this.children().iterator();
 
             SpruceWidget element;
@@ -178,30 +180,30 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                 }
 
                 element = it.next();
-            } while (!element.mouseClicked(new Click(mouseX, mouseY, new MouseInput(button, 0)), false));
+            } while (!element.mouseClicked(click, false));
 
             this.setFocused(element);
-            if (button == GLFW.GLFW_MOUSE_BUTTON_1)
+            if (click.button() == GLFW.GLFW_MOUSE_BUTTON_1)
                 this.dragging = true;
 
             return true;
         }
 
         @Override
-        protected boolean onMouseRelease(double mouseX, double mouseY, int button) {
+        protected boolean onMouseRelease(Click click) {
             this.dragging = false;
-            return this.hoveredElement(mouseX, mouseY).filter(element -> element.mouseReleased(new Click(mouseX, mouseY, new MouseInput(button, 0)))).isPresent();
+            return this.hoveredElement(click.x(), click.y()).filter(element -> element.mouseReleased(click)).isPresent();
         }
 
         @Override
-        protected boolean onMouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-            return this.getFocused() != null && this.dragging && button == GLFW.GLFW_MOUSE_BUTTON_1
-                    && this.getFocused().mouseDragged(new Click(mouseX, mouseY, new MouseInput(button, 0)), deltaX, deltaY);
+        protected boolean onMouseDrag(@NotNull Click click, double deltaX, double deltaY) {
+            return this.getFocused() != null && this.dragging && click.button() == GLFW.GLFW_MOUSE_BUTTON_1
+                    && this.getFocused().mouseDragged(click, deltaX, deltaY);
         }
 
         @Override
-        protected boolean onKeyPress(int keyCode, int scanCode, int modifiers) {
-            return this.focused != null && this.focused.keyPressed(new KeyInput(keyCode, scanCode, modifiers));
+        protected boolean onKeyPress(@NotNull KeyInput input) {
+            return this.focused != null && this.focused.keyPressed(input);
         }
 
         /* Navigation */
@@ -215,9 +217,9 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         }
 
         @Override
-        public boolean onNavigation(@NotNull NavigationDirection direction, boolean tab) {
+        public boolean onNavigation(NavigationEvent event) {
             if (this.requiresCursor()) return false;
-            if (!tab && direction.isVertical()) {
+            if (!event.tab() && event.direction().getAxis() == NavigationAxis.VERTICAL) {
                 if (this.isFocused()) {
                     this.setFocused(null);
                     return false;
@@ -225,16 +227,16 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                 int lastIndex = this.parent.lastIndex;
                 if (lastIndex >= this.children.size())
                     lastIndex = this.children.size() - 1;
-                if (!this.children.get(lastIndex).onNavigation(direction, tab))
+                if (!this.children.get(lastIndex).onNavigation(event))
                     return false;
                 this.setFocused(this.children.get(lastIndex));
                 return true;
             }
 
-            boolean result = NavigationUtils.tryNavigate(direction, tab, this.children, this.focused, this::setFocused, true);
+            boolean result = NavigationUtils.tryNavigate(event, this.children, this.focused, this::setFocused, true);
             if (result) {
                 this.setFocused(true);
-                if (direction.isHorizontal() && this.getFocused() != null) {
+                if (event.direction().getAxis() == NavigationAxis.HORIZONTAL && this.getFocused() != null) {
                     this.parent.lastIndex = this.children.indexOf(this.getFocused());
                 }
             }
@@ -244,7 +246,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         /* Rendering */
 
         @Override
-        protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        protected void renderWidget(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
             boolean focused = gui.focusedBinding == this.binding;
 
             var textRenderer = ControlsListWidget.this.client.textRenderer;
@@ -300,14 +302,14 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         /* Navigation */
 
         @Override
-        public boolean onNavigation(@NotNull NavigationDirection direction, boolean tab) {
-            return this.separatorWidget.onNavigation(direction, tab);
+        public boolean onNavigation(NavigationEvent event) {
+            return this.separatorWidget.onNavigation(event);
         }
 
         /* Rendering */
 
         @Override
-        protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        protected void renderWidget(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
             this.separatorWidget.render(context, mouseX, mouseY, delta);
         }
 

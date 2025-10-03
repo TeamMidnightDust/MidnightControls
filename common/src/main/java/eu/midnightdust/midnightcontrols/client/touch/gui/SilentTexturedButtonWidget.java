@@ -1,8 +1,8 @@
 package eu.midnightdust.midnightcontrols.client.touch.gui;
 
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.widget.SpruceTexturedButtonWidget;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
-import org.thinkingstudio.obsidianui.Position;
-import org.thinkingstudio.obsidianui.widget.SpruceTexturedButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 

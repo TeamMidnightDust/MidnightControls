@@ -1,9 +1,9 @@
 package eu.midnightdust.midnightcontrols.client.touch.gui;
 
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.consume.UseAction;
-import org.thinkingstudio.obsidianui.Position;
-import org.thinkingstudio.obsidianui.widget.SpruceButtonWidget;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import net.minecraft.text.Text;

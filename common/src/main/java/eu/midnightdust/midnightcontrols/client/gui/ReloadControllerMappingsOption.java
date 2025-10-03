@@ -9,9 +9,10 @@
 
 package eu.midnightdust.midnightcontrols.client.gui;
 
+import dev.lambdaurora.spruceui.option.SpruceSimpleActionOption;
+import dev.lambdaurora.spruceui.tooltip.TooltipData;
+import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
-import org.thinkingstudio.obsidianui.option.SpruceSimpleActionOption;
-import org.thinkingstudio.obsidianui.widget.SpruceButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
@@ -35,6 +36,6 @@ public class ReloadControllerMappingsOption {
                 client.currentScreen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
             client.getToastManager().add(SystemToast.create(client, SystemToast.Type.PERIODIC_NOTIFICATION,
                     Text.translatable("midnightcontrols.controller.mappings.updated"), Text.empty()));
-        }, Text.translatable("midnightcontrols.tooltip.reload_controller_mappings"));
+        }, TooltipData.builder().text(Text.translatable("midnightcontrols.tooltip.reload_controller_mappings")).build());
     }
 }

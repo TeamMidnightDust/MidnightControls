@@ -1,8 +1,8 @@
 package eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler;
 
+import dev.lambdaurora.spruceui.widget.text.SpruceTextFieldWidget;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import org.thinkingstudio.obsidianui.widget.text.SpruceTextFieldWidget;
 
 public record TextFieldWrapper(Object textField) {
 

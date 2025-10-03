@@ -40,9 +40,6 @@
     ],
     "client": [
       "eu.midnightdust.midnightcontrols.fabric.MidnightControlsClientFabric"
-    ],
-    "modmenu": [
-      "eu.midnightdust.midnightcontrols.client.MidnightControlsModMenu"
     ]
   },
   "mixins": [

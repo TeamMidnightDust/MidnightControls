@@ -11,12 +11,9 @@ package eu.midnightdust.midnightcontrols;
 
 import net.minecraft.text.Text;
 import net.minecraft.text.object.AtlasTextObjectContents;
-import net.minecraft.text.object.TextObjectContents;
 import net.minecraft.util.Atlases;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.TranslatableOption;
 import org.jetbrains.annotations.NotNull;
-import org.thinkingstudio.obsidianui.util.Nameable;
 
 import java.util.Arrays;
 import java.util.Optional;

@@ -24,6 +24,10 @@ subprojects {
         maven {
             url = "https://api.modrinth.com/maven"
         }
+        maven {
+            name 'Gegy'
+            url 'https://maven.gegy.dev'
+        }
         maven { url 'https://jitpack.io' }
         flatDir {
             dirs("../localMaven")

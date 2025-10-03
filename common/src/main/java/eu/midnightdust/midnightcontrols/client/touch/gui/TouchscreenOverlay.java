@@ -9,21 +9,20 @@
 
 package eu.midnightdust.midnightcontrols.client.touch.gui;
 
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.consume.UseAction;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Atlases;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import org.thinkingstudio.obsidianui.Position;
-import org.thinkingstudio.obsidianui.widget.SpruceButtonWidget;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
@@ -37,7 +36,6 @@ import eu.midnightdust.midnightcontrols.client.util.KeyBindingAccessor;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.TextIconButtonWidget;
-import net.minecraft.client.texture.MissingSprite;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.text.Text;
@@ -145,7 +143,7 @@ public class TouchscreenOverlay extends Screen {
      */
     private void handleJump(SpruceButtonWidget btn) {
         assert this.client != null;
-        ((KeyBindingAccessor) this.client.options.jumpKey).midnightcontrols$handlePressState(btn.isActive());
+        ((KeyBindingAccessor) this.client.options.jumpKey).midnightcontrols$handlePressState(btn.isInteractable());
     }
     /**
      * Handles the jump button.
@@ -210,7 +208,7 @@ public class TouchscreenOverlay extends Screen {
         // Swap items hand.
         this.addDrawableChild(this.swapHandsButton = new SilentTexturedButtonWidget(Position.of(swapHandsX, sneakButtonY), 20, 20, Text.empty(),
                 button -> {
-                    if (button.isActive()) {
+                    if (button.isInteractable()) {
                         if (!this.client.player.isSpectator()) {
                             Objects.requireNonNull(this.client.getNetworkHandler()).sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
                         }
@@ -218,7 +216,7 @@ public class TouchscreenOverlay extends Screen {
                 },0, 160, 20, WIDGETS_LOCATION));
         // Drop
         this.addDrawableChild(this.dropButton = new SilentTexturedButtonWidget(Position.of(swapHandsX, sneakButtonY + 5 + 20), 20, 20, Text.empty(), btn -> {
-            if (btn.isActive() && !client.player.isSpectator() && client.player.dropSelectedItem(false)) {
+            if (btn.isInteractable() && !client.player.isSpectator() && client.player.dropSelectedItem(false)) {
                 client.player.swingHand(Hand.MAIN_HAND);
             }
         }, 20, 160, 20, WIDGETS_LOCATION));
@@ -235,12 +233,12 @@ public class TouchscreenOverlay extends Screen {
                 this::handleJump, 40, 40, 20, WIDGETS_LOCATION
         ));
         this.addDrawableChild(this.flyDownButton = new SilentTexturedButtonWidget(Position.of(jumpButtonX, sneakButtonY + 20 + 5), 20, 20, Text.empty(),
-                btn -> ((KeyBindingAccessor) this.client.options.sneakKey).midnightcontrols$handlePressState(btn.isActive()), 60, 40, 20, WIDGETS_LOCATION
+                btn -> ((KeyBindingAccessor) this.client.options.sneakKey).midnightcontrols$handlePressState(btn.isInteractable()), 60, 40, 20, WIDGETS_LOCATION
         ));
         this.updateJumpButtons();
         // Movements keys
         this.addDrawableChild((this.startSneakButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX, sneakButtonY), 20, 20, Text.empty(), btn -> {
-                    if (btn.isActive()) {
+                    if (btn.isInteractable()) {
                         ((KeyBindingAccessor) this.client.options.sneakKey).midnightcontrols$handlePressState(true);
                         this.startSneakButton.setVisible(false);
                         this.endSneakButton.setVisible(true);
@@ -248,40 +246,40 @@ public class TouchscreenOverlay extends Screen {
                 }, 0, 120, 20, WIDGETS_LOCATION))
         );
         this.addDrawableChild((this.endSneakButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX, sneakButtonY), 20, 20, Text.empty(), btn -> {
-            if (btn.isActive()) {
+            if (btn.isInteractable()) {
                 ((KeyBindingAccessor) this.client.options.sneakKey).midnightcontrols$handlePressState(false);
                 this.endSneakButton.setVisible(false);
                 this.startSneakButton.setVisible(true);
             }
         }, 20, 120, 20, WIDGETS_LOCATION)));
         this.addDrawableChild(this.forwardLeftButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX - 20 - 5, sneakButtonY - 5 - 20), 20, 20, Text.empty(), btn -> {
-            ((KeyBindingAccessor) this.client.options.forwardKey).midnightcontrols$handlePressState(btn.isActive());
-            ((KeyBindingAccessor) this.client.options.leftKey).midnightcontrols$handlePressState(btn.isActive());
-            this.updateForwardButtonsState(btn.isActive());
+            ((KeyBindingAccessor) this.client.options.forwardKey).midnightcontrols$handlePressState(btn.isInteractable());
+            ((KeyBindingAccessor) this.client.options.leftKey).midnightcontrols$handlePressState(btn.isInteractable());
+            this.updateForwardButtonsState(btn.isInteractable());
         }, 80, 80, 20, WIDGETS_LOCATION
         ));
         this.addDrawableChild(this.forwardButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX, sneakButtonY - 5 - 20), 20, 20, Text.empty(), btn -> {
-            ((KeyBindingAccessor) this.client.options.forwardKey).midnightcontrols$handlePressState(btn.isActive());
-            this.updateForwardButtonsState(btn.isActive());
+            ((KeyBindingAccessor) this.client.options.forwardKey).midnightcontrols$handlePressState(btn.isInteractable());
+            this.updateForwardButtonsState(btn.isInteractable());
             this.forwardLeftButton.setVisible(true);
             this.forwardRightButton.setVisible(true);
         }, 0, 80, 20, WIDGETS_LOCATION
         ));
         this.addDrawableChild(this.forwardRightButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX + 20 + 5, sneakButtonY - 5 - 20), 20, 20, Text.empty(), btn -> {
-            ((KeyBindingAccessor) this.client.options.forwardKey).midnightcontrols$handlePressState(btn.isActive());
-            ((KeyBindingAccessor) this.client.options.rightKey).midnightcontrols$handlePressState(btn.isActive());
-            this.updateForwardButtonsState(btn.isActive());
+            ((KeyBindingAccessor) this.client.options.forwardKey).midnightcontrols$handlePressState(btn.isInteractable());
+            ((KeyBindingAccessor) this.client.options.rightKey).midnightcontrols$handlePressState(btn.isInteractable());
+            this.updateForwardButtonsState(btn.isInteractable());
         }, 100, 80, 20, WIDGETS_LOCATION
         ));
 
         this.addDrawableChild(this.rightButton =new SilentTexturedButtonWidget(Position.of(sneakButtonX + 20 + 5, sneakButtonY), 20, 20, Text.empty(),
-                btn -> ((KeyBindingAccessor) this.client.options.rightKey).midnightcontrols$handlePressState(btn.isActive()), 20, 80, 20, WIDGETS_LOCATION
+                btn -> ((KeyBindingAccessor) this.client.options.rightKey).midnightcontrols$handlePressState(btn.isInteractable()), 20, 80, 20, WIDGETS_LOCATION
         ));
         this.addDrawableChild(this.backButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX, sneakButtonY + 20 + 5), 20, 20, Text.empty(),
-                btn -> ((KeyBindingAccessor) this.client.options.backKey).midnightcontrols$handlePressState(btn.isActive()), 40, 80, 20, WIDGETS_LOCATION
+                btn -> ((KeyBindingAccessor) this.client.options.backKey).midnightcontrols$handlePressState(btn.isInteractable()), 40, 80, 20, WIDGETS_LOCATION
         ));
         this.addDrawableChild(this.leftButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX - 20 - 5, sneakButtonY), 20, 20, Text.empty(),
-                btn -> ((KeyBindingAccessor) this.client.options.leftKey).midnightcontrols$handlePressState(btn.isActive()), 60, 80, 20, WIDGETS_LOCATION
+                btn -> ((KeyBindingAccessor) this.client.options.leftKey).midnightcontrols$handlePressState(btn.isInteractable()), 60, 80, 20, WIDGETS_LOCATION
         ));
         initCustomButtons(true);
         initCustomButtons(false);

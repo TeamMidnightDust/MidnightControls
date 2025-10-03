@@ -1,16 +1,15 @@
 package eu.midnightdust.midnightcontrols.client.virtualkeyboard.gui;
 
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.SpruceTexts;
+import dev.lambdaurora.spruceui.screen.SpruceScreen;
+import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
+import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
+import dev.lambdaurora.spruceui.widget.text.SpruceTextAreaWidget;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayout;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutManager;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import org.thinkingstudio.obsidianui.Position;
-import org.thinkingstudio.obsidianui.SpruceTexts;
-import org.thinkingstudio.obsidianui.screen.SpruceScreen;
-import org.thinkingstudio.obsidianui.widget.SpruceButtonWidget;
-import org.thinkingstudio.obsidianui.widget.container.SpruceContainerWidget;
-import org.thinkingstudio.obsidianui.widget.text.SpruceTextAreaWidget;
 
 import java.util.List;
 
