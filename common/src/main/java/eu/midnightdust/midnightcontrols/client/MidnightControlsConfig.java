@@ -65,7 +65,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     public static final String VISUAL = "visual";
     public static final String MISC = "misc";
     public static final String BUTTONS = "buttons";
-    public static final String MAPPING = "mapping";
+    //public static final String MAPPING = "mapping";
     public static boolean isEditing = false;
     @Hidden @Entry public static int configVersion = 2;
 
@@ -192,7 +192,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(category = MISC, name = "Excluded Controllers (Name Regex)") public static List<String> excludedControllers = Lists.newArrayList(".*(Keyboard)$", ".*(Touchpad)$", ".*(Pen)$", ".*(Finger)$");
 
     // Init mapping tab (see #onTabInit())
-    @Comment(category = MAPPING) @Condition(requiredModId = "thisModDoesNotExist") public static Comment this_spacer_will_never_be_visible_as_well;
+    //@Comment(category = MAPPING) @Condition(requiredModId = "thisModDoesNotExist") public static Comment this_spacer_will_never_be_visible_as_well;
 
     @Entry @Hidden public static Map<String, Map<String, String>> controllerBindingProfiles = new HashMap<>();
 
@@ -252,9 +252,9 @@ public class MidnightControlsConfig extends MidnightConfig {
                     }).dimensions(screen.width - 185, 0, 175, 20).build();
             list.addButton(List.of(editButton), Text.of("Legacy Config UI"), new EntryInfo(null, screen.modid));
         }
-        if (MAPPING.equals(tabName)) {
-            MappingsStringInputWidget.add(centeredComment, list, screen);
-        }
+//        if (MAPPING.equals(tabName)) {
+//            MappingsStringInputWidget.add(centeredComment, list, screen);
+//        }
     }
 
     /**

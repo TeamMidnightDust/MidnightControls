@@ -10,6 +10,8 @@
 package eu.midnightdust.midnightcontrols.client.gui.config;
 
 import com.google.common.collect.Lists;
+import dev.lambdaurora.spruceui.Position;
+import dev.lambdaurora.spruceui.widget.text.SpruceTextAreaWidget;
 import eu.midnightdust.lib.config.EntryInfo;
 import eu.midnightdust.lib.config.MidnightConfigListWidget;
 import eu.midnightdust.lib.config.MidnightConfigScreen;
@@ -32,6 +34,7 @@ import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.cli
 public class MappingsStringInputWidget {
 
     public static void add(EntryInfo centered, MidnightConfigListWidget list, MidnightConfigScreen screen) {
+        //SpruceTextAreaWidget editButton = new SpruceTextAreaWidget(Position.of(0, 0), 20, 20, Text.empty());
         MultilineTextFieldWidget editButton = new MultilineTextFieldWidget(screen.getTextRenderer(), screen.width / 2 - 128, 0, 256, 60, Text.of("TESTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT\nnew line!"));
         TextIconButtonWidget resetButton = TextIconButtonWidget.builder(Text.translatable("controls.reset"), (button -> {
             screen.updateList();
@@ -42,6 +45,7 @@ public class MappingsStringInputWidget {
         });
 
         list.addButton(List.of(), Text.translatable("midnightcontrols.menu.title.mappings.string"), centered);
+        //screen.addDrawableChild(editButton);
         list.addButton(Lists.newArrayList(editButton, resetButton), Text.empty(), centered);
         list.addButton(List.of(), Text.empty(), centered);
         list.addButton(List.of(), Text.empty(), centered);

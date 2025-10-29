@@ -63,7 +63,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption virtualKeyboardOption;
     private final SpruceOption hideCursorOption;
     private final SpruceOption resetOption;
-    private final SpruceOption advancedConfigOption;
     // Gameplay options
     private final SpruceOption analogMovementOption;
     private final SpruceOption autoJumpOption;
@@ -224,7 +223,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             var client = MinecraftClient.getInstance();
             this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
         });
-        this.advancedConfigOption = SpruceSimpleActionOption.of("midnightcontrols.midnightconfig.title", button -> client.setScreen(MidnightControlsConfig.getScreen(this, MidnightControlsConstants.NAMESPACE)));
         // Gameplay options
         this.analogMovementOption = new SpruceToggleBooleanOption("midnightcontrols.menu.analog_movement",
                 () -> MidnightControlsConfig.analogMovement, value -> MidnightControlsConfig.analogMovement = value,
@@ -399,7 +397,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         list.addSingleOptionEntry(this.hideCursorOption);
         list.addSingleOptionEntry(this.joystickAsMouseOption);
         list.addSingleOptionEntry(this.eyeTrackingAsMouseOption);
-        list.addSingleOptionEntry(this.advancedConfigOption);
         return list;
     }
 
