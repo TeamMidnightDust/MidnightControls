@@ -204,7 +204,7 @@ public class MidnightControlsClient extends MidnightControls {
         client = MinecraftClient.getInstance();
         if (screen == null && MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN) {
             screen = new TouchscreenOverlay();
-            screen.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
+            screen.init(client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
             client.skipGameRender = false;
             client.currentScreen = screen;
         } else if (screen != null) {

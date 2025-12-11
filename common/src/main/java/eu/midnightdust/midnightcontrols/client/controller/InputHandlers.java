@@ -94,9 +94,9 @@ public class InputHandlers {
                     nextTab = tabs.size() - 1;
                 else if (nextTab >= tabs.size())
                     nextTab = 0;
-                currentTab.setToggled(false);
+                currentTab.active = false;
                 recipeBookAccessor.setCurrentTab(currentTab = tabs.get(nextTab));
-                currentTab.setToggled(true);
+                currentTab.active = true;
                 recipeBookScreen.refreshRecipeBook();
                 return true;
             } else if (client.currentScreen instanceof AdvancementsScreenAccessor screen) {

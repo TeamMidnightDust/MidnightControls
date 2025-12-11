@@ -77,11 +77,11 @@ public abstract class WorldRendererMixin {
             var outlineShape = this.world.getBlockState(blockPos).getOutlineShape(this.client.world, blockPos, ShapeContext.of(camera.getFocusedEntity()));
             Color rgb = MidnightColorUtil.hex2Rgb(MidnightControlsConfig.touchOutlineColorHex);
             if (MidnightControlsConfig.touchOutlineColorHex.isEmpty()) rgb = RainbowColor.radialRainbow(1,1);
-            var pos = camera.getPos();
+            var pos = camera.getCameraPos();
             matrices.push();
-            var vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
+            var vertexConsumer = immediate.getBuffer(RenderLayers.lines());
             VertexRendering.drawOutline(matrices, vertexConsumer, outlineShape, blockPos.getX() - pos.getX(), blockPos.getY() - pos.getY(), blockPos.getZ() - pos.getZ(),
-                    ColorHelper.withAlpha(MidnightControlsConfig.touchOutlineColorAlpha, rgb.getRGB()));
+                    ColorHelper.withAlpha(MidnightControlsConfig.touchOutlineColorAlpha, rgb.getRGB()), 4);
             matrices.pop();
         }
     }
@@ -105,15 +105,15 @@ public abstract class WorldRendererMixin {
             var placementState = block.getPlacementState(context);
             if (placementState == null)
                 return;
-            var pos = camera.getPos();
+            var pos = camera.getCameraPos();
 
             var outlineShape = placementState.getOutlineShape(this.client.world, blockPos, ShapeContext.of(camera.getFocusedEntity()));
             Color rgb = MidnightColorUtil.hex2Rgb(MidnightControlsConfig.reacharoundOutlineColorHex);
             if (MidnightControlsConfig.reacharoundOutlineColorHex.isEmpty()) rgb = RainbowColor.radialRainbow(1,1);
             matrices.push();
-            var vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
+            var vertexConsumer = immediate.getBuffer(RenderLayers.lines());
             VertexRendering.drawOutline(matrices, vertexConsumer, outlineShape, blockPos.getX() - pos.getX(), blockPos.getY() - pos.getY(), blockPos.getZ() - pos.getZ(),
-                    ColorHelper.withAlpha(MidnightControlsConfig.touchOutlineColorAlpha, rgb.getRGB()));
+                    ColorHelper.withAlpha(MidnightControlsConfig.touchOutlineColorAlpha, rgb.getRGB()), 4);
             matrices.pop();
         }
     }

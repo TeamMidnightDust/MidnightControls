@@ -19,6 +19,7 @@ public abstract class CursorRenderer {
 
     public static void drawUnalignedTexturedQuad(RenderPipeline pipeline, Identifier texture, DrawContext context, float x1, float x2, float y1, float y2, float u1, float u2, float v1, float v2) {
         DrawContextAccessor accessor = (DrawContextAccessor) context;
-        accessor.getState().addSimpleElement(new UnalignedTexturedQuadGuiElementRenderState(pipeline, TextureSetup.withoutGlTexture(client.getTextureManager().getTexture(texture).getGlTextureView()), new Matrix3x2f(context.getMatrices()), x1, y1, x2, y2, u1, u2, v1, v2, 0xffffffff, accessor.getScissorStack().peekLast()));
+        var tex = client.getTextureManager().getTexture(texture);
+        accessor.getState().addSimpleElement(new UnalignedTexturedQuadGuiElementRenderState(pipeline, TextureSetup.of(tex.getGlTextureView(), tex.getSampler()), new Matrix3x2f(context.getMatrices()), x1, y1, x2, y2, u1, u2, v1, v2, 0xffffffff, accessor.getScissorStack().peekLast()));
     }
 }

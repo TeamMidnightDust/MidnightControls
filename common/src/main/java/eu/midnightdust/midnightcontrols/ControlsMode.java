@@ -12,7 +12,7 @@ package eu.midnightdust.midnightcontrols;
 import net.minecraft.text.Text;
 import net.minecraft.text.object.AtlasTextObjectContents;
 import net.minecraft.util.Atlases;
-import net.minecraft.util.TranslatableOption;
+import net.minecraft.util.StringIdentifiable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -27,7 +27,7 @@ import static eu.midnightdust.midnightcontrols.MidnightControls.id;
  * @version 1.7.0
  * @since 1.0.0
  */
-public enum ControlsMode implements TranslatableOption {
+public enum ControlsMode implements StringIdentifiable {
     DEFAULT("icon/keyboard_mouse"),
     CONTROLLER("icon/controller"),
     TOUCHSCREEN("icon/touchscreen");
@@ -49,15 +49,10 @@ public enum ControlsMode implements TranslatableOption {
         return v[this.ordinal() + 1];
     }
 
-    @Override
-    public int getId() {
-        return this.ordinal();
-    }
-
-    @Override
-    public Text getText() {
-        return Text.object(new AtlasTextObjectContents(Atlases.GUI, id(emoji))).append(" ").append(Text.translatable(getTranslationKey()));
-    }
+//    @Override
+//    public Text getText() {
+//        return Text.object(new AtlasTextObjectContents(Atlases.GUI, id(emoji))).append(" ").append(Text.translatable(getTranslationKey()));
+//    }
 
     /**
      * Gets the translation key of this controls mode.
@@ -82,5 +77,10 @@ public enum ControlsMode implements TranslatableOption {
      */
     public static Optional<ControlsMode> byId(@NotNull String id) {
         return Arrays.stream(values()).filter(mode -> mode.getName().equalsIgnoreCase(id)).findFirst();
+    }
+
+    @Override
+    public String asString() {
+        return getTranslationKey();
     }
 }

@@ -62,7 +62,7 @@ public class TouchUtils {
                 .unproject((float) x / displayWidth * viewport[2],
                         (float) (displayHeight - y) / displayHeight * viewport[3], (float) d, viewport, target);
 
-        return new Vec3d(target.x, target.y, target.z).add(camera.getPos());
+        return new Vec3d(target.x, target.y, target.z).add(camera.getCameraPos());
     }
 
     public static boolean hasInWorldUseAction(ItemStack stack) {

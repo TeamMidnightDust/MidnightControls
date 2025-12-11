@@ -221,7 +221,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         this.resetOption = SpruceSimpleActionOption.reset(btn -> {
             MidnightControlsConfig.reset();
             var client = MinecraftClient.getInstance();
-            this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
+            this.init(client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
         });
         // Gameplay options
         this.analogMovementOption = new SpruceToggleBooleanOption("midnightcontrols.menu.analog_movement",

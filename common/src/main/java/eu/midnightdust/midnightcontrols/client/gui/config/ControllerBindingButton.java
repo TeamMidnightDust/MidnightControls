@@ -11,7 +11,7 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsRenderer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.font.DrawnTextConsumer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -36,7 +36,7 @@ public class ControllerBindingButton extends ButtonWidget implements ControlsInp
 
     public static void add(ButtonBinding binding, MidnightConfigListWidget list, MidnightConfigScreen screen) {
         ControllerBindingButton editButton = new ControllerBindingButton(screen.width - 185 + 22, 0, 128, 20, binding);
-        TextIconButtonWidget resetButton = TextIconButtonWidget.builder(Text.translatable("controls.reset"), (button -> {
+        TextIconButtonWidget resetButton = TextIconButtonWidget.builder(net.minecraft.text.Text.translatable("controls.reset"), (button -> {
             MidnightControlsConfig.setButtonBinding(binding, binding.getDefaultButton());
             MidnightControlsClient.input.beginControlsInput(null);
             editButton.updateMessage(false);
@@ -46,7 +46,7 @@ public class ControllerBindingButton extends ButtonWidget implements ControlsInp
         editButton.updateMessage(false);
         EntryInfo info = new EntryInfo(null, screen.modid);
 
-        TextIconButtonWidget unbindButton = TextIconButtonWidget.builder(Text.translatable("midnightcontrols.narrator.unbound", binding.getText()), (button -> {
+        TextIconButtonWidget unbindButton = TextIconButtonWidget.builder(net.minecraft.text.Text.translatable("midnightcontrols.narrator.unbound", binding.getText()), (button -> {
             MidnightControlsConfig.setButtonBinding(binding, UNBOUND);
             MidnightControlsClient.input.beginControlsInput(null);
             editButton.updateMessage(false);
@@ -56,7 +56,7 @@ public class ControllerBindingButton extends ButtonWidget implements ControlsInp
         unbindButton.active = !binding.isNotBound();
         editButton.unbindButton = unbindButton;
 
-        list.addButton(Lists.newArrayList(editButton, resetButton, unbindButton), Text.translatable(binding.getTranslationKey()), info);
+        list.addButton(Lists.newArrayList(editButton, resetButton, unbindButton), net.minecraft.text.Text.translatable(binding.getTranslationKey()), info);
     }
 
     private final ButtonBinding binding;
@@ -64,7 +64,7 @@ public class ControllerBindingButton extends ButtonWidget implements ControlsInp
     private @Nullable ClickableWidget unbindButton;
     public ControllerBindingButton(int x, int y, int width, int height, ButtonBinding binding) {
         super(x, y, width, height, binding.getText(), (button) -> {},
-                (textSupplier) -> binding.isNotBound() ? Text.translatable("narrator.controls.unbound", binding.getTranslationKey()) : Text.translatable("narrator.controls.bound", binding.getTranslationKey(), textSupplier.get()));
+                (textSupplier) -> binding.isNotBound() ? net.minecraft.text.Text.translatable("narrator.controls.unbound", binding.getTranslationKey()) : net.minecraft.text.Text.translatable("narrator.controls.bound", binding.getTranslationKey(), textSupplier.get()));
         this.binding = binding;
         updateMessage(false);
     }
@@ -78,8 +78,8 @@ public class ControllerBindingButton extends ButtonWidget implements ControlsInp
 
     public void updateMessage(boolean focused) {
         AtomicBoolean hasConflicts = new AtomicBoolean(false);
-        MutableText conflictingBindings = Text.empty();
-        if (focused) this.setMessage(Text.literal("> ").append(getTranslatedButtons().copy().formatted(Formatting.WHITE, Formatting.UNDERLINE)).append(" <").formatted(Formatting.YELLOW));
+        MutableText conflictingBindings = net.minecraft.text.Text.empty();
+        if (focused) this.setMessage(net.minecraft.text.Text.literal("> ").append(getTranslatedButtons().copy().formatted(Formatting.WHITE, Formatting.UNDERLINE)).append(" <").formatted(Formatting.YELLOW));
         else {
             this.setMessage(getTranslatedButtons());
 
@@ -89,7 +89,7 @@ public class ControllerBindingButton extends ButtonWidget implements ControlsInp
                         if (hasConflicts.get()) conflictingBindings.append(", ");
 
                         hasConflicts.set(true);
-                        conflictingBindings.append(Text.translatable(keyBinding.getTranslationKey()));
+                        conflictingBindings.append(net.minecraft.text.Text.translatable(keyBinding.getTranslationKey()));
                     }
                 });
             }
@@ -99,26 +99,25 @@ public class ControllerBindingButton extends ButtonWidget implements ControlsInp
         if (this.unbindButton != null) this.unbindButton.active = !binding.isNotBound();
 
         if (hasConflicts.get()) {
-            this.setMessage(Text.literal("[ ").append(this.getMessage().copy().formatted(Formatting.WHITE)).append(" ]").formatted(Formatting.RED));
-            this.setTooltip(Tooltip.of(Text.translatable("controls.keybinds.duplicateKeybinds", conflictingBindings)));
+            this.setMessage(net.minecraft.text.Text.literal("[ ").append(this.getMessage().copy().formatted(Formatting.WHITE)).append(" ]").formatted(Formatting.RED));
+            this.setTooltip(Tooltip.of(net.minecraft.text.Text.translatable("controls.keybinds.duplicateKeybinds", conflictingBindings)));
         } else {
             this.setTooltip(null);
         }
     }
 
-    private Text getTranslatedButtons() {
+    private net.minecraft.text.Text getTranslatedButtons() {
         return this.binding.isNotBound() ? SpruceTexts.NOT_BOUND.copy() :
-                (binding.getButton().length > 0 ? ButtonBinding.getLocalizedButtonName(binding.getButton()[0]) : Text.literal("..."));
+                (binding.getButton().length > 0 ? ButtonBinding.getLocalizedButtonName(binding.getButton()[0]) : net.minecraft.text.Text.literal("..."));
     }
 
     @Override
-    public void drawMessage(DrawContext context, TextRenderer textRenderer, int color) {
-        if (this.binding.getButton().length < 2) super.drawMessage(context, textRenderer, color);
+    public void drawLabel(DrawnTextConsumer consumer) {
+        if (this.binding.getButton().length < 2) super.drawLabel(consumer);
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-        super.renderWidget(context, mouseX, mouseY, deltaTicks);
+    protected void drawIcon(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
         int x = this.getX();
         if (this.binding.getButton().length > 1) {
             x += (this.width / 2 - iconWidth / 2) - 4;
