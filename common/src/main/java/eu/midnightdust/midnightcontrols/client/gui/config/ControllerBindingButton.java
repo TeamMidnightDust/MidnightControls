@@ -118,6 +118,8 @@ public class ControllerBindingButton extends ButtonWidget implements ControlsInp
 
     @Override
     protected void drawIcon(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        this.drawButton(context);
+        this.drawLabel(context.getHoverListener(this, DrawContext.HoverType.NONE));
         int x = this.getX();
         if (this.binding.getButton().length > 1) {
             x += (this.width / 2 - iconWidth / 2) - 4;
