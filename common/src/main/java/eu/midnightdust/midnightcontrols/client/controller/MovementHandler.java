@@ -13,12 +13,12 @@ import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.mixin.InputAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MathUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Input;
+import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -48,22 +48,22 @@ public final class MovementHandler implements PressAction {
      *
      * @param player The client player.
      */
-    public void applyMovement(@NotNull ClientPlayerEntity player) {
+    public void applyMovement(@NotNull LocalPlayer player) {
         if (!this.shouldOverrideMovement)
             return;
-        player.input.playerInput = new PlayerInput(this.pressingForward, this.pressingBack, this.pressingLeft, this.pressingRight,
-                player.input.playerInput.jump(), player.input.playerInput.sneak(), player.input.playerInput.sprint());
+        player.input.keyPresses = new Input(this.pressingForward, this.pressingBack, this.pressingLeft, this.pressingRight,
+                player.input.keyPresses.jump(), player.input.keyPresses.shift(), player.input.keyPresses.sprint());
 
         polarUtil.calculate(this.movementSideways, this.movementForward, this.slowdownFactor);
-        Vec2f inputVector = new Vec2f(polarUtil.polarX, polarUtil.polarY);
-        ((InputAccessor)player.input).setMovementVector(inputVector);
+        Vec2 inputVector = new Vec2(polarUtil.polarX, polarUtil.polarY);
+        ((InputAccessor)player.input).setMoveVector(inputVector);
 
         this.shouldOverrideMovement = false;
     }
 
     @Override
-    public boolean press(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action) {
-        if (client.currentScreen != null || client.player == null)
+    public boolean press(@NotNull Minecraft client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action) {
+        if (client.screen != null || client.player == null)
             return this.shouldOverrideMovement = false;
 
         int direction = 0;
@@ -81,8 +81,8 @@ public final class MovementHandler implements PressAction {
             value = 1.f;
         }
 
-        this.slowdownFactor = client.player.shouldSlowDown() ? (MathHelper.clamp(
-            0.3F + (float) client.player.getAttributeValue(EntityAttributes.SNEAKING_SPEED),
+        this.slowdownFactor = client.player.isMovingSlowly() ? (Mth.clamp(
+            0.3F + (float) client.player.getAttributeValue(Attributes.SNEAKING_SPEED),
             0.0F,
             1.0F
         )) : 1.f;

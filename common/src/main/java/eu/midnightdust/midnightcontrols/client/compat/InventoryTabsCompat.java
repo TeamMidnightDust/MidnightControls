@@ -1,14 +1,14 @@
 package eu.midnightdust.midnightcontrols.client.compat;
 
 import com.kqp.inventorytabs.tabs.TabManager;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 
 public class InventoryTabsCompat implements CompatHandler {
     @Override
     public boolean handleTabs(Screen screen, boolean next) {
-        if (screen instanceof HandledScreen<?> && !(screen instanceof CreativeInventoryScreen)) {
+        if (screen instanceof AbstractContainerScreen<?> && !(screen instanceof CreativeModeInventoryScreen)) {
             TabManager tabManager = TabManager.getInstance();
             int tabIndex = tabManager.tabs.indexOf(tabManager.currentTab);
             if (next) {
@@ -24,7 +24,7 @@ public class InventoryTabsCompat implements CompatHandler {
     }
     @Override
     public boolean handlePages(Screen screen, boolean next) {
-        if (screen instanceof HandledScreen<?> && !(screen instanceof CreativeInventoryScreen)) {
+        if (screen instanceof AbstractContainerScreen<?> && !(screen instanceof CreativeModeInventoryScreen)) {
             TabManager tabManager = TabManager.getInstance();
             if (next) {
                 if (tabManager.canGoForwardAPage()) {

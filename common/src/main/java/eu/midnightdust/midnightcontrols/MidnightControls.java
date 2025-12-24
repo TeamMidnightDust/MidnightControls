@@ -10,7 +10,7 @@
 package eu.midnightdust.midnightcontrols;
 
 import eu.midnightdust.lib.util.PlatformFunctions;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,7 +31,7 @@ public class MidnightControls {
         log("Initializing MidnightControls...");
     }
     public static Identifier id(String path) {
-        return Identifier.of(MidnightControlsConstants.NAMESPACE, path);
+        return Identifier.fromNamespaceAndPath(MidnightControlsConstants.NAMESPACE, path);
     }
 
     /**

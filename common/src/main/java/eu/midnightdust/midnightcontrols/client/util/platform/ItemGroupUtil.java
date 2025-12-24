@@ -1,30 +1,29 @@
 package eu.midnightdust.midnightcontrols.client.util.platform;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.mixin.CreativeInventoryScreenAccessor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.client.gui.widget.PressableWidget;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemGroups;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightInput.ENTER_KEY_INPUT;
 
 public class ItemGroupUtil {
     @ExpectPlatform
-    public static List<ItemGroup> getVisibleGroups(CreativeInventoryScreen screen) {
+    public static List<CreativeModeTab> getVisibleGroups(CreativeModeInventoryScreen screen) {
         throw new AssertionError();
     }
 
-    public static boolean cyclePage(boolean next, CreativeInventoryScreen screen) {
+    public static boolean cyclePage(boolean next, CreativeModeInventoryScreen screen) {
         try {
-            return screen.children().stream().filter(element -> element instanceof PressableWidget)
-                    .map(element -> (PressableWidget) element)
-                    .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
+            return screen.children().stream().filter(element -> element instanceof AbstractButton)
+                    .map(element -> (AbstractButton) element)
+                    .filter(element -> element.getMessage() != null && element.getMessage().getContents() != null)
                     .anyMatch(element -> {
                         if (next && element.getMessage().getString().equals(">")) {
                             element.onPress(ENTER_KEY_INPUT);
@@ -39,31 +38,31 @@ public class ItemGroupUtil {
         return false;
     }
 
-    public static @NotNull ItemGroup cycleTab(boolean next, MinecraftClient client) {
-        ItemGroup currentTab = CreativeInventoryScreenAccessor.getSelectedTab();
-        int currentColumn = currentTab.getColumn();
-        ItemGroup.Row currentRow = currentTab.getRow();
-        ItemGroup newTab = null;
-        List<ItemGroup> visibleTabs = ItemGroupUtil.getVisibleGroups((CreativeInventoryScreen) client.currentScreen);
-        for (ItemGroup tab : visibleTabs) {
-            if (tab.getRow().equals(currentRow) && ((newTab == null && ((next && tab.getColumn() > currentColumn) ||
-                    (!next && tab.getColumn() < currentColumn))) || (newTab != null && ((next && tab.getColumn() > currentColumn && tab.getColumn() < newTab.getColumn()) ||
-                    (!next && tab.getColumn() < currentColumn && tab.getColumn() > newTab.getColumn())))))
+    public static @NotNull CreativeModeTab cycleTab(boolean next, Minecraft client) {
+        CreativeModeTab currentTab = CreativeInventoryScreenAccessor.getSelectedTab();
+        int currentColumn = currentTab.column();
+        CreativeModeTab.Row currentRow = currentTab.row();
+        CreativeModeTab newTab = null;
+        List<CreativeModeTab> visibleTabs = ItemGroupUtil.getVisibleGroups((CreativeModeInventoryScreen) client.screen);
+        for (CreativeModeTab tab : visibleTabs) {
+            if (tab.row().equals(currentRow) && ((newTab == null && ((next && tab.column() > currentColumn) ||
+                    (!next && tab.column() < currentColumn))) || (newTab != null && ((next && tab.column() > currentColumn && tab.column() < newTab.column()) ||
+                    (!next && tab.column() < currentColumn && tab.column() > newTab.column())))))
                 newTab = tab;
         }
         if (newTab == null)
-            for (ItemGroup tab : visibleTabs) {
-                if ((tab.getRow().compareTo(currentRow)) != 0 && ((next && newTab == null || next && newTab.getColumn() > tab.getColumn()) || (!next && newTab == null) || (!next && newTab.getColumn() < tab.getColumn())))
+            for (CreativeModeTab tab : visibleTabs) {
+                if ((tab.row().compareTo(currentRow)) != 0 && ((next && newTab == null || next && newTab.column() > tab.column()) || (!next && newTab == null) || (!next && newTab.column() < tab.column())))
                     newTab = tab;
             }
         if (newTab == null) {
-            for (ItemGroup tab : visibleTabs) {
-                if ((next && tab.getRow() == ItemGroup.Row.TOP && tab.getColumn() == 0) ||
-                        !next && tab.getRow() == ItemGroup.Row.BOTTOM && (newTab == null || tab.getColumn() > newTab.getColumn()))
+            for (CreativeModeTab tab : visibleTabs) {
+                if ((next && tab.row() == CreativeModeTab.Row.TOP && tab.column() == 0) ||
+                        !next && tab.row() == CreativeModeTab.Row.BOTTOM && (newTab == null || tab.column() > newTab.column()))
                     newTab = tab;
             }
         }
-        if (newTab == null || newTab.equals(currentTab)) newTab = ItemGroups.getDefaultTab();
+        if (newTab == null || newTab.equals(currentTab)) newTab = CreativeModeTabs.getDefaultTab();
         return newTab;
     }
 }

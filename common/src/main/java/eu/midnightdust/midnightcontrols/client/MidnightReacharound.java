@@ -10,21 +10,21 @@
 package eu.midnightdust.midnightcontrols.client;
 
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FluidBlock;
-import net.minecraft.block.SlabBlock;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,8 +76,8 @@ public class MidnightReacharound {
         return MidnightControlsFeature.HORIZONTAL_REACHAROUND.isAvailable() || MidnightControlsFeature.VERTICAL_REACHAROUND.isAvailable();
     }
 
-    public static float getPlayerRange(@NotNull MinecraftClient client) {
-        return client.player != null ? Double.valueOf(client.player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE)).floatValue() : 0.f;
+    public static float getPlayerRange(@NotNull Minecraft client) {
+        return client.player != null ? Double.valueOf(client.player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE)).floatValue() : 0.f;
     }
 
     /**
@@ -88,23 +88,23 @@ public class MidnightReacharound {
     public @Nullable BlockHitResult tryVerticalReachAround() {
         if (!MidnightControlsFeature.VERTICAL_REACHAROUND.isAvailable())
             return null;
-        if (client.player == null || client.world == null || client.crosshairTarget == null || client.crosshairTarget.getType() != HitResult.Type.MISS
-                || !client.player.isOnGround() || client.player.getPitch(0.f) < 80.0F
-                || client.player.isRiding())
+        if (client.player == null || client.level == null || client.hitResult == null || client.hitResult.getType() != HitResult.Type.MISS
+                || !client.player.onGround() || client.player.getViewXRot(0.f) < 80.0F
+                || client.player.isHandsBusy())
             return null;
 
-        Vec3d pos = client.player.getCameraPosVec(1.0F);
-        Vec3d rotationVec = client.player.getRotationVec(1.0F);
+        Vec3 pos = client.player.getEyePosition(1.0F);
+        Vec3 rotationVec = client.player.getViewVector(1.0F);
         float range = getPlayerRange(client);
         var rayVec = pos.add(rotationVec.x * range, rotationVec.y * range, rotationVec.z * range).add(0, 0.75, 0);
-        var result = client.world.raycast(new RaycastContext(pos, rayVec, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, client.player));
+        var result = client.level.clip(new ClipContext(pos, rayVec, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, client.player));
 
         if (result.getType() == HitResult.Type.BLOCK) {
-            BlockPos blockPos = result.getBlockPos().down();
-            BlockState state = client.world.getBlockState(blockPos);
+            BlockPos blockPos = result.getBlockPos().below();
+            BlockState state = client.level.getBlockState(blockPos);
 
-            if (client.player.getBlockPos().getY() - blockPos.getY() > 1 && (client.world.isAir(blockPos) || state.isReplaceable())) {
-                return new BlockHitResult(result.getPos(), Direction.DOWN, blockPos, false);
+            if (client.player.blockPosition().getY() - blockPos.getY() > 1 && (client.level.isEmptyBlock(blockPos) || state.canBeReplaced())) {
+                return new BlockHitResult(result.getLocation(), Direction.DOWN, blockPos, false);
             }
         }
 
@@ -120,36 +120,36 @@ public class MidnightReacharound {
         if (!MidnightControlsFeature.HORIZONTAL_REACHAROUND.isAvailable())
             return null;
 
-        if (client.world != null && client.player != null && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.MISS
-                && client.player.isOnGround() && client.player.getPitch(0.f) >= 35.f) {
-            if (client.player.isRiding())
+        if (client.level != null && client.player != null && client.hitResult != null && client.hitResult.getType() == HitResult.Type.MISS
+                && client.player.onGround() && client.player.getViewXRot(0.f) >= 35.f) {
+            if (client.player.isHandsBusy())
                 return null;
             // Temporary pos, do not use
-            Vec3d playerPosi = client.player.getEntityPos();
+            Vec3 playerPosi = client.player.position();
 
             // Imitates var playerPos = client.player.getBlockPos().down();
-            Vec3d playerPos = new Vec3d(playerPosi.getX(), playerPosi.getY() - 1.0, playerPosi.getZ());
-            if (client.player.getY() - playerPos.getY() - 1.0 >= 0.25) {
+            Vec3 playerPos = new Vec3(playerPosi.x(), playerPosi.y() - 1.0, playerPosi.z());
+            if (client.player.getY() - playerPos.y() - 1.0 >= 0.25) {
                 // Imitates playerPos = playerPos.up();
                 playerPos = playerPosi;
                 this.onSlab = true;
             } else {
                 this.onSlab = false;
             }
-            var targetPos = new Vec3d(client.crosshairTarget.getPos().getX(), client.crosshairTarget.getPos().getY(), client.crosshairTarget.getPos().getZ()).subtract(playerPos);
-            var vector = new Vec3d(MathHelper.clamp(targetPos.getX(), -1, 1), 0, MathHelper.clamp(targetPos.getZ(), -1, 1));
+            var targetPos = new Vec3(client.hitResult.getLocation().x(), client.hitResult.getLocation().y(), client.hitResult.getLocation().z()).subtract(playerPos);
+            var vector = new Vec3(Mth.clamp(targetPos.x(), -1, 1), 0, Mth.clamp(targetPos.z(), -1, 1));
             var blockPos = playerPos.add(vector);
 
             // Some functions still need BlockPos, so this is here to let that happen
-            var blockyPos = BlockPos.ofFloored(blockPos);
+            var blockyPos = BlockPos.containing(blockPos);
 
-            var direction = client.player.getHorizontalFacing();
+            var direction = client.player.getDirection();
 
-            var state = client.world.getBlockState(blockyPos);
+            var state = client.level.getBlockState(blockyPos);
             if (!state.isAir())
                 return null;
-            var adjacentBlockState = client.world.getBlockState(blockyPos.offset(direction.getOpposite()));
-            if (adjacentBlockState.isAir() || adjacentBlockState.getBlock() instanceof FluidBlock || (vector.getX() == 0 && vector.getZ() == 0)) {
+            var adjacentBlockState = client.level.getBlockState(blockyPos.relative(direction.getOpposite()));
+            if (adjacentBlockState.isAir() || adjacentBlockState.getBlock() instanceof LiquidBlock || (vector.x() == 0 && vector.z() == 0)) {
                 return null;
             }
 
@@ -161,13 +161,13 @@ public class MidnightReacharound {
     public @NotNull BlockHitResult withSideForReacharound(@NotNull BlockHitResult result, @Nullable ItemStack stack) {
         if (stack == null || stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
             return result;
-        return withSideForReacharound(result, Block.getBlockFromItem(stack.getItem()));
+        return withSideForReacharound(result, Block.byItem(stack.getItem()));
     }
 
     public @NotNull BlockHitResult withSideForReacharound(@NotNull BlockHitResult result, @NotNull Block block) {
         if (block instanceof SlabBlock) {
-            if (this.onSlab) result = result.withSide(Direction.UP);
-            else result = result.withSide(Direction.DOWN);
+            if (this.onSlab) result = result.withDirection(Direction.UP);
+            else result = result.withDirection(Direction.DOWN);
         }
         return result;
     }

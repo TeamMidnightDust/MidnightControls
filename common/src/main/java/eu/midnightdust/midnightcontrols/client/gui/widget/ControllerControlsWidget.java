@@ -19,14 +19,13 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.gui.config.ControlsInput;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsSettingsScreen;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
-import net.minecraft.text.Text;
 import org.aperlambda.lambdacommon.utils.function.Predicates;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import net.minecraft.client.gui.screens.options.controls.ControlsScreen;
+import net.minecraft.network.chat.Component;
 
 /**
  * Represents the controls screen.
@@ -45,8 +44,8 @@ public class ControllerControlsWidget extends SpruceContainerWidget implements C
 
     protected void init() {
         this.addChild(new SpruceButtonWidget(Position.of(this, this.width / 2 - 155, 18), 310, 20,
-                Text.translatable("midnightcontrols.menu.keyboard_controls"),
-                btn -> this.client.setScreen(new ControlsOptionsScreen(null, this.client.options))));
+                Component.translatable("midnightcontrols.menu.keyboard_controls"),
+                btn -> this.client.setScreen(new ControlsScreen(null, this.client.options))));
         ControlsListWidget bindingsListWidget = new ControlsListWidget(Position.of(this, 0, 43), this.width, this.height - 43 - 35, this);
         bindingsListWidget.setBackground(new MidnightControlsSettingsScreen.MidnightControlsBackground(130));
         this.addChild(bindingsListWidget);
@@ -57,7 +56,7 @@ public class ControllerControlsWidget extends SpruceContainerWidget implements C
 
     @Override
     public void renderWidget(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
-        context.vanilla().drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.title.controller_controls"),
+        context.vanilla().drawCenteredString(this.client.font, Component.translatable("midnightcontrols.menu.title.controller_controls"),
                 this.getX() + this.width / 2, this.getY() + 4, 0xFFFFFFFF);
         this.resetButton.setActive(InputManager.streamBindings().anyMatch(Predicates.not(ButtonBinding::isDefault)));
         super.renderWidget(context, mouseX, mouseY, delta);

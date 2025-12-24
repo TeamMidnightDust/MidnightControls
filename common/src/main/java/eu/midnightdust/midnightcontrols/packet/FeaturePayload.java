@@ -2,19 +2,19 @@ package eu.midnightdust.midnightcontrols.packet;
 
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
-public record FeaturePayload(MidnightControlsFeature... features) implements CustomPayload {
-    public static final Id<FeaturePayload> PACKET_ID = new Id<>(MidnightControlsConstants.FEATURE_CHANNEL);
-    public static final PacketCodec<RegistryByteBuf, FeaturePayload> codec = PacketCodec.of(FeaturePayload::write, FeaturePayload::read);
+public record FeaturePayload(MidnightControlsFeature... features) implements CustomPacketPayload {
+    public static final Type<FeaturePayload> PACKET_ID = new Type<>(MidnightControlsConstants.FEATURE_CHANNEL);
+    public static final StreamCodec<RegistryFriendlyByteBuf, FeaturePayload> codec = StreamCodec.ofMember(FeaturePayload::write, FeaturePayload::read);
 
-    public static FeaturePayload read(RegistryByteBuf buf) {
+    public static FeaturePayload read(RegistryFriendlyByteBuf buf) {
         int featureLength = buf.readVarInt();
         MidnightControlsFeature[] receivedFeatures = new MidnightControlsFeature[featureLength];
         for (int i = 0; i < featureLength; i++) {
-            var name = buf.readString(64);
+            var name = buf.readUtf(64);
             boolean allowed = buf.readBoolean();
             var feature = MidnightControlsFeature.fromName(name);
             if (feature.isPresent()) {
@@ -25,19 +25,19 @@ public record FeaturePayload(MidnightControlsFeature... features) implements Cus
         return new FeaturePayload(receivedFeatures);
     }
 
-    public void write(RegistryByteBuf buf) {
+    public void write(RegistryFriendlyByteBuf buf) {
         if (features.length == 0)
             throw new IllegalArgumentException("At least one feature must be provided.");
 
         buf.writeVarInt(features.length);
         for (var feature : features) {
-            buf.writeString(feature.getName(), 64);
+            buf.writeUtf(feature.getName(), 64);
             buf.writeBoolean(feature.isAllowed());
         }
     }
 
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public Type<? extends CustomPacketPayload> type() {
         return PACKET_ID;
     }
 }

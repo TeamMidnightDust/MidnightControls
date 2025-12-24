@@ -1,27 +1,26 @@
 package eu.midnightdust.midnightcontrols.packet;
 
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
-
 import java.util.Objects;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
-public record ControlsModePayload(String controlsMode) implements CustomPayload {
-    public static final Id<ControlsModePayload> PACKET_ID = new Id<>(MidnightControlsConstants.CONTROLS_MODE_CHANNEL);
-    public static final PacketCodec<RegistryByteBuf, ControlsModePayload> codec = PacketCodec.of(ControlsModePayload::write, ControlsModePayload::read);
+public record ControlsModePayload(String controlsMode) implements CustomPacketPayload {
+    public static final Type<ControlsModePayload> PACKET_ID = new Type<>(MidnightControlsConstants.CONTROLS_MODE_CHANNEL);
+    public static final StreamCodec<RegistryFriendlyByteBuf, ControlsModePayload> codec = StreamCodec.ofMember(ControlsModePayload::write, ControlsModePayload::read);
 
-    public static ControlsModePayload read(RegistryByteBuf buf) {
-        return new ControlsModePayload(buf.readString(32));
+    public static ControlsModePayload read(RegistryFriendlyByteBuf buf) {
+        return new ControlsModePayload(buf.readUtf(32));
     }
 
-    public void write(RegistryByteBuf buf) {
+    public void write(RegistryFriendlyByteBuf buf) {
         Objects.requireNonNull(controlsMode, "Controls mode cannot be null.");
-        buf.writeString(controlsMode, 32);
+        buf.writeUtf(controlsMode, 32);
     }
 
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public Type<? extends CustomPacketPayload> type() {
         return PACKET_ID;
     }
 }

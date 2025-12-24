@@ -9,7 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.ring;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,11 +26,11 @@ public enum RingButtonMode implements Nameable {
     TOGGLE("toggle");
 
     private final String name;
-    private final Text text;
+    private final Component text;
 
     RingButtonMode(@NotNull String name) {
         this.name = name;
-        this.text = Text.translatable(this.getTranslationKey());
+        this.text = Component.translatable(this.getTranslationKey());
     }
 
     /**
@@ -59,7 +59,7 @@ public enum RingButtonMode implements Nameable {
      *
      * @return the translated name of this ring button mode
      */
-    public @NotNull Text getTranslatedText() {
+    public @NotNull Component getTranslatedText() {
         return this.text;
     }
 

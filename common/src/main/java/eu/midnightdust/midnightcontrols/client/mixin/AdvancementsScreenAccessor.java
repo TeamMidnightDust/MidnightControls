@@ -9,22 +9,22 @@
 
 package eu.midnightdust.midnightcontrols.client.mixin;
 
-import net.minecraft.advancement.Advancement;
-import net.minecraft.client.gui.screen.advancement.AdvancementTab;
-import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
-import net.minecraft.client.network.ClientAdvancementManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.Map;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.client.gui.screens.advancements.AdvancementTab;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
+import net.minecraft.client.multiplayer.ClientAdvancements;
 
 /**
  * Represents an accessor of {@link AdvancementsScreen}.
  */
 @Mixin(AdvancementsScreen.class)
 public interface AdvancementsScreenAccessor {
-    @Accessor("advancementHandler")
-    ClientAdvancementManager getAdvancementManager();
+    @Accessor("advancements")
+    ClientAdvancements getAdvancementManager();
 
     @Accessor("tabs")
     Map<Advancement, AdvancementTab> getTabs();

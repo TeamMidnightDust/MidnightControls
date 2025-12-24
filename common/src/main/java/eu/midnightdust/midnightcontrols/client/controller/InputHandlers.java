@@ -13,7 +13,6 @@ import com.google.common.collect.Lists;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
-import eu.midnightdust.midnightcontrols.client.compat.InventoryTabsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
@@ -22,23 +21,24 @@ import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.util.InventoryUtil;
 import eu.midnightdust.midnightcontrols.client.util.ToggleSneakSprintUtil;
 import eu.midnightdust.midnightcontrols.client.util.platform.ItemGroupUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
-import net.minecraft.client.gui.screen.ingame.*;
-import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
-import net.minecraft.client.gui.widget.TabNavigationWidget;
-import net.minecraft.client.util.ScreenshotRecorder;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Screenshot;
+import net.minecraft.client.gui.components.tabs.TabNavigationBar;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
-import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
 
 /**
@@ -58,7 +58,7 @@ public class InputHandlers {
                 return false;
 
             // When in-game
-            if (client.currentScreen == null && client.player != null) {
+            if (client.screen == null && client.player != null) {
                 if (!client.player.isSpectator()) {
                     var inv = client.player.getInventory();
                     if (next)
@@ -67,27 +67,27 @@ public class InputHandlers {
                         inv.setSelectedSlot(inv.getSelectedSlot() > 0 ? inv.getSelectedSlot() - 1 : inv.getSelectedSlot() + 8);
                 }
                 else {
-                    if (client.inGameHud.getSpectatorHud().isOpen()) {
-                        client.inGameHud.getSpectatorHud().cycleSlot(next ? -1 : 1);
+                    if (client.gui.getSpectatorGui().isMenuActive()) {
+                        client.gui.getSpectatorGui().onMouseScrolled(next ? -1 : 1);
                     } else {
-                        float g = MathHelper.clamp(client.player.getAbilities().getFlySpeed() + (next ? 1 : -1) * 0.005F, 0.0F, 0.2F);
-                        client.player.getAbilities().setFlySpeed(g);
+                        float g = Mth.clamp(client.player.getAbilities().getFlyingSpeed() + (next ? 1 : -1) * 0.005F, 0.0F, 0.2F);
+                        client.player.getAbilities().setFlyingSpeed(g);
                     }
                 }
                 return true;
-            } else if (client.currentScreen instanceof RingScreen) {
+            } else if (client.screen instanceof RingScreen) {
                 MidnightControlsClient.ring.cyclePage(next);
-            } else if (client.currentScreen instanceof CreativeInventoryScreenAccessor inventory) {
+            } else if (client.screen instanceof CreativeInventoryScreenAccessor inventory) {
                 inventory.midnightcontrols$setSelectedTab(ItemGroupUtil.cycleTab(next, client));
                 return true;
-            } else if (client.currentScreen instanceof RecipeBookScreen<?> recipeBookScreen) {
-                RecipeBookWidget<?> recipeBook = ((RecipeBookScreenAccessor) recipeBookScreen).getRecipeBook();
+            } else if (client.screen instanceof AbstractRecipeBookScreen<?> recipeBookScreen) {
+                RecipeBookComponent<?> recipeBook = ((RecipeBookScreenAccessor) recipeBookScreen).getRecipeBook();
 
                 var recipeBookAccessor = (RecipeBookWidgetAccessor) recipeBook;
                 var tabs = recipeBookAccessor.getTabButtons();
                 var currentTab = recipeBookAccessor.getCurrentTab();
-                if (currentTab == null || !recipeBook.isOpen()) {
-                    return MidnightControlsCompat.handleTabs(client.currentScreen, next);
+                if (currentTab == null || !recipeBook.isVisible()) {
+                    return MidnightControlsCompat.handleTabs(client.screen, next);
                 }
                 int nextTab = tabs.indexOf(currentTab) + (next ? 1 : -1);
                 if (nextTab < 0)
@@ -97,9 +97,9 @@ public class InputHandlers {
                 currentTab.active = false;
                 recipeBookAccessor.setCurrentTab(currentTab = tabs.get(nextTab));
                 currentTab.active = true;
-                recipeBookScreen.refreshRecipeBook();
+                recipeBookScreen.recipesUpdated();
                 return true;
-            } else if (client.currentScreen instanceof AdvancementsScreenAccessor screen) {
+            } else if (client.screen instanceof AdvancementsScreenAccessor screen) {
                 var tabs = screen.getTabs().values().stream().distinct().toList();
                 var tab = screen.getSelectedTab();
                 if (tab == null)
@@ -111,14 +111,14 @@ public class InputHandlers {
                             nextTab = tabs.size() - 1;
                         else if (nextTab >= tabs.size())
                             nextTab = 0;
-                        screen.getAdvancementManager().selectTab(tabs.get(nextTab).getRoot().getAdvancementEntry(), true);
+                        screen.getAdvancementManager().setSelectedTab(tabs.get(nextTab).getRootNode().holder(), true);
                         break;
                     }
                 }
                 return true;
-            } else if (client.currentScreen != null && client.currentScreen.children().stream().anyMatch(e -> e instanceof TabNavigationWidget)) {
-                return Lists.newCopyOnWriteArrayList(client.currentScreen.children()).stream().anyMatch(e -> {
-                    if (e instanceof TabNavigationWidget tabs) {
+            } else if (client.screen != null && client.screen.children().stream().anyMatch(e -> e instanceof TabNavigationBar)) {
+                return Lists.newCopyOnWriteArrayList(client.screen.children()).stream().anyMatch(e -> {
+                    if (e instanceof TabNavigationBar tabs) {
                         TabNavigationWidgetAccessor accessor = (TabNavigationWidgetAccessor) tabs;
                         int tabIndex = accessor.getTabs().indexOf(accessor.getTabManager().getCurrentTab());
                         if (next ? tabIndex+1 < accessor.getTabs().size() : tabIndex > 0) {
@@ -129,7 +129,7 @@ public class InputHandlers {
                     }
                     return false;
                 });
-            } else return MidnightControlsCompat.handleTabs(client.currentScreen, next);
+            } else return MidnightControlsCompat.handleTabs(client.screen, next);
 
             return false;
         };
@@ -139,20 +139,20 @@ public class InputHandlers {
         return (client, button, value, action) -> {
             if (action == ButtonState.RELEASE)
                 return false;
-            if (client.currentScreen instanceof CreativeInventoryScreen creativeScreen) {
+            if (client.screen instanceof CreativeModeInventoryScreen creativeScreen) {
                 return ItemGroupUtil.cyclePage(next, creativeScreen);
             }
 
 
-            return MidnightControlsCompat.handlePages(client.currentScreen, next);
+            return MidnightControlsCompat.handlePages(client.screen, next);
         };
     }
     public static PressAction handleExit() {
         return (client, button, value, action) -> {
-            if (client.currentScreen != null && client.currentScreen.getClass() != TitleScreen.class) {
-                if (!MidnightControlsCompat.handleMenuBack(client, client.currentScreen))
-                    if (!MidnightControlsClient.input.tryGoBack(client.currentScreen))
-                        client.currentScreen.close();
+            if (client.screen != null && client.screen.getClass() != TitleScreen.class) {
+                if (!MidnightControlsCompat.handleMenuBack(client, client.screen))
+                    if (!MidnightControlsClient.input.tryGoBack(client.screen))
+                        client.screen.onClose();
                 return true;
             }
             return false;
@@ -160,14 +160,14 @@ public class InputHandlers {
     }
     public static PressAction handleActions() {
         return (client, button, value, action) -> {
-            if (!(client.currentScreen instanceof HandledScreen<?> screen)) return false;
-            if (client.interactionManager == null || client.player == null)
+            if (!(client.screen instanceof AbstractContainerScreen<?> screen)) return false;
+            if (client.gameMode == null || client.player == null)
                 return false;
 
             if (MidnightControlsClient.input.inventoryInteractionCooldown > 0)
                 return true;
-            double x = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
-            double y = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
+            double x = client.mouseHandler.xpos() * (double) client.getWindow().getGuiScaledWidth() / (double) client.getWindow().getScreenWidth();
+            double y = client.mouseHandler.ypos() * (double) client.getWindow().getGuiScaledHeight() / (double) client.getWindow().getScreenHeight();
 
             var accessor = (HandledScreenAccessor) screen;
             Slot slot = accessor.midnightcontrols$getSlotAt(x, y);
@@ -179,24 +179,24 @@ public class InputHandlers {
                 }
                 slotId = accessor.midnightcontrols$isClickOutsideBounds(x, y, accessor.getX(), accessor.getY()) ? -999 : -1;
             } else {
-                slotId = slot.id;
+                slotId = slot.index;
             }
-            var actionType = SlotActionType.PICKUP;
+            var actionType = ClickType.PICKUP;
             int clickData = GLFW.GLFW_MOUSE_BUTTON_1;
 
             MidnightControlsClient.input.inventoryInteractionCooldown = 5;
             switch (button.getName()) {
                 case "take_all" -> {
-                    if (screen instanceof CreativeInventoryScreen) {
+                    if (screen instanceof CreativeModeInventoryScreen) {
                         if (slot != null && (((CreativeInventoryScreenAccessor) accessor).midnightcontrols$isCreativeInventorySlot(slot) || MidnightControlsCompat.streamCompatHandlers().anyMatch(handler -> handler.isCreativeSlot(screen, slot))))
-                            actionType = SlotActionType.CLONE;
+                            actionType = ClickType.CLONE;
                     }
                 }
                 case "take" -> {
                     clickData = GLFW_MOUSE_BUTTON_2;
                 }
                 case "quick_move" -> {
-                    actionType = SlotActionType.QUICK_MOVE;
+                    actionType = ClickType.QUICK_MOVE;
                 }
                 default -> {
                     return false;
@@ -207,15 +207,15 @@ public class InputHandlers {
         };
     }
 
-    public static boolean handlePauseGame(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action) {
+    public static boolean handlePauseGame(@NotNull Minecraft client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action) {
         if (action == ButtonState.PRESS) {
             // If in game, then pause the game.
-            if (client.currentScreen == null || client.currentScreen instanceof RingScreen)
-                client.openGameMenu(false);
-            else if (client.currentScreen instanceof HandledScreen && client.player != null) // If the current screen is a container then close it.
-                client.player.closeHandledScreen();
+            if (client.screen == null || client.screen instanceof RingScreen)
+                client.pauseGame(false);
+            else if (client.screen instanceof AbstractContainerScreen && client.player != null) // If the current screen is a container then close it.
+                client.player.closeContainer();
             else // Else just close the current screen.
-                client.currentScreen.close();
+                client.screen.onClose();
         }
         return true;
     }
@@ -228,23 +228,23 @@ public class InputHandlers {
      * @param action the action done on the binding
      * @return true if handled, else false
      */
-    public static boolean handleScreenshot(@NotNull MinecraftClient client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action) {
+    public static boolean handleScreenshot(@NotNull Minecraft client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action) {
         if (action == ButtonState.RELEASE)
-            ScreenshotRecorder.saveScreenshot(client.runDirectory, client.getFramebuffer(),
-                    text -> client.execute(() -> client.inGameHud.getChatHud().addMessage(text)));
+            Screenshot.grab(client.gameDirectory, client.getMainRenderTarget(),
+                    text -> client.execute(() -> client.gui.getChat().addMessage(text)));
         return true;
     }
 
-    public static boolean handleToggleSneak(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action) {
+    public static boolean handleToggleSneak(@NotNull Minecraft client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action) {
         return ToggleSneakSprintUtil.toggleSneak(button);
     }
-    public static boolean handleToggleSprint(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action) {
+    public static boolean handleToggleSprint(@NotNull Minecraft client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action) {
         return ToggleSneakSprintUtil.toggleSprint(button);
     }
 
     public static PressAction handleInventorySlotPad(int direction) {
         return (client, binding, value, action) -> {
-            if (!(client.currentScreen instanceof HandledScreen<?> inventory && action != ButtonState.RELEASE))
+            if (!(client.screen instanceof AbstractContainerScreen<?> inventory && action != ButtonState.RELEASE))
                 return false;
 
             var accessor = (HandledScreenAccessor) inventory;
@@ -255,8 +255,8 @@ public class InputHandlers {
                 var slot = closestSlot.get();
                 int x = accessor.getX() + slot.x + 8;
                 int y = accessor.getY() + slot.y + 8;
-                InputManager.queueMousePosition(x * (double) client.getWindow().getWidth() / (double) client.getWindow().getScaledWidth(),
-                        y * (double) client.getWindow().getHeight() / (double) client.getWindow().getScaledHeight());
+                InputManager.queueMousePosition(x * (double) client.getWindow().getScreenWidth() / (double) client.getWindow().getGuiScaledWidth(),
+                        y * (double) client.getWindow().getScreenHeight() / (double) client.getWindow().getGuiScaledHeight());
                 return true;
             }
             return false;
@@ -280,7 +280,7 @@ public class InputHandlers {
      * @return true if the client is in game, else false
      */
     public static boolean inGame(@NotNull ButtonBinding binding) {
-        return (client.currentScreen == null && MidnightControlsClient.input.screenCloseCooldown <= 0) || client.currentScreen instanceof TouchscreenOverlay || client.currentScreen instanceof RingScreen;
+        return (client.screen == null && MidnightControlsClient.input.screenCloseCooldown <= 0) || client.screen instanceof TouchscreenOverlay || client.screen instanceof RingScreen;
     }
 
     /**
@@ -290,9 +290,9 @@ public class InputHandlers {
      * @return true if the client is in a non-interactive screen, else false
      */
     public static boolean inNonInteractiveScreens(@NotNull ButtonBinding binding) {
-        if (client.currentScreen == null)
+        if (client.screen == null)
             return false;
-        return !MidnightInput.isScreenInteractive(client.currentScreen);
+        return !MidnightInput.isScreenInteractive(client.screen);
     }
 
     /**
@@ -302,7 +302,7 @@ public class InputHandlers {
      * @return true if the client is in an inventory, else false
      */
     public static boolean inInventory(@NotNull ButtonBinding binding) {
-        return client.currentScreen instanceof HandledScreen;
+        return client.screen instanceof AbstractContainerScreen;
     }
 
     /**
@@ -312,6 +312,6 @@ public class InputHandlers {
      * @return true if the client is in the advancements screen, else false
      */
     public static boolean inAdvancements(@NotNull ButtonBinding binding) {
-        return client.currentScreen instanceof AdvancementsScreen;
+        return client.screen instanceof AdvancementsScreen;
     }
 }

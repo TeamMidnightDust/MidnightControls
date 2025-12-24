@@ -13,16 +13,6 @@ import dev.lambdaurora.spruceui.Position;
 import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.GameMenuScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.consume.UseAction;
-import net.minecraft.util.Arm;
-import net.minecraft.util.Atlases;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
@@ -33,18 +23,28 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
 import eu.midnightdust.midnightcontrols.client.util.KeyBindingAccessor;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.gui.widget.TextIconButtonWidget;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.Objects;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.SpriteIconButton;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.data.AtlasIds;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.item.ItemUseAnimation;
 
 import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.input;
@@ -76,22 +76,22 @@ public class TouchscreenOverlay extends Screen {
     private int forwardButtonTick = 0;
 
     public TouchscreenOverlay() {
-        super(Text.literal("Touchscreen Overlay"));
+        super(Component.literal("Touchscreen Overlay"));
     }
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 
     @Override
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {}
+    public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float delta) {}
 
     private void pauseGame() {
-        assert this.client != null;
-        this.client.setScreen(new GameMenuScreen(true));
-        if (this.client.isIntegratedServerRunning() && !Objects.requireNonNull(this.client.getServer()).isRemote()) {
-            this.client.getSoundManager().pauseAllExcept();
+        assert this.minecraft != null;
+        this.minecraft.setScreen(new PauseScreen(true));
+        if (this.minecraft.hasSingleplayerServer() && !Objects.requireNonNull(this.minecraft.getSingleplayerServer()).isPublished()) {
+            this.minecraft.getSoundManager().pauseAllExcept();
         }
     }
 
@@ -109,11 +109,11 @@ public class TouchscreenOverlay extends Screen {
      * Updates the jump buttons.
      */
     private void updateJumpButtons() {
-        assert this.client != null;
-        assert this.client.player != null;
+        assert this.minecraft != null;
+        assert this.minecraft.player != null;
         float transparency = MidnightControlsConfig.touchTransparency / 100f;
 
-        if (this.client.player.getAbilities().flying) {
+        if (this.minecraft.player.getAbilities().flying) {
             boolean oldStateFly = this.flyButton.isVisible();
             this.jumpButton.setVisible(false);
             this.flyButton.setVisible(true);
@@ -142,8 +142,8 @@ public class TouchscreenOverlay extends Screen {
      * @param btn   The pressed button.
      */
     private void handleJump(SpruceButtonWidget btn) {
-        assert this.client != null;
-        ((KeyBindingAccessor) this.client.options.jumpKey).midnightcontrols$handlePressState(btn.isInteractable());
+        assert this.minecraft != null;
+        ((KeyBindingAccessor) this.minecraft.options.keyJump).midnightcontrols$handlePressState(btn.isActive());
     }
     /**
      * Handles the jump button.
@@ -151,46 +151,46 @@ public class TouchscreenOverlay extends Screen {
      * @param state   The state.
      */
     private void setJump(boolean state) {
-        assert this.client != null;
-        ((KeyBindingAccessor) this.client.options.jumpKey).midnightcontrols$handlePressState(state);
+        assert this.minecraft != null;
+        ((KeyBindingAccessor) this.minecraft.options.keyJump).midnightcontrols$handlePressState(state);
     }
 
     @Override
     protected void init() {
         super.init();
-        assert this.client != null;
-        assert this.client.player != null;
-        assert this.client.interactionManager != null;
-        int scaledWidth = this.client.getWindow().getScaledWidth();
-        int scaledHeight = this.client.getWindow().getScaledHeight();
+        assert this.minecraft != null;
+        assert this.minecraft.player != null;
+        assert this.minecraft.gameMode != null;
+        int scaledWidth = this.minecraft.getWindow().getGuiScaledWidth();
+        int scaledHeight = this.minecraft.getWindow().getGuiScaledHeight();
         int emoteOffset = 0;
         if (PlatformFunctions.isModLoaded("emotecraft")) {
             emoteOffset = 10;
-            TextIconButtonWidget emoteButton = TextIconButtonWidget.builder(Text.empty(), btn -> EmotecraftCompat.openEmotecraftScreen(this), true).width(20).texture(id("touch/emote"), 20, 20).build();
+            SpriteIconButton emoteButton = SpriteIconButton.builder(Component.empty(), btn -> EmotecraftCompat.openEmotecraftScreen(this), true).width(20).sprite(id("touch/emote"), 20, 20).build();
             emoteButton.setPosition(scaledWidth / 2 - 30, 0);
-            this.addDrawableChild(emoteButton);
+            this.addRenderableWidget(emoteButton);
         }
 
-        TextIconButtonWidget chatButton = TextIconButtonWidget.builder(Text.empty(), btn -> this.client.setScreen(new ChatScreen("", true)), true).width(20).texture(id("touch/chat"), 20, 20).build();
+        SpriteIconButton chatButton = SpriteIconButton.builder(Component.empty(), btn -> this.minecraft.setScreen(new ChatScreen("", true)), true).width(20).sprite(id("touch/chat"), 20, 20).build();
         chatButton.setPosition(scaledWidth / 2 - 20 + emoteOffset, 0);
-        this.addDrawableChild(chatButton);
-        TextIconButtonWidget pauseButton = TextIconButtonWidget.builder(Text.empty(), btn -> this.pauseGame(), true).width(20).texture(id("touch/pause"), 20, 20).build();
+        this.addRenderableWidget(chatButton);
+        SpriteIconButton pauseButton = SpriteIconButton.builder(Component.empty(), btn -> this.pauseGame(), true).width(20).sprite(id("touch/pause"), 20, 20).build();
         pauseButton.setPosition(scaledWidth / 2 + emoteOffset, 0);
-        this.addDrawableChild(pauseButton);
+        this.addRenderableWidget(pauseButton);
         // Inventory buttons.
         int inventoryButtonX = scaledWidth / 2;
         int inventoryButtonY = scaledHeight - 16 - 5;
-        if (this.client.options.getMainArm().getValue() == Arm.LEFT) {
+        if (this.minecraft.options.mainHand().get() == HumanoidArm.LEFT) {
             inventoryButtonX = inventoryButtonX - 91 - 24;
         } else {
             inventoryButtonX = inventoryButtonX + 91 + 4;
         }
-        this.addDrawableChild(this.inventoryButton = new SilentTexturedButtonWidget(Position.of(inventoryButtonX, inventoryButtonY), 20, 20, Text.empty(), btn -> {
-            if (this.client.interactionManager.hasRidingInventory()) {
-                this.client.player.openRidingInventory();
+        this.addRenderableWidget(this.inventoryButton = new SilentTexturedButtonWidget(Position.of(inventoryButtonX, inventoryButtonY), 20, 20, Component.empty(), btn -> {
+            if (this.minecraft.gameMode.isServerControlledInventory()) {
+                this.minecraft.player.sendOpenInventory();
             } else {
-                this.client.getTutorialManager().onInventoryOpened();
-                this.client.setScreen(new InventoryScreen(this.client.player));
+                this.minecraft.getTutorial().onOpenInventory();
+                this.minecraft.setScreen(new InventoryScreen(this.minecraft.player));
             }
         }, 20, 0, 20, WIDGETS_LOCATION, 256, 256));
                 ;
@@ -206,80 +206,80 @@ public class TouchscreenOverlay extends Screen {
             sneakButtonX = scaledWidth - 10 - 40 - 5;
         }
         // Swap items hand.
-        this.addDrawableChild(this.swapHandsButton = new SilentTexturedButtonWidget(Position.of(swapHandsX, sneakButtonY), 20, 20, Text.empty(),
+        this.addRenderableWidget(this.swapHandsButton = new SilentTexturedButtonWidget(Position.of(swapHandsX, sneakButtonY), 20, 20, Component.empty(),
                 button -> {
-                    if (button.isInteractable()) {
-                        if (!this.client.player.isSpectator()) {
-                            Objects.requireNonNull(this.client.getNetworkHandler()).sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+                    if (button.isActive()) {
+                        if (!this.minecraft.player.isSpectator()) {
+                            Objects.requireNonNull(this.minecraft.getConnection()).send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
                         }
                     }
                 },0, 160, 20, WIDGETS_LOCATION));
         // Drop
-        this.addDrawableChild(this.dropButton = new SilentTexturedButtonWidget(Position.of(swapHandsX, sneakButtonY + 5 + 20), 20, 20, Text.empty(), btn -> {
-            if (btn.isInteractable() && !client.player.isSpectator() && client.player.dropSelectedItem(false)) {
-                client.player.swingHand(Hand.MAIN_HAND);
+        this.addRenderableWidget(this.dropButton = new SilentTexturedButtonWidget(Position.of(swapHandsX, sneakButtonY + 5 + 20), 20, 20, Component.empty(), btn -> {
+            if (btn.isActive() && !minecraft.player.isSpectator() && minecraft.player.drop(false)) {
+                minecraft.player.swing(InteractionHand.MAIN_HAND);
             }
         }, 20, 160, 20, WIDGETS_LOCATION));
         // Use
-        this.addDrawableChild(this.useButton = new ItemUseButtonWidget(Position.of(width/2-25, height - 70), 50, 17, Text.translatable(MidnightControlsConstants.NAMESPACE+".action.eat"), btn ->
-                client.interactionManager.interactItem(client.player, client.player.getActiveHand())));
+        this.addRenderableWidget(this.useButton = new ItemUseButtonWidget(Position.of(width/2-25, height - 70), 50, 17, Component.translatable(MidnightControlsConstants.NAMESPACE+".action.eat"), btn ->
+                minecraft.gameMode.useItem(minecraft.player, minecraft.player.getUsedItemHand())));
         // Jump keys
-        this.addDrawableChild(this.jumpButton = new SilentTexturedButtonWidget(Position.of(jumpButtonX, sneakButtonY), 20, 20, Text.empty(), this::handleJump, 0, 40, 20, WIDGETS_LOCATION));
-        this.addDrawableChild(this.flyButton = new SilentTexturedButtonWidget(Position.of(jumpButtonX, sneakButtonY), 20, 20, Text.empty(),btn -> {
-                    if (this.flyButtonEnableTicks == 0) this.client.player.getAbilities().flying = false;
+        this.addRenderableWidget(this.jumpButton = new SilentTexturedButtonWidget(Position.of(jumpButtonX, sneakButtonY), 20, 20, Component.empty(), this::handleJump, 0, 40, 20, WIDGETS_LOCATION));
+        this.addRenderableWidget(this.flyButton = new SilentTexturedButtonWidget(Position.of(jumpButtonX, sneakButtonY), 20, 20, Component.empty(),btn -> {
+                    if (this.flyButtonEnableTicks == 0) this.minecraft.player.getAbilities().flying = false;
                 }, 20, 40, 20, WIDGETS_LOCATION)
         );
-        this.addDrawableChild(this.flyUpButton = new SilentTexturedButtonWidget(Position.of(jumpButtonX, sneakButtonY - 5 - 20), 20, 20,Text.empty(),
+        this.addRenderableWidget(this.flyUpButton = new SilentTexturedButtonWidget(Position.of(jumpButtonX, sneakButtonY - 5 - 20), 20, 20,Component.empty(),
                 this::handleJump, 40, 40, 20, WIDGETS_LOCATION
         ));
-        this.addDrawableChild(this.flyDownButton = new SilentTexturedButtonWidget(Position.of(jumpButtonX, sneakButtonY + 20 + 5), 20, 20, Text.empty(),
-                btn -> ((KeyBindingAccessor) this.client.options.sneakKey).midnightcontrols$handlePressState(btn.isInteractable()), 60, 40, 20, WIDGETS_LOCATION
+        this.addRenderableWidget(this.flyDownButton = new SilentTexturedButtonWidget(Position.of(jumpButtonX, sneakButtonY + 20 + 5), 20, 20, Component.empty(),
+                btn -> ((KeyBindingAccessor) this.minecraft.options.keyShift).midnightcontrols$handlePressState(btn.isActive()), 60, 40, 20, WIDGETS_LOCATION
         ));
         this.updateJumpButtons();
         // Movements keys
-        this.addDrawableChild((this.startSneakButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX, sneakButtonY), 20, 20, Text.empty(), btn -> {
-                    if (btn.isInteractable()) {
-                        ((KeyBindingAccessor) this.client.options.sneakKey).midnightcontrols$handlePressState(true);
+        this.addRenderableWidget((this.startSneakButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX, sneakButtonY), 20, 20, Component.empty(), btn -> {
+                    if (btn.isActive()) {
+                        ((KeyBindingAccessor) this.minecraft.options.keyShift).midnightcontrols$handlePressState(true);
                         this.startSneakButton.setVisible(false);
                         this.endSneakButton.setVisible(true);
                     }
                 }, 0, 120, 20, WIDGETS_LOCATION))
         );
-        this.addDrawableChild((this.endSneakButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX, sneakButtonY), 20, 20, Text.empty(), btn -> {
-            if (btn.isInteractable()) {
-                ((KeyBindingAccessor) this.client.options.sneakKey).midnightcontrols$handlePressState(false);
+        this.addRenderableWidget((this.endSneakButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX, sneakButtonY), 20, 20, Component.empty(), btn -> {
+            if (btn.isActive()) {
+                ((KeyBindingAccessor) this.minecraft.options.keyShift).midnightcontrols$handlePressState(false);
                 this.endSneakButton.setVisible(false);
                 this.startSneakButton.setVisible(true);
             }
         }, 20, 120, 20, WIDGETS_LOCATION)));
-        this.addDrawableChild(this.forwardLeftButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX - 20 - 5, sneakButtonY - 5 - 20), 20, 20, Text.empty(), btn -> {
-            ((KeyBindingAccessor) this.client.options.forwardKey).midnightcontrols$handlePressState(btn.isInteractable());
-            ((KeyBindingAccessor) this.client.options.leftKey).midnightcontrols$handlePressState(btn.isInteractable());
-            this.updateForwardButtonsState(btn.isInteractable());
+        this.addRenderableWidget(this.forwardLeftButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX - 20 - 5, sneakButtonY - 5 - 20), 20, 20, Component.empty(), btn -> {
+            ((KeyBindingAccessor) this.minecraft.options.keyUp).midnightcontrols$handlePressState(btn.isActive());
+            ((KeyBindingAccessor) this.minecraft.options.keyLeft).midnightcontrols$handlePressState(btn.isActive());
+            this.updateForwardButtonsState(btn.isActive());
         }, 80, 80, 20, WIDGETS_LOCATION
         ));
-        this.addDrawableChild(this.forwardButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX, sneakButtonY - 5 - 20), 20, 20, Text.empty(), btn -> {
-            ((KeyBindingAccessor) this.client.options.forwardKey).midnightcontrols$handlePressState(btn.isInteractable());
-            this.updateForwardButtonsState(btn.isInteractable());
+        this.addRenderableWidget(this.forwardButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX, sneakButtonY - 5 - 20), 20, 20, Component.empty(), btn -> {
+            ((KeyBindingAccessor) this.minecraft.options.keyUp).midnightcontrols$handlePressState(btn.isActive());
+            this.updateForwardButtonsState(btn.isActive());
             this.forwardLeftButton.setVisible(true);
             this.forwardRightButton.setVisible(true);
         }, 0, 80, 20, WIDGETS_LOCATION
         ));
-        this.addDrawableChild(this.forwardRightButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX + 20 + 5, sneakButtonY - 5 - 20), 20, 20, Text.empty(), btn -> {
-            ((KeyBindingAccessor) this.client.options.forwardKey).midnightcontrols$handlePressState(btn.isInteractable());
-            ((KeyBindingAccessor) this.client.options.rightKey).midnightcontrols$handlePressState(btn.isInteractable());
-            this.updateForwardButtonsState(btn.isInteractable());
+        this.addRenderableWidget(this.forwardRightButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX + 20 + 5, sneakButtonY - 5 - 20), 20, 20, Component.empty(), btn -> {
+            ((KeyBindingAccessor) this.minecraft.options.keyUp).midnightcontrols$handlePressState(btn.isActive());
+            ((KeyBindingAccessor) this.minecraft.options.keyRight).midnightcontrols$handlePressState(btn.isActive());
+            this.updateForwardButtonsState(btn.isActive());
         }, 100, 80, 20, WIDGETS_LOCATION
         ));
 
-        this.addDrawableChild(this.rightButton =new SilentTexturedButtonWidget(Position.of(sneakButtonX + 20 + 5, sneakButtonY), 20, 20, Text.empty(),
-                btn -> ((KeyBindingAccessor) this.client.options.rightKey).midnightcontrols$handlePressState(btn.isInteractable()), 20, 80, 20, WIDGETS_LOCATION
+        this.addRenderableWidget(this.rightButton =new SilentTexturedButtonWidget(Position.of(sneakButtonX + 20 + 5, sneakButtonY), 20, 20, Component.empty(),
+                btn -> ((KeyBindingAccessor) this.minecraft.options.keyRight).midnightcontrols$handlePressState(btn.isActive()), 20, 80, 20, WIDGETS_LOCATION
         ));
-        this.addDrawableChild(this.backButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX, sneakButtonY + 20 + 5), 20, 20, Text.empty(),
-                btn -> ((KeyBindingAccessor) this.client.options.backKey).midnightcontrols$handlePressState(btn.isInteractable()), 40, 80, 20, WIDGETS_LOCATION
+        this.addRenderableWidget(this.backButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX, sneakButtonY + 20 + 5), 20, 20, Component.empty(),
+                btn -> ((KeyBindingAccessor) this.minecraft.options.keyDown).midnightcontrols$handlePressState(btn.isActive()), 40, 80, 20, WIDGETS_LOCATION
         ));
-        this.addDrawableChild(this.leftButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX - 20 - 5, sneakButtonY), 20, 20, Text.empty(),
-                btn -> ((KeyBindingAccessor) this.client.options.leftKey).midnightcontrols$handlePressState(btn.isInteractable()), 60, 80, 20, WIDGETS_LOCATION
+        this.addRenderableWidget(this.leftButton = new SilentTexturedButtonWidget(Position.of(sneakButtonX - 20 - 5, sneakButtonY), 20, 20, Component.empty(),
+                btn -> ((KeyBindingAccessor) this.minecraft.options.keyLeft).midnightcontrols$handlePressState(btn.isActive()), 60, 80, 20, WIDGETS_LOCATION
         ));
         initCustomButtons(true);
         initCustomButtons(false);
@@ -287,27 +287,27 @@ public class TouchscreenOverlay extends Screen {
         this.setButtonProperties(MidnightControlsConfig.touchTransparency / 100f);
     }
     private void initCustomButtons(boolean left) {
-        assert client != null;
+        assert minecraft != null;
         Identifier emptySprite = id("touch/empty");
         List<String> list = left ? MidnightControlsConfig.leftTouchBinds : MidnightControlsConfig.rightTouchBinds;
-        Sprite missingSprite = client.getAtlasManager().getAtlasTexture(Atlases.GUI).getMissingSprite();
+        TextureAtlasSprite missingSprite = minecraft.getAtlasManager().getAtlasOrThrow(AtlasIds.GUI).missingSprite();
         for (int i = 0; i < list.size(); i++) {
             String bindName = list.get(i);
             ButtonBinding binding = InputManager.getBinding(bindName);
             if (binding == null) continue;
-            boolean hasTexture = client.getAtlasManager().getAtlasTexture(Atlases.GUI).getSprite(id("binding/"+bindName)) != missingSprite;
+            boolean hasTexture = minecraft.getAtlasManager().getAtlasOrThrow(AtlasIds.GUI).getSprite(id("binding/"+bindName)) != missingSprite;
             if (MidnightControlsConfig.debug) System.out.println(left +" "+id("binding/"+bindName)+" "+ hasTexture);
-            var button = TextIconButtonWidget.builder(Text.translatable(binding.getTranslationKey()), b -> {
-                    binding.handle(client, 1.0f, ButtonState.PRESS);
+            var button = SpriteIconButton.builder(Component.translatable(binding.getTranslationKey()), b -> {
+                    binding.handle(minecraft, 1.0f, ButtonState.PRESS);
                     if (binding.asKeyBinding().isPresent()) {
-                        binding.asKeyBinding().get().setPressed(true);
+                        binding.asKeyBinding().get().setDown(true);
                         ((KeyBindingAccessor)binding.asKeyBinding().get()).midnightcontrols$press();
                     }
                 }, hasTexture)
-                    .texture(hasTexture ? id("binding/"+bindName) : emptySprite, 20, 20).dimension(20, 20).build();
+                    .sprite(hasTexture ? id("binding/"+bindName) : emptySprite, 20, 20).size(20, 20).build();
             button.setPosition(left ? (3+(i*23)) : this.width-(23+(i*23)), 3);
             button.setAlpha(MidnightControlsConfig.touchTransparency / 100f);
-            this.addDrawableChild(button);
+            this.addRenderableWidget(button);
         }
     }
     private void setButtonProperties(float transparency) {
@@ -335,9 +335,9 @@ public class TouchscreenOverlay extends Screen {
 
     @Override
     public void tick() {
-        assert this.client != null;
-        assert this.client.interactionManager != null;
-        assert this.client.player != null;
+        assert this.minecraft != null;
+        assert this.minecraft.gameMode != null;
+        assert this.minecraft.player != null;
 
         if (this.forwardButtonTick > 0) {
             --this.forwardButtonTick;
@@ -345,13 +345,13 @@ public class TouchscreenOverlay extends Screen {
             this.forwardLeftButton.setVisible(false);
             this.forwardRightButton.setVisible(false);
         }
-        this.useButton.setVisible(client.player.getMainHandStack() != null && (client.player.getMainHandStack().getUseAction() != UseAction.NONE || client.player.getMainHandStack().getComponents().contains(DataComponentTypes.EQUIPPABLE)) && !TouchUtils.hasInWorldUseAction(client.player.getMainHandStack()));
+        this.useButton.setVisible(minecraft.player.getMainHandItem() != null && (minecraft.player.getMainHandItem().getUseAnimation() != ItemUseAnimation.NONE || minecraft.player.getMainHandItem().getComponents().has(DataComponents.EQUIPPABLE)) && !TouchUtils.hasInWorldUseAction(minecraft.player.getMainHandItem()));
         this.updateJumpButtons();
     }
 
     @Override
-    public boolean mouseDragged(Click click, double deltaX, double deltaY) {
-        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_1 && this.client != null) {
+    public boolean mouseDragged(MouseButtonEvent click, double deltaX, double deltaY) {
+        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_1 && this.minecraft != null) {
             if (TouchInput.isDragging) {
                 if (!MidnightControlsConfig.invertTouch) {
                     deltaX = -deltaX;

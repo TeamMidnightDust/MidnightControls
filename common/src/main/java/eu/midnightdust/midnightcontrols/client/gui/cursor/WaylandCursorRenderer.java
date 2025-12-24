@@ -3,16 +3,17 @@ package eu.midnightdust.midnightcontrols.client.gui.cursor;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.enums.VirtualMouseSkin;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.cursor.StandardCursors;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.util.Atlases;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.data.AtlasIds;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import static eu.midnightdust.midnightcontrols.MidnightControls.id;
+
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 
 public class WaylandCursorRenderer extends CursorRenderer {
     private static final WaylandCursorRenderer INSTANCE = new WaylandCursorRenderer();
@@ -34,28 +35,28 @@ public class WaylandCursorRenderer extends CursorRenderer {
         return INSTANCE;
     }
 
-    public void renderCursor(@NotNull DrawContext context, @NotNull MinecraftClient client) {
-        if (MidnightControlsConfig.virtualMouse || client.currentScreen == null || MidnightControlsConfig.controlsMode != ControlsMode.CONTROLLER) return;
+    public void renderCursor(@NotNull GuiGraphics context, @NotNull Minecraft client) {
+        if (MidnightControlsConfig.virtualMouse || client.screen == null || MidnightControlsConfig.controlsMode != ControlsMode.CONTROLLER) return;
 
-        float mouseX = (float) client.mouse.getX() * client.getWindow().getScaledWidth() / client.getWindow().getWidth();
-        float mouseY = (float) client.mouse.getY() * client.getWindow().getScaledHeight() / client.getWindow().getHeight();
+        float mouseX = (float) client.mouseHandler.xpos() * client.getWindow().getGuiScaledWidth() / client.getWindow().getScreenWidth();
+        float mouseY = (float) client.mouseHandler.ypos() * client.getWindow().getGuiScaledHeight() / client.getWindow().getScreenHeight();
 
         try {
-            Sprite sprite = getSprite(client);
-            drawUnalignedTexturedQuad(RenderPipelines.GUI_TEXTURED, sprite.getAtlasId(), context, mouseX - 2, mouseX + 6, mouseY - 2, mouseY + 6, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
+            TextureAtlasSprite sprite = getSprite(client);
+            drawUnalignedTexturedQuad(RenderPipelines.GUI_TEXTURED, sprite.atlasLocation(), context, mouseX - 2, mouseX + 6, mouseY - 2, mouseY + 6, sprite.getU0(), sprite.getU1(), sprite.getV0(), sprite.getV1());
         } catch (IllegalStateException ignored) {}
     }
 
-    private static Sprite getSprite(@NotNull MinecraftClient client) {
+    private static TextureAtlasSprite getSprite(@NotNull Minecraft client) {
         boolean isDark = MidnightControlsConfig.virtualMouseSkin == VirtualMouseSkin.DEFAULT_DARK || MidnightControlsConfig.virtualMouseSkin == VirtualMouseSkin.SECOND_DARK;
         Identifier spritePath;
-        if (CursorRenderer.currentCursorStyle == StandardCursors.POINTING_HAND) spritePath = isDark ? WAYLAND_CURSOR_POINTING_DARK : WAYLAND_CURSOR_POINTING_LIGHT;
-        else if (CursorRenderer.currentCursorStyle == StandardCursors.IBEAM) spritePath = isDark ? WAYLAND_CURSOR_IBEAM_DARK : WAYLAND_CURSOR_IBEAM_LIGHT;
-        else if (CursorRenderer.currentCursorStyle == StandardCursors.RESIZE_NS) spritePath = isDark ? WAYLAND_CURSOR_REZIZE_VERTICAL_DARK : WAYLAND_CURSOR_RESIZE_VERTICAL_LIGHT;
-        else if (CursorRenderer.currentCursorStyle == StandardCursors.RESIZE_EW) spritePath = isDark ? WAYLAND_CURSOR_REZIZE_HORIZONTAL_DARK : WAYLAND_CURSOR_RESIZE_HORIZONTAL_LIGHT;
-        else if (CursorRenderer.currentCursorStyle == StandardCursors.NOT_ALLOWED) spritePath = isDark ? WAYLAND_CURSOR_NOT_ALLOWED_DARK : WAYLAND_CURSOR_NOT_ALLOWED_LIGHT;
+        if (CursorRenderer.currentCursorStyle == CursorTypes.POINTING_HAND) spritePath = isDark ? WAYLAND_CURSOR_POINTING_DARK : WAYLAND_CURSOR_POINTING_LIGHT;
+        else if (CursorRenderer.currentCursorStyle == CursorTypes.IBEAM) spritePath = isDark ? WAYLAND_CURSOR_IBEAM_DARK : WAYLAND_CURSOR_IBEAM_LIGHT;
+        else if (CursorRenderer.currentCursorStyle == CursorTypes.RESIZE_NS) spritePath = isDark ? WAYLAND_CURSOR_REZIZE_VERTICAL_DARK : WAYLAND_CURSOR_RESIZE_VERTICAL_LIGHT;
+        else if (CursorRenderer.currentCursorStyle == CursorTypes.RESIZE_EW) spritePath = isDark ? WAYLAND_CURSOR_REZIZE_HORIZONTAL_DARK : WAYLAND_CURSOR_RESIZE_HORIZONTAL_LIGHT;
+        else if (CursorRenderer.currentCursorStyle == CursorTypes.NOT_ALLOWED) spritePath = isDark ? WAYLAND_CURSOR_NOT_ALLOWED_DARK : WAYLAND_CURSOR_NOT_ALLOWED_LIGHT;
         else spritePath = isDark ? WAYLAND_CURSOR_ARROW_DARK : WAYLAND_CURSOR_ARROW_LIGHT;
 
-        return client.getAtlasManager().getAtlasTexture(Atlases.GUI).getSprite(spritePath);
+        return client.getAtlasManager().getAtlasOrThrow(AtlasIds.GUI).getSprite(spritePath);
     }
 }

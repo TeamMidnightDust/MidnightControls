@@ -12,11 +12,11 @@ package eu.midnightdust.midnightcontrols.client.gui;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.ring.RingButtonMode;
 import eu.midnightdust.midnightcontrols.client.ring.RingPage;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.ring;
 
@@ -30,36 +30,36 @@ import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.rin
 public class RingScreen extends Screen {
 
     public RingScreen() {
-        super(Text.literal("midnightcontrols.menu.title.ring"));
+        super(Component.literal("midnightcontrols.menu.title.ring"));
     }
 
     @Override
     protected void init() {
         super.init();
         if (ring.getMaxPages() > 1) {
-            this.addDrawableChild(ButtonWidget.builder(Text.of("◀"), button -> ring.cyclePage(false)).dimensions(5, 5, 20, 20).build());
-            this.addDrawableChild(ButtonWidget.builder(Text.of("▶"), button -> ring.cyclePage(true)).dimensions(width - 25, 5, 20, 20).build());
+            this.addRenderableWidget(Button.builder(Component.nullToEmpty("◀"), button -> ring.cyclePage(false)).bounds(5, 5, 20, 20).build());
+            this.addRenderableWidget(Button.builder(Component.nullToEmpty("▶"), button -> ring.cyclePage(true)).bounds(width - 25, 5, 20, 20).build());
         }
     }
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
         RingPage page = ring.getCurrentPage();
-        page.render(context, this.textRenderer, this.width, this.height, mouseX, mouseY, delta);
+        page.render(context, this.font, this.width, this.height, mouseX, mouseY, delta);
     }
 
     @Override
-    public void close() {
-        super.close();
-        assert client != null;
-        client.currentScreen = null;
+    public void onClose() {
+        super.onClose();
+        assert minecraft != null;
+        minecraft.screen = null;
         RingPage page = ring.getCurrentPage();
         if (RingPage.selected >= 0 && page.actions[RingPage.selected] != null)
             page.actions[RingPage.selected].activate(RingButtonMode.PRESS);
@@ -80,9 +80,9 @@ public class RingScreen extends Screen {
 //    }
 
     @Override
-    public boolean mouseReleased(Click click) {
+    public boolean mouseReleased(MouseButtonEvent click) {
         if (ring.getCurrentPage().onClick(width, height, (int) click.x(), (int) click.y())) {
-            this.close();
+            this.onClose();
             return true;
         }
         return false;

@@ -4,14 +4,13 @@ import eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler.Abst
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler.BookEditScreenClickHandler;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler.DefaultScreenClickHandler;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler.SignEditScreenClickHandler;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.BookEditScreen;
-import net.minecraft.client.gui.screen.ingame.BookSigningScreen;
-import net.minecraft.client.gui.screen.ingame.SignEditScreen;
-
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.BookEditScreen;
+import net.minecraft.client.gui.screens.inventory.BookSignScreen;
+import net.minecraft.client.gui.screens.inventory.SignEditScreen;
+import net.minecraft.client.input.MouseButtonEvent;
 
 
 public class MouseClickInterceptor {
@@ -20,14 +19,14 @@ public class MouseClickInterceptor {
 
     public MouseClickInterceptor() {
         this.clickHandlers = new HashMap<>();
-        this.clickHandlers.put(BookSigningScreen.class, new BookEditScreenClickHandler.Signing());
+        this.clickHandlers.put(BookSignScreen.class, new BookEditScreenClickHandler.Signing());
         this.clickHandlers.put(BookEditScreen.class, new BookEditScreenClickHandler());
         this.clickHandlers.put(SignEditScreen.class, new SignEditScreenClickHandler());
         this.clickHandlers.put(Screen.class, new DefaultScreenClickHandler());
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Screen> void intercept(T screen, Click click) {
+    public <T extends Screen> void intercept(T screen, MouseButtonEvent click) {
         AbstractScreenClickHandler<T> handler = (AbstractScreenClickHandler<T>) clickHandlers.get(screen.getClass());
 
         if (handler == null) {

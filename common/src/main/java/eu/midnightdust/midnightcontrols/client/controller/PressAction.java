@@ -11,8 +11,8 @@ package eu.midnightdust.midnightcontrols.client.controller;
 
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.util.KeyBindingAccessor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.StickyKeyBinding;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.ToggleKeyMapping;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,11 +25,11 @@ import org.jetbrains.annotations.NotNull;
 @FunctionalInterface
 public interface PressAction {
     PressAction DEFAULT_ACTION = (client, button, value, action) -> {
-        if (action == ButtonState.REPEAT || client.currentScreen != null)
+        if (action == ButtonState.REPEAT || client.screen != null)
             return false;
         button.asKeyBinding().ifPresent(binding -> {
-            if (binding instanceof StickyKeyBinding && binding != client.options.attackKey) // TODO: Properly fix sticky keys so the attack key doesn't need to be a hardcoded exception
-                binding.setPressed(button.isPressed());
+            if (binding instanceof ToggleKeyMapping && binding != client.options.keyAttack) // TODO: Properly fix sticky keys so the attack key doesn't need to be a hardcoded exception
+                binding.setDown(button.isPressed());
             else
                 ((KeyBindingAccessor) binding).midnightcontrols$handlePressState(button.isPressed());
         });
@@ -42,5 +42,5 @@ public interface PressAction {
      * @param client the client instance
      * @param action the action done
      */
-    boolean press(@NotNull MinecraftClient client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action);
+    boolean press(@NotNull Minecraft client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action);
 }

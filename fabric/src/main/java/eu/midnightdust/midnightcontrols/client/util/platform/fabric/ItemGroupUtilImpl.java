@@ -1,7 +1,8 @@
 package eu.midnightdust.midnightcontrols.client.util.platform.fabric;
 
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.item.ItemGroup;
+
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  * @see eu.midnightdust.midnightcontrols.client.util.platform.ItemGroupUtil
  */
 public class ItemGroupUtilImpl {
-    public static List<ItemGroup> getVisibleGroups(CreativeInventoryScreen screen) {
+    public static List<CreativeModeTab> getVisibleGroups(CreativeModeInventoryScreen screen) {
         return (screen.getItemGroupsOnPage(screen.getCurrentPage()));
     }
 }

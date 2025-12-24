@@ -17,12 +17,12 @@ import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsRenderer;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -34,29 +34,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * Represents the mixin for the class ContainerScreen.
  */
-@Mixin(HandledScreen.class)
+@Mixin(AbstractContainerScreen.class)
 public abstract class HandledScreenMixin implements HandledScreenAccessor {
-    @Accessor("x")
+    @Accessor("leftPos")
     public abstract int getX();
 
-    @Accessor("y")
+    @Accessor("topPos")
     public abstract int getY();
 
-    @Invoker("getSlotAt")
+    @Invoker("getHoveredSlot")
     public abstract Slot midnightcontrols$getSlotAt(double posX, double posY);
 
-    @Invoker("isClickOutsideBounds")
+    @Invoker("hasClickedOutside")
     public abstract boolean midnightcontrols$isClickOutsideBounds(double mouseX, double mouseY, int left, int top);
 
 
-    @Invoker("onMouseClick")
-    public abstract void midnightcontrols$onMouseClick(@Nullable Slot slot, int slotId, int clickData, SlotActionType actionType);
+    @Invoker("slotClicked")
+    public abstract void midnightcontrols$onMouseClick(@Nullable Slot slot, int slotId, int clickData, ClickType actionType);
 
     @Inject(method = "render", at = @At("RETURN"))
-    public void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    public void onRender(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.hudEnable) {
-            var client = MinecraftClient.getInstance();
-            int x = 2, y = client.getWindow().getScaledHeight() - 2 - MidnightControlsRenderer.ICON_SIZE;
+            var client = Minecraft.getInstance();
+            int x = 2, y = client.getWindow().getGuiScaledHeight() - 2 - MidnightControlsRenderer.ICON_SIZE;
             if (PlatformFunctions.isModLoaded("emi") && EMICompat.isEMIEnabled()) {
                 x += 42;
             }
@@ -67,8 +67,8 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
                 y -= 24;
             }
             if (PlatformFunctions.isModLoaded("emi") && EMICompat.isEMIEnabled() && EMICompat.isSearchBarCentered()) {
-                x = client.getWindow().getScaledWidth() - 4 - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.pickup"))
-                        - client.textRenderer.getWidth(Text.translatable("midnightcontrols.action.quick_move"))
+                x = client.getWindow().getGuiScaledWidth() - 4 - client.font.width(Component.translatable("midnightcontrols.action.pickup"))
+                        - client.font.width(Component.translatable("midnightcontrols.action.quick_move"))
                         - 2 * MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.TAKE) - MidnightControlsRenderer.getBindingIconWidth(ButtonBinding.QUICK_MOVE);
                 y += 2;
             }

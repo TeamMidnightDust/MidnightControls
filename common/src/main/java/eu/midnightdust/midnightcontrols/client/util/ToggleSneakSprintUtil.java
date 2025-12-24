@@ -9,38 +9,38 @@ public class ToggleSneakSprintUtil {
     public static boolean toggleSneak(ButtonBinding button) {
         if (client.player == null) return false;
         boolean isFlying = client.player.getAbilities().flying;
-        var option = client.options.getSneakToggled();
+        var option = client.options.toggleCrouch();
 
         button.asKeyBinding().ifPresent(binding -> {
-            boolean sneakToggled = option.getValue();
+            boolean sneakToggled = option.get();
             if (isFlying && sneakToggled)
-                option.setValue(false);
+                option.set(false);
             else if (MidnightControlsConfig.controllerToggleSneak != sneakToggled)
-                option.setValue(!sneakToggled);
-            binding.setPressed(button.isPressed());
+                option.set(!sneakToggled);
+            binding.setDown(button.isPressed());
             if (isFlying && sneakToggled)
-                option.setValue(true);
+                option.set(true);
             else if (MidnightControlsConfig.controllerToggleSneak != sneakToggled)
-                option.setValue(sneakToggled);
+                option.set(sneakToggled);
         });
         return true;
     }
     public static boolean toggleSprint(ButtonBinding button) {
         if (client.player == null) return false;
         boolean isFlying = client.player.getAbilities().flying;
-        var option = client.options.getSprintToggled();
+        var option = client.options.toggleSprint();
 
         button.asKeyBinding().ifPresent(binding -> {
-            boolean sprintToggled = option.getValue();
+            boolean sprintToggled = option.get();
             if (isFlying && sprintToggled)
-                option.setValue(false);
+                option.set(false);
             else if (MidnightControlsConfig.controllerToggleSprint != sprintToggled)
-                option.setValue(!sprintToggled);
-            binding.setPressed(button.isPressed());
+                option.set(!sprintToggled);
+            binding.setDown(button.isPressed());
             if (client.player.getAbilities().flying && sprintToggled)
-                option.setValue(true);
+                option.set(true);
             else if (MidnightControlsConfig.controllerToggleSprint != sprintToggled)
-                option.setValue(sprintToggled);
+                option.set(sprintToggled);
         });
         return true;
     }

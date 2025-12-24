@@ -31,15 +31,6 @@ import eu.midnightdust.midnightcontrols.client.mixin.MouseAccessor;
 import eu.midnightdust.midnightcontrols.client.util.InventoryUtil;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
 import eu.midnightdust.midnightcontrols.client.util.storage.ButtonStorage;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.navigation.NavigationDirection;
-import net.minecraft.client.gui.screen.option.KeybindsScreen;
-import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.client.gui.widget.PressableWidget;
-import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.input.MouseInput;
-import net.minecraft.entity.vehicle.BoatEntity;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
@@ -51,18 +42,6 @@ import eu.midnightdust.midnightcontrols.client.ring.RingPage;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MathUtil;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.ParentElement;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.advancement.AdvancementTab;
-import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
-import net.minecraft.client.gui.screen.world.WorldListWidget;
-import net.minecraft.text.TranslatableTextContent;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
@@ -71,6 +50,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.navigation.ScreenDirection;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.advancements.AdvancementTab;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
+import net.minecraft.client.gui.screens.options.controls.KeyBindsScreen;
+import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.vehicle.boat.Boat;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 import static org.lwjgl.glfw.GLFW.*;
@@ -84,7 +84,7 @@ import static org.lwjgl.glfw.GLFW.*;
  */
 public class MidnightInput {
     public static final Map<Integer, Integer> BUTTON_COOLDOWNS = new HashMap<>();
-    public static final KeyInput ENTER_KEY_INPUT = new KeyInput(GLFW_KEY_ENTER, 0, 0);
+    public static final KeyEvent ENTER_KEY_INPUT = new KeyEvent(GLFW_KEY_ENTER, 0, 0);
     // Cooldowns
     public int actionGuiCooldown = 0;
     public int joystickCooldown = 0;
@@ -111,14 +111,14 @@ public class MidnightInput {
         this.targetPitch = 0.F;
 
         // Handles the key bindings.
-        if (MidnightControlsClient.BINDING_LOOK_UP.isPressed()) {
+        if (MidnightControlsClient.BINDING_LOOK_UP.isDown()) {
             this.handleFlatLook(AxisStorage.of(GLFW_GAMEPAD_AXIS_RIGHT_Y, -0.8F, 0d));
-        } else if (MidnightControlsClient.BINDING_LOOK_DOWN.isPressed()) {
+        } else if (MidnightControlsClient.BINDING_LOOK_DOWN.isDown()) {
             this.handleFlatLook(AxisStorage.of(GLFW_GAMEPAD_AXIS_RIGHT_Y, 0.8F, 0d));
         }
-        if (MidnightControlsClient.BINDING_LOOK_LEFT.isPressed()) {
+        if (MidnightControlsClient.BINDING_LOOK_LEFT.isDown()) {
             this.handleFlatLook(AxisStorage.of(GLFW_GAMEPAD_AXIS_RIGHT_X, -0.8F, 0d));
-        } else if (MidnightControlsClient.BINDING_LOOK_RIGHT.isPressed()) {
+        } else if (MidnightControlsClient.BINDING_LOOK_RIGHT.isDown()) {
             this.handleFlatLook(AxisStorage.of(GLFW_GAMEPAD_AXIS_RIGHT_X, 0.8F, 0d));
         }
 
@@ -209,7 +209,7 @@ public class MidnightInput {
      * This method is called to update the camera
      */
     public void updateCamera() {
-        if (!(client.currentScreen == null || client.currentScreen instanceof TouchscreenOverlay))
+        if (!(client.screen == null || client.screen instanceof TouchscreenOverlay))
             return;
 
         var player = client.player;
@@ -217,16 +217,16 @@ public class MidnightInput {
             return;
 
         if (this.targetYaw != 0.f || this.targetPitch != 0.f) {
-            float rotationYaw = (float) (client.player.lastYaw + (this.targetYaw * 0.175));
-            float rotationPitch = (float) (client.player.lastPitch + (this.targetPitch * 0.175));
-            client.player.lastYaw = rotationYaw;
-            client.player.lastPitch = MathHelper.clamp(rotationPitch, -90.f, 90.f);
-            client.player.setYaw(rotationYaw);
-            client.player.setPitch(MathHelper.clamp(rotationPitch, -90.f, 90.f));
-            if (client.player.isRiding() && client.player.getVehicle() != null) {
-                client.player.getVehicle().onPassengerLookAround(client.player);
+            float rotationYaw = (float) (client.player.yRotO + (this.targetYaw * 0.175));
+            float rotationPitch = (float) (client.player.xRotO + (this.targetPitch * 0.175));
+            client.player.yRotO = rotationYaw;
+            client.player.xRotO = Mth.clamp(rotationPitch, -90.f, 90.f);
+            client.player.setYRot(rotationYaw);
+            client.player.setXRot(Mth.clamp(rotationPitch, -90.f, 90.f));
+            if (client.player.isHandsBusy() && client.player.getVehicle() != null) {
+                client.player.getVehicle().onPassengerTurned(client.player);
             }
-            client.getTutorialManager().onUpdateMouse(this.targetPitch, this.targetYaw);
+            client.getTutorial().onMouse(this.targetPitch, this.targetYaw);
         }
     }
 
@@ -237,11 +237,11 @@ public class MidnightInput {
      * @param windowHeight the window height
      */
     public void onScreenOpen(int windowWidth, int windowHeight) {
-        if (client.currentScreen == null) {
+        if (client.screen == null) {
             this.mouseSpeedX = this.mouseSpeedY = 0.0F;
             InputManager.INPUT_MANAGER.resetMousePosition(windowWidth, windowHeight);
-        } else if (isScreenInteractive(client.currentScreen) && MidnightControlsConfig.virtualMouse) {
-            ((MouseAccessor) client.mouse).midnightcontrols$onCursorPos(client.getWindow().getHandle(), 0, 0);
+        } else if (isScreenInteractive(client.screen) && MidnightControlsConfig.virtualMouse) {
+            ((MouseAccessor) client.mouseHandler).midnightcontrols$onCursorPos(client.getWindow().handle(), 0, 0);
             InputManager.INPUT_MANAGER.resetMouseTarget(client);
         }
         this.inventoryInteractionCooldown = 5;
@@ -291,7 +291,7 @@ public class MidnightInput {
         float rightX = polarUtil.polarX;
         float rightY = polarUtil.polarY;
 
-        boolean isRadialMenu = client.currentScreen instanceof RingScreen || (PlatformFunctions.isModLoaded("emotecraft") && EmotecraftCompat.isEmotecraftScreen(client.currentScreen));
+        boolean isRadialMenu = client.screen instanceof RingScreen || (PlatformFunctions.isModLoaded("emotecraft") && EmotecraftCompat.isEmotecraftScreen(client.screen));
 
         if (!isRadialMenu) {
             for (int i = cameraTick ? GLFW_GAMEPAD_AXIS_RIGHT_X : 0; i < (cameraTick ? GLFW_GAMEPAD_AXIS_LEFT_TRIGGER : GLFW_GAMEPAD_AXIS_RIGHT_X); i++) {
@@ -348,20 +348,20 @@ public class MidnightInput {
             return;
         }
 
-        if (client.currentScreen != null && storage.state.isPressed() && storage.button == GLFW_GAMEPAD_BUTTON_Y &&
-                MidnightControlsConfig.arrowScreens.contains(client.currentScreen.getClass().getCanonicalName())) {
+        if (client.screen != null && storage.state.isPressed() && storage.button == GLFW_GAMEPAD_BUTTON_Y &&
+                MidnightControlsConfig.arrowScreens.contains(client.screen.getClass().getCanonicalName())) {
             pressKeyboardKey(client, GLFW.GLFW_KEY_ENTER);
             this.screenCloseCooldown = 5;
         }
         else if (storage.state.isPressed()) {
-            if (client.currentScreen != null && storage.isDpad() && this.actionGuiCooldown == 0) {
+            if (client.screen != null && storage.isDpad() && this.actionGuiCooldown == 0) {
                 switch (storage.button) {
-                    case GLFW_GAMEPAD_BUTTON_DPAD_UP -> this.changeFocus(client.currentScreen, NavigationDirection.UP);
-                    case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> this.changeFocus(client.currentScreen, NavigationDirection.DOWN);
-                    case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> this.handleLeftRight(client.currentScreen, false);
-                    case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> this.handleLeftRight(client.currentScreen, true);
+                    case GLFW_GAMEPAD_BUTTON_DPAD_UP -> this.changeFocus(client.screen, ScreenDirection.UP);
+                    case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> this.changeFocus(client.screen, ScreenDirection.DOWN);
+                    case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> this.handleLeftRight(client.screen, false);
+                    case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> this.handleLeftRight(client.screen, true);
                 }
-                if (MidnightControlsConfig.wasdScreens.contains(client.currentScreen.getClass().getCanonicalName())) {
+                if (MidnightControlsConfig.wasdScreens.contains(client.screen.getClass().getCanonicalName())) {
                     switch (storage.button) {
                         case GLFW_GAMEPAD_BUTTON_DPAD_UP -> pressKeyboardKey(client, GLFW.GLFW_KEY_W);
                         case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> pressKeyboardKey(client, GLFW.GLFW_KEY_S);
@@ -373,51 +373,51 @@ public class MidnightInput {
             }
         }
         else {
-            if (storage.button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null) {
+            if (storage.button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.screen != null) {
                 if (this.actionGuiCooldown == 0) {
-                    var focused = client.currentScreen.getFocused();
-                    if (focused != null && isScreenInteractive(client.currentScreen)) {
-                        if (this.handleAButton(client.currentScreen, focused)) {
+                    var focused = client.screen.getFocused();
+                    if (focused != null && isScreenInteractive(client.screen)) {
+                        if (this.handleAButton(client.screen, focused)) {
                             this.actionGuiCooldown = 5; // Set the cooldown to 5 ticks to avoid unintended button presses.
                             return;
                         }
                     }
-                    else if (PlatformFunctions.isModLoaded("libgui")) LibGuiCompat.handlePress(client.currentScreen);
+                    else if (PlatformFunctions.isModLoaded("libgui")) LibGuiCompat.handlePress(client.screen);
                 }
             }
         }
 
-        if (storage.button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.currentScreen != null && !isScreenInteractive(client.currentScreen)
+        if (storage.button == GLFW.GLFW_GAMEPAD_BUTTON_A && client.screen != null && !isScreenInteractive(client.screen)
                 && this.actionGuiCooldown == 0) {
-            if (client.currentScreen instanceof HandledScreen<?> handledScreen && ((HandledScreenAccessor) handledScreen).midnightcontrols$getSlotAt(
-                    client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth(),
-                    client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight()) != null) return;
-            if (!this.ignoreNextARelease && client.currentScreen != null) {
-                var accessor = (MouseAccessor) client.mouse;
-                accessor.midnightcontrols$onCursorPos(client.getWindow().getHandle(), client.mouse.getX(), client.mouse.getY());
+            if (client.screen instanceof AbstractContainerScreen<?> handledScreen && ((HandledScreenAccessor) handledScreen).midnightcontrols$getSlotAt(
+                    client.mouseHandler.xpos() * (double) client.getWindow().getGuiScaledWidth() / (double) client.getWindow().getScreenWidth(),
+                    client.mouseHandler.ypos() * (double) client.getWindow().getGuiScaledHeight() / (double) client.getWindow().getScreenHeight()) != null) return;
+            if (!this.ignoreNextARelease && client.screen != null) {
+                var accessor = (MouseAccessor) client.mouseHandler;
+                accessor.midnightcontrols$onCursorPos(client.getWindow().handle(), client.mouseHandler.xpos(), client.mouseHandler.ypos());
                 switch (storage.state) {
                     // Button pressed
-                    case PRESS -> accessor.midnightcontrols$onMouseButton(client.getWindow().getHandle(), new MouseInput(GLFW_MOUSE_BUTTON_LEFT, 0), 1);
+                    case PRESS -> accessor.midnightcontrols$onMouseButton(client.getWindow().handle(), new MouseButtonInfo(GLFW_MOUSE_BUTTON_LEFT, 0), 1);
                     case RELEASE -> { // Button released
-                        accessor.midnightcontrols$onMouseButton(client.getWindow().getHandle(), new MouseInput(GLFW_MOUSE_BUTTON_LEFT, 0), 0);
-                        client.currentScreen.setDragging(false);
+                        accessor.midnightcontrols$onMouseButton(client.getWindow().handle(), new MouseButtonInfo(GLFW_MOUSE_BUTTON_LEFT, 0), 0);
+                        client.screen.setDragging(false);
                     }
-                    case REPEAT -> client.currentScreen.setDragging(true); // Button held down / dragging
+                    case REPEAT -> client.screen.setDragging(true); // Button held down / dragging
                 }
                 this.screenCloseCooldown = 5;
             } else {
                 this.ignoreNextARelease = false;
             }
         }
-        else if (storage.button == GLFW.GLFW_GAMEPAD_BUTTON_X && client.currentScreen != null && !isScreenInteractive(client.currentScreen)
+        else if (storage.button == GLFW.GLFW_GAMEPAD_BUTTON_X && client.screen != null && !isScreenInteractive(client.screen)
                 && this.actionGuiCooldown == 0) {
-            double mouseX = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
-            double mouseY = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
-            if (client.currentScreen instanceof HandledScreen<?> handledScreen && ((HandledScreenAccessor) handledScreen).midnightcontrols$getSlotAt(
+            double mouseX = client.mouseHandler.xpos() * (double) client.getWindow().getGuiScaledWidth() / (double) client.getWindow().getScreenWidth();
+            double mouseY = client.mouseHandler.ypos() * (double) client.getWindow().getGuiScaledHeight() / (double) client.getWindow().getScreenHeight();
+            if (client.screen instanceof AbstractContainerScreen<?> handledScreen && ((HandledScreenAccessor) handledScreen).midnightcontrols$getSlotAt(
                     mouseX, mouseY) != null) return;
-            if (!this.ignoreNextXRelease && client.currentScreen != null) {
-                if (storage.state == ButtonState.PRESS) client.currentScreen.mouseClicked(new Click(mouseX, mouseY, new MouseInput(GLFW.GLFW_MOUSE_BUTTON_2, 1)), false);
-                else if (storage.state == ButtonState.RELEASE) client.currentScreen.mouseReleased(new Click(mouseX, mouseY, new MouseInput(GLFW.GLFW_MOUSE_BUTTON_2, 0)));
+            if (!this.ignoreNextXRelease && client.screen != null) {
+                if (storage.state == ButtonState.PRESS) client.screen.mouseClicked(new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(GLFW.GLFW_MOUSE_BUTTON_2, 1)), false);
+                else if (storage.state == ButtonState.RELEASE) client.screen.mouseReleased(new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(GLFW.GLFW_MOUSE_BUTTON_2, 0)));
                 this.screenCloseCooldown = 5;
             } else {
                 this.ignoreNextXRelease = false;
@@ -433,24 +433,24 @@ public class MidnightInput {
 
         this.handleJoystickMovement(storage);
 
-        if (this.handleScreenScrolling(client.currentScreen, storage)) return;
+        if (this.handleScreenScrolling(client.screen, storage)) return;
 
-        storage.absValue = (float) MathHelper.clamp(storage.absValue / MidnightControlsConfig.getAxisMaxValue(storage.axis), 0.f, 1.f);
-        if (client.currentScreen == null) {
+        storage.absValue = (float) Mth.clamp(storage.absValue / MidnightControlsConfig.getAxisMaxValue(storage.axis), 0.f, 1.f);
+        if (client.screen == null) {
             // Handles the look direction.
             this.handleLook(storage);
         } else {
             boolean allowMouseControl = true;
 
-            if (this.actionGuiCooldown == 0 && MidnightControlsConfig.isMovementAxis(storage.axis) && isScreenInteractive(client.currentScreen)) {
+            if (this.actionGuiCooldown == 0 && MidnightControlsConfig.isMovementAxis(storage.axis) && isScreenInteractive(client.screen)) {
                 if (MidnightControlsConfig.isForwardButton(storage.axis, false, storage.buttonState)) {
-                    allowMouseControl = this.changeFocus(client.currentScreen, NavigationDirection.UP);
+                    allowMouseControl = this.changeFocus(client.screen, ScreenDirection.UP);
                 } else if (MidnightControlsConfig.isBackButton(storage.axis, false, storage.buttonState)) {
-                    allowMouseControl = this.changeFocus(client.currentScreen, NavigationDirection.DOWN);
+                    allowMouseControl = this.changeFocus(client.screen, ScreenDirection.DOWN);
                 } else if (MidnightControlsConfig.isLeftButton(storage.axis, false, storage.buttonState)) {
-                    allowMouseControl = this.handleLeftRight(client.currentScreen, false);
+                    allowMouseControl = this.handleLeftRight(client.screen, false);
                 } else if (MidnightControlsConfig.isRightButton(storage.axis, false, storage.buttonState)) {
-                    allowMouseControl = this.handleLeftRight(client.currentScreen, true);
+                    allowMouseControl = this.handleLeftRight(client.screen, true);
                 }
             }
 
@@ -467,7 +467,7 @@ public class MidnightInput {
                 movementX = storage.absValue;
             }
 
-            if (client.currentScreen != null && allowMouseControl) {
+            if (client.screen != null && allowMouseControl) {
                 boolean moving = movementY != 0 || movementX != 0;
                 if (moving) {
                 /*
@@ -492,7 +492,7 @@ public class MidnightInput {
                     );
                 }
 
-                InventoryUtil.moveMouseToClosestSlot(client.currentScreen);
+                InventoryUtil.moveMouseToClosestSlot(client.screen);
             }
 
             this.prevXAxis = movementX;
@@ -502,7 +502,7 @@ public class MidnightInput {
 
     private void handleJoystickMovement(AxisStorage storage) {
         float axisValue = storage.absValue;
-        if (!MidnightControlsConfig.analogMovement || (client.player != null && client.player.getVehicle() instanceof BoatEntity)) {
+        if (!MidnightControlsConfig.analogMovement || (client.player != null && client.player.getVehicle() instanceof Boat)) {
             axisValue = (float) (storage.absValue - storage.deadZone);
             axisValue /= (float) (1.0 - storage.deadZone);
             axisValue *= (float) storage.deadZone;
@@ -534,7 +534,7 @@ public class MidnightInput {
             }
             return true;
         } else if (storage.absValue >= storage.deadZone) {
-            if (screen instanceof CreativeInventoryScreen creativeInventoryScreen) {
+            if (screen instanceof CreativeModeInventoryScreen creativeInventoryScreen) {
                 if (storage.axis == preferredAxis) {
                     var accessor = (CreativeInventoryScreenAccessor) creativeInventoryScreen;
                     if (accessor.midnightcontrols$hasScrollbar() && storage.absValue >= storage.deadZone) {
@@ -546,7 +546,7 @@ public class MidnightInput {
                 if (storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X || storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y) {
                     var accessor = (AdvancementsScreenAccessor) advancementsScreen;
                     AdvancementTab tab = accessor.getSelectedTab();
-                    tab.move(storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X ? -storage.value * 1.0 : 0.0, storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y ? -storage.value * 5.0 : 0.0);
+                    tab.scroll(storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X ? -storage.value * 1.0 : 0.0, storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y ? -storage.value * 5.0 : 0.0);
                     return true;
                 }
             } else if (screen != null) {
@@ -558,7 +558,7 @@ public class MidnightInput {
                     if (joystickCooldown == 0) {
                         switch (storage.axis) {
                             case GLFW_GAMEPAD_AXIS_LEFT_Y -> {
-                                this.changeFocus(screen, storage.value > 0 ? NavigationDirection.UP : NavigationDirection.DOWN);
+                                this.changeFocus(screen, storage.value > 0 ? ScreenDirection.UP : ScreenDirection.DOWN);
                                 joystickCooldown = 4;
                             }
                             case GLFW_GAMEPAD_AXIS_LEFT_X -> {
@@ -588,11 +588,11 @@ public class MidnightInput {
             if (y < -border) index = 1;
             else if (y > border) index = 6;
         }
-        if (client.currentScreen instanceof RingScreen && index > -1) RingPage.selected = index;
-        if (PlatformFunctions.isModLoaded("emotecraft") && EmotecraftCompat.isEmotecraftScreen(client.currentScreen)) EmotecraftCompat.handleEmoteSelector(index);
+        if (client.screen instanceof RingScreen && index > -1) RingPage.selected = index;
+        if (PlatformFunctions.isModLoaded("emotecraft") && EmotecraftCompat.isEmotecraftScreen(client.screen)) EmotecraftCompat.handleEmoteSelector(index);
     }
 
-    public boolean handleListWidgetScrolling(List<? extends Element> children, float value) {
+    public boolean handleListWidgetScrolling(List<? extends GuiEventListener> children, float value) {
         return children.stream().filter(element -> element instanceof SpruceEntryListWidget)
                 .map(element -> (SpruceEntryListWidget<?>) element)
                 .filter(AbstractSpruceWidget::isFocusedOrHovered)
@@ -600,18 +600,18 @@ public class MidnightInput {
                     element.mouseScrolled(0.0, 0.0, 0, -value);
                     return true;
                 }) ||
-                children.stream().filter(element -> element instanceof EntryListWidget)
-                    .map(element -> (EntryListWidget<?>) element)
-                    .filter(element -> element.getType().isFocused())
+                children.stream().filter(element -> element instanceof AbstractSelectionList)
+                    .map(element -> (AbstractSelectionList<?>) element)
+                    .filter(element -> element.narrationPriority().isTerminal())
                     .anyMatch(element -> {
                         element.mouseScrolled(0.0, 0.0, 0, -value / 30);
                         return true;
                     });
     }
 
-    public boolean handleAButton(@NotNull Screen screen, @NotNull Element focused) {
-        if (focused instanceof PressableWidget widget) {
-            widget.playDownSound(MinecraftClient.getInstance().getSoundManager());
+    public boolean handleAButton(@NotNull Screen screen, @NotNull GuiEventListener focused) {
+        if (focused instanceof AbstractButton widget) {
+            widget.playDownSound(Minecraft.getInstance().getSoundManager());
             widget.onPress(ENTER_KEY_INPUT);
             return true;
         } else if (focused instanceof AbstractSprucePressableButtonWidget widget) {
@@ -621,20 +621,20 @@ public class MidnightInput {
         } else if (focused instanceof SpruceLabelWidget labelWidget) {
             labelWidget.onPress();
             return true;
-        } else if (focused instanceof WorldListWidget list) {
-            list.getSelectedAsOptional().ifPresent(WorldListWidget.WorldEntry::play);
+        } else if (focused instanceof WorldSelectionList list) {
+            list.getSelectedOpt().ifPresent(WorldSelectionList.WorldListEntry::joinWorld);
             return true;
-        } else if (focused instanceof MultiplayerServerListWidget list) {
-            var entry = list.getSelectedOrNull();
-            if (entry instanceof MultiplayerServerListWidget.LanServerEntry || entry instanceof MultiplayerServerListWidget.ServerEntry) {
+        } else if (focused instanceof ServerSelectionList list) {
+            var entry = list.getSelected();
+            if (entry instanceof ServerSelectionList.NetworkServerEntry || entry instanceof ServerSelectionList.OnlineServerEntry) {
                 //((MultiplayerScreen) screen).select(entry);
-                entry.connect();
+                entry.join();
             }
         } else if (focused instanceof SpruceParentWidget) {
             var childFocused = ((SpruceParentWidget<?>) focused).getFocused();
             if (childFocused != null)
                 return this.handleAButton(screen, childFocused);
-        } else if (focused instanceof ParentElement widget) {
+        } else if (focused instanceof ContainerEventHandler widget) {
             var childFocused = widget.getFocused();
             if (childFocused != null)
                 return this.handleAButton(screen, childFocused);
@@ -653,7 +653,7 @@ public class MidnightInput {
      */
     private boolean handleLeftRight(@NotNull Screen screen, boolean right) {
         if (screen instanceof SpruceScreen spruceScreen) {
-            spruceScreen.onNavigation(new NavigationEvent(right ? NavigationDirection.RIGHT : NavigationDirection.LEFT, false, false));
+            spruceScreen.onNavigation(new NavigationEvent(right ? ScreenDirection.RIGHT : ScreenDirection.LEFT, false, false));
             this.actionGuiCooldown = 5;
             return false;
         }
@@ -664,20 +664,20 @@ public class MidnightInput {
         var focused = screen.getFocused();
         if (focused != null)
             if (this.handleRightLeftElement(focused, right))
-                return this.changeFocus(screen, right ? NavigationDirection.RIGHT : NavigationDirection.LEFT);
+                return this.changeFocus(screen, right ? ScreenDirection.RIGHT : ScreenDirection.LEFT);
         return true;
     }
 
-    private boolean handleRightLeftElement(@NotNull Element element, boolean right) {
+    private boolean handleRightLeftElement(@NotNull GuiEventListener element, boolean right) {
         switch (element) {
             case SpruceElement spruceElement -> {
                 if (spruceElement.requiresCursor())
                     return true;
-                return !spruceElement.onNavigation(new NavigationEvent(right ? NavigationDirection.RIGHT : NavigationDirection.LEFT, false, false));
+                return !spruceElement.onNavigation(new NavigationEvent(right ? ScreenDirection.RIGHT : ScreenDirection.LEFT, false, false));
             }
-            case SliderWidget slider -> {
+            case AbstractSliderButton slider -> {
                 if (slider.active) {
-                    slider.keyPressed(new KeyInput(right ? 262 : 263, 0, 0));
+                    slider.keyPressed(new KeyEvent(right ? 262 : 263, 0, 0));
                     this.actionGuiCooldown = 2; // Prevent to press too quickly the focused element, so we have to skip 5 ticks.
                     return true;
                 }
@@ -686,7 +686,7 @@ public class MidnightInput {
 //                //TODO ((EntryListWidgetAccessor) element).midnightcontrols$moveSelection(right ? EntryListWidget.MoveDirection.DOWN : EntryListWidget.MoveDirection.UP);
 //                return false;
 //            }
-            case ParentElement entryList -> {
+            case ContainerEventHandler entryList -> {
                 var focused = entryList.getFocused();
                 if (focused == null)
                     return true;
@@ -735,7 +735,7 @@ public class MidnightInput {
 
             double cursorDeltaX = 2 * xValue - this.prevX;
             double cursorDeltaY = 2 * yValue - this.prevY;
-            boolean slowdown = client.options.getPerspective().isFirstPerson() && Objects.requireNonNull(client.player).isUsingSpyglass();
+            boolean slowdown = client.options.getCameraType().isFirstPerson() && Objects.requireNonNull(client.player).isScoping();
             double x = cursorDeltaX * xStep * (slowdown ? xStep : 1);
             double y = cursorDeltaY * yStep * (slowdown ? yStep : 1);
 
@@ -764,7 +764,7 @@ public class MidnightInput {
         }
     }
 
-    private boolean changeFocus(@NotNull Screen screen, NavigationDirection direction) {
+    private boolean changeFocus(@NotNull Screen screen, ScreenDirection direction) {
         if (!isScreenInteractive(screen) && !screen.getClass().getCanonicalName().contains("me.jellysquid.mods.sodium.client.gui")) return false;
         try {
             if (screen instanceof SpruceScreen spruceScreen) {
@@ -793,13 +793,13 @@ public class MidnightInput {
      */
     public boolean tryGoBack(@NotNull Screen screen) {
         var set = ImmutableSet.of("gui.back", "gui.done", "gui.cancel", "gui.toTitle", "gui.toMenu");
-        if (screen instanceof KeybindsScreen) return false;
+        if (screen instanceof KeyBindsScreen) return false;
 
-        return screen.children().stream().filter(element -> element instanceof PressableWidget)
-                .map(element -> (PressableWidget) element)
-                .filter(element -> element.getMessage() != null && element.getMessage().getContent() != null)
+        return screen.children().stream().filter(element -> element instanceof AbstractButton)
+                .map(element -> (AbstractButton) element)
+                .filter(element -> element.getMessage() != null && element.getMessage().getContents() != null)
                 .anyMatch(element -> {
-                    if (element.getMessage().getContent() instanceof TranslatableTextContent translatableText) {
+                    if (element.getMessage().getContents() instanceof TranslatableContents translatableText) {
                         if (set.stream().anyMatch(key -> translatableText.getKey().equals(key))) {
                             element.onPress(ENTER_KEY_INPUT);
                             return true;
@@ -810,15 +810,15 @@ public class MidnightInput {
     }
 
     public static boolean isScreenInteractive(@NotNull Screen screen) {
-        return !(screen instanceof HandledScreen || MidnightControlsConfig.joystickAsMouse || MidnightControlsConfig.mouseScreens.stream().anyMatch(a -> screen.getClass().toString().contains(a))
+        return !(screen instanceof AbstractContainerScreen || MidnightControlsConfig.joystickAsMouse || MidnightControlsConfig.mouseScreens.stream().anyMatch(a -> screen.getClass().toString().contains(a))
                 || (screen instanceof SpruceScreen && ((SpruceScreen) screen).requiresCursor())
                 || MidnightControlsCompat.requireMouseOnScreen(screen));
     }
 
-    public void pressKeyboardKey(MinecraftClient client, int key) {
-        ((KeyboardAccessor) client.keyboard).midnightcontrols$onKey(client.getWindow().getHandle(), 1, new KeyInput(key, 0, 0));
+    public void pressKeyboardKey(Minecraft client, int key) {
+        ((KeyboardAccessor) client.keyboardHandler).midnightcontrols$onKey(client.getWindow().handle(), 1, new KeyEvent(key, 0, 0));
     }
     public void pressKeyboardKey(Screen screen, int key) {
-        screen.keyPressed(new KeyInput(key, 0, 0));
+        screen.keyPressed(new KeyEvent(key, 0, 0));
     }
 }

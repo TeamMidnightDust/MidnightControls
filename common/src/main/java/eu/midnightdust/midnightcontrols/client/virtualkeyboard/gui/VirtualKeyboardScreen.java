@@ -9,9 +9,8 @@ import dev.lambdaurora.spruceui.widget.text.SpruceTextAreaWidget;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayout;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutManager;
-import net.minecraft.text.Text;
-
 import java.util.List;
+import net.minecraft.network.chat.Component;
 
 public class VirtualKeyboardScreen extends SpruceScreen {
 
@@ -43,7 +42,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
     private SpruceContainerWidget keyboardContainer;
 
     public VirtualKeyboardScreen(String initialText, CloseCallback closeCallback, boolean newLineSupport) {
-        super(Text.translatable("midnightcontrols.virtual_keyboard.screen"));
+        super(Component.translatable("midnightcontrols.virtual_keyboard.screen"));
         this.buffer = new StringBuilder(initialText);
         this.closeCallback = closeCallback;
         this.layout = KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout);
@@ -57,30 +56,30 @@ public class VirtualKeyboardScreen extends SpruceScreen {
         super.init();
 
         this.bufferDisplayArea = createBufferDisplayArea();
-        this.addDrawableChild(this.bufferDisplayArea);
+        this.addRenderableWidget(this.bufferDisplayArea);
 
         rebuildKeyboard();
 
         int doneButtonY = this.keyboardContainer.getY() + this.keyboardContainer.getHeight() + VERTICAL_SPACING * 2;
-        this.addDrawableChild(
+        this.addRenderableWidget(
                 new SpruceButtonWidget(
                         Position.of(this, this.width / 2 - 50, doneButtonY),
                         100,
                         20,
                         SpruceTexts.GUI_DONE,
-                        btn -> this.close()
+                        btn -> this.onClose()
                 )
         );
     }
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 
     @Override
-    public void close() {
-        super.close();
+    public void onClose() {
+        super.onClose();
         if (this.closeCallback != null) {
             this.closeCallback.onClose(this.buffer.toString());
         }
@@ -88,7 +87,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
 
     private void rebuildKeyboard() {
         if (this.keyboardContainer != null) {
-            this.remove(this.keyboardContainer);
+            this.removeWidget(this.keyboardContainer);
         }
 
         var layoutKeys = getActiveKeyLayout();
@@ -99,7 +98,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
         addBottomRow(keyboardContainer);
 
         this.keyboardContainer = keyboardContainer;
-        this.addDrawableChild(this.keyboardContainer);
+        this.addRenderableWidget(this.keyboardContainer);
     }
 
     private SpruceContainerWidget createKeyboardContainer(List<List<String>> layoutKeys) {
@@ -119,13 +118,13 @@ public class VirtualKeyboardScreen extends SpruceScreen {
         int bufferX = this.width / 2 - 100;
         int bufferY = this.height / 4 - VERTICAL_SPACING * 5 - 5;
         int bufferWidth = 200;
-        int desiredHeight = (this.textRenderer.fontHeight + 2) * lineCount + 6;
+        int desiredHeight = (this.font.lineHeight + 2) * lineCount + 6;
 
         var bufferDisplay = new SpruceTextAreaWidget(
                 Position.of(bufferX, bufferY),
                 bufferWidth,
                 desiredHeight,
-                Text.literal("Buffer Display")
+                Component.literal("Buffer Display")
         );
         bufferDisplay.setText(this.buffer.toString());
         bufferDisplay.setEditable(false);
@@ -157,7 +156,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
                                 Position.of(currentX, currentY),
                                 STANDARD_KEY_WIDTH,
                                 KEY_HEIGHT,
-                                Text.literal(displayText),
+                                Component.literal(displayText),
                                 btn -> handleKeyPress(displayText)
                         )
                 );
@@ -194,7 +193,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
                         Position.of(backspaceX, CONTAINER_PADDING),
                         backspaceWidth,
                         KEY_HEIGHT,
-                        Text.literal("←"),
+                        Component.literal("←"),
                         btn -> handleKeyPress(BACKSPACE_SYMBOL)
                 )
         );
@@ -213,7 +212,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
                             Position.of(newlineX, newlineY),
                             newlineWidth,
                             KEY_HEIGHT,
-                            Text.literal("⏎"),
+                            Component.literal("⏎"),
                             btn -> handleKeyPress(NEWLINE_SYMBOL)
                     )
             );
@@ -234,7 +233,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
                         Position.of(spaceX, rowY),
                         spaceKeyWidth,
                         KEY_HEIGHT,
-                        Text.translatable("midnightcontrols.virtual_keyboard.keyboard.space"),
+                        Component.translatable("midnightcontrols.virtual_keyboard.keyboard.space"),
                         btn -> handleKeyPress(SPACE_SYMBOL)
                 )
         );
@@ -246,7 +245,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
                     Position.of(capsX, rowY),
                     SPECIAL_KEY_WIDTH,
                     KEY_HEIGHT,
-                    Text.literal(this.capsMode ? "caps" : "CAPS"),
+                    Component.literal(this.capsMode ? "caps" : "CAPS"),
                     btn -> toggleCapsMode());
 
             container.addChild(capsModeButton);
@@ -258,7 +257,7 @@ public class VirtualKeyboardScreen extends SpruceScreen {
                 Position.of(symbolsX, rowY),
                 SPECIAL_KEY_WIDTH,
                 KEY_HEIGHT,
-                Text.literal(this.symbolMode ? "ABC" : "123?!"),
+                Component.literal(this.symbolMode ? "ABC" : "123?!"),
                 btn -> toggleSymbolMode()
         );
         container.addChild(symbolModeButton);

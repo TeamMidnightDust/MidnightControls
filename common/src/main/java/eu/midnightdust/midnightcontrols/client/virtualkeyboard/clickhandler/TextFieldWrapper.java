@@ -1,8 +1,8 @@
 package eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler;
 
 import dev.lambdaurora.spruceui.widget.text.SpruceTextFieldWidget;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 
 public record TextFieldWrapper(Object textField) {
 
@@ -12,8 +12,8 @@ public record TextFieldWrapper(Object textField) {
         }
     }
 
-    Element asElement() {
-        return (Element) textField;
+    GuiEventListener asElement() {
+        return (GuiEventListener) textField;
     }
 
     String getText() {
@@ -21,8 +21,8 @@ public record TextFieldWrapper(Object textField) {
             case SpruceTextFieldWidget spruceTextField -> {
                 return spruceTextField.getText();
             }
-            case TextFieldWidget vanillaTextField -> {
-                return vanillaTextField.getText();
+            case EditBox vanillaTextField -> {
+                return vanillaTextField.getValue();
             }
             default -> {
                 return null;
@@ -35,8 +35,8 @@ public record TextFieldWrapper(Object textField) {
             case SpruceTextFieldWidget spruceTextField -> {
                 spruceTextField.setText(text);
             }
-            case TextFieldWidget vanillaTextField -> {
-                vanillaTextField.setText(text);
+            case EditBox vanillaTextField -> {
+                vanillaTextField.setValue(text);
             }
             default -> {
             }
@@ -48,7 +48,7 @@ public record TextFieldWrapper(Object textField) {
             case SpruceTextFieldWidget spruceTextField -> {
                 return spruceTextField.isMouseOver(mouseX, mouseY);
             }
-            case TextFieldWidget vanillaTextField -> {
+            case EditBox vanillaTextField -> {
                 return vanillaTextField.isMouseOver(mouseX, mouseY);
             }
             default -> {
@@ -62,7 +62,7 @@ public record TextFieldWrapper(Object textField) {
             case SpruceTextFieldWidget spruceTextField -> {
                 return spruceTextField.isFocused();
             }
-            case TextFieldWidget vanillaTextField -> {
+            case EditBox vanillaTextField -> {
                 return vanillaTextField.isFocused();
             }
             default -> {
@@ -72,6 +72,6 @@ public record TextFieldWrapper(Object textField) {
     }
 
     static boolean isValidTextField(Object textField) {
-        return textField instanceof TextFieldWidget || textField instanceof SpruceTextFieldWidget;
+        return textField instanceof EditBox || textField instanceof SpruceTextFieldWidget;
     }
 }

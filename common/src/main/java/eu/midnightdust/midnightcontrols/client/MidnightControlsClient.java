@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControls;
@@ -27,16 +28,9 @@ import eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction;
 import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.MouseClickInterceptor;
-import net.minecraft.client.gui.screen.Screen;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -45,6 +39,12 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
 /**
  * Represents the midnightcontrols client mod.
@@ -55,22 +55,22 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class MidnightControlsClient extends MidnightControls {
     public static boolean lateInitDone = false;
-    public static final KeyBinding.Category MIDNIGHTCONTROLS_CATEGORY = KeyBinding.Category.create(Identifier.of("midnightcontrols", "keybinds"));
-    public static final KeyBinding BINDING_LOOK_UP = InputManager.makeKeyBinding(id("look_up"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, MIDNIGHTCONTROLS_CATEGORY);
-    public static final KeyBinding BINDING_LOOK_RIGHT = InputManager.makeKeyBinding(id("look_right"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, MIDNIGHTCONTROLS_CATEGORY);
-    public static final KeyBinding BINDING_LOOK_DOWN = InputManager.makeKeyBinding(id("look_down"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, MIDNIGHTCONTROLS_CATEGORY);
-    public static final KeyBinding BINDING_LOOK_LEFT = InputManager.makeKeyBinding(id("look_left"),
-            InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, MIDNIGHTCONTROLS_CATEGORY);
-    public static final KeyBinding BINDING_RING = InputManager.makeKeyBinding(id("ring"),
-            InputUtil.Type.KEYSYM, InputUtil.UNKNOWN_KEY.getCode(), MIDNIGHTCONTROLS_CATEGORY);
+    public static final KeyMapping.Category MIDNIGHTCONTROLS_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("midnightcontrols", "keybinds"));
+    public static final KeyMapping BINDING_LOOK_UP = InputManager.makeKeyBinding(id("look_up"),
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, MIDNIGHTCONTROLS_CATEGORY);
+    public static final KeyMapping BINDING_LOOK_RIGHT = InputManager.makeKeyBinding(id("look_right"),
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, MIDNIGHTCONTROLS_CATEGORY);
+    public static final KeyMapping BINDING_LOOK_DOWN = InputManager.makeKeyBinding(id("look_down"),
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, MIDNIGHTCONTROLS_CATEGORY);
+    public static final KeyMapping BINDING_LOOK_LEFT = InputManager.makeKeyBinding(id("look_left"),
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, MIDNIGHTCONTROLS_CATEGORY);
+    public static final KeyMapping BINDING_RING = InputManager.makeKeyBinding(id("ring"),
+            InputConstants.Type.KEYSYM, InputConstants.UNKNOWN.getValue(), MIDNIGHTCONTROLS_CATEGORY);
     public static final Identifier CONTROLLER_BUTTONS = id("textures/gui/controller_buttons.png");
     public static final Identifier CONTROLLER_EXPANDED = id("textures/gui/controller_expanded.png");
     public static final Identifier CONTROLLER_AXIS = id("textures/gui/controller_axis.png");
     public static final File MAPPINGS_FILE = new File("config/gamecontrollercustommappings.txt");
-    public static MinecraftClient client = MinecraftClient.getInstance();
+    public static Minecraft client = Minecraft.getInstance();
     public static final MidnightInput input = new MidnightInput();
     public static final MidnightRing ring = new MidnightRing();
     public static final MidnightReacharound reacharound = new MidnightReacharound();
@@ -80,7 +80,7 @@ public class MidnightControlsClient extends MidnightControls {
     private static ControlsMode previousControlsMode;
 
     public static void initClient() {
-        client = MinecraftClient.getInstance();
+        client = Minecraft.getInstance();
         ring.registerAction("buttonbinding", ButtonBindingRingAction.FACTORY);
 
         int delay = 0; // delay for 0 sec.
@@ -90,7 +90,7 @@ public class MidnightControlsClient extends MidnightControls {
             public void run() {
                 try {
                     if (lateInitDone && client.isRunning()) {
-                        if (MidnightControlsConfig.controlsMode != ControlsMode.DEFAULT && (client.isWindowFocused() || MidnightControlsConfig.unfocusedInput)) {
+                        if (MidnightControlsConfig.controlsMode != ControlsMode.DEFAULT && (client.isWindowActive() || MidnightControlsConfig.unfocusedInput)) {
                             if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER) input.tickCameraStick();
                             input.updateCamera();
                         }
@@ -107,7 +107,7 @@ public class MidnightControlsClient extends MidnightControls {
     /**
      * This method is called when Minecraft is initializing.
      */
-    public static void onMcInit(@NotNull MinecraftClient client) {
+    public static void onMcInit(@NotNull Minecraft client) {
         ButtonBinding.init(client.options);
         MidnightControlsConfig.load();
         if (MidnightControlsConfig.configVersion < 2) {
@@ -124,10 +124,10 @@ public class MidnightControlsClient extends MidnightControls {
             GLFW.glfwSetJoystickCallback((jid, event) -> {
                 if (event == GLFW.GLFW_CONNECTED) {
                     var controller = Controller.byId(jid);
-                    client.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION, Text.translatable("midnightcontrols.controller.connected", jid),
-                            Text.literal(controller.getName())));
+                    client.getToastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION, Component.translatable("midnightcontrols.controller.connected", jid),
+                            Component.literal(controller.getName())));
                 } else if (event == GLFW.GLFW_DISCONNECTED) {
-                    client.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION, Text.translatable("midnightcontrols.controller.disconnected", jid),
+                    client.getToastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION, Component.translatable("midnightcontrols.controller.disconnected", jid),
                             null));
                 }
 
@@ -142,13 +142,13 @@ public class MidnightControlsClient extends MidnightControls {
      */
     public static void initKeybindings() {
         if (lateInitDone) return;
-        if (KeyBindingIDAccessor.getKEYS_BY_ID() == null || KeyBindingIDAccessor.getKEYS_BY_ID().isEmpty()) return;
-        if (PlatformFunctions.isModLoaded("voxelmap") && !KeyBindingIDAccessor.getKEYS_BY_ID().containsKey("key.minimap.toggleingamewaypoints")) return;
-        if (PlatformFunctions.isModLoaded("wynntils") && KeyBindingIDAccessor.getKEYS_BY_ID().entrySet().stream().noneMatch(b -> Objects.equals(b.getValue().getCategory(), "Wynntils"))) return;
-        for (int i = 0; i < KeyBindingIDAccessor.getKEYS_BY_ID().size(); ++i) {
-            KeyBinding keyBinding = KeyBindingIDAccessor.getKEYS_BY_ID().entrySet().stream().toList().get(i).getValue();
-            if (MidnightControlsConfig.excludedKeybindings.stream().noneMatch(excluded -> keyBinding.getId().startsWith(excluded))) {
-                if (!keyBinding.getId().contains(MidnightControlsConstants.NAMESPACE)) {
+        if (KeyBindingIDAccessor.getALL() == null || KeyBindingIDAccessor.getALL().isEmpty()) return;
+        if (PlatformFunctions.isModLoaded("voxelmap") && !KeyBindingIDAccessor.getALL().containsKey("key.minimap.toggleingamewaypoints")) return;
+        if (PlatformFunctions.isModLoaded("wynntils") && KeyBindingIDAccessor.getALL().entrySet().stream().noneMatch(b -> Objects.equals(b.getValue().getCategory(), "Wynntils"))) return;
+        for (int i = 0; i < KeyBindingIDAccessor.getALL().size(); ++i) {
+            KeyMapping keyBinding = KeyBindingIDAccessor.getALL().entrySet().stream().toList().get(i).getValue();
+            if (MidnightControlsConfig.excludedKeybindings.stream().noneMatch(excluded -> keyBinding.getName().startsWith(excluded))) {
+                if (!keyBinding.getName().contains(MidnightControlsConstants.NAMESPACE)) {
                     AtomicReference<ButtonCategory> category = new AtomicReference<>();
                     InputManager.streamCategories().forEach(buttonCategory -> {
                         if (buttonCategory.getIdentifier().equals(keyBinding.getCategory().id()))
@@ -158,9 +158,9 @@ public class MidnightControlsClient extends MidnightControls {
                         category.set(new ButtonCategory(keyBinding.getCategory().id()));
                         InputManager.registerCategory(category.get());
                     }
-                    ButtonBinding buttonBinding = new ButtonBinding.Builder(keyBinding.getId()).category(category.get()).linkKeybind(keyBinding).register();
+                    ButtonBinding buttonBinding = new ButtonBinding.Builder(keyBinding.getName()).category(category.get()).linkKeybind(keyBinding).register();
                     if (MidnightControlsConfig.debug) {
-                        MidnightControls.log(keyBinding.getId());
+                        MidnightControls.log(keyBinding.getName());
                         MidnightControls.log(String.valueOf(buttonBinding));
                     }
                 }
@@ -175,21 +175,21 @@ public class MidnightControlsClient extends MidnightControls {
      *
      * @param client the client instance
      */
-    public static void onTick(@NotNull MinecraftClient client) {
+    public static void onTick(@NotNull Minecraft client) {
         initKeybindings();
         input.tick();
         reacharound.tick();
-        if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && (client.isWindowFocused() || MidnightControlsConfig.unfocusedInput))
+        if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && (client.isWindowActive() || MidnightControlsConfig.unfocusedInput))
             input.tickController();
 
-        if (BINDING_RING.wasPressed()) {
+        if (BINDING_RING.consumeClick()) {
             ring.loadFromUnbound();
             client.setScreen(new RingScreen());
         }
-        if (client.world != null && MidnightControlsConfig.enableHints && !MidnightControlsConfig.autoSwitchMode && MidnightControlsConfig.controlsMode == ControlsMode.DEFAULT && MidnightControlsConfig.getController().isGamepad()) {
-            client.getToastManager().add(SystemToast.create(client, SystemToast.Type.PERIODIC_NOTIFICATION, Text.translatable("midnightcontrols.controller.tutorial.title"),
-                    Text.translatable("midnightcontrols.controller.tutorial.description", Text.translatable("options.title"), Text.translatable("controls.title"),
-                            Text.translatable("midnightcontrols.menu.title.controller"))));
+        if (client.level != null && MidnightControlsConfig.enableHints && !MidnightControlsConfig.autoSwitchMode && MidnightControlsConfig.controlsMode == ControlsMode.DEFAULT && MidnightControlsConfig.getController().isGamepad()) {
+            client.getToastManager().addToast(SystemToast.multiline(client, SystemToast.SystemToastId.PERIODIC_NOTIFICATION, Component.translatable("midnightcontrols.controller.tutorial.title"),
+                    Component.translatable("midnightcontrols.controller.tutorial.description", Component.translatable("options.title"), Component.translatable("controls.title"),
+                            Component.translatable("midnightcontrols.menu.title.controller"))));
             MidnightControlsConfig.enableHints = false;
             MidnightControlsConfig.save();
         }
@@ -201,14 +201,14 @@ public class MidnightControlsClient extends MidnightControls {
      * Called when opening a screen.
      */
     public static void onScreenOpen(Screen screen) {
-        client = MinecraftClient.getInstance();
+        client = Minecraft.getInstance();
         if (screen == null && MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN) {
             screen = new TouchscreenOverlay();
-            screen.init(client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
-            client.skipGameRender = false;
-            client.currentScreen = screen;
+            screen.init(client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());
+            client.noRender = false;
+            client.screen = screen;
         } else if (screen != null) {
-            MidnightControlsClient.input.onScreenOpen(client.getWindow().getWidth(), client.getWindow().getHeight());
+            MidnightControlsClient.input.onScreenOpen(client.getWindow().getScreenWidth(), client.getWindow().getScreenHeight());
         }
     }
 

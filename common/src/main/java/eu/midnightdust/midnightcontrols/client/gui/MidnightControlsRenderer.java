@@ -10,14 +10,14 @@
 package eu.midnightdust.midnightcontrols.client.gui;
 
 import eu.midnightdust.midnightcontrols.client.enums.ControllerType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.resources.language.I18n;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.resource.language.I18n;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -71,11 +71,11 @@ public class MidnightControlsRenderer {
         return width;
     }
 
-    public static ButtonSize drawButton(DrawContext context, int x, int y, @NotNull ButtonBinding button, @NotNull MinecraftClient client) {
+    public static ButtonSize drawButton(GuiGraphics context, int x, int y, @NotNull ButtonBinding button, @NotNull Minecraft client) {
         return drawButton(context, x, y, button.getButton(), client);
     }
 
-    public static ButtonSize drawButton(DrawContext context, int x, int y, int[] buttons, @NotNull MinecraftClient client) {
+    public static ButtonSize drawButton(GuiGraphics context, int x, int y, int[] buttons, @NotNull Minecraft client) {
         int height = 0;
         int length = 0;
         int currentX = x;
@@ -93,7 +93,7 @@ public class MidnightControlsRenderer {
         return new ButtonSize(length, height);
     }
 
-    public static int drawButton(DrawContext context, int x, int y, int button, @NotNull MinecraftClient client) {
+    public static int drawButton(GuiGraphics context, int x, int y, int button, @NotNull Minecraft client) {
         boolean second = false;
         if (button == -1)
             return 0;
@@ -156,7 +156,7 @@ public class MidnightControlsRenderer {
         int assetSize = axis || (button >= 15 && button <= 18) ? AXIS_SIZE : BUTTON_SIZE;
 
         //RenderSystem.setShaderColor(1.f, second ? 0.f : 1.f, 1.f, 1.f);
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, axis ? MidnightControlsClient.CONTROLLER_AXIS : button >= 15 && button <= 19 ? MidnightControlsClient.CONTROLLER_EXPANDED :MidnightControlsClient.CONTROLLER_BUTTONS
+        context.blit(RenderPipelines.GUI_TEXTURED, axis ? MidnightControlsClient.CONTROLLER_AXIS : button >= 15 && button <= 19 ? MidnightControlsClient.CONTROLLER_EXPANDED :MidnightControlsClient.CONTROLLER_BUTTONS
                 , x + (ICON_SIZE / 2 - assetSize / 2), y + (ICON_SIZE / 2 - assetSize / 2),
                 (float) buttonOffset, (float) (controllerType * assetSize),
                 assetSize, assetSize,
@@ -165,26 +165,26 @@ public class MidnightControlsRenderer {
         return ICON_SIZE;
     }
 
-    public static int drawButtonTip(DrawContext context, int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull MinecraftClient client) {
+    public static int drawButtonTip(GuiGraphics context, int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull Minecraft client) {
         return drawButtonTip(context, x, y, button.getButton(), button.getTranslationKey(), display, client);
     }
 
-    public static int drawButtonTip(DrawContext context, int x, int y, int[] button, @NotNull String action, boolean display, @NotNull MinecraftClient client) {
+    public static int drawButtonTip(GuiGraphics context, int x, int y, int[] button, @NotNull String action, boolean display, @NotNull Minecraft client) {
         if (display) {
             int buttonWidth = drawButton(context, x, y, button, client).length();
 
-            var translatedAction = I18n.translate(action);
-            int textY = (MidnightControlsRenderer.ICON_SIZE / 2 - client.textRenderer.fontHeight / 2) + 1;
+            var translatedAction = I18n.get(action);
+            int textY = (MidnightControlsRenderer.ICON_SIZE / 2 - client.font.lineHeight / 2) + 1;
 
-            context.drawTextWithShadow(client.textRenderer, translatedAction, (x + buttonWidth + 2), (y + textY), 0xFFFFFFFF);
-            return (x + buttonWidth + 2) + client.textRenderer.getWidth(translatedAction);
+            context.drawString(client.font, translatedAction, (x + buttonWidth + 2), (y + textY), 0xFFFFFFFF);
+            return (x + buttonWidth + 2) + client.font.width(translatedAction);
         }
 
         return -10;
     }
 
-    private static int getButtonTipWidth(@NotNull String action, @NotNull TextRenderer textRenderer) {
-        return 15 + 5 + textRenderer.getWidth(action);
+    private static int getButtonTipWidth(@NotNull String action, @NotNull Font textRenderer) {
+        return 15 + 5 + textRenderer.width(action);
     }
 
     public record ButtonSize(int length, int height) {

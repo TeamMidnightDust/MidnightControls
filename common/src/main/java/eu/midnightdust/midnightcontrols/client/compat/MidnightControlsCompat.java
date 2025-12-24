@@ -12,9 +12,6 @@ package eu.midnightdust.midnightcontrols.client.compat;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.hit.BlockHitResult;
 import org.aperlambda.lambdacommon.utils.LambdaReflection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,6 +19,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.phys.BlockHitResult;
 
 import static eu.midnightdust.midnightcontrols.MidnightControls.log;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
@@ -139,7 +139,7 @@ public class MidnightControlsCompat {
      * @param placeResult the last place block result
      * @return null if untouched, else a translation key
      */
-    public static String getAttackActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult) {
+    public static String getAttackActionAt(@NotNull Minecraft client, @Nullable BlockHitResult placeResult) {
         for (CompatHandler handler : HANDLERS) {
             String action = handler.getAttackActionAt(client, placeResult);
             if (action != null) {
@@ -156,7 +156,7 @@ public class MidnightControlsCompat {
      * @param placeResult the last place block result
      * @return null if untouched, else a translation key
      */
-    public static String getUseActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult) {
+    public static String getUseActionAt(@NotNull Minecraft client, @Nullable BlockHitResult placeResult) {
         for (CompatHandler handler : HANDLERS) {
             String action = handler.getUseActionAt(client, placeResult);
             if (action != null) {
@@ -173,7 +173,7 @@ public class MidnightControlsCompat {
      * @param screen the screen
      * @return true if the handle was fired and succeed, else false
      */
-    public static boolean handleMenuBack(@NotNull MinecraftClient client, @NotNull Screen screen) {
+    public static boolean handleMenuBack(@NotNull Minecraft client, @NotNull Screen screen) {
         for (CompatHandler handler : HANDLERS) {
             if (handler.handleMenuBack(client, screen))
                 return true;

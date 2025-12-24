@@ -13,20 +13,20 @@ import com.google.gson.Gson;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.util.KeyBindingAccessor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Supplier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 
 public class ButtonBindingRingAction extends RingAction {
-    public static final Factory FACTORY = new Factory();
+    public static final eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction.Factory FACTORY = new eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction.Factory();
     public final ButtonBinding binding;
 
     public ButtonBindingRingAction(@NotNull ButtonBinding binding) {
@@ -40,18 +40,18 @@ public class ButtonBindingRingAction extends RingAction {
 
     @Override
     public void onAction(@NotNull RingButtonMode mode) {
-        binding.handle(MinecraftClient.getInstance(), 1.0f, ButtonState.PRESS);
+        binding.handle(Minecraft.getInstance(), 1.0f, ButtonState.PRESS);
         if (binding.asKeyBinding().isPresent()) {
-            binding.asKeyBinding().get().setPressed(true);
+            binding.asKeyBinding().get().setDown(true);
             ((KeyBindingAccessor)binding.asKeyBinding().get()).midnightcontrols$press();
         }
     }
 
     @Override
-    public void drawIcon(@NotNull DrawContext context, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered) {
-        List<OrderedText> lines = textRenderer.wrapLines(Text.translatable(this.getName()), MidnightRing.ELEMENT_SIZE);
+    public void drawIcon(@NotNull GuiGraphics context, @NotNull Font textRenderer, int x, int y, boolean hovered) {
+        List<FormattedCharSequence> lines = textRenderer.split(Component.translatable(this.getName()), MidnightRing.ELEMENT_SIZE);
         for (int i = 0; i < lines.size(); ++i) {
-            context.drawCenteredTextWithShadow(textRenderer, lines.get(i), x + MidnightRing.ELEMENT_SIZE / 2, y + MidnightRing.ELEMENT_SIZE / 2 - textRenderer.fontHeight / 2 * (lines.size()-1) - textRenderer.fontHeight / 2 + textRenderer.fontHeight * i, 0xffffff);
+            context.drawCenteredString(textRenderer, lines.get(i), x + MidnightRing.ELEMENT_SIZE / 2, y + MidnightRing.ELEMENT_SIZE / 2 - textRenderer.lineHeight / 2 * (lines.size()-1) - textRenderer.lineHeight / 2 + textRenderer.lineHeight * i, 0xffffff);
         }
     }
 

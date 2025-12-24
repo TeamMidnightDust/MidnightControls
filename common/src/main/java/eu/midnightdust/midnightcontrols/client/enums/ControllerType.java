@@ -9,11 +9,11 @@
 
 package eu.midnightdust.midnightcontrols.client.enums;
 
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Optional;
+import net.minecraft.network.chat.Component;
 
 /**
  * Represents a controller type.
@@ -35,14 +35,14 @@ public enum ControllerType {
     NUMBERED(9);
 
     private final int id;
-    private final Text text;
+    private final Component text;
 
     ControllerType(int id) {
         this.id = id;
-        this.text = Text.translatable("midnightcontrols.controller_type." + this.getName());
+        this.text = Component.translatable("midnightcontrols.controller_type." + this.getName());
     }
 
-    ControllerType(int id, @NotNull Text text) {
+    ControllerType(int id, @NotNull Component text) {
         this.id = id;
         this.text = text;
     }
@@ -73,7 +73,7 @@ public enum ControllerType {
      *
      * @return the translated text of this controller type
      */
-    public @NotNull Text getTranslatedText() {
+    public @NotNull Component getTranslatedText() {
         return this.text;
     }
 

@@ -26,20 +26,19 @@ import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutManager;
-import net.minecraft.util.math.ColorHelper;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.gui.widget.ControllerControlsWidget;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
 
@@ -47,7 +46,7 @@ import org.lwjgl.glfw.GLFW;
  * Represents the midnightcontrols settings screen.
  */
 public class MidnightControlsSettingsScreen extends SpruceScreen {
-    private static final Text SDL2_GAMEPAD_TOOL = Text.literal("SDL2 Gamepad Tool").formatted(Formatting.GREEN);
+    private static final Component SDL2_GAMEPAD_TOOL = Component.literal("SDL2 Gamepad Tool").withStyle(ChatFormatting.GREEN);
     public static final String GAMEPAD_TOOL_URL = "https://generalarcade.com/gamepadtool/";
     private final Screen parent;
     // General options
@@ -95,11 +94,11 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                         var controller = MidnightControlsConfig.getController();
                         var controllerName = controller.getName();
                         if (!controller.isConnected())
-                            return option.getDisplayText(Text.literal(controllerName).formatted(Formatting.RED));
+                            return option.getDisplayText(Component.literal(controllerName).withStyle(ChatFormatting.RED));
                         else if (!controller.isGamepad())
-                            return option.getDisplayText(Text.literal(controllerName).formatted(Formatting.GOLD));
+                            return option.getDisplayText(Component.literal(controllerName).withStyle(ChatFormatting.GOLD));
                         else
-                            return option.getDisplayText(Text.literal(controllerName));
+                            return option.getDisplayText(Component.literal(controllerName));
                     }, TooltipData.EMPTY);
     private final SpruceOption secondControllerOption = new SpruceCyclingOption("midnightcontrols.menu.controller2",
             amount -> {
@@ -113,13 +112,13 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             option -> MidnightControlsConfig.getSecondController().map(controller -> {
                 var controllerName = controller.getName();
                 if (!controller.isConnected())
-                    return option.getDisplayText(Text.literal(controllerName).formatted(Formatting.RED));
+                    return option.getDisplayText(Component.literal(controllerName).withStyle(ChatFormatting.RED));
                 else if (!controller.isGamepad())
-                    return option.getDisplayText(Text.literal(controllerName).formatted(Formatting.GOLD));
+                    return option.getDisplayText(Component.literal(controllerName).withStyle(ChatFormatting.GOLD));
                 else
-                    return option.getDisplayText(Text.literal(controllerName));
-            }).orElse(option.getDisplayText(SpruceTexts.OPTIONS_OFF.copyContentOnly().formatted(Formatting.RED))),
-            TooltipData.builder().text(Text.translatable("midnightcontrols.menu.controller2.tooltip")).build());
+                    return option.getDisplayText(Component.literal(controllerName));
+            }).orElse(option.getDisplayText(SpruceTexts.OPTIONS_OFF.plainCopy().withStyle(ChatFormatting.RED))),
+            TooltipData.builder().text(Component.translatable("midnightcontrols.menu.controller2.tooltip")).build());
     private final SpruceOption unfocusedInputOption;
     private final SpruceOption invertsRightXAxis;
     private final SpruceOption invertsRightYAxis;
@@ -140,15 +139,15 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                         MidnightControlsConfig.keyboardLayout = KeyboardLayoutManager.getNext(KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout)).getId();
                     },
                     option -> {
-                        return option.getDisplayText(Text.translatable(KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout).getTranslationKey()));
+                        return option.getDisplayText(Component.translatable(KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout).getTranslationKey()));
                     }, TooltipData.EMPTY);
 
     private static SpruceOption maxAnalogValueOption(String key, int axis) {
         return new SpruceDoubleOption(key, .25f, 1.f, 0.05f,
                 () -> MidnightControlsConfig.getAxisMaxValue(axis),
                 newValue -> MidnightControlsConfig.setAxisMaxValue(axis, newValue),
-                option -> option.getDisplayText(Text.literal(String.format("%.2f", option.get()))),
-                TooltipData.builder().text(Text.translatable(key.concat(".tooltip"))).build()
+                option -> option.getDisplayText(Component.literal(String.format("%.2f", option.get()))),
+                TooltipData.builder().text(Component.translatable(key.concat(".tooltip"))).build()
         );
     }
     // Touch options
@@ -159,8 +158,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption touchTransparencyOption;
     private final SpruceOption touchModeOption;
 
-    private final MutableText controllerMappingsUrlText = Text.literal("(")
-            .append(Text.literal(GAMEPAD_TOOL_URL).formatted(Formatting.GOLD))
+    private final MutableComponent controllerMappingsUrlText = Component.literal("(")
+            .append(Component.literal(GAMEPAD_TOOL_URL).withStyle(ChatFormatting.GOLD))
             .append("),");
 
     public static int searchNextAvailableController(int newId, boolean allowNone) {
@@ -180,7 +179,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     }
 
     public MidnightControlsSettingsScreen(Screen parent, boolean hideControls) {
-        super(Text.translatable("midnightcontrols.title.settings"));
+        super(Component.translatable("midnightcontrols.title.settings"));
         MidnightControlsConfig.isEditing = true;
         this.parent = parent;
         // General options
@@ -190,46 +189,46 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                     MidnightControlsConfig.controlsMode = next;
                     MidnightControlsConfig.save();
 
-                    if (this.client != null && this.client.player != null) {
+                    if (this.minecraft != null && this.minecraft.player != null) {
                         NetworkUtil.sendPayloadC2S(new ControlsModePayload(next.getName()));
                     }
-                }, option -> option.getDisplayText(Text.translatable(MidnightControlsConfig.controlsMode.getTranslationKey())),
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.controls_mode.tooltip")).build());
+                }, option -> option.getDisplayText(Component.translatable(MidnightControlsConfig.controlsMode.getTranslationKey())),
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.controls_mode.tooltip")).build());
         this.autoSwitchModeOption = new SpruceToggleBooleanOption("midnightcontrols.menu.auto_switch_mode", () -> MidnightControlsConfig.autoSwitchMode,
-                value -> MidnightControlsConfig.autoSwitchMode = value, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.auto_switch_mode.tooltip")).build());
+                value -> MidnightControlsConfig.autoSwitchMode = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.auto_switch_mode.tooltip")).build());
         this.rotationSpeedOption = new SpruceDoubleOption("midnightcontrols.menu.rotation_speed", 0.0, 100.0, .5f,
                 () -> MidnightControlsConfig.rotationSpeed,
-                value -> MidnightControlsConfig.rotationSpeed = value, option -> option.getDisplayText(Text.literal(String.valueOf(option.get()))),
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.rotation_speed.tooltip")).build());
+                value -> MidnightControlsConfig.rotationSpeed = value, option -> option.getDisplayText(Component.literal(String.valueOf(option.get()))),
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.rotation_speed.tooltip")).build());
         this.yAxisRotationSpeedOption = new SpruceDoubleOption("midnightcontrols.menu.y_axis_rotation_speed", 0.0, 100.0, .5f,
                 () -> MidnightControlsConfig.yAxisRotationSpeed,
-                value -> MidnightControlsConfig.yAxisRotationSpeed = value, option -> option.getDisplayText(Text.literal(String.valueOf(option.get()))),
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.y_axis_rotation_speed.tooltip")).build());
+                value -> MidnightControlsConfig.yAxisRotationSpeed = value, option -> option.getDisplayText(Component.literal(String.valueOf(option.get()))),
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.y_axis_rotation_speed.tooltip")).build());
         this.mouseSpeedOption = new SpruceDoubleOption("midnightcontrols.menu.mouse_speed", 0.0, 150.0, .5f,
                 () -> MidnightControlsConfig.mouseSpeed,
-                value -> MidnightControlsConfig.mouseSpeed = value, option -> option.getDisplayText(Text.literal(String.valueOf(option.get()))),
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.mouse_speed.tooltip")).build());
+                value -> MidnightControlsConfig.mouseSpeed = value, option -> option.getDisplayText(Component.literal(String.valueOf(option.get()))),
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.mouse_speed.tooltip")).build());
         this.joystickAsMouseOption = new SpruceToggleBooleanOption("midnightcontrols.menu.joystick_as_mouse",
                 () -> MidnightControlsConfig.joystickAsMouse, value -> MidnightControlsConfig.joystickAsMouse = value,
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.joystick_as_mouse.tooltip")).build());
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.joystick_as_mouse.tooltip")).build());
         this.eyeTrackingAsMouseOption = new SpruceToggleBooleanOption("midnightcontrols.menu.eye_tracker_as_mouse",
                 () -> MidnightControlsConfig.eyeTrackerAsMouse, value -> MidnightControlsConfig.eyeTrackerAsMouse = value,
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.eye_tracker_as_mouse.tooltip")).build());
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.eye_tracker_as_mouse.tooltip")).build());
         this.eyeTrackingDeadzone = new SpruceDoubleInputOption("midnightcontrols.menu.eye_tracker_deadzone",
                 () -> MidnightControlsConfig.eyeTrackerDeadzone, value -> MidnightControlsConfig.eyeTrackerDeadzone = value,
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.eye_tracker_deadzone.tooltip")).build());
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.eye_tracker_deadzone.tooltip")).build());
         this.resetOption = SpruceSimpleActionOption.reset(btn -> {
             MidnightControlsConfig.reset();
-            var client = MinecraftClient.getInstance();
-            this.init(client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
+            var client = Minecraft.getInstance();
+            this.init(client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());
         });
         // Gameplay options
         this.analogMovementOption = new SpruceToggleBooleanOption("midnightcontrols.menu.analog_movement",
                 () -> MidnightControlsConfig.analogMovement, value -> MidnightControlsConfig.analogMovement = value,
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.analog_movement.tooltip")).build());
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.analog_movement.tooltip")).build());
         this.autoJumpOption = new SpruceToggleBooleanOption("options.autoJump",
-                () -> this.client.options.getAutoJump().getValue(),
-                newValue -> this.client.options.getAutoJump().setValue(newValue),
+                () -> this.minecraft.options.autoJump().get(),
+                newValue -> this.minecraft.options.autoJump().set(newValue),
                 TooltipData.EMPTY);
         this.controllerToggleSneakOption = new SpruceToggleBooleanOption("midnightcontrols.menu.controller_toggle_sneak",
                 () -> MidnightControlsConfig.controllerToggleSneak, value -> MidnightControlsConfig.controllerToggleSneak = value,
@@ -238,32 +237,32 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                 () -> MidnightControlsConfig.controllerToggleSprint, value -> MidnightControlsConfig.controllerToggleSprint = value,
                 TooltipData.EMPTY);
         this.fastBlockPlacingOption = new SpruceToggleBooleanOption("midnightcontrols.menu.fast_block_placing", () -> MidnightControlsConfig.fastBlockPlacing,
-                value -> MidnightControlsConfig.fastBlockPlacing = value, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.fast_block_placing.tooltip")).build());
+                value -> MidnightControlsConfig.fastBlockPlacing = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.fast_block_placing.tooltip")).build());
         this.frontBlockPlacingOption = new SpruceToggleBooleanOption("midnightcontrols.menu.reacharound.horizontal", () -> MidnightControlsConfig.horizontalReacharound,
-                value -> MidnightControlsConfig.horizontalReacharound = value, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.reacharound.horizontal.tooltip")).build());
+                value -> MidnightControlsConfig.horizontalReacharound = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.reacharound.horizontal.tooltip")).build());
         this.verticalReacharoundOption = new SpruceToggleBooleanOption("midnightcontrols.menu.reacharound.vertical", () -> MidnightControlsConfig.verticalReacharound,
-                value -> MidnightControlsConfig.verticalReacharound = value, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.reacharound.vertical.tooltip")).build());
+                value -> MidnightControlsConfig.verticalReacharound = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.reacharound.vertical.tooltip")).build());
         this.flyDriftingOption = new SpruceToggleBooleanOption("midnightcontrols.menu.fly_drifting", () -> MidnightControlsConfig.flyDrifting,
-                value -> MidnightControlsConfig.flyDrifting = value, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.fly_drifting.tooltip")).build());
+                value -> MidnightControlsConfig.flyDrifting = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.fly_drifting.tooltip")).build());
         this.flyVerticalDriftingOption = new SpruceToggleBooleanOption("midnightcontrols.menu.fly_drifting_vertical", () -> MidnightControlsConfig.verticalFlyDrifting,
-                value -> MidnightControlsConfig.verticalFlyDrifting = value, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.fly_drifting_vertical.tooltip")).build());
+                value -> MidnightControlsConfig.verticalFlyDrifting = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.fly_drifting_vertical.tooltip")).build());
         // Appearance options
         this.controllerTypeOption = new SpruceCyclingOption("midnightcontrols.menu.controller_type",
                 amount -> MidnightControlsConfig.controllerType = MidnightControlsConfig.controllerType.next(),
                 option -> option.getDisplayText(MidnightControlsConfig.controllerType.getTranslatedText()),
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.controller_type.tooltip")).build());
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.controller_type.tooltip")).build());
         this.virtualMouseSkinOption = new SpruceCyclingOption("midnightcontrols.menu.virtual_mouse.skin",
                 amount -> MidnightControlsConfig.virtualMouseSkin = MidnightControlsConfig.virtualMouseSkin.next(),
                 option -> option.getDisplayText(MidnightControlsConfig.virtualMouseSkin.getTranslatedText()),
                 TooltipData.EMPTY);
         this.hudEnableOption = new SpruceToggleBooleanOption("midnightcontrols.menu.hud_enable", () -> MidnightControlsConfig.hudEnable,
-                MidnightControlsClient::setHudEnabled, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.hud_enable.tooltip")).build());
+                MidnightControlsClient::setHudEnabled, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.hud_enable.tooltip")).build());
         this.hudSideOption = new SpruceCyclingOption("midnightcontrols.menu.hud_side",
                 amount -> MidnightControlsConfig.hudSide = MidnightControlsConfig.hudSide.next(),
                 option -> option.getDisplayText(MidnightControlsConfig.hudSide.getTranslatedText()),
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.hud_side.tooltip")).build());
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.hud_side.tooltip")).build());
         this.moveChatOption = new SpruceToggleBooleanOption("midnightcontrols.menu.move_chat", () -> MidnightControlsConfig.moveChat,
-                value -> MidnightControlsConfig.moveChat = value, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.move_chat.tooltip")).build());
+                value -> MidnightControlsConfig.moveChat = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.move_chat.tooltip")).build());
         // Controller options
         this.toggleControllerProfileOption = new SpruceToggleBooleanOption("midnightcontrols.menu.separate_controller_profile", () -> MidnightControlsConfig.controllerBindingProfiles.containsKey(MidnightControlsConfig.getController().getGuid()), value -> {
             if (value) {
@@ -278,52 +277,52 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         this.cameraModeOption = new SpruceCyclingOption("midnightcontrols.menu.camera_mode",
                 amount -> MidnightControlsConfig.cameraMode = MidnightControlsConfig.cameraMode.next(),
                 option -> option.getDisplayText(MidnightControlsConfig.cameraMode.getTranslatedText()),
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.camera_mode.tooltip")).build());
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.camera_mode.tooltip")).build());
         this.rightDeadZoneOption = new SpruceDoubleOption("midnightcontrols.menu.right_dead_zone", 0.05, 1.0, .05f,
                 () -> MidnightControlsConfig.rightDeadZone,
                 value -> MidnightControlsConfig.rightDeadZone = value, option -> {
             var value = String.valueOf(option.get());
-            return option.getDisplayText(Text.literal(value.substring(0, Math.min(value.length(), 5))));
-        }, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.right_dead_zone.tooltip")).build());
+            return option.getDisplayText(Component.literal(value.substring(0, Math.min(value.length(), 5))));
+        }, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.right_dead_zone.tooltip")).build());
         this.leftDeadZoneOption = new SpruceDoubleOption("midnightcontrols.menu.left_dead_zone", 0.05, 1.0, .05f,
                 () -> MidnightControlsConfig.leftDeadZone,
                 value -> MidnightControlsConfig.leftDeadZone = value, option -> {
             var value = String.valueOf(option.get());
-            return option.getDisplayText(Text.literal(value.substring(0, Math.min(value.length(), 5))));
-        }, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.left_dead_zone.tooltip")).build());
+            return option.getDisplayText(Component.literal(value.substring(0, Math.min(value.length(), 5))));
+        }, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.left_dead_zone.tooltip")).build());
         this.invertsRightXAxis = new SpruceToggleBooleanOption("midnightcontrols.menu.invert_right_x_axis", () -> MidnightControlsConfig.invertRightXAxis,
                 value -> MidnightControlsConfig.invertRightXAxis = value, TooltipData.EMPTY);
         this.invertsRightYAxis = new SpruceToggleBooleanOption("midnightcontrols.menu.invert_right_y_axis", () -> MidnightControlsConfig.invertRightYAxis,
                 value -> MidnightControlsConfig.invertRightYAxis = value, TooltipData.EMPTY);
         this.unfocusedInputOption = new SpruceToggleBooleanOption("midnightcontrols.menu.unfocused_input", () -> MidnightControlsConfig.unfocusedInput,
-                value -> MidnightControlsConfig.unfocusedInput = value, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.unfocused_input.tooltip")).build());
+                value -> MidnightControlsConfig.unfocusedInput = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.unfocused_input.tooltip")).build());
         this.virtualMouseOption = new SpruceToggleBooleanOption("midnightcontrols.menu.virtual_mouse", () -> MidnightControlsConfig.virtualMouse,
-                value -> MidnightControlsConfig.virtualMouse = value, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.virtual_mouse.tooltip")).build());
+                value -> MidnightControlsConfig.virtualMouse = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.virtual_mouse.tooltip")).build());
         this.virtualKeyboardOption = new SpruceToggleBooleanOption("midnightcontrols.menu.virtual_keyboard", () -> MidnightControlsConfig.virtualMouse,
-                value -> MidnightControlsConfig.virtualKeyboard = value, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.virtual_keyboard.tooltip")).build());
+                value -> MidnightControlsConfig.virtualKeyboard = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.virtual_keyboard.tooltip")).build());
         this.hideCursorOption = new SpruceToggleBooleanOption("midnightcontrols.menu.hide_cursor", () -> MidnightControlsConfig.hideNormalMouse,
-                value -> MidnightControlsConfig.hideNormalMouse = value, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.hide_cursor.tooltip")).build());
+                value -> MidnightControlsConfig.hideNormalMouse = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.hide_cursor.tooltip")).build());
         // Touch options
         this.touchModeOption = new SpruceCyclingOption("midnightcontrols.menu.touch_mode",
                 amount -> MidnightControlsConfig.touchMode = MidnightControlsConfig.touchMode.next(),
                 option -> option.getDisplayText(MidnightControlsConfig.touchMode.getTranslatedText()),
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.touch_mode.tooltip")).build());
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.touch_mode.tooltip")).build());
         this.touchWithControllerOption = new SpruceToggleBooleanOption("midnightcontrols.menu.touch_with_controller", () -> MidnightControlsConfig.touchInControllerMode,
-                value -> MidnightControlsConfig.touchInControllerMode = value, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.touch_with_controller.tooltip")).build());
+                value -> MidnightControlsConfig.touchInControllerMode = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.touch_with_controller.tooltip")).build());
         this.touchSpeedOption = new SpruceDoubleOption("midnightcontrols.menu.touch_speed", 0.0, 150.0, .5f,
                 () -> MidnightControlsConfig.touchSpeed,
-                value -> MidnightControlsConfig.touchSpeed = value, option -> option.getDisplayText(Text.literal(String.valueOf(option.get()))),
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.touch_speed.tooltip")).build());
+                value -> MidnightControlsConfig.touchSpeed = value, option -> option.getDisplayText(Component.literal(String.valueOf(option.get()))),
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.touch_speed.tooltip")).build());
         this.touchBreakDelayOption = new SpruceDoubleOption("midnightcontrols.menu.touch_break_delay", 50, 500, 1f,
                 () -> (double) MidnightControlsConfig.touchBreakDelay,
-                value -> MidnightControlsConfig.touchBreakDelay = value.intValue(), option -> option.getDisplayText(Text.literal(String.valueOf(option.get()))),
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.touch_break_delay.tooltip")).build());
+                value -> MidnightControlsConfig.touchBreakDelay = value.intValue(), option -> option.getDisplayText(Component.literal(String.valueOf(option.get()))),
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.touch_break_delay.tooltip")).build());
         this.touchTransparencyOption = new SpruceDoubleOption("midnightcontrols.menu.touch_transparency", 0, 100, 1f,
                 () -> (double) MidnightControlsConfig.touchTransparency,
-                value -> MidnightControlsConfig.touchTransparency = value.intValue(), option -> option.getDisplayText(Text.literal(String.valueOf(option.get()))),
-                TooltipData.builder().text(Text.translatable("midnightcontrols.menu.touch_break_delay.tooltip")).build());
+                value -> MidnightControlsConfig.touchTransparency = value.intValue(), option -> option.getDisplayText(Component.literal(String.valueOf(option.get()))),
+                TooltipData.builder().text(Component.translatable("midnightcontrols.menu.touch_break_delay.tooltip")).build());
         this.invertTouchOption = new SpruceToggleBooleanOption("midnightcontrols.menu.invert_touch", () -> MidnightControlsConfig.invertTouch,
-                value -> MidnightControlsConfig.invertTouch = value, TooltipData.builder().text(Text.translatable("midnightcontrols.menu.invert_touch.tooltip")).build());
+                value -> MidnightControlsConfig.invertTouch = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.invert_touch.tooltip")).build());
     }
 
     @Override
@@ -334,14 +333,14 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     }
 
     @Override
-    public void close() {
+    public void onClose() {
         MidnightControlsConfig.isEditing = false;
         MidnightControlsConfig.save();
-        super.close();
+        super.onClose();
     }
 
     private int getTextHeight() {
-        return (5 + this.textRenderer.fontHeight) * 3 + 5;
+        return (5 + this.font.lineHeight) * 3 + 5;
     }
 
     @Override
@@ -350,9 +349,9 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
 
         this.buildTabs();
 
-        this.addDrawableChild(this.resetOption.createWidget(Position.of(this.width / 2 - 155, this.height - 29), 150));
-        this.addDrawableChild(ButtonWidget.builder(SpruceTexts.GUI_DONE, btn -> this.client.setScreen(this.parent))
-                .dimensions(this.width / 2 - 155 + 160, this.height - 29, 150, 20).build());
+        this.addRenderableWidget(this.resetOption.createWidget(Position.of(this.width / 2 - 155, this.height - 29), 150));
+        this.addRenderableWidget(Button.builder(SpruceTexts.GUI_DONE, btn -> this.minecraft.setScreen(this.parent))
+                .bounds(this.width / 2 - 155 + 160, this.height - 29, 150, 20).build());
     }
 
     public void buildTabs() {
@@ -360,26 +359,26 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                 null,
                 Math.max(116, this.width / 8), 0);
         tabs.getList().setBackground(new MidnightControlsBackground());
-        this.addDrawableChild(tabs);
+        this.addRenderableWidget(tabs);
 
-        tabs.addSeparatorEntry(Text.translatable("midnightcontrols.menu.separator.general"));
-        tabs.addTabEntry(Text.translatable("midnightcontrols.menu.title.general"), null,
+        tabs.addSeparatorEntry(Component.translatable("midnightcontrols.menu.separator.general"));
+        tabs.addTabEntry(Component.translatable("midnightcontrols.menu.title.general"), null,
                 this::buildGeneralTab);
-        tabs.addTabEntry(Text.translatable("midnightcontrols.menu.title.gameplay"), null,
+        tabs.addTabEntry(Component.translatable("midnightcontrols.menu.title.gameplay"), null,
                 this::buildGameplayTab);
-        tabs.addTabEntry(Text.translatable("midnightcontrols.menu.title.visual"), null,
+        tabs.addTabEntry(Component.translatable("midnightcontrols.menu.title.visual"), null,
                 this::buildVisualTab);
 
-        tabs.addSeparatorEntry(Text.translatable("options.controls"));
-        tabs.addTabEntry(Text.translatable("midnightcontrols.menu.title.controller_controls"), null,
+        tabs.addSeparatorEntry(Component.translatable("options.controls"));
+        tabs.addTabEntry(Component.translatable("midnightcontrols.menu.title.controller_controls"), null,
                 this::buildControllerControlsTab);
 
-        tabs.addSeparatorEntry(Text.translatable("midnightcontrols.menu.separator.controller"));
-        tabs.addTabEntry(Text.translatable("midnightcontrols.menu.title.controller"), null,
+        tabs.addSeparatorEntry(Component.translatable("midnightcontrols.menu.separator.controller"));
+        tabs.addTabEntry(Component.translatable("midnightcontrols.menu.title.controller"), null,
                 this::buildControllerTab);
-        tabs.addTabEntry(Text.translatable("midnightcontrols.menu.title.touch"), null,
+        tabs.addTabEntry(Component.translatable("midnightcontrols.menu.title.touch"), null,
                 this::buildTouchTab);
-        tabs.addTabEntry(Text.translatable("midnightcontrols.menu.title.mappings.string"), null,
+        tabs.addTabEntry(Component.translatable("midnightcontrols.menu.title.mappings.string"), null,
                 this::buildMappingsStringEditorTab);
     }
 
@@ -435,17 +434,17 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         var root = new SpruceContainerWidget(Position.origin(), width, height);
 
         var aboutMappings1 = new SpruceLabelWidget(Position.of(0, 2),
-                Text.translatable("midnightcontrols.controller.mappings.1", SDL2_GAMEPAD_TOOL),
+                Component.translatable("midnightcontrols.controller.mappings.1", SDL2_GAMEPAD_TOOL),
                 width);
 
         var gamepadToolUrlLabel = new SpruceLabelWidget(Position.of(0, aboutMappings1.getHeight() + 4),
                 this.controllerMappingsUrlText, width,
-                label -> Util.getOperatingSystem().open(GAMEPAD_TOOL_URL));
-        gamepadToolUrlLabel.setTooltip(Text.translatable("chat.link.open"));
+                label -> Util.getPlatform().openUri(GAMEPAD_TOOL_URL));
+        gamepadToolUrlLabel.setTooltip(Component.translatable("chat.link.open"));
 
         var aboutMappings3 = new SpruceLabelWidget(Position.of(0,
                 aboutMappings1.getHeight() + gamepadToolUrlLabel.getHeight() + 6),
-                Text.translatable("midnightcontrols.controller.mappings.3", Formatting.GREEN.toString(), Formatting.RESET.toString()),
+                Component.translatable("midnightcontrols.controller.mappings.3", ChatFormatting.GREEN.toString(), ChatFormatting.RESET.toString()),
                 width);
 
         int listHeight = height - 8 - aboutMappings1.getHeight() - aboutMappings3.getHeight() - gamepadToolUrlLabel.getHeight();
@@ -494,7 +493,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     @Override
     public void render(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.vanilla().drawCenteredTextWithShadow(this.textRenderer, I18n.translate("midnightcontrols.menu.title"), this.width / 2, 8, 0xFFFFFFFF);
+        context.vanilla().drawCenteredString(this.font, I18n.get("midnightcontrols.menu.title"), this.width / 2, 8, 0xFFFFFFFF);
     }
 
     public static class MidnightControlsBackground implements Background {
@@ -505,7 +504,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         }
         @Override
         public void render(SpruceGuiGraphics context, SpruceWidget widget, int vOffset, int mouseX, int mouseY, float delta) {
-            context.fill(widget.getX(), widget.getY(), widget.getX() + widget.getWidth(), widget.getY() + widget.getHeight(), ColorHelper.getArgb(transparency, 0, 0, 0));
+            context.fill(widget.getX(), widget.getY(), widget.getX() + widget.getWidth(), widget.getY() + widget.getHeight(), ARGB.color(transparency, 0, 0, 0));
         }
     }
 }

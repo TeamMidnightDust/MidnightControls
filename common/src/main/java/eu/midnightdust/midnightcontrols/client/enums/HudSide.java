@@ -9,12 +9,12 @@
 
 package eu.midnightdust.midnightcontrols.client.enums;
 
-import net.minecraft.text.Text;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Optional;
+import net.minecraft.network.chat.Component;
 
 /**
  * Represents the hud side which is the side where the movements buttons are.
@@ -27,10 +27,10 @@ public enum HudSide {
     LEFT,
     RIGHT;
 
-    private final Text text;
+    private final Component text;
 
     HudSide() {
-        this.text = Text.translatable(this.getTranslationKey());
+        this.text = Component.translatable(this.getTranslationKey());
     }
 
     /**
@@ -59,7 +59,7 @@ public enum HudSide {
      *
      * @return the translated text of this hud side
      */
-    public @NotNull Text getTranslatedText() {
+    public @NotNull Component getTranslatedText() {
         return this.text;
     }
 

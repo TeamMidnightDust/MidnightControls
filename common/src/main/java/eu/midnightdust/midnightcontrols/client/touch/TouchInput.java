@@ -2,61 +2,60 @@ package eu.midnightdust.midnightcontrols.client.touch;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.input.MouseInput;
-import net.minecraft.client.particle.BlockDustParticle;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsConfig.doMixedInput;
 
 public class TouchInput {
-    private static final MinecraftClient client = MinecraftClient.getInstance();
+    private static final Minecraft client = Minecraft.getInstance();
     public static long clickStartTime;
     public static HitResult firstHitResult = null;
     public static boolean isDragging = false;
 
     public static void tick() {
-        if ((client.currentScreen == null && doMixedInput()) || client.currentScreen instanceof TouchscreenOverlay) {
-            double scaleFactor = client.getWindow().getScaleFactor();
+        if ((client.screen == null && doMixedInput()) || client.screen instanceof TouchscreenOverlay) {
+            double scaleFactor = client.getWindow().getGuiScale();
             if (clickStartTime > 0 && System.currentTimeMillis() - clickStartTime >= MidnightControlsConfig.touchBreakDelay) {
-                mouseHeldDown(client.mouse.getX() / scaleFactor, client.mouse.getY() / scaleFactor);
+                mouseHeldDown(client.mouseHandler.xpos() / scaleFactor, client.mouseHandler.ypos() / scaleFactor);
             }
         }
     }
     public static void mouseHeldDown(double mouseX, double mouseY) {
         assert client != null;
         assert client.player != null;
-        assert client.interactionManager != null;
+        assert client.gameMode != null;
 
-        if (client.player.getMainHandStack() != null && TouchUtils.hasInWorldUseAction(client.player.getMainHandStack())) {
-            client.interactionManager.interactItem(client.player, client.player.getActiveHand());
+        if (client.player.getMainHandItem() != null && TouchUtils.hasInWorldUseAction(client.player.getMainHandItem())) {
+            client.gameMode.useItem(client.player, client.player.getUsedItemHand());
             return;
         }
         HitResult result = TouchUtils.getTargetedObject(mouseX, mouseY);
         if (result == null || firstHitResult == null) {
-            client.interactionManager.cancelBlockBreaking();
+            client.gameMode.stopDestroyBlock();
             return;
         }
 
         if (result instanceof BlockHitResult blockHit && firstHitResult instanceof BlockHitResult firstBlock && blockHit.getBlockPos().equals(firstBlock.getBlockPos())) {
             if (MidnightControlsConfig.debug) System.out.println(blockHit.getBlockPos().toString());
-            if (client.interactionManager.updateBlockBreakingProgress(blockHit.getBlockPos(), blockHit.getSide())) {
+            if (client.gameMode.continueDestroyBlock(blockHit.getBlockPos(), blockHit.getDirection())) {
                 //client.particleManager.addBlockBreakingParticles(blockHit.getBlockPos(), blockHit.getSide()); // TODO Re-implement block breaking particles!!!
-                client.player.swingHand(Hand.MAIN_HAND);
-            } else client.interactionManager.cancelBlockBreaking();
+                client.player.swing(InteractionHand.MAIN_HAND);
+            } else client.gameMode.stopDestroyBlock();
             firstHitResult = TouchUtils.getTargetedObject(mouseX, mouseY);
         }
-        else if (result instanceof EntityHitResult entityHit && firstHitResult instanceof EntityHitResult firstEntity && entityHit.getEntity().getUuid().compareTo(firstEntity.getEntity().getUuid()) == 0) {
-            if (client.interactionManager.interactEntity(client.player, entityHit.getEntity(), client.player.getActiveHand()) == ActionResult.SUCCESS) {
-                client.player.swingHand(Hand.MAIN_HAND);
+        else if (result instanceof EntityHitResult entityHit && firstHitResult instanceof EntityHitResult firstEntity && entityHit.getEntity().getUUID().compareTo(firstEntity.getEntity().getUUID()) == 0) {
+            if (client.gameMode.interact(client.player, entityHit.getEntity(), client.player.getUsedItemHand()) == InteractionResult.SUCCESS) {
+                client.player.swing(InteractionHand.MAIN_HAND);
             }
             firstHitResult = TouchUtils.getTargetedObject(mouseX, mouseY);
         }
@@ -64,15 +63,15 @@ public class TouchInput {
     public static boolean mouseReleased(double mouseX, double mouseY, int button) {
         isDragging = false;
         firstHitResult = null;
-        if (client.interactionManager != null) client.interactionManager.cancelBlockBreaking();
-        if ((client.currentScreen == null || !client.currentScreen.mouseReleased(new Click(mouseX, mouseY, new MouseInput(button, 0)))) && System.currentTimeMillis() - clickStartTime < MidnightControlsConfig.touchBreakDelay) {
+        if (client.gameMode != null) client.gameMode.stopDestroyBlock();
+        if ((client.screen == null || !client.screen.mouseReleased(new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0)))) && System.currentTimeMillis() - clickStartTime < MidnightControlsConfig.touchBreakDelay) {
             assert client.player != null;
-            assert client.world != null;
-            assert client.interactionManager != null;
+            assert client.level != null;
+            assert client.gameMode != null;
             clickStartTime = -1;
 
-            if (client.player.getMainHandStack() != null && TouchUtils.hasInWorldUseAction(client.player.getMainHandStack())) {
-                client.interactionManager.stopUsingItem(client.player);
+            if (client.player.getMainHandItem() != null && TouchUtils.hasInWorldUseAction(client.player.getMainHandItem())) {
+                client.gameMode.releaseUsingItem(client.player);
                 return true;
             }
             HitResult result = TouchUtils.getTargetedObject(mouseX, mouseY);
@@ -80,18 +79,18 @@ public class TouchInput {
 
 
             if (result instanceof BlockHitResult blockHit) {
-                BlockPos blockPos = blockHit.getBlockPos().offset(blockHit.getSide());
-                BlockState state = client.world.getBlockState(blockPos);
+                BlockPos blockPos = blockHit.getBlockPos().relative(blockHit.getDirection());
+                BlockState state = client.level.getBlockState(blockPos);
 
-                if (client.world.isAir(blockPos) || state.isReplaceable()) {
-                    ItemStack stackInHand = client.player.getMainHandStack();
+                if (client.level.isEmptyBlock(blockPos) || state.canBeReplaced()) {
+                    ItemStack stackInHand = client.player.getMainHandItem();
                     int previousStackCount = stackInHand.getCount();
-                    var interaction = client.interactionManager.interactBlock(client.player, client.player.getActiveHand(), blockHit);
-                    if (interaction.isAccepted()) {
+                    var interaction = client.gameMode.useItemOn(client.player, client.player.getUsedItemHand(), blockHit);
+                    if (interaction.consumesAction()) {
                         //if (interaction.shouldSwingHand()) {
-                            client.player.swingHand(client.player.preferredHand);
-                            if (!stackInHand.isEmpty() && (stackInHand.getCount() != previousStackCount || client.player.isInCreativeMode())) {
-                                client.gameRenderer.firstPersonRenderer.resetEquipProgress(client.player.preferredHand);
+                            client.player.swing(client.player.swingingArm);
+                            if (!stackInHand.isEmpty() && (stackInHand.getCount() != previousStackCount || client.player.hasInfiniteMaterials())) {
+                                client.gameRenderer.itemInHandRenderer.itemUsed(client.player.swingingArm);
                             }
                         //}
                         return true;
@@ -99,8 +98,8 @@ public class TouchInput {
                 }
             }
             if (result instanceof EntityHitResult entityHit) {
-                client.interactionManager.attackEntity(client.player, entityHit.getEntity());
-                client.player.swingHand(Hand.MAIN_HAND);
+                client.gameMode.attack(client.player, entityHit.getEntity());
+                client.player.swing(InteractionHand.MAIN_HAND);
                 return true;
             }
         }

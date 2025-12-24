@@ -3,9 +3,9 @@ package eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler;
 import eu.midnightdust.midnightcontrols.client.mixin.BookEditScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.mixin.BookSigningScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.gui.VirtualKeyboardScreen;
-import net.minecraft.client.gui.screen.ingame.BookEditScreen;
-import net.minecraft.client.gui.screen.ingame.BookSigningScreen;
-import net.minecraft.client.gui.widget.EditBoxWidget;
+import net.minecraft.client.gui.components.MultiLineEditBox;
+import net.minecraft.client.gui.screens.inventory.BookEditScreen;
+import net.minecraft.client.gui.screens.inventory.BookSignScreen;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 
@@ -13,32 +13,32 @@ public class BookEditScreenClickHandler extends AbstractScreenClickHandler<BookE
     @Override
     public void handle(BookEditScreen screen, double mouseX, double mouseY) {
         // don't open the keyboard if a UI element was clicked
-        if(screen.hoveredElement(mouseX, mouseY).isPresent() && !(screen.hoveredElement(mouseX, mouseY).get() instanceof EditBoxWidget)) {
+        if(screen.getChildAt(mouseX, mouseY).isPresent() && !(screen.getChildAt(mouseX, mouseY).get() instanceof MultiLineEditBox)) {
             return;
         }
 
         var accessor = (BookEditScreenAccessor) screen;
 
-        VirtualKeyboardScreen virtualKeyboardScreen = new VirtualKeyboardScreen(accessor.midnightcontrols$getEditBox().getText(), (text) -> {
+        VirtualKeyboardScreen virtualKeyboardScreen = new VirtualKeyboardScreen(accessor.midnightcontrols$getEditBox().getValue(), (text) -> {
             client.setScreen(screen);
-            accessor.midnightcontrols$getEditBox().setText(text);
+            accessor.midnightcontrols$getEditBox().setValue(text);
         }, true);
 
         client.setScreen(virtualKeyboardScreen);
     }
-    public static class Signing extends AbstractScreenClickHandler<BookSigningScreen> {
+    public static class Signing extends AbstractScreenClickHandler<BookSignScreen> {
         @Override
-        public void handle(BookSigningScreen screen, double mouseX, double mouseY) {
+        public void handle(BookSignScreen screen, double mouseX, double mouseY) {
             // don't open the keyboard if a UI element was clicked
-            if(screen.hoveredElement(mouseX, mouseY).isPresent()) {
+            if(screen.getChildAt(mouseX, mouseY).isPresent()) {
                 return;
             }
 
             var accessor = (BookSigningScreenAccessor) screen;
 
-            VirtualKeyboardScreen virtualKeyboardScreen = new VirtualKeyboardScreen(accessor.midnightcontrols$getBookTitleTextField().getText(), (text) -> {
+            VirtualKeyboardScreen virtualKeyboardScreen = new VirtualKeyboardScreen(accessor.midnightcontrols$getBookTitleTextField().getValue(), (text) -> {
                 client.setScreen(screen);
-                accessor.midnightcontrols$getBookTitleTextField().setText(text);
+                accessor.midnightcontrols$getBookTitleTextField().setValue(text);
             }, false);
 
             client.setScreen(virtualKeyboardScreen);

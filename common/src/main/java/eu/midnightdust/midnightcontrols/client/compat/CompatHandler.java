@@ -11,11 +11,11 @@ package eu.midnightdust.midnightcontrols.client.compat;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +47,7 @@ public interface CompatHandler {
      *
      * @param client the Minecraft client instance
      */
-    default void handleCamera(@NotNull MinecraftClient client, double targetYaw, double targetPitch) {};
+    default void handleCamera(@NotNull Minecraft client, double targetYaw, double targetPitch) {};
 
     /**
      * Handles movement for players as well as vehicles
@@ -55,7 +55,7 @@ public interface CompatHandler {
      * @param storage the storage containing info about the current axis
      * @param adjustedValue the value of the axis, adjusted for max values and non-analogue movement, recommended for player movement
      */
-    default void handleMovement(@NotNull MinecraftClient client, AxisStorage storage, float adjustedValue) {}
+    default void handleMovement(@NotNull Minecraft client, AxisStorage storage, float adjustedValue) {}
 
     /**
      * Handles custom tab behavior
@@ -105,7 +105,7 @@ public interface CompatHandler {
      * @param slot the slot to check
      * @return true if the slot is a creative slot, else false
      */
-    default boolean isCreativeSlot(@NotNull HandledScreen screen, @NotNull Slot slot) {
+    default boolean isCreativeSlot(@NotNull AbstractContainerScreen screen, @NotNull Slot slot) {
         return false;
     }
 
@@ -116,7 +116,7 @@ public interface CompatHandler {
      * @param placeResult the last place block result
      * @return null if untouched, else a translation key
      */
-    default String getAttackActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult) {
+    default String getAttackActionAt(@NotNull Minecraft client, @Nullable BlockHitResult placeResult) {
         return null;
     }
 
@@ -127,7 +127,7 @@ public interface CompatHandler {
      * @param placeResult the last place block result
      * @return null if untouched, else a translation key
      */
-    default String getUseActionAt(@NotNull MinecraftClient client, @Nullable BlockHitResult placeResult) {
+    default String getUseActionAt(@NotNull Minecraft client, @Nullable BlockHitResult placeResult) {
         return null;
     }
 
@@ -138,7 +138,7 @@ public interface CompatHandler {
      * @param screen the screen
      * @return true if the handle was fired and succeed, else false
      */
-    default boolean handleMenuBack(@NotNull MinecraftClient client, @NotNull Screen screen) {
+    default boolean handleMenuBack(@NotNull Minecraft client, @NotNull Screen screen) {
         return false;
     }
 

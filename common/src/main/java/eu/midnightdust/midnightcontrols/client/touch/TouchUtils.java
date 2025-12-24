@@ -3,17 +3,17 @@ package eu.midnightdust.midnightcontrols.client.touch;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.enums.TouchMode;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.consume.UseAction;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
@@ -21,35 +21,35 @@ import org.lwjgl.opengl.GL11;
 import static eu.midnightdust.midnightcontrols.client.MidnightReacharound.getPlayerRange;
 
 public class TouchUtils {
-    private static final MinecraftClient client = MinecraftClient.getInstance();
+    private static final Minecraft client = Minecraft.getInstance();
     public static final Matrix4f lastWorldSpaceMatrix = new Matrix4f();
     public static final Matrix4f lastProjMat = new Matrix4f();
     public static final Matrix4f lastModMat = new Matrix4f();
 
     public static HitResult getTargetedObject(double mouseX, double mouseY) {
-        if (client.player == null || client.world == null || MidnightControlsConfig.touchMode == TouchMode.CROSSHAIR || PlatformFunctions.isModLoaded("vulkanmod")) {
-            return client.crosshairTarget;
+        if (client.player == null || client.level == null || MidnightControlsConfig.touchMode == TouchMode.CROSSHAIR || PlatformFunctions.isModLoaded("vulkanmod")) {
+            return client.hitResult;
         }
-        Vec3d near = screenSpaceToWorldSpace(mouseX, mouseY, 0);
-        Vec3d far = screenSpaceToWorldSpace(mouseX, mouseY, 1);
+        Vec3 near = screenSpaceToWorldSpace(mouseX, mouseY, 0);
+        Vec3 far = screenSpaceToWorldSpace(mouseX, mouseY, 1);
 
         float playerRange = getPlayerRange(client);
-        EntityHitResult entityCast = ProjectileUtil.raycast(client.player, near, far, Box.from(client.player.getEntityPos()).expand(playerRange), entity -> (!entity.isSpectator() && entity.isAttackable()), playerRange * playerRange);
+        EntityHitResult entityCast = ProjectileUtil.getEntityHitResult(client.player, near, far, AABB.unitCubeFromLowerCorner(client.player.position()).inflate(playerRange), entity -> (!entity.isSpectator() && entity.isAttackable()), playerRange * playerRange);
 
         if (entityCast != null && entityCast.getType() == HitResult.Type.ENTITY) return entityCast;
 
-        BlockHitResult result = client.world.raycast(new RaycastContext(near, far, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, client.player));
+        BlockHitResult result = client.level.clip(new ClipContext(near, far, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, client.player));
 
-        if (client.player.getEntityPos().distanceTo(result.getPos()) > playerRange) return null;
+        if (client.player.position().distanceTo(result.getLocation()) > playerRange) return null;
         return result;
     }
 
     /* Taken from https://github.com/0x3C50/Renderer/blob/master/src/main/java/me/x150/renderer/util/RendererUtils.java#L270
      * Credits to 0x3C50 */
-    public static Vec3d screenSpaceToWorldSpace(double x, double y, double d) {
+    public static Vec3 screenSpaceToWorldSpace(double x, double y, double d) {
         Camera camera = client.getEntityRenderDispatcher().camera;
-        int displayHeight = client.getWindow().getScaledHeight();
-        int displayWidth = client.getWindow().getScaledWidth();
+        int displayHeight = client.getWindow().getGuiScaledHeight();
+        int displayWidth = client.getWindow().getGuiScaledWidth();
         int[] viewport = new int[4];
         GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
         Vector3f target = new Vector3f();
@@ -62,11 +62,11 @@ public class TouchUtils {
                 .unproject((float) x / displayWidth * viewport[2],
                         (float) (displayHeight - y) / displayHeight * viewport[3], (float) d, viewport, target);
 
-        return new Vec3d(target.x, target.y, target.z).add(camera.getCameraPos());
+        return new Vec3(target.x, target.y, target.z).add(camera.position());
     }
 
     public static boolean hasInWorldUseAction(ItemStack stack) {
-        UseAction action = stack.getUseAction();
-        return action == UseAction.BOW || action == UseAction.BRUSH || action == UseAction.SPEAR;
+        ItemUseAnimation action = stack.getUseAnimation();
+        return action == ItemUseAnimation.BOW || action == ItemUseAnimation.BRUSH || action == ItemUseAnimation.SPEAR;
     }
 }

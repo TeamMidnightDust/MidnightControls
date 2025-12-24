@@ -2,7 +2,7 @@ package eu.midnightdust.midnightcontrols.client.virtualkeyboard.clickhandler;
 
 import eu.midnightdust.midnightcontrols.client.util.AbstractSignEditScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.gui.VirtualKeyboardScreen;
-import net.minecraft.client.gui.screen.ingame.SignEditScreen;
+import net.minecraft.client.gui.screens.inventory.SignEditScreen;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 
@@ -10,7 +10,7 @@ public class SignEditScreenClickHandler extends AbstractScreenClickHandler<SignE
     @Override
     public void handle(SignEditScreen screen, double mouseX, double mouseY) {
         // don't open the keyboard if a UI element was clicked
-        if(screen.hoveredElement(mouseX, mouseY).isPresent()) {
+        if(screen.getChildAt(mouseX, mouseY).isPresent()) {
             return;
         }
 

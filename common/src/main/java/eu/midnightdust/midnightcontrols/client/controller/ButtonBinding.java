@@ -13,18 +13,18 @@ import com.google.common.base.Predicates;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 import static org.lwjgl.glfw.GLFW.*;
@@ -53,7 +53,7 @@ public class ButtonBinding {
                     MidnightControlsClient.ring.loadFromUnbound();
                     client.setScreen(new RingScreen());
                 }
-                if (action.isUnpressed() && client.currentScreen != null) client.currentScreen.close();
+                if (action.isUnpressed() && client.screen != null) client.screen.onClose();
                 return true;
             }).register();
     public static final ButtonBinding DROP_ITEM = new Builder("drop_item").buttons(GLFW_GAMEPAD_BUTTON_B).onlyInGame().cooldown().register();
@@ -64,7 +64,7 @@ public class ButtonBinding {
     public static final ButtonBinding HOTBAR_RIGHT = new Builder("hotbar_right").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
             .action(InputHandlers.handleHotbar(true)).onlyInGame().cooldown().register();
     public static final ButtonBinding INVENTORY = new Builder("inventory").buttons(GLFW_GAMEPAD_BUTTON_Y).onlyInGame().cooldown().register();
-    public static final ButtonBinding EXIT = new Builder("exit").buttons(GLFW_GAMEPAD_BUTTON_B).filter((buttonBinding) -> client.currentScreen != null && buttonBinding.cooldown == 0 && INVENTORY.cooldown == 0)
+    public static final ButtonBinding EXIT = new Builder("exit").buttons(GLFW_GAMEPAD_BUTTON_B).filter((buttonBinding) -> client.screen != null && buttonBinding.cooldown == 0 && INVENTORY.cooldown == 0)
             .action(InputHandlers.handleExit()).cooldown().register();
     public static final ButtonBinding JUMP = new Builder("jump").buttons(GLFW_GAMEPAD_BUTTON_A).onlyInGame().register();
     public static final ButtonBinding LEFT = new Builder("left").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, false))
@@ -77,7 +77,7 @@ public class ButtonBinding {
     public static final ButtonBinding SCREENSHOT = new Builder("screenshot").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_A)
             .action(InputHandlers::handleScreenshot).cooldown().register();
     public static final ButtonBinding DEBUG_SCREEN = new Builder("debug_screen").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_B)
-            .action((client,binding,value,action) -> {if (action == ButtonState.PRESS) client.debugHudEntryList.setF3Enabled(!client.debugHudEntryList.isF3Enabled()); return true;}).cooldown().register();
+            .action((client,binding,value,action) -> {if (action == ButtonState.PRESS) client.debugEntries.setOverlayVisible(!client.debugEntries.isOverlayVisible()); return true;}).cooldown().register();
     public static final ButtonBinding SLOT_DOWN = new Builder("slot_down").buttons(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)
             .action(InputHandlers.handleInventorySlotPad(1)).onlyInInventory().cooldown().register();
     public static final ButtonBinding SLOT_LEFT = new Builder("slot_left").buttons(GLFW_GAMEPAD_BUTTON_DPAD_LEFT)
@@ -92,9 +92,9 @@ public class ButtonBinding {
             .actions(InputHandlers::handleToggleSprint).onlyInGame().cooldown().register();
     public static final ButtonBinding SWAP_HANDS = new Builder("swap_hands").buttons(GLFW_GAMEPAD_BUTTON_X).onlyInGame().cooldown().register();
     public static final ButtonBinding TAB_LEFT = new Builder("tab_back").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
-            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((binding) -> client.currentScreen != null)).cooldown().register();
+            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((binding) -> client.screen != null)).cooldown().register();
     public static final ButtonBinding TAB_RIGHT = new Builder("tab_next").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
-            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((binding) -> client.currentScreen != null)).cooldown().register();
+            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((binding) -> client.screen != null)).cooldown().register();
     public static final ButtonBinding PAGE_LEFT = new Builder("page_back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
             .action(InputHandlers.handlePage(false)).filter(InputHandlers::inInventory).cooldown(30).register();
     public static final ButtonBinding PAGE_RIGHT = new Builder("page_next").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
@@ -111,8 +111,8 @@ public class ButtonBinding {
     private int[] button;
     private final int[] defaultButton;
     private final String key;
-    private final Text text;
-    private KeyBinding mcKeyBinding = null;
+    private final Component text;
+    private KeyMapping mcKeyBinding = null;
     protected Predicate<ButtonBinding> filter;
     private final List<PressAction> actions = new ArrayList<>(Collections.singletonList(PressAction.DEFAULT_ACTION));
     private final boolean hasCooldown;
@@ -123,7 +123,7 @@ public class ButtonBinding {
     public ButtonBinding(String key, int[] defaultButton, List<PressAction> actions, Predicate<ButtonBinding> filter, boolean hasCooldown) {
         this.setButton(this.defaultButton = defaultButton);
         this.key = key;
-        this.text = Text.translatable(this.key);
+        this.text = Component.translatable(this.key);
         this.filter = filter;
         this.actions.addAll(actions);
         this.hasCooldown = hasCooldown;
@@ -131,7 +131,7 @@ public class ButtonBinding {
     public ButtonBinding(String key, int[] defaultButton, List<PressAction> actions, Predicate<ButtonBinding> filter, boolean hasCooldown, int cooldownLength) {
         this.setButton(this.defaultButton = defaultButton);
         this.key = key;
-        this.text = Text.translatable(this.key);
+        this.text = Component.translatable(this.key);
         this.filter = filter;
         this.actions.addAll(actions);
         this.hasCooldown = hasCooldown;
@@ -246,7 +246,7 @@ public class ButtonBinding {
      *
      * @param keyBinding the optional key binding
      */
-    public void setKeyBinding(@Nullable KeyBinding keyBinding) {
+    public void setKeyBinding(@Nullable KeyMapping keyBinding) {
         this.mcKeyBinding = keyBinding;
     }
 
@@ -273,7 +273,7 @@ public class ButtonBinding {
      * @param client the client instance
      * @param state the state
      */
-    public void handle(@NotNull MinecraftClient client, float value, @NotNull ButtonState state) {
+    public void handle(@NotNull Minecraft client, float value, @NotNull ButtonState state) {
         if (state == ButtonState.REPEAT && this.hasCooldown && this.cooldown != 0)
             return;
         if (this.hasCooldown && state.isPressed()) {
@@ -295,10 +295,10 @@ public class ButtonBinding {
      * @return the translation key
      */
     public @NotNull String getTranslationKey() {
-        return I18n.hasTranslation("midnightcontrols.action." + this.getName()) ? "midnightcontrols.action." + this.getName() : this.getName();
+        return I18n.exists("midnightcontrols.action." + this.getName()) ? "midnightcontrols.action." + this.getName() : this.getName();
     }
 
-    public @NotNull Text getText() {
+    public @NotNull Component getText() {
         return this.text;
     }
 
@@ -307,7 +307,7 @@ public class ButtonBinding {
      *
      * @return the key binding equivalent
      */
-    public @NotNull Optional<KeyBinding> asKeyBinding() {
+    public @NotNull Optional<KeyMapping> asKeyBinding() {
         return Optional.ofNullable(this.mcKeyBinding);
     }
 
@@ -350,24 +350,24 @@ public class ButtonBinding {
         return 500 + button;
     }
 
-    public static void init(@NotNull GameOptions options) {
-        ATTACK.mcKeyBinding = options.attackKey;
-        BACK.mcKeyBinding = options.backKey;
-        CHAT.mcKeyBinding = options.chatKey;
-        DROP_ITEM.mcKeyBinding = options.dropKey;
-        FORWARD.mcKeyBinding = options.forwardKey;
-        INVENTORY.mcKeyBinding = options.inventoryKey;
-        JUMP.mcKeyBinding = options.jumpKey;
-        LEFT.mcKeyBinding = options.leftKey;
-        PICK_BLOCK.mcKeyBinding = options.pickItemKey;
-        PLAYER_LIST.mcKeyBinding = options.playerListKey;
-        RIGHT.mcKeyBinding = options.rightKey;
-        SCREENSHOT.mcKeyBinding = options.screenshotKey;
-        SNEAK.mcKeyBinding = options.sneakKey;
-        SPRINT.mcKeyBinding = options.sprintKey;
-        SWAP_HANDS.mcKeyBinding = options.swapHandsKey;
-        TOGGLE_PERSPECTIVE.mcKeyBinding = options.togglePerspectiveKey;
-        USE.mcKeyBinding = options.useKey;
+    public static void init(@NotNull Options options) {
+        ATTACK.mcKeyBinding = options.keyAttack;
+        BACK.mcKeyBinding = options.keyDown;
+        CHAT.mcKeyBinding = options.keyChat;
+        DROP_ITEM.mcKeyBinding = options.keyDrop;
+        FORWARD.mcKeyBinding = options.keyUp;
+        INVENTORY.mcKeyBinding = options.keyInventory;
+        JUMP.mcKeyBinding = options.keyJump;
+        LEFT.mcKeyBinding = options.keyLeft;
+        PICK_BLOCK.mcKeyBinding = options.keyPickItem;
+        PLAYER_LIST.mcKeyBinding = options.keyPlayerList;
+        RIGHT.mcKeyBinding = options.keyRight;
+        SCREENSHOT.mcKeyBinding = options.keyScreenshot;
+        SNEAK.mcKeyBinding = options.keyShift;
+        SPRINT.mcKeyBinding = options.keySprint;
+        SWAP_HANDS.mcKeyBinding = options.keySwapOffhand;
+        TOGGLE_PERSPECTIVE.mcKeyBinding = options.keyTogglePerspective;
+        USE.mcKeyBinding = options.keyUse;
     }
 
     /**
@@ -376,39 +376,39 @@ public class ButtonBinding {
      * @param button the button
      * @return the localized name of the button
      */
-    public static @NotNull Text getLocalizedButtonName(int button) {
+    public static @NotNull Component getLocalizedButtonName(int button) {
         return switch (button % 500) {
-            case -1 -> Text.translatable("key.keyboard.unknown");
-            case GLFW_GAMEPAD_BUTTON_A -> Text.translatable("midnightcontrols.button.a");
-            case GLFW_GAMEPAD_BUTTON_B -> Text.translatable("midnightcontrols.button.b");
-            case GLFW_GAMEPAD_BUTTON_X -> Text.translatable("midnightcontrols.button.x");
-            case GLFW_GAMEPAD_BUTTON_Y -> Text.translatable("midnightcontrols.button.y");
-            case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER -> Text.translatable("midnightcontrols.button.left_bumper");
-            case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER -> Text.translatable("midnightcontrols.button.right_bumper");
-            case GLFW_GAMEPAD_BUTTON_BACK -> Text.translatable("midnightcontrols.button.back");
-            case GLFW_GAMEPAD_BUTTON_START -> Text.translatable("midnightcontrols.button.start");
-            case GLFW_GAMEPAD_BUTTON_GUIDE -> Text.translatable("midnightcontrols.button.guide");
-            case GLFW_GAMEPAD_BUTTON_LEFT_THUMB -> Text.translatable("midnightcontrols.button.left_thumb");
-            case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB -> Text.translatable("midnightcontrols.button.right_thumb");
-            case GLFW_GAMEPAD_BUTTON_DPAD_UP -> Text.translatable("midnightcontrols.button.dpad_up");
-            case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> Text.translatable("midnightcontrols.button.dpad_right");
-            case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> Text.translatable("midnightcontrols.button.dpad_down");
-            case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> Text.translatable("midnightcontrols.button.dpad_left");
-            case 100 -> Text.translatable("midnightcontrols.axis.left_x+");
-            case 101 -> Text.translatable("midnightcontrols.axis.left_y+");
-            case 102 -> Text.translatable("midnightcontrols.axis.right_x+");
-            case 103 -> Text.translatable("midnightcontrols.axis.right_y+");
-            case 104 -> Text.translatable("midnightcontrols.axis.left_trigger");
-            case 105 -> Text.translatable("midnightcontrols.axis.right_trigger");
-            case 200 -> Text.translatable("midnightcontrols.axis.left_x-");
-            case 201 -> Text.translatable("midnightcontrols.axis.left_y-");
-            case 202 -> Text.translatable("midnightcontrols.axis.right_x-");
-            case 203 -> Text.translatable("midnightcontrols.axis.right_y-");
-            case 15 -> Text.translatable("midnightcontrols.button.l4");
-            case 16 -> Text.translatable("midnightcontrols.button.l5");
-            case 17 -> Text.translatable("midnightcontrols.button.r4");
-            case 18 -> Text.translatable("midnightcontrols.button.r5");
-            default -> Text.translatable("midnightcontrols.button.unknown", button);
+            case -1 -> Component.translatable("key.keyboard.unknown");
+            case GLFW_GAMEPAD_BUTTON_A -> Component.translatable("midnightcontrols.button.a");
+            case GLFW_GAMEPAD_BUTTON_B -> Component.translatable("midnightcontrols.button.b");
+            case GLFW_GAMEPAD_BUTTON_X -> Component.translatable("midnightcontrols.button.x");
+            case GLFW_GAMEPAD_BUTTON_Y -> Component.translatable("midnightcontrols.button.y");
+            case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER -> Component.translatable("midnightcontrols.button.left_bumper");
+            case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER -> Component.translatable("midnightcontrols.button.right_bumper");
+            case GLFW_GAMEPAD_BUTTON_BACK -> Component.translatable("midnightcontrols.button.back");
+            case GLFW_GAMEPAD_BUTTON_START -> Component.translatable("midnightcontrols.button.start");
+            case GLFW_GAMEPAD_BUTTON_GUIDE -> Component.translatable("midnightcontrols.button.guide");
+            case GLFW_GAMEPAD_BUTTON_LEFT_THUMB -> Component.translatable("midnightcontrols.button.left_thumb");
+            case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB -> Component.translatable("midnightcontrols.button.right_thumb");
+            case GLFW_GAMEPAD_BUTTON_DPAD_UP -> Component.translatable("midnightcontrols.button.dpad_up");
+            case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> Component.translatable("midnightcontrols.button.dpad_right");
+            case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> Component.translatable("midnightcontrols.button.dpad_down");
+            case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> Component.translatable("midnightcontrols.button.dpad_left");
+            case 100 -> Component.translatable("midnightcontrols.axis.left_x+");
+            case 101 -> Component.translatable("midnightcontrols.axis.left_y+");
+            case 102 -> Component.translatable("midnightcontrols.axis.right_x+");
+            case 103 -> Component.translatable("midnightcontrols.axis.right_y+");
+            case 104 -> Component.translatable("midnightcontrols.axis.left_trigger");
+            case 105 -> Component.translatable("midnightcontrols.axis.right_trigger");
+            case 200 -> Component.translatable("midnightcontrols.axis.left_x-");
+            case 201 -> Component.translatable("midnightcontrols.axis.left_y-");
+            case 202 -> Component.translatable("midnightcontrols.axis.right_x-");
+            case 203 -> Component.translatable("midnightcontrols.axis.right_y-");
+            case 15 -> Component.translatable("midnightcontrols.button.l4");
+            case 16 -> Component.translatable("midnightcontrols.button.l5");
+            case 17 -> Component.translatable("midnightcontrols.button.r4");
+            case 18 -> Component.translatable("midnightcontrols.button.r5");
+            default -> Component.translatable("midnightcontrols.button.unknown", button);
         };
     }
 
@@ -484,7 +484,7 @@ public class ButtonBinding {
         private boolean cooldown = false;
         private int cooldownLength = 5;
         private ButtonCategory category = null;
-        private KeyBinding mcBinding = null;
+        private KeyMapping mcBinding = null;
 
         /**
          * This constructor shouldn't be used for other mods.
@@ -628,7 +628,7 @@ public class ButtonBinding {
          * @param binding the keybinding to link
          * @return the builder instance
          */
-        public Builder linkKeybind(@Nullable KeyBinding binding) {
+        public Builder linkKeybind(@Nullable KeyMapping binding) {
             this.mcBinding = binding;
             return this;
         }

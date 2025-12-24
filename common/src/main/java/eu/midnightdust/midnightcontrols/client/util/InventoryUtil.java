@@ -1,29 +1,29 @@
 package eu.midnightdust.midnightcontrols.client.util;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.screen.slot.Slot;
 import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Predicate;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.inventory.Slot;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.input;
 
 public class InventoryUtil {
     // Finds the closest slot in the GUI within 14 pixels.
-    public static Optional<Slot> findClosestSlot(HandledScreen<?> inventory, int direction) {
+    public static Optional<Slot> findClosestSlot(AbstractContainerScreen<?> inventory, int direction) {
         var accessor = (HandledScreenAccessor) inventory;
         int guiLeft = accessor.getX();
         int guiTop = accessor.getY();
-        double mouseX = client.mouse.getX() * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
-        double mouseY = client.mouse.getY() * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
+        double mouseX = client.mouseHandler.xpos() * (double) client.getWindow().getGuiScaledWidth() / (double) client.getWindow().getScreenWidth();
+        double mouseY = client.mouseHandler.ypos() * (double) client.getWindow().getGuiScaledHeight() / (double) client.getWindow().getScreenHeight();
         // Finds the hovered slot.
         var mouseSlot = accessor.midnightcontrols$getSlotAt(mouseX, mouseY);
-        return inventory.getScreenHandler().slots.parallelStream()
+        return inventory.getMenu().slots.parallelStream()
                 .filter(Predicate.isEqual(mouseSlot).negate())
                 .map(slot -> {
                     int posX = guiLeft + slot.x + 8;
@@ -70,32 +70,32 @@ public class InventoryUtil {
     // Inspired from https://github.com/MrCrayfish/Controllable/blob/1.14.X/src/main/java/com/mrcrayfish/controllable/client/ControllerInput.java#L686.
     public static void moveMouseToClosestSlot(@Nullable Screen screen) {
         // Makes the mouse attracted to slots. This helps with selecting items when using a controller.
-        if (screen instanceof HandledScreen<?> inventoryScreen) {
+        if (screen instanceof AbstractContainerScreen<?> inventoryScreen) {
             var accessor = (HandledScreenAccessor) inventoryScreen;
             int guiLeft = accessor.getX();
             int guiTop = accessor.getY();
-            int mouseX = (int) (targetMouseX * (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth());
-            int mouseY = (int) (targetMouseY * (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight());
+            int mouseX = (int) (targetMouseX * (double) client.getWindow().getGuiScaledWidth() / (double) client.getWindow().getScreenWidth());
+            int mouseY = (int) (targetMouseY * (double) client.getWindow().getGuiScaledHeight() / (double) client.getWindow().getScreenHeight());
 
             // Finds the closest slot in the GUI within 14 pixels.
-            Optional<net.minecraft.util.Pair<Slot, Double>> closestSlot = inventoryScreen.getScreenHandler().slots.parallelStream()
+            Optional<net.minecraft.util.Tuple<Slot, Double>> closestSlot = inventoryScreen.getMenu().slots.parallelStream()
                     .map(slot -> {
                         int x = guiLeft + slot.x + 8;
                         int y = guiTop + slot.y + 8;
 
                         // Distance between the slot and the cursor.
                         double distance = Math.sqrt(Math.pow(x - mouseX, 2) + Math.pow(y - mouseY, 2));
-                        return new net.minecraft.util.Pair<>(slot, distance);
-                    }).filter(entry -> entry.getRight() <= 14.0)
-                    .min(Comparator.comparingDouble(net.minecraft.util.Pair::getRight));
+                        return new net.minecraft.util.Tuple<>(slot, distance);
+                    }).filter(entry -> entry.getB() <= 14.0)
+                    .min(Comparator.comparingDouble(net.minecraft.util.Tuple::getB));
 
             if (closestSlot.isPresent() && client.player != null) {
-                var slot = closestSlot.get().getLeft();
-                if (slot.hasStack() || !client.player.getInventory().getSelectedStack().isEmpty()) {
+                var slot = closestSlot.get().getA();
+                if (slot.hasItem() || !client.player.getInventory().getSelectedItem().isEmpty()) {
                     int slotCenterXScaled = guiLeft + slot.x + 8;
                     int slotCenterYScaled = guiTop + slot.y + 8;
-                    int slotCenterX = (int) (slotCenterXScaled / ((double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth()));
-                    int slotCenterY = (int) (slotCenterYScaled / ((double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight()));
+                    int slotCenterX = (int) (slotCenterXScaled / ((double) client.getWindow().getGuiScaledWidth() / (double) client.getWindow().getScreenWidth()));
+                    int slotCenterY = (int) (slotCenterYScaled / ((double) client.getWindow().getGuiScaledHeight() / (double) client.getWindow().getScreenHeight()));
                     double deltaX = slotCenterX - targetMouseX;
                     double deltaY = slotCenterY - targetMouseY;
 

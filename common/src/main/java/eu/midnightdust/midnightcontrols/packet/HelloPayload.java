@@ -1,24 +1,24 @@
 package eu.midnightdust.midnightcontrols.packet;
 
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
-public record HelloPayload(String version, String controlsMode) implements CustomPayload {
-    public static final CustomPayload.Id<HelloPayload> PACKET_ID = new CustomPayload.Id<>(MidnightControlsConstants.HELLO_CHANNEL);
-    public static final PacketCodec<RegistryByteBuf, HelloPayload> codec = PacketCodec.of(HelloPayload::write, HelloPayload::read);
+public record HelloPayload(String version, String controlsMode) implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<HelloPayload> PACKET_ID = new CustomPacketPayload.Type<>(MidnightControlsConstants.HELLO_CHANNEL);
+    public static final StreamCodec<RegistryFriendlyByteBuf, HelloPayload> codec = StreamCodec.ofMember(HelloPayload::write, HelloPayload::read);
 
-    public static HelloPayload read(RegistryByteBuf buf) {
-        return new HelloPayload(buf.readString(32), buf.readString(32));
+    public static HelloPayload read(RegistryFriendlyByteBuf buf) {
+        return new HelloPayload(buf.readUtf(32), buf.readUtf(32));
     }
 
-    public void write(RegistryByteBuf buf) {
-        buf.writeString(version, 32).writeString(controlsMode, 32);
+    public void write(RegistryFriendlyByteBuf buf) {
+        buf.writeUtf(version, 32).writeUtf(controlsMode, 32);
     }
 
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public Type<? extends CustomPacketPayload> type() {
         return PACKET_ID;
     }
 }

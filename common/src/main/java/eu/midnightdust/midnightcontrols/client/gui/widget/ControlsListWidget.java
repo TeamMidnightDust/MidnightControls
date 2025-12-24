@@ -25,19 +25,16 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.navigation.NavigationAxis;
-import net.minecraft.client.gui.navigation.NavigationDirection;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.input.MouseInput;
-import net.minecraft.util.Identifier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.navigation.ScreenAxis;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -58,7 +55,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
     public ControlsListWidget(Position position, int width, int height, ControllerControlsWidget gui) {
         super(position, width, height, 4, ControlsListWidget.Entry.class);
         this.gui = gui;
-        this.maxTextLength = InputManager.streamBindings().mapToInt(binding -> this.client.textRenderer.getWidth(binding.getText())).max().orElse(0);
+        this.maxTextLength = InputManager.streamBindings().mapToInt(binding -> this.client.font.width(binding.getText())).max().orElse(0);
 
         InputManager.streamCategories()
                 .sorted(Comparator.comparingInt(ButtonCategory::getPriority))
@@ -82,7 +79,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         return this.getWidth() / 2 - baseWidth / 2 + 72 - this.maxTextLength;
     }
 
-    public class ButtonBindingEntry extends Entry implements SpruceParentWidget<SpruceWidget> {
+    public class ButtonBindingEntry extends eu.midnightdust.midnightcontrols.client.gui.widget.ControlsListWidget.Entry implements SpruceParentWidget<SpruceWidget> {
         private final List<SpruceWidget> children = new ArrayList<>();
         private @Nullable SpruceWidget focused;
         private final ButtonBinding binding;
@@ -94,33 +91,33 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         ButtonBindingEntry(@NotNull ControlsListWidget parent, @NotNull ButtonBinding binding) {
             super(parent);
             this.binding = binding;
-            this.bindingName = I18n.translate(this.binding.getTranslationKey());
+            this.bindingName = I18n.get(this.binding.getTranslationKey());
             this.editButton = new ControllerButtonWidget(Position.of(this, parent.getWidth() / 2 - 8, 0), 120, this.binding, btn -> {
                 gui.focusedBinding = binding;
                 MidnightControlsClient.input.beginControlsInput(gui);
             }) {
-                protected Text getNarrationMessage() {
-                    return binding.isNotBound() ? Text.translatable("narrator.controls.unbound", bindingName)
-                            : Text.translatable("narrator.controls.bound", bindingName, super.getNarrationMessage());
+                protected Component getNarrationMessage() {
+                    return binding.isNotBound() ? Component.translatable("narrator.controls.unbound", bindingName)
+                            : Component.translatable("narrator.controls.bound", bindingName, super.getNarrationMessage());
                 }
             };
             this.children.add(editButton);
             this.resetButton = new SpruceIconButtonWidget(Position.of(this,
                     this.editButton.getPosition().getRelativeX() + this.editButton.getWidth() + 2, 0),
-                    37, 20, Text.empty(),
+                    37, 20, Component.empty(),
                     btn -> MidnightControlsConfig.setButtonBinding(binding, binding.getDefaultButton())) {
-                protected Text getNarrationMessage() {
-                    return Text.translatable("narrator.controls.reset", bindingName);
+                protected Component getNarrationMessage() {
+                    return Component.translatable("narrator.controls.reset", bindingName);
                 }
 
-                private final Identifier resetTexture = Identifier.of("midnightlib","icon/reset");
+                private final Identifier resetTexture = Identifier.fromNamespaceAndPath("midnightlib","icon/reset");
 
                 @Override
                 protected int renderIcon(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
                     int size = 12;
                     int x = this.getX() + this.getWidth() / 2 - size / 2;
                     int y = this.getY() + this.getHeight() / 2 - size / 2;
-                    context.vanilla().drawGuiTexture(RenderPipelines.GUI_TEXTURED, resetTexture, x, y, size, size);
+                    context.vanilla().blitSprite(RenderPipelines.GUI_TEXTURED, resetTexture, x, y, size, size);
                     return 1;
                 }
             };
@@ -133,8 +130,8 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                         gui.focusedBinding = null;
                         MidnightControlsClient.input.beginControlsInput(null);
                     }) {
-                protected Text getNarrationMessage() {
-                    return Text.translatable("midnightcontrols.narrator.unbound", bindingName);
+                protected Component getNarrationMessage() {
+                    return Component.translatable("midnightcontrols.narrator.unbound", bindingName);
                 }
             };
             this.children.add(this.unbindButton);
@@ -170,7 +167,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         /* Input */
 
         @Override
-        protected boolean onMouseClick(Click click, boolean doubleClick) {
+        protected boolean onMouseClick(MouseButtonEvent click, boolean doubleClick) {
             var it = this.children().iterator();
 
             SpruceWidget element;
@@ -190,19 +187,19 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         }
 
         @Override
-        protected boolean onMouseRelease(Click click) {
+        protected boolean onMouseRelease(MouseButtonEvent click) {
             this.dragging = false;
             return this.hoveredElement(click.x(), click.y()).filter(element -> element.mouseReleased(click)).isPresent();
         }
 
         @Override
-        protected boolean onMouseDrag(@NotNull Click click, double deltaX, double deltaY) {
+        protected boolean onMouseDrag(@NotNull MouseButtonEvent click, double deltaX, double deltaY) {
             return this.getFocused() != null && this.dragging && click.button() == GLFW.GLFW_MOUSE_BUTTON_1
                     && this.getFocused().mouseDragged(click, deltaX, deltaY);
         }
 
         @Override
-        protected boolean onKeyPress(@NotNull KeyInput input) {
+        protected boolean onKeyPress(@NotNull KeyEvent input) {
             return this.focused != null && this.focused.keyPressed(input);
         }
 
@@ -219,7 +216,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         @Override
         public boolean onNavigation(NavigationEvent event) {
             if (this.requiresCursor()) return false;
-            if (!event.tab() && event.direction().getAxis() == NavigationAxis.VERTICAL) {
+            if (!event.tab() && event.direction().getAxis() == ScreenAxis.VERTICAL) {
                 if (this.isFocused()) {
                     this.setFocused(null);
                     return false;
@@ -236,7 +233,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
             boolean result = NavigationUtils.tryNavigate(event, this.children, this.focused, this::setFocused, true);
             if (result) {
                 this.setFocused(true);
-                if (event.direction().getAxis() == NavigationAxis.HORIZONTAL && this.getFocused() != null) {
+                if (event.direction().getAxis() == ScreenAxis.HORIZONTAL && this.getFocused() != null) {
                     this.parent.lastIndex = this.children.indexOf(this.getFocused());
                 }
             }
@@ -249,7 +246,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         protected void renderWidget(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
             boolean focused = gui.focusedBinding == this.binding;
 
-            var textRenderer = ControlsListWidget.this.client.textRenderer;
+            var textRenderer = ControlsListWidget.this.client.font;
             int height = this.getHeight();
             //float textX = (float) (this.getX() + 70 - ControlsListWidget.this.maxTextLength);
             int textY = this.getY() + height / 2;
@@ -261,28 +258,28 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
 
             this.editButton.update();
             if (focused) {
-                var text = Text.literal("> ").formatted(Formatting.WHITE);
-                text.append(this.editButton.getMessage().copy().formatted(Formatting.YELLOW));
-                this.editButton.setMessage(text.append(Text.literal(" <").formatted(Formatting.WHITE)));
+                var text = Component.literal("> ").withStyle(ChatFormatting.WHITE);
+                text.append(this.editButton.getMessage().copy().withStyle(ChatFormatting.YELLOW));
+                this.editButton.setMessage(text.append(Component.literal(" <").withStyle(ChatFormatting.WHITE)));
             } else if (!this.binding.isNotBound() && InputManager.hasDuplicatedBindings(this.binding)) {
                 var text = this.editButton.getMessage().copy();
-                this.editButton.setMessage(text.formatted(Formatting.RED));
+                this.editButton.setMessage(text.withStyle(ChatFormatting.RED));
             } else if (this.binding.isNotBound()) {
                 var text = this.editButton.getMessage().copy();
-                this.editButton.setMessage(text.formatted(Formatting.GOLD));
+                this.editButton.setMessage(text.withStyle(ChatFormatting.GOLD));
             }
 
             this.children.forEach(widget -> widget.render(context, mouseX, mouseY, delta));
         }
     }
 
-    public static class CategoryEntry extends Entry {
+    public static class CategoryEntry extends eu.midnightdust.midnightcontrols.client.gui.widget.ControlsListWidget.Entry {
         private final SpruceSeparatorWidget separatorWidget;
 
         protected CategoryEntry(ControlsListWidget parent, ButtonCategory category) {
             super(parent);
             this.separatorWidget = new SpruceSeparatorWidget(Position.of(this, 2, 0), this.getWidth() - 4,
-                    Text.literal(category.getTranslatedName())) {
+                    Component.literal(category.getTranslatedName())) {
                 @Override
                 public int getWidth() {
                     return CategoryEntry.this.getWidth() - 4;
@@ -323,7 +320,6 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         }
     }
 
-    @Environment(EnvType.CLIENT)
     public abstract static class Entry extends SpruceEntryListWidget.Entry {
         protected final ControlsListWidget parent;
 

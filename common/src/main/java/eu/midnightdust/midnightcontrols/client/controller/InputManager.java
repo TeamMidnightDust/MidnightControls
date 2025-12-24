@@ -15,12 +15,6 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.mixin.MouseAccessor;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 import org.aperlambda.lambdacommon.utils.function.PairPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -29,8 +23,15 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
+
+import com.mojang.blaze3d.platform.InputConstants;
 
 /**
  * Represents an input manager for controllers.
@@ -73,14 +74,14 @@ public class InputManager {
      *
      * @param client the client instance
      */
-    public void updateMousePosition(@NotNull MinecraftClient client) {
+    public void updateMousePosition(@NotNull Minecraft client) {
         Objects.requireNonNull(client, "Client instance cannot be null.");
         if (this.prevTargetMouseX != this.targetMouseX || this.prevTargetMouseY != this.targetMouseY) {
-            double mouseX = this.prevTargetMouseX + (this.targetMouseX - this.prevTargetMouseX) * client.getRenderTickCounter().getTickProgress(true) + 0.5;
-            double mouseY = this.prevTargetMouseY + (this.targetMouseY - this.prevTargetMouseY) * client.getRenderTickCounter().getTickProgress(true) + 0.5;
+            double mouseX = this.prevTargetMouseX + (this.targetMouseX - this.prevTargetMouseX) * client.getDeltaTracker().getGameTimeDeltaPartialTick(true) + 0.5;
+            double mouseY = this.prevTargetMouseY + (this.targetMouseY - this.prevTargetMouseY) * client.getDeltaTracker().getGameTimeDeltaPartialTick(true) + 0.5;
             if (!MidnightControlsConfig.virtualMouse)
-                GLFW.glfwSetCursorPos(client.getWindow().getHandle(), mouseX, mouseY);
-            ((MouseAccessor) client.mouse).midnightcontrols$onCursorPos(client.getWindow().getHandle(), mouseX, mouseY);
+                GLFW.glfwSetCursorPos(client.getWindow().handle(), mouseX, mouseY);
+            ((MouseAccessor) client.mouseHandler).midnightcontrols$onCursorPos(client.getWindow().handle(), mouseX, mouseY);
         }
     }
 
@@ -95,9 +96,9 @@ public class InputManager {
         this.targetMouseY = this.prevTargetMouseY = (int) (windowHeight / 2.F);
     }
 
-    public void resetMouseTarget(@NotNull MinecraftClient client) {
-        double mouseX = client.mouse.getX();
-        double mouseY = client.mouse.getY();
+    public void resetMouseTarget(@NotNull Minecraft client) {
+        double mouseX = client.mouseHandler.xpos();
+        double mouseY = client.mouseHandler.ypos();
         this.prevTargetMouseX = this.targetMouseX = (int) mouseX;
         this.prevTargetMouseY = this.targetMouseY = (int) mouseY;
     }
@@ -159,7 +160,7 @@ public class InputManager {
                 if (binding.isNotBound() && !MidnightControlsConfig.ignoredUnboundKeys.contains(binding.getTranslationKey())) unboundBindings.add(binding);
             });
         }
-        unboundBindings.sort(Comparator.comparing(s -> I18n.translate(s.getTranslationKey())));
+        unboundBindings.sort(Comparator.comparing(s -> I18n.get(s.getTranslationKey())));
         return unboundBindings;
     }
 
@@ -180,7 +181,7 @@ public class InputManager {
 
     @Deprecated
     public static @NotNull ButtonBinding registerBinding(@NotNull org.aperlambda.lambdacommon.Identifier id, int[] defaultButton, @NotNull List<PressAction> actions, @NotNull Predicate<ButtonBinding> filter, boolean hasCooldown) {
-        return registerBinding(Identifier.of(id.getNamespace(), id.getName()), defaultButton, actions, filter, hasCooldown);
+        return registerBinding(Identifier.fromNamespaceAndPath(id.getNamespace(), id.getName()), defaultButton, actions, filter, hasCooldown);
     }
 
     @Deprecated
@@ -219,11 +220,11 @@ public class InputManager {
         return category;
     }
     public static ButtonCategory registerCategory(@NotNull org.aperlambda.lambdacommon.Identifier identifier, int priority) {
-        return registerCategory(Identifier.of(identifier.getNamespace(), identifier.getName()), priority);
+        return registerCategory(Identifier.fromNamespaceAndPath(identifier.getNamespace(), identifier.getName()), priority);
     }
 
     public static ButtonCategory registerCategory(@NotNull org.aperlambda.lambdacommon.Identifier identifier) {
-        return registerCategory(Identifier.of(identifier.getNamespace(), identifier.getName()));
+        return registerCategory(Identifier.fromNamespaceAndPath(identifier.getNamespace(), identifier.getName()));
     }
 
     public static ButtonCategory registerCategory(@NotNull Identifier identifier, int priority) {
@@ -235,7 +236,7 @@ public class InputManager {
     }
 
     protected static ButtonCategory registerDefaultCategory(@NotNull String key, @NotNull Consumer<ButtonCategory> keyAdder) {
-        var category = registerCategory(Identifier.of("minecraft", key), CATEGORIES.size());
+        var category = registerCategory(Identifier.fromNamespaceAndPath("minecraft", key), CATEGORIES.size());
         keyAdder.accept(category);
         return category;
     }
@@ -394,8 +395,8 @@ public class InputManager {
     }
 
     public static void queueMousePosition(double x, double y) {
-        INPUT_MANAGER.targetMouseX = (int) MathHelper.clamp(x, 0, MinecraftClient.getInstance().getWindow().getWidth());
-        INPUT_MANAGER.targetMouseY = (int) MathHelper.clamp(y, 0, MinecraftClient.getInstance().getWindow().getHeight());
+        INPUT_MANAGER.targetMouseX = (int) Mth.clamp(x, 0, Minecraft.getInstance().getWindow().getScreenWidth());
+        INPUT_MANAGER.targetMouseY = (int) Mth.clamp(y, 0, Minecraft.getInstance().getWindow().getScreenHeight());
     }
 
     public static void queueMoveMousePosition(double x, double y) {
@@ -420,9 +421,9 @@ public class InputManager {
      * @param code the code
      * @param category the category of the key binding
      * @return the key binding
-     * @see #makeKeyBinding(Identifier, InputUtil.Type, int, net.minecraft.client.option.KeyBinding.Category)
+     * @see #makeKeyBinding(Identifier, InputConstants.Type, int, net.minecraft.client.KeyMapping.Category)
      */
-    public static @NotNull KeyBinding makeKeyBinding(@NotNull Identifier id, InputUtil.Type type, int code, @NotNull KeyBinding.Category category) {
-        return new KeyBinding(String.format("key.%s.%s", id.getNamespace(), id.getPath()), type, code, category);
+    public static @NotNull KeyMapping makeKeyBinding(@NotNull Identifier id, InputConstants.Type type, int code, @NotNull KeyMapping.Category category) {
+        return new KeyMapping(String.format("key.%s.%s", id.getNamespace(), id.getPath()), type, code, category);
     }
 }

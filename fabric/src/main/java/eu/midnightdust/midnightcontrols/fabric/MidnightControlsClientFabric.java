@@ -20,9 +20,9 @@ import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.util.Optional;
 
@@ -68,14 +68,14 @@ public class MidnightControlsClientFabric implements ClientModInitializer {
         });
         MidnightControlsClient.initClient();
 
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
             @Override
             public Identifier getFabricId() {
                 return id("keyboard_layouts");
             }
             @Override
-            public void reload(ResourceManager manager) {
-                MidnightControlsReloadListener.INSTANCE.reload(manager);
+            public void onResourceManagerReload(ResourceManager manager) {
+                MidnightControlsReloadListener.INSTANCE.onResourceManagerReload(manager);
             }
         });
     }

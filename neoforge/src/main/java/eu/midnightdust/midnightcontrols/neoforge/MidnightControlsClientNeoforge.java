@@ -1,16 +1,17 @@
 package eu.midnightdust.midnightcontrols.neoforge;
 
+import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsReloadListener;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
 import eu.midnightdust.midnightcontrols.packet.HelloPayload;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.resource.ResourcePackProfile;
-import net.minecraft.resource.ResourcePackSource;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
@@ -48,8 +49,10 @@ public class MidnightControlsClientNeoforge {
         }
         @SubscribeEvent
         public static void addPackFinders(AddPackFindersEvent event) {
-            event.addPackFinders(id("bedrock"), ResourceType.CLIENT_RESOURCES, Text.of("midnightcontrols/bedrock"), ResourcePackSource.BUILTIN, false, ResourcePackProfile.InsertionPosition.TOP);
-            event.addPackFinders(id("legacy"), ResourceType.CLIENT_RESOURCES, Text.of("midnightcontrols/legacy"), ResourcePackSource.BUILTIN, false, ResourcePackProfile.InsertionPosition.TOP);
+            if (false) { // TODO: Switch to stonecutter build system to be able to test packs in dev environment
+                event.addPackFinders(id("bedrock"), PackType.CLIENT_RESOURCES, Component.literal("midnightcontrols/bedrock"), PackSource.BUILT_IN, false, Pack.Position.TOP);
+                event.addPackFinders(id("legacy"), PackType.CLIENT_RESOURCES, Component.literal("midnightcontrols/legacy"), PackSource.BUILT_IN, false, Pack.Position.TOP);
+            }
         }
         @SubscribeEvent
         public static void onResourceReload(AddClientReloadListenersEvent event) {

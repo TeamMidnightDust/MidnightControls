@@ -10,15 +10,14 @@
 package eu.midnightdust.midnightcontrols.client.ring;
 
 import com.google.gson.Gson;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 
 /**
  * Represents a ring action.
@@ -50,12 +49,12 @@ public abstract class RingAction {
 
     public abstract void onAction(@NotNull RingButtonMode mode);
 
-    public void render(@NotNull DrawContext context, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered, int index) {
+    public void render(@NotNull GuiGraphics context, @NotNull Font textRenderer, int x, int y, boolean hovered, int index) {
         context.fill(x, y, x + MidnightRing.ELEMENT_SIZE, y + MidnightRing.ELEMENT_SIZE, hovered || RingPage.selected == index ? 0xbb777777 : 0xbb000000);
         drawIcon(context, textRenderer, x, y, hovered);
     }
 
-    public abstract void drawIcon(@NotNull DrawContext context, @NotNull TextRenderer textRenderer, int x, int y, boolean hovered);
+    public abstract void drawIcon(@NotNull GuiGraphics context, @NotNull Font textRenderer, int x, int y, boolean hovered);
 
     /**
      * Represents a factory for {@link RingAction}.

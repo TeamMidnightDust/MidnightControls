@@ -1,6 +1,6 @@
 package eu.midnightdust.midnightcontrols.client.util;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 public class MathUtil {
     public static class PolarUtil {
@@ -13,7 +13,7 @@ public class MathUtil {
         }
         public void calculate(float x, float y, float speedFactor, double deadZone) {
             double inputR = Math.pow(x, 2) + Math.pow(y, 2);
-            inputR = (Math.abs(speedFactor * MathHelper.clamp(inputR,0.f,1.f)));
+            inputR = (Math.abs(speedFactor * Mth.clamp(inputR,0.f,1.f)));
             inputR = inputR < deadZone ? 0f : (inputR-deadZone) / (1f-deadZone);
             double inputTheta = Math.atan2(y, x);
             polarX = (float) (inputR *Math.cos(inputTheta));

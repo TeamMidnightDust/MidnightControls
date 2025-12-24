@@ -1,12 +1,12 @@
 package eu.midnightdust.midnightcontrols.client.mixin;
 
-import net.minecraft.client.gui.screen.ingame.BookSigningScreen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.inventory.BookSignScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(BookSigningScreen.class)
+@Mixin(BookSignScreen.class)
 public interface BookSigningScreenAccessor {
-    @Accessor("bookTitleTextField")
-    TextFieldWidget midnightcontrols$getBookTitleTextField();
+    @Accessor("titleBox")
+    EditBox midnightcontrols$getBookTitleTextField();
 }

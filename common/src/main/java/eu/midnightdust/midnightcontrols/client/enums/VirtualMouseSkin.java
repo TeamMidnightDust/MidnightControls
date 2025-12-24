@@ -9,11 +9,11 @@
 
 package eu.midnightdust.midnightcontrols.client.enums;
 
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Optional;
+import net.minecraft.network.chat.Component;
 
 /**
  * Represents the virtual mouse skins.
@@ -28,11 +28,11 @@ public enum VirtualMouseSkin {
     SECOND_DARK("second_dark");
 
     private final String name;
-    private final Text text;
+    private final Component text;
 
     VirtualMouseSkin(String name) {
         this.name = name;
-        this.text = Text.translatable(this.getTranslationKey());
+        this.text = Component.translatable(this.getTranslationKey());
     }
 
     /**
@@ -61,7 +61,7 @@ public enum VirtualMouseSkin {
      *
      * @return the translated text of this virtual mouse skin
      */
-    public @NotNull Text getTranslatedText() {
+    public @NotNull Component getTranslatedText() {
         return this.text;
     }
 

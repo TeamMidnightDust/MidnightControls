@@ -8,8 +8,8 @@ import eu.midnightdust.midnightcontrols.neoforge.event.PlayerChangeControlsModeE
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
 import eu.midnightdust.midnightcontrols.packet.FeaturePayload;
 import eu.midnightdust.midnightcontrols.packet.HelloPayload;
-import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
@@ -24,17 +24,17 @@ public class MidnightControlsNeoforge {
         MidnightControls.init();
     }
     @EventBusSubscriber(modid = NAMESPACE)
-    public class CommonEvents {
+    public static class CommonEvents {
         @SubscribeEvent
         public static void registerPayloads(RegisterPayloadHandlersEvent event) {
             PayloadRegistrar registrar = event.registrar("1").optional();
             registrar.playToServer(HelloPayload.PACKET_ID, HelloPayload.codec, (payload, context) -> {
                 ControlsMode.byId(payload.controlsMode()).ifPresent(controlsMode -> new PlayerChangeControlsModeEvent(context.player(), controlsMode));
-                context.connection().send(new CustomPayloadS2CPacket(new FeaturePayload(MidnightControlsFeature.HORIZONTAL_REACHAROUND)));
+                context.connection().send(new ClientboundCustomPayloadPacket(new FeaturePayload(MidnightControlsFeature.HORIZONTAL_REACHAROUND)));
             });
             registrar.playBidirectional(ControlsModePayload.PACKET_ID, ControlsModePayload.codec, (payload, context) -> {
                 if (context.flow().isServerbound()) ControlsMode.byId(payload.controlsMode()).ifPresent(controlsMode -> new PlayerChangeControlsModeEvent(context.player(), controlsMode));
-                else context.connection().send(new CustomPayloadC2SPacket(new ControlsModePayload(MidnightControlsConfig.controlsMode.getName())));
+                else context.connection().send(new ServerboundCustomPayloadPacket(new ControlsModePayload(MidnightControlsConfig.controlsMode.getName())));
             });
             registrar.playToClient(FeaturePayload.PACKET_ID, FeaturePayload.codec, (payload, context) -> {});
         }

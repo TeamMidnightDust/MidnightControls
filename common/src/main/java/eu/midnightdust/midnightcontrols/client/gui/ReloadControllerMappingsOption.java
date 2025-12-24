@@ -13,12 +13,12 @@ import dev.lambdaurora.spruceui.option.SpruceSimpleActionOption;
 import dev.lambdaurora.spruceui.tooltip.TooltipData;
 import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.network.chat.Component;
 
 /**
  * Represents the option to reload the controller mappings.
@@ -28,14 +28,14 @@ public class ReloadControllerMappingsOption {
 
     public static SpruceSimpleActionOption newOption(@Nullable Consumer<SpruceButtonWidget> before) {
         return SpruceSimpleActionOption.of(KEY, btn -> {
-            var client = MinecraftClient.getInstance();
+            var client = Minecraft.getInstance();
             if (before != null)
                 before.accept(btn);
             Controller.updateMappings();
-            if (client.currentScreen instanceof MidnightControlsSettingsScreen)
-                client.currentScreen.init(client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
-            client.getToastManager().add(SystemToast.create(client, SystemToast.Type.PERIODIC_NOTIFICATION,
-                    Text.translatable("midnightcontrols.controller.mappings.updated"), Text.empty()));
-        }, TooltipData.builder().text(Text.translatable("midnightcontrols.tooltip.reload_controller_mappings")).build());
+            if (client.screen instanceof MidnightControlsSettingsScreen)
+                client.screen.init(client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());
+            client.getToastManager().addToast(SystemToast.multiline(client, SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+                    Component.translatable("midnightcontrols.controller.mappings.updated"), Component.empty()));
+        }, TooltipData.builder().text(Component.translatable("midnightcontrols.tooltip.reload_controller_mappings")).build());
     }
 }

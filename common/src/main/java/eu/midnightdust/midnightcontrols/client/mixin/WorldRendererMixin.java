@@ -15,19 +15,22 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.enums.TouchMode;
 import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.state.WorldRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.ColorHelper;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.ShapeRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.LevelRenderState;
+import net.minecraft.util.ARGB;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -40,81 +43,83 @@ import java.awt.*;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.reacharound;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+
 /**
  * Represents a mixin to WorldRenderer.
  * <p>
  * Handles the rendering of the block outline of the reach-around features.
  */
-@Mixin(WorldRenderer.class)
+@Mixin(LevelRenderer.class)
 public abstract class WorldRendererMixin {
     @Shadow
     @Final
-    private MinecraftClient client;
+    private Minecraft minecraft;
 
     @Shadow
-    private ClientWorld world;
+    private ClientLevel level;
 
     @Inject(
-            method = "renderTargetBlockOutline",
+            method = "renderBlockOutline",
             at = @At("HEAD"),
             cancellable = true
     )
-    private void onOutlineRender(VertexConsumerProvider.Immediate immediate, MatrixStack matrices, boolean renderBlockOutline, WorldRenderState renderStates, CallbackInfo ci) {
+    private void onOutlineRender(MultiBufferSource.BufferSource immediate, PoseStack matrices, boolean renderBlockOutline, LevelRenderState renderStates, CallbackInfo ci) {
         if (((MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.touchInControllerMode) || MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN)
                 && MidnightControlsConfig.touchMode == TouchMode.FINGER_POS) {
-            this.midnightcontrols$renderFingerOutline(immediate, matrices, client.gameRenderer.getCamera());
+            this.midnightcontrols$renderFingerOutline(immediate, matrices, minecraft.gameRenderer.getMainCamera());
             ci.cancel();
         }
-        this.midnightcontrols$renderReacharoundOutline(immediate, matrices, client.gameRenderer.getCamera());
+        this.midnightcontrols$renderReacharoundOutline(immediate, matrices, minecraft.gameRenderer.getMainCamera());
     }
     @Unique
-    private void midnightcontrols$renderFingerOutline(VertexConsumerProvider.Immediate immediate, MatrixStack matrices, Camera camera) {
+    private void midnightcontrols$renderFingerOutline(MultiBufferSource.BufferSource immediate, PoseStack matrices, Camera camera) {
         if (TouchInput.firstHitResult == null || TouchInput.firstHitResult.getType() != HitResult.Type.BLOCK)
             return;
         BlockHitResult result = (BlockHitResult) TouchInput.firstHitResult;
         var blockPos = result.getBlockPos();
-        if (this.world.getWorldBorder().contains(blockPos) && this.client.player != null) {
-            var outlineShape = this.world.getBlockState(blockPos).getOutlineShape(this.client.world, blockPos, ShapeContext.of(camera.getFocusedEntity()));
+        if (this.level.getWorldBorder().isWithinBounds(blockPos) && this.minecraft.player != null) {
+            var outlineShape = this.level.getBlockState(blockPos).getShape(this.level, blockPos, CollisionContext.of(camera.entity()));
             Color rgb = MidnightColorUtil.hex2Rgb(MidnightControlsConfig.touchOutlineColorHex);
             if (MidnightControlsConfig.touchOutlineColorHex.isEmpty()) rgb = RainbowColor.radialRainbow(1,1);
-            var pos = camera.getCameraPos();
-            matrices.push();
-            var vertexConsumer = immediate.getBuffer(RenderLayers.lines());
-            VertexRendering.drawOutline(matrices, vertexConsumer, outlineShape, blockPos.getX() - pos.getX(), blockPos.getY() - pos.getY(), blockPos.getZ() - pos.getZ(),
-                    ColorHelper.withAlpha(MidnightControlsConfig.touchOutlineColorAlpha, rgb.getRGB()), 4);
-            matrices.pop();
+            var pos = camera.position();
+            matrices.pushPose();
+            var vertexConsumer = immediate.getBuffer(RenderTypes.lines());
+            ShapeRenderer.renderShape(matrices, vertexConsumer, outlineShape, blockPos.getX() - pos.x(), blockPos.getY() - pos.y(), blockPos.getZ() - pos.z(),
+                    ARGB.color(MidnightControlsConfig.touchOutlineColorAlpha, rgb.getRGB()), 4);
+            matrices.popPose();
         }
     }
     @Unique
-    private void midnightcontrols$renderReacharoundOutline(VertexConsumerProvider.Immediate immediate, MatrixStack matrices, Camera camera) {
-        if (this.client.crosshairTarget == null || this.client.crosshairTarget.getType() != HitResult.Type.MISS || !MidnightControlsConfig.shouldRenderReacharoundOutline)
+    private void midnightcontrols$renderReacharoundOutline(MultiBufferSource.BufferSource immediate, PoseStack matrices, Camera camera) {
+        if (this.minecraft.hitResult == null || this.minecraft.hitResult.getType() != HitResult.Type.MISS || !MidnightControlsConfig.shouldRenderReacharoundOutline)
             return;
         var result = reacharound.getLastReacharoundResult();
         if (result == null)
             return;
         var blockPos = result.getBlockPos();
-        if (this.world.getWorldBorder().contains(blockPos) && this.client.player != null) {
-            var stack = this.client.player.getStackInHand(Hand.MAIN_HAND);
+        if (this.level.getWorldBorder().isWithinBounds(blockPos) && this.minecraft.player != null) {
+            var stack = this.minecraft.player.getItemInHand(InteractionHand.MAIN_HAND);
             if (stack == null || !(stack.getItem() instanceof BlockItem))
                 return;
 
             var block = ((BlockItem) stack.getItem()).getBlock();
             result = reacharound.withSideForReacharound(result, block);
-            var context = new ItemPlacementContext(new ItemUsageContext(this.client.player, Hand.MAIN_HAND, result));
+            var context = new BlockPlaceContext(new UseOnContext(this.minecraft.player, InteractionHand.MAIN_HAND, result));
 
-            var placementState = block.getPlacementState(context);
+            var placementState = block.getStateForPlacement(context);
             if (placementState == null)
                 return;
-            var pos = camera.getCameraPos();
+            var pos = camera.position();
 
-            var outlineShape = placementState.getOutlineShape(this.client.world, blockPos, ShapeContext.of(camera.getFocusedEntity()));
+            var outlineShape = placementState.getShape(this.level, blockPos, CollisionContext.of(camera.entity()));
             Color rgb = MidnightColorUtil.hex2Rgb(MidnightControlsConfig.reacharoundOutlineColorHex);
             if (MidnightControlsConfig.reacharoundOutlineColorHex.isEmpty()) rgb = RainbowColor.radialRainbow(1,1);
-            matrices.push();
-            var vertexConsumer = immediate.getBuffer(RenderLayers.lines());
-            VertexRendering.drawOutline(matrices, vertexConsumer, outlineShape, blockPos.getX() - pos.getX(), blockPos.getY() - pos.getY(), blockPos.getZ() - pos.getZ(),
-                    ColorHelper.withAlpha(MidnightControlsConfig.touchOutlineColorAlpha, rgb.getRGB()), 4);
-            matrices.pop();
+            matrices.pushPose();
+            var vertexConsumer = immediate.getBuffer(RenderTypes.lines());
+            ShapeRenderer.renderShape(matrices, vertexConsumer, outlineShape, blockPos.getX() - pos.x(), blockPos.getY() - pos.y(), blockPos.getZ() - pos.z(),
+                    ARGB.color(MidnightControlsConfig.touchOutlineColorAlpha, rgb.getRGB()), 4);
+            matrices.popPose();
         }
     }
 }

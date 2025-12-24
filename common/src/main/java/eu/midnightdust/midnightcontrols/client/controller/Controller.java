@@ -12,10 +12,6 @@ package eu.midnightdust.midnightcontrols.client.controller;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.text.Text;
 import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -33,6 +29,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 
 import static org.lwjgl.BufferUtils.createByteBuffer;
 
@@ -168,12 +168,12 @@ public record Controller(int id) {
             if (i != 0) {
                 long l = pointerBuffer.get();
                 var string = l == 0L ? "" : MemoryUtil.memUTF8(l);
-                var client = MinecraftClient.getInstance();
+                var client = Minecraft.getInstance();
                 if (client != null) {
-                    client.getToastManager().add(SystemToast.create(client, SystemToast.Type.PERIODIC_NOTIFICATION,
-                            Text.translatable("midnightcontrols.controller.mappings.error"), Text.literal(string)));
+                    client.getToastManager().addToast(SystemToast.multiline(client, SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+                            Component.translatable("midnightcontrols.controller.mappings.error"), Component.literal(string)));
                 }
-                MidnightControls.log(I18n.translate("midnightcontrols.controller.mappings.error")+string);
+                MidnightControls.log(I18n.get("midnightcontrols.controller.mappings.error")+string);
             }
         } catch (Throwable e) {
             /* Ignored :concern: */

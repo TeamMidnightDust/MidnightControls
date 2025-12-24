@@ -1,12 +1,12 @@
 package eu.midnightdust.midnightcontrols.client.enums;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 public enum CameraMode {
     FLAT, ADAPTIVE;
-    public Text getTranslatedText() {
-        return Text.translatable("midnightcontrols.midnightconfig.enum."+this.getClass().getSimpleName()+"."+this.name());
+    public Component getTranslatedText() {
+        return Component.translatable("midnightcontrols.midnightconfig.enum."+this.getClass().getSimpleName()+"."+this.name());
     }
     public @NotNull CameraMode next() {
         var v = values();

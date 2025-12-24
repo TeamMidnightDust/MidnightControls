@@ -4,12 +4,12 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.Atlases;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.data.AtlasIds;
+import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.NotNull;
 
 import static eu.midnightdust.midnightcontrols.MidnightControls.id;
@@ -21,17 +21,17 @@ public class VirtualCursorRenderer extends CursorRenderer {
         return INSTANCE;
     }
 
-    public void renderCursor(@NotNull DrawContext context, @NotNull MinecraftClient client) {
-        if (!MidnightControlsConfig.virtualMouse || (client.currentScreen == null
-                || MidnightInput.isScreenInteractive(client.currentScreen)))
+    public void renderCursor(@NotNull GuiGraphics context, @NotNull Minecraft client) {
+        if (!MidnightControlsConfig.virtualMouse || (client.screen == null
+                || MidnightInput.isScreenInteractive(client.screen)))
             return;
 
-        float mouseX = (float) client.mouse.getX() * client.getWindow().getScaledWidth() / client.getWindow().getWidth();
-        float mouseY = (float) client.mouse.getY() * client.getWindow().getScaledHeight() / client.getWindow().getHeight();
+        float mouseX = (float) client.mouseHandler.xpos() * client.getWindow().getGuiScaledWidth() / client.getWindow().getScreenWidth();
+        float mouseY = (float) client.mouseHandler.ypos() * client.getWindow().getGuiScaledHeight() / client.getWindow().getScreenHeight();
 
         boolean hoverSlot = false;
 
-        if (client.currentScreen instanceof HandledScreenAccessor inventoryScreen) {
+        if (client.screen instanceof HandledScreenAccessor inventoryScreen) {
             int guiLeft = inventoryScreen.getX();
             int guiTop = inventoryScreen.getY();
 
@@ -44,8 +44,8 @@ public class VirtualCursorRenderer extends CursorRenderer {
             }
         }
 
-        if (!hoverSlot && client.currentScreen != null) {
-            var slot = MidnightControlsCompat.getSlotAt(client.currentScreen, (int) mouseX, (int) mouseY);
+        if (!hoverSlot && client.screen != null) {
+            var slot = MidnightControlsCompat.getSlotAt(client.screen, (int) mouseX, (int) mouseY);
 
             if (slot != null) {
                 mouseX = slot.x();
@@ -60,8 +60,8 @@ public class VirtualCursorRenderer extends CursorRenderer {
         }
 
         try {
-            Sprite sprite = client.getAtlasManager().getAtlasTexture(Atlases.GUI).getSprite(id(MidnightControlsConfig.virtualMouseSkin.getSpritePath() + (hoverSlot ? "_slot" : "")));
-            drawUnalignedTexturedQuad(RenderPipelines.GUI_TEXTURED, sprite.getAtlasId(), context, mouseX, mouseX + 16, mouseY, mouseY + 16, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
+            TextureAtlasSprite sprite = client.getAtlasManager().getAtlasOrThrow(AtlasIds.GUI).getSprite(id(MidnightControlsConfig.virtualMouseSkin.getSpritePath() + (hoverSlot ? "_slot" : "")));
+            drawUnalignedTexturedQuad(RenderPipelines.GUI_TEXTURED, sprite.atlasLocation(), context, mouseX, mouseX + 16, mouseY, mouseY + 16, sprite.getU0(), sprite.getU1(), sprite.getV0(), sprite.getV1());
         } catch (IllegalStateException ignored) {}
     }
 }

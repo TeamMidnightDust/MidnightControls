@@ -9,10 +9,10 @@
 
 package eu.midnightdust.midnightcontrols.client.compat;
 
-import net.minecraft.client.gui.screen.Screen;
 import org.aperlambda.lambdacommon.utils.LambdaReflection;
 
 import java.util.Optional;
+import net.minecraft.client.gui.screens.Screen;
 
 /**
  * Represents HQM compatibility handler.

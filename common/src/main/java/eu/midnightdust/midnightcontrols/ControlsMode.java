@@ -9,14 +9,11 @@
 
 package eu.midnightdust.midnightcontrols;
 
-import net.minecraft.text.Text;
-import net.minecraft.text.object.AtlasTextObjectContents;
-import net.minecraft.util.Atlases;
-import net.minecraft.util.StringIdentifiable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Optional;
+import net.minecraft.util.StringRepresentable;
 
 import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 
@@ -27,7 +24,7 @@ import static eu.midnightdust.midnightcontrols.MidnightControls.id;
  * @version 1.7.0
  * @since 1.0.0
  */
-public enum ControlsMode implements StringIdentifiable {
+public enum ControlsMode implements StringRepresentable {
     DEFAULT("icon/keyboard_mouse"),
     CONTROLLER("icon/controller"),
     TOUCHSCREEN("icon/touchscreen");
@@ -80,7 +77,7 @@ public enum ControlsMode implements StringIdentifiable {
     }
 
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return getTranslationKey();
     }
 }

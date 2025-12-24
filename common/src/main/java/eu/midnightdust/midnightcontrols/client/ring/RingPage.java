@@ -10,8 +10,8 @@
 package eu.midnightdust.midnightcontrols.client.ring;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -45,10 +45,10 @@ public class RingPage {
      * @param mouseY the mouse Y-coordinate
      * @param tickDelta the tick delta
      */
-    public void render(@NotNull DrawContext context, @NotNull TextRenderer textRenderer, int width, int height, int mouseX, int mouseY, float tickDelta) {
+    public void render(@NotNull GuiGraphics context, @NotNull Font textRenderer, int width, int height, int mouseX, int mouseY, float tickDelta) {
         int centerX = width / 2;
         int centerY = height / 2;
-        if (MidnightControlsClient.ring.getMaxPages() > 1) context.drawCenteredTextWithShadow(textRenderer, name, centerX, 5, 0xffffff);
+        if (MidnightControlsClient.ring.getMaxPages() > 1) context.drawCenteredString(textRenderer, name, centerX, 5, 0xffffff);
 
         int offset = MidnightRing.ELEMENT_SIZE + (MidnightRing.ELEMENT_SIZE / 2) + 5;
 

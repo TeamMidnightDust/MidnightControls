@@ -14,14 +14,13 @@ import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.MovementHandler;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.input.Input;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.MovementType;
-import net.minecraft.network.encryption.PlayerPublicKey;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.ClientInput;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,37 +34,37 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * Injects the anti fly drifting feature.
  */
-@Mixin(ClientPlayerEntity.class)
-public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
+@Mixin(LocalPlayer.class)
+public abstract class ClientPlayerEntityMixin extends AbstractClientPlayer {
     @Unique private boolean midnightcontrols$driftingPrevented = false;
 
-    public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
+    public ClientPlayerEntityMixin(ClientLevel world, GameProfile profile) {
         super(world, profile);
     }
 
     @Shadow
-    protected abstract boolean hasMovementInput();
+    protected abstract boolean isMoving();
 
     @Shadow
     @Final
-    protected MinecraftClient client;
+    protected Minecraft minecraft;
 
     @Shadow
-    public Input input;
+    public ClientInput input;
 
     @Shadow
-    protected abstract boolean isCamera();
+    protected abstract boolean isControlledCamera();
 
 
-    @Inject(method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"))
-    public void onMove(MovementType type, Vec3d movement, CallbackInfo ci) {
+    @Inject(method = "move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V"))
+    public void onMove(MoverType type, Vec3 movement, CallbackInfo ci) {
         if (!MidnightControls.isExtrasLoaded) return;
-        if (type == MovementType.SELF) {
+        if (type == MoverType.SELF) {
             if (this.getAbilities().flying && (!MidnightControlsConfig.flyDrifting || !MidnightControlsConfig.verticalFlyDrifting)) {
-                if (!this.hasMovementInput()) {
+                if (!this.isMoving()) {
                     if (!this.midnightcontrols$driftingPrevented) {
                         if (!MidnightControlsConfig.flyDrifting)
-                            this.setVelocity(this.getVelocity().multiply(0, 1.0, 0));
+                            this.setDeltaMovement(this.getDeltaMovement().multiply(0, 1.0, 0));
                     }
                     this.midnightcontrols$driftingPrevented = true;
                 } else
@@ -74,27 +73,27 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         }
     }
 
-    @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/Input;tick()V", shift = At.Shift.AFTER))
+    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/ClientInput;tick()V", shift = At.Shift.AFTER))
     public void onInputUpdate(CallbackInfo ci) {
-        MovementHandler.HANDLER.applyMovement((ClientPlayerEntity) (Object) this);
+        MovementHandler.HANDLER.applyMovement((LocalPlayer) (Object) this);
     }
 
-    @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isCamera()Z"))
+    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isControlledCamera()Z"))
     public void onTickMovement(CallbackInfo ci) {
-        if (this.getAbilities().flying && this.isCamera()) {
+        if (this.getAbilities().flying && this.isControlledCamera()) {
             if (MidnightControlsConfig.verticalFlyDrifting || !MidnightControls.isExtrasLoaded)
                 return;
             int moving = 0;
-            if (this.input.playerInput.sneak()) {
+            if (this.input.keyPresses.shift()) {
                 --moving;
             }
 
-            if (this.input.playerInput.jump()) {
+            if (this.input.keyPresses.jump()) {
                 ++moving;
             }
 
             if (moving == 0) {
-                this.setVelocity(this.getVelocity().multiply(1.0, 0.0, 1.0));
+                this.setDeltaMovement(this.getDeltaMovement().multiply(1.0, 0.0, 1.0));
             }
         }
     }

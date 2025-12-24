@@ -36,13 +36,6 @@ import eu.midnightdust.midnightcontrols.client.gui.config.ControllerBindingButto
 import eu.midnightdust.midnightcontrols.client.gui.config.ControllerSelectionButton;
 import eu.midnightdust.midnightcontrols.client.gui.config.MappingsStringInputWidget;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutManager;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextIconButtonWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -50,6 +43,13 @@ import org.lwjgl.glfw.GLFW;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.regex.Pattern;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.SpriteIconButton;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 import static org.lwjgl.glfw.GLFW.*;
@@ -122,8 +122,8 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Comment(category = GAMEPLAY, centered = true, name="\uD83D\uDECB Comfort") public static Comment _comfort;
     @Entry(category = GAMEPLAY, name = "Enable Hints") public static boolean enableHints = true;
     @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.analog_movement") public static boolean analogMovement = true;
-    @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.controller_toggle_sneak") public static boolean controllerToggleSneak = MinecraftClient.getInstance().options.getSneakToggled().getValue();
-    @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.controller_toggle_sprint") public static boolean controllerToggleSprint = MinecraftClient.getInstance().options.getSprintToggled().getValue();
+    @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.controller_toggle_sneak") public static boolean controllerToggleSneak = Minecraft.getInstance().options.toggleCrouch().get();
+    @Entry(category = GAMEPLAY, name = "midnightcontrols.menu.controller_toggle_sprint") public static boolean controllerToggleSprint = Minecraft.getInstance().options.toggleSprint().get();
 
     @Condition(requiredModId = "midnightcontrols-extra")
     @Comment(category = GAMEPLAY, centered = true, name="✨ Extras") public static Comment _extras;
@@ -218,7 +218,7 @@ public class MidnightControlsConfig extends MidnightConfig {
                     .sorted(Comparator.comparingInt(ButtonCategory::getPriority))
                     .forEach(category -> {
 
-                        list.addButton(Lists.newArrayList(), Text.literal(category.getTranslatedName()), centeredComment);
+                        list.addButton(Lists.newArrayList(), Component.literal(category.getTranslatedName()), centeredComment);
 
                         category.getBindings().forEach(binding -> {
                             ControllerBindingButton.add(binding, list, screen);
@@ -226,31 +226,31 @@ public class MidnightControlsConfig extends MidnightConfig {
                     });
         }
         if (MISC.equals(tabName)) {
-            TextIconButtonWidget resetButton = TextIconButtonWidget.builder(Text.translatable("controls.reset"), (button -> {
+            SpriteIconButton resetButton = SpriteIconButton.builder(Component.translatable("controls.reset"), (button -> {
                 MidnightControlsConfig.keyboardLayout = "en_US:qwerty";
                 screen.updateList();
-            }), true).texture(Identifier.of("midnightlib","icon/reset"), 12, 12).dimension(20, 20).build();
+            }), true).sprite(Identifier.fromNamespaceAndPath("midnightlib","icon/reset"), 12, 12).size(20, 20).build();
             resetButton.setPosition(screen.width - 205 + 150 + 25, 0);
-            ButtonWidget editButton = ButtonWidget.builder(Text.translatable(KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout).getTranslationKey()),
+            Button editButton = Button.builder(Component.translatable(KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout).getTranslationKey()),
                     button -> {
                         MidnightControlsConfig.keyboardLayout = KeyboardLayoutManager.getNext(KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout)).getId();
                         resetButton.active = !MidnightControlsConfig.keyboardLayout.equals("en_US:qwerty");
-                        button.setMessage(Text.translatable(KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout).getTranslationKey()));
-                    }).dimensions(screen.width - 185, 0, 150, 20).build();
+                        button.setMessage(Component.translatable(KeyboardLayoutManager.getById(MidnightControlsConfig.keyboardLayout).getTranslationKey()));
+                    }).bounds(screen.width - 185, 0, 150, 20).build();
             resetButton.active = !MidnightControlsConfig.keyboardLayout.equals("en_US:qwerty");
 
-            list.addButton(List.of(editButton, resetButton), Text.translatable("midnightcontrols.menu.virtual_keyboard_layout"), new EntryInfo(null, screen.modid));
+            list.addButton(List.of(editButton, resetButton), Component.translatable("midnightcontrols.menu.virtual_keyboard_layout"), new EntryInfo(null, screen.modid));
         }
         if (CONTROLLER.equals(tabName)) {
-            list.addButton(List.of(), Text.of("\uD83C\uDFAE General"), centeredComment);
+            list.addButton(List.of(), Component.nullToEmpty("\uD83C\uDFAE General"), centeredComment);
             ControllerSelectionButton.add(list, screen, false);
             ControllerSelectionButton.add(list, screen, true);
 
-            ButtonWidget editButton = ButtonWidget.builder(Text.of("OPEN"),
+            Button editButton = Button.builder(Component.nullToEmpty("OPEN"),
                     button -> {
-                        client.setScreen(new MidnightControlsSettingsScreen(client.currentScreen, false));
-                    }).dimensions(screen.width - 185, 0, 175, 20).build();
-            list.addButton(List.of(editButton), Text.of("Legacy Config UI"), new EntryInfo(null, screen.modid));
+                        client.setScreen(new MidnightControlsSettingsScreen(client.screen, false));
+                    }).bounds(screen.width - 185, 0, 175, 20).build();
+            list.addButton(List.of(editButton), Component.nullToEmpty("Legacy Config UI"), new EntryInfo(null, screen.modid));
         }
 //        if (MAPPING.equals(tabName)) {
 //            MappingsStringInputWidget.add(centeredComment, list, screen);
@@ -481,8 +481,8 @@ public class MidnightControlsConfig extends MidnightConfig {
         hudEnable = true;
         hudSide = HudSide.LEFT;
         analogMovement = true;
-        controllerToggleSneak = MinecraftClient.getInstance().options.getSneakToggled().getValue();
-        controllerToggleSprint = MinecraftClient.getInstance().options.getSprintToggled().getValue();
+        controllerToggleSneak = Minecraft.getInstance().options.toggleCrouch().get();
+        controllerToggleSprint = Minecraft.getInstance().options.toggleSprint().get();
         fastBlockPlacing = false;
         flyDrifting = true;
         verticalFlyDrifting = true;

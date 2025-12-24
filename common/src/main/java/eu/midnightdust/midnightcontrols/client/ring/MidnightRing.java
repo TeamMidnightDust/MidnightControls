@@ -14,13 +14,13 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.util.Mth;
 
 /**
  * Represents a key binding ring.
@@ -55,15 +55,15 @@ public final class MidnightRing {
         if (configBindings != null) {
             this.pages.clear();
             int bindingIndex = 0;
-            for (int i = 0; i < MathHelper.ceil(configBindings.size() / 8f); ++i) {
-                this.pages.add(new RingPage(i+1 + " / " + MathHelper.ceil(configBindings.size() / 8f)));
+            for (int i = 0; i < Mth.ceil(configBindings.size() / 8f); ++i) {
+                this.pages.add(new RingPage(i+1 + " / " + Mth.ceil(configBindings.size() / 8f)));
             }
 
             for (String binding : configBindings) {
                 ButtonBinding buttonBinding = InputManager.getBinding(binding);
                 if (buttonBinding != null) {
-                    RingPage page = this.pages.get(MathHelper.floor(bindingIndex / 8f));
-                    page.actions[bindingIndex - 8 * (MathHelper.floor(bindingIndex / 8f))] = (new ButtonBindingRingAction(buttonBinding));
+                    RingPage page = this.pages.get(Mth.floor(bindingIndex / 8f));
+                    page.actions[bindingIndex - 8 * (Mth.floor(bindingIndex / 8f))] = (new ButtonBindingRingAction(buttonBinding));
                     ++bindingIndex;
                 }
             }
@@ -80,14 +80,14 @@ public final class MidnightRing {
         if (unboundBindings != null) {
             this.pages.clear();
             int bindingIndex = 0;
-            for (int i = 0; i < MathHelper.ceil(unboundBindings.size() / 8f); ++i) {
-                this.pages.add(new RingPage(i+1 + " / " + MathHelper.ceil(unboundBindings.size() / 8f)));
+            for (int i = 0; i < Mth.ceil(unboundBindings.size() / 8f); ++i) {
+                this.pages.add(new RingPage(i+1 + " / " + Mth.ceil(unboundBindings.size() / 8f)));
             }
 
             for (ButtonBinding buttonBinding : unboundBindings) {
                 if (buttonBinding != null) {
-                    RingPage page = this.pages.get(MathHelper.floor(bindingIndex / 8f));
-                    page.actions[bindingIndex - 8 * (MathHelper.floor(bindingIndex / 8f))] = (new ButtonBindingRingAction(buttonBinding));
+                    RingPage page = this.pages.get(Mth.floor(bindingIndex / 8f));
+                    page.actions[bindingIndex - 8 * (Mth.floor(bindingIndex / 8f))] = (new ButtonBindingRingAction(buttonBinding));
                     ++bindingIndex;
                 }
             }

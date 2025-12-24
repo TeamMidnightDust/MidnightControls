@@ -18,13 +18,11 @@ import dev.lambdaurora.spruceui.widget.text.SpruceTextAreaWidget;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.text.Text;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.network.chat.Component;
 
 /**
  * Represents the controller mappings file editor screen.
@@ -45,7 +43,7 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
         this.reloadMappingsOption = ReloadControllerMappingsOption.newOption(btn -> {
             this.writeMappings();
         });
-        this.copyGuidOption = SpruceSimpleActionOption.of("midnightcontrols.menu.copy_controller_guid", button -> client.keyboard.setClipboard(MidnightControlsConfig.getController().getGuid()));
+        this.copyGuidOption = SpruceSimpleActionOption.of("midnightcontrols.menu.copy_controller_guid", button -> client.keyboardHandler.setClipboard(MidnightControlsConfig.getController().getGuid()));
 
         this.init();
     }
@@ -68,8 +66,8 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
                 fw.close();
             } catch (IOException e) {
                 if (this.client != null)
-                    this.client.getToastManager().add(SystemToast.create(this.client, SystemToast.Type.PERIODIC_NOTIFICATION,
-                            Text.translatable("midnightcontrols.controller.mappings.error.write"), Text.empty()));
+                    this.client.getToastManager().addToast(SystemToast.multiline(this.client, SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+                            Component.translatable("midnightcontrols.controller.mappings.error.write"), Component.empty()));
                 e.fillInStackTrace();
             }
         }
@@ -94,10 +92,10 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
         }
 
         int textFieldWidth = (int) (this.width * (5.0 / 6.0));
-        this.textArea = new SpruceTextAreaWidget(Position.of(this, this.width / 2 - textFieldWidth / 2, 0), textFieldWidth, this.height - 50, Text.literal(mappings));
+        this.textArea = new SpruceTextAreaWidget(Position.of(this, this.width / 2 - textFieldWidth / 2, 0), textFieldWidth, this.height - 50, Component.literal(mappings));
         this.textArea.setText(mappings);
         // Display as many lines as possible
-        this.textArea.setDisplayedLines(this.textArea.getInnerHeight() / this.client.textRenderer.fontHeight);
+        this.textArea.setDisplayedLines(this.textArea.getInnerHeight() / this.client.font.lineHeight);
         this.addChild(this.textArea);
 
         this.addChild(this.reloadMappingsOption.createWidget(Position.of(this.width / 2 - 155, this.height - 29), 257));
@@ -107,7 +105,7 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
     @Override
     public void renderWidget(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
         super.renderWidget(context, mouseX, mouseY, delta);
-        context.vanilla().drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.multiple_mapping_tip"), this.textArea.getX() + this.textArea.getWidth() / 2, this.textArea.getY() + this.textArea.getHeight() - 12, 0xFF888888);
-        context.vanilla().drawCenteredTextWithShadow(this.client.textRenderer, Text.translatable("midnightcontrols.menu.current_controller_guid", MidnightControlsConfig.getController().getGuid()), this.textArea.getX() + this.textArea.getWidth() / 2, this.height - 21, 0xFFFFFFFF);
+        context.vanilla().drawCenteredString(this.client.font, Component.translatable("midnightcontrols.menu.multiple_mapping_tip"), this.textArea.getX() + this.textArea.getWidth() / 2, this.textArea.getY() + this.textArea.getHeight() - 12, 0xFF888888);
+        context.vanilla().drawCenteredString(this.client.font, Component.translatable("midnightcontrols.menu.current_controller_guid", MidnightControlsConfig.getController().getGuid()), this.textArea.getX() + this.textArea.getWidth() / 2, this.height - 21, 0xFFFFFFFF);
     }
 }

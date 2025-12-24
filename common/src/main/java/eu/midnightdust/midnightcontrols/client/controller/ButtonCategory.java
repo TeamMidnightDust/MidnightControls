@@ -9,14 +9,14 @@
 
 package eu.midnightdust.midnightcontrols.client.controller;
 
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.resources.Identifier;
 
 /**
  * Represents a button binding category
@@ -70,7 +70,7 @@ public class ButtonCategory {
      * @return the translated name
      */
     public @NotNull String getTranslatedName() {
-        return I18n.translate("key.category.%s.%s".formatted(id.getNamespace(), id.getPath()));
+        return I18n.get("key.category.%s.%s".formatted(id.getNamespace(), id.getPath()));
     }
 
     /**

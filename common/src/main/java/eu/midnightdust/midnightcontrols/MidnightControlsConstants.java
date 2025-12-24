@@ -10,9 +10,9 @@
 package eu.midnightdust.midnightcontrols;
 
 
-import net.minecraft.util.Identifier;
-
 import static eu.midnightdust.midnightcontrols.MidnightControls.id;
+
+import net.minecraft.resources.Identifier;
 
 /**
  * Represents the constants used by MidnightControls.

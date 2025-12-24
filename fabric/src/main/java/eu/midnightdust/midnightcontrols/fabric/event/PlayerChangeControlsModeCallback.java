@@ -12,7 +12,7 @@ package eu.midnightdust.midnightcontrols.fabric.event;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -24,11 +24,11 @@ import org.jetbrains.annotations.NotNull;
  */
 @FunctionalInterface
 public interface PlayerChangeControlsModeCallback {
-    Event<PlayerChangeControlsModeCallback> EVENT = EventFactory.createArrayBacked(PlayerChangeControlsModeCallback.class, listeners -> (player, controlsMode) -> {
+    Event<@NotNull PlayerChangeControlsModeCallback> EVENT = EventFactory.createArrayBacked(PlayerChangeControlsModeCallback.class, listeners -> (player, controlsMode) -> {
         for (PlayerChangeControlsModeCallback event : listeners) {
             event.apply(player, controlsMode);
         }
     });
 
-    void apply(@NotNull PlayerEntity player, @NotNull ControlsMode controlsMode);
+    void apply(@NotNull Player player, @NotNull ControlsMode controlsMode);
 }

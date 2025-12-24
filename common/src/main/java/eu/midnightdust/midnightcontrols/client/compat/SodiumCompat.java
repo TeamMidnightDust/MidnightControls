@@ -2,7 +2,7 @@ package eu.midnightdust.midnightcontrols.client.compat;
 
 import eu.midnightdust.midnightcontrols.client.compat.mixin.sodium.SodiumOptionsGUIAccessor;
 import net.caffeinemc.mods.sodium.client.gui.SodiumOptionsGUI;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 public class SodiumCompat implements CompatHandler {
     @Override

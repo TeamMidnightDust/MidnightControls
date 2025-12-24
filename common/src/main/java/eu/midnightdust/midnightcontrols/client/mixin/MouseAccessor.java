@@ -1,14 +1,14 @@
 package eu.midnightdust.midnightcontrols.client.mixin;
 
-import net.minecraft.client.Mouse;
-import net.minecraft.client.input.MouseInput;
+import net.minecraft.client.MouseHandler;
+import net.minecraft.client.input.MouseButtonInfo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(Mouse.class)
+@Mixin(MouseHandler.class)
 public interface MouseAccessor {
-    @Invoker("onCursorPos")
+    @Invoker("onMove")
     void midnightcontrols$onCursorPos(long window, double x, double y);
-    @Invoker("onMouseButton")
-    void midnightcontrols$onMouseButton(long window, MouseInput input, int action);
+    @Invoker("onButton")
+    void midnightcontrols$onMouseButton(long window, MouseButtonInfo input, int action);
 }

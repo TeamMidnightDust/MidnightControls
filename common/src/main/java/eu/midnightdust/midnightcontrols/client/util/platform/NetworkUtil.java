@@ -1,8 +1,8 @@
 package eu.midnightdust.midnightcontrols.client.util.platform;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 public class NetworkUtil {
     @ExpectPlatform
@@ -10,7 +10,7 @@ public class NetworkUtil {
         throw new AssertionError();
     }
     @ExpectPlatform
-    public static void sendPayloadC2S(CustomPayload payload) {
+    public static void sendPayloadC2S(CustomPacketPayload payload) {
         throw new AssertionError();
     }
 }

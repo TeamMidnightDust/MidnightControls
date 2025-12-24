@@ -9,8 +9,8 @@
 
 package eu.midnightdust.midnightcontrols.client.util;
 
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -50,5 +50,5 @@ public interface HandledScreenAccessor {
      * @param clickData the click data
      * @param actionType the action type
      */
-    void midnightcontrols$onMouseClick(@Nullable Slot slot, int slotId, int clickData, SlotActionType actionType);
+    void midnightcontrols$onMouseClick(@Nullable Slot slot, int slotId, int clickData, ClickType actionType);
 }
