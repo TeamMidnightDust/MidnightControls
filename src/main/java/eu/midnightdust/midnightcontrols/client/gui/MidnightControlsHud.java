@@ -75,7 +75,8 @@ public class MidnightControlsHud {
      * Renders the MidnightControls HUD.
      */
     public void render(GuiGraphics context, DeltaTracker tickCounter) {
-        if (this.client == null || !isVisible) return;
+        if (this.client == null) this.client = Minecraft.getInstance();
+        if (!isVisible) return;
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.screen == null) {
             isCrammed = client.getWindow().getGuiScaledWidth() < 520;
             int y = bottom(2);

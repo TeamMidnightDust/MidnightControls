@@ -38,10 +38,11 @@ public abstract class GameRendererMixin {
         if (this.minecraft.screen != null && MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER)
             MidnightControlsClient.input.onPreRenderScreen(this.minecraft.screen);
     }
-    //? fabric
-    @Inject(method = "render", at = @At(value = "INVOKE, target = "Lnet/minecraft/client/gui/screens/Screen;renderWithTooltipAndSubtitles(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))
-    //? neoforge
-    /*@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/ClientHooks;drawScreen(Lnet/minecraft/client/gui/screens/Screen;Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))*/
+    //? fabric {
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderWithTooltipAndSubtitles(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))
+    //?} else if neoforge {
+    /*@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/ClientHooks;drawScreen(Lnet/minecraft/client/gui/screens/Screen;Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))
+    *//*?}*/
     private void midnightcontrols$renderVirtualCursor(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphics drawContext) {
         VirtualCursorRenderer.getInstance().renderCursor(drawContext,  minecraft);
         if (MidnightControlsClient.isWayland) WaylandCursorRenderer.getInstance().renderCursor(drawContext, minecraft);
