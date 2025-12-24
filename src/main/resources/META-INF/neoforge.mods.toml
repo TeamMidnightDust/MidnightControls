@@ -1,0 +1,39 @@
+modLoader = "javafml"
+loaderVersion = "[2,)"
+#issueTrackerURL = ""
+license = "MIT License"
+
+[[mods]]
+modId = "midnightcontrols"
+version = "${version}"
+displayName = "MidnightControls"
+logoFile = "icon.png"
+authors = "Motschen, LambdAurora"
+contributors = "akemin-dayo, DioEgizio, dogtopus, egeesin, EnnuiL, FlashyReese, gyular, Hambaka, Ivanoks, joaoh1, KiskaUWU, Madis0, RaptaG, ronniedude, spudpiggy, TrueHorse"
+description = '''
+Adds controller support and enhanced controls overall.
+'''
+
+[[mixins]]
+config = "midnightcontrols.mixins.json"
+
+[[dependencies.midnightcontrols]]
+modId = "neoforge"
+mandatory = true
+versionRange = "[21.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.midnightcontrols]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${minecraft}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.midnightcontrols]]
+modId = "midnightlib"
+mandatory = true
+versionRange = "[1.0,)"
+ordering = "AFTER"
+side = "BOTH"
