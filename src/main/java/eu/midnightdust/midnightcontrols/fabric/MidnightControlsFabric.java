@@ -1,7 +1,7 @@
 package eu.midnightdust.midnightcontrols.fabric;
 
 //? fabric {
-/*import eu.midnightdust.midnightcontrols.ControlsMode;
+import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.fabric.event.PlayerChangeControlsModeCallback;
@@ -30,4 +30,4 @@ public class MidnightControlsFabric implements ModInitializer {
         });
     }
 }
-*///?}
+//?}

@@ -1,7 +1,7 @@
 package eu.midnightdust.midnightcontrols.fabric.event;
 
 //? fabric {
-/*import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
+import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -38,4 +38,4 @@ public class MouseClickListener implements ScreenMouseEvents.AllowMouseClick {
         return screen.hashCode();
     }
 }
-*///?}
+//?}

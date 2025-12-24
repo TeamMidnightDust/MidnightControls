@@ -1,7 +1,7 @@
 package eu.midnightdust.midnightcontrols.neoforge;
 
 //? neoforge {
-import eu.midnightdust.midnightcontrols.ControlsMode;
+/*import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.neoforge.event.PlayerChangeControlsModeEvent;
@@ -38,4 +38,4 @@ public class MidnightControlsNeoforge {
         }
     }
 }
-//?}
+*///?}

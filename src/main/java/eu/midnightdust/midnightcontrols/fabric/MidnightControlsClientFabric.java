@@ -1,7 +1,7 @@
 package eu.midnightdust.midnightcontrols.fabric;
 
 //? fabric {
-/*import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
+import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsReloadListener;
@@ -81,4 +81,4 @@ public class MidnightControlsClientFabric implements ClientModInitializer {
         });
     }
 }
-*///?}
+//?}

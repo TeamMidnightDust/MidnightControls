@@ -18,7 +18,10 @@ public class InGameHudMixin {
         MidnightControlsHud.getInstance().init();
     }
 
+    //? fabric
     @Inject(method = "renderHotbarAndDecorations", at = @At("HEAD"))
+    //? neoforge
+    /*@Inject(method = "renderCrosshair", at = @At("HEAD"))*/
     public void midnightcontrols$renderHud(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci) {
         MidnightControlsHud.getInstance().render(context, tickCounter);
     }

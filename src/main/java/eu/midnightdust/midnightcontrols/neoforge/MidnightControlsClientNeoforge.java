@@ -1,7 +1,7 @@
 package eu.midnightdust.midnightcontrols.neoforge;
 
 //? neoforge {
-import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+/*import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsReloadListener;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
@@ -90,4 +90,4 @@ public class MidnightControlsClientNeoforge {
         }
     }
 }
-//?}
+*///?}
