@@ -7,14 +7,10 @@ import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
 import eu.midnightdust.midnightcontrols.packet.HelloPayload;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.resource.DirectoryResourcePack;
-import net.minecraft.resource.ResourcePackInfo;
-import net.minecraft.resource.ResourcePackPosition;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
@@ -22,9 +18,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
-import net.neoforged.neoforgespi.locating.IModFile;
-
-import java.util.Optional;
 
 import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 import static eu.midnightdust.midnightcontrols.MidnightControlsConstants.NAMESPACE;
@@ -43,8 +36,8 @@ public class MidnightControlsClientNeoforge {
         MidnightControlsClient.initClient();
     }
 
-    @EventBusSubscriber(modid = NAMESPACE, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public class ClientEvents {
+    @EventBusSubscriber(modid = NAMESPACE, value = Dist.CLIENT)
+    public static class ClientEvents {
         @SubscribeEvent
         public static void registerKeybinding(RegisterKeyMappingsEvent event) {
             event.register(BINDING_RING);
@@ -55,23 +48,8 @@ public class MidnightControlsClientNeoforge {
         }
         @SubscribeEvent
         public static void addPackFinders(AddPackFindersEvent event) {
-            if (event.getPackType() == ResourceType.CLIENT_RESOURCES) {
-                registerResourcePack(event, id("bedrock"), false);
-                registerResourcePack(event, id("legacy"), false);
-            }
-        }
-        private static void registerResourcePack(AddPackFindersEvent event, Identifier id, boolean alwaysEnabled) {
-            event.addRepositorySource(((profileAdder) -> {
-                IModFile file = ModList.get().getModFileById(id.getNamespace()).getFile();
-                try {
-                    ResourcePackProfile.PackFactory pack = new DirectoryResourcePack.DirectoryBackedFactory(file.findResource("resourcepacks/" + id.getPath()));
-                    ResourcePackInfo info = new ResourcePackInfo(id.toString(), Text.of(id.getNamespace()+"/"+id.getPath()), ResourcePackSource.BUILTIN, Optional.empty());
-                    ResourcePackProfile packProfile = ResourcePackProfile.create(info, pack, ResourceType.CLIENT_RESOURCES, new ResourcePackPosition(alwaysEnabled, ResourcePackProfile.InsertionPosition.TOP, false));
-                    if (packProfile != null) {
-                        profileAdder.accept(packProfile);
-                    }
-                } catch (NullPointerException e) {e.fillInStackTrace();}
-            }));
+            event.addPackFinders(id("bedrock"), ResourceType.CLIENT_RESOURCES, Text.of("midnightcontrols/bedrock"), ResourcePackSource.BUILTIN, false, ResourcePackProfile.InsertionPosition.TOP);
+            event.addPackFinders(id("legacy"), ResourceType.CLIENT_RESOURCES, Text.of("midnightcontrols/legacy"), ResourcePackSource.BUILTIN, false, ResourcePackProfile.InsertionPosition.TOP);
         }
         @SubscribeEvent
         public static void onResourceReload(AddClientReloadListenersEvent event) {
@@ -79,8 +57,8 @@ public class MidnightControlsClientNeoforge {
         }
     }
 
-    @EventBusSubscriber(modid = NAMESPACE, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
-    public class ClientGameEvents {
+    @EventBusSubscriber(modid = NAMESPACE, value = Dist.CLIENT)
+    public static class ClientGameEvents {
         @SubscribeEvent
         public static void sendPacketOnLogin(ClientPlayerNetworkEvent.LoggingIn event) {
             var version = ModList.get().getModFileById(NAMESPACE).versionString();
@@ -100,10 +78,7 @@ public class MidnightControlsClientNeoforge {
         public static void onMouseButtonPressed(ScreenEvent.MouseButtonPressed.Pre event) {
             if (MidnightControlsConfig.virtualKeyboard && !event.isCanceled()) {
                 Screen screen = event.getScreen();
-                double mouseX = event.getMouseX();
-                double mouseY = event.getMouseY();
-
-                clickInterceptor.intercept(screen, mouseX, mouseY);
+                clickInterceptor.intercept(screen, event.getMouseButtonEvent());
             }
         }
     }

@@ -23,7 +23,7 @@ public class MidnightControlsNeoforge {
     public MidnightControlsNeoforge() {
         MidnightControls.init();
     }
-    @EventBusSubscriber(modid = NAMESPACE, bus = EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = NAMESPACE)
     public class CommonEvents {
         @SubscribeEvent
         public static void registerPayloads(RegisterPayloadHandlersEvent event) {

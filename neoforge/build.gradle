@@ -41,10 +41,25 @@ configurations {
 dependencies {
     neoForge "net.neoforged:neoforge:$rootProject.neoforge_version"
     modImplementation include ("maven.modrinth:midnightlib:${rootProject.midnightlib_version}-neoforge")
-    modImplementation include ("maven.modrinth:obsidianui:${rootProject.obsidianui_version}-neoforge")
     shadowBundle('org.aperlambda:lambdajcommon:1.8.1') {
         exclude group: 'com.google.code.gson'
         exclude group: 'com.google.guava'
+    }
+    var mappingsAttribute = Attribute.of("net.minecraft.mappings", String)
+
+    dependencies {
+        var spruceui = implementation("dev.lambdaurora:spruceui:${project.spruceui_version}") {
+            attributes {
+                attribute(mappingsAttribute, "mojmap")
+            }
+        }
+
+        include("dev.yumi.mc.core:yumi-mc-foundation:1.0.0-beta.1+1.21.11") {
+            attributes {
+                attribute(mappingsAttribute, "mojmap")
+            }
+        }
+        include(spruceui)
     }
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
