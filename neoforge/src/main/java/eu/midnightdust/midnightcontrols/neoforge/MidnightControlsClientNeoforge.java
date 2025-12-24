@@ -1,6 +1,5 @@
 package eu.midnightdust.midnightcontrols.neoforge;
 
-import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsReloadListener;
@@ -9,6 +8,7 @@ import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
 import eu.midnightdust.midnightcontrols.packet.HelloPayload;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
@@ -18,6 +18,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 
 import static eu.midnightdust.midnightcontrols.MidnightControls.id;
@@ -58,10 +59,12 @@ public class MidnightControlsClientNeoforge {
         public static void onResourceReload(AddClientReloadListenersEvent event) {
             event.addListener(id("keyboard-layouts"), MidnightControlsReloadListener.INSTANCE);
         }
-    }
-
-    @EventBusSubscriber(modid = NAMESPACE, value = Dist.CLIENT)
-    public static class ClientGameEvents {
+        @SubscribeEvent
+        public static void registerPayloads(RegisterClientPayloadHandlersEvent event) {
+            event.register(ControlsModePayload.PACKET_ID, (payload, context) -> {
+                context.connection().send(new ServerboundCustomPayloadPacket(new ControlsModePayload(MidnightControlsConfig.controlsMode.getName())));
+            });
+        }
         @SubscribeEvent
         public static void sendPacketOnLogin(ClientPlayerNetworkEvent.LoggingIn event) {
             var version = ModList.get().getModFileById(NAMESPACE).versionString();

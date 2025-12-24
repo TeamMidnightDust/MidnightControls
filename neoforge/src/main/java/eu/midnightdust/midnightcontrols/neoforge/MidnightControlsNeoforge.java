@@ -24,7 +24,7 @@ public class MidnightControlsNeoforge {
         MidnightControls.init();
     }
     @EventBusSubscriber(modid = NAMESPACE)
-    public static class CommonEvents {
+    public class CommonEvents {
         @SubscribeEvent
         public static void registerPayloads(RegisterPayloadHandlersEvent event) {
             PayloadRegistrar registrar = event.registrar("1").optional();
@@ -33,8 +33,7 @@ public class MidnightControlsNeoforge {
                 context.connection().send(new ClientboundCustomPayloadPacket(new FeaturePayload(MidnightControlsFeature.HORIZONTAL_REACHAROUND)));
             });
             registrar.playBidirectional(ControlsModePayload.PACKET_ID, ControlsModePayload.codec, (payload, context) -> {
-                if (context.flow().isServerbound()) ControlsMode.byId(payload.controlsMode()).ifPresent(controlsMode -> new PlayerChangeControlsModeEvent(context.player(), controlsMode));
-                else context.connection().send(new ServerboundCustomPayloadPacket(new ControlsModePayload(MidnightControlsConfig.controlsMode.getName())));
+                ControlsMode.byId(payload.controlsMode()).ifPresent(controlsMode -> new PlayerChangeControlsModeEvent(context.player(), controlsMode));
             });
             registrar.playToClient(FeaturePayload.PACKET_ID, FeaturePayload.codec, (payload, context) -> {});
         }

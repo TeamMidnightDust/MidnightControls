@@ -268,7 +268,7 @@ public class MidnightControlsHud {
     }
 
     private int width(@Nullable String text) {
-        if (text == null || text.isEmpty())
+        if (client == null || text == null || text.isEmpty())
             return 0;
         return this.client.font.width(I18n.get(text));
     }
