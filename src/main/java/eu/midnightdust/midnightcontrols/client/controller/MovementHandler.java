@@ -15,8 +15,6 @@ import eu.midnightdust.midnightcontrols.client.mixin.InputAccessor;
 import eu.midnightdust.midnightcontrols.client.util.MathUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.NotNull;
@@ -81,11 +79,8 @@ public final class MovementHandler implements PressAction {
             value = 1.f;
         }
 
-        this.slowdownFactor = client.player.isMovingSlowly() ? (Mth.clamp(
-            0.3F + (float) client.player.getAttributeValue(Attributes.SNEAKING_SPEED),
-            0.0F,
-            1.0F
-        )) : 1.f;
+        this.slowdownFactor = 1.f; // TODO: Remove this entirely in case it also isn't needed in backports for older versions
+        // LocalPlayer#modifyInput already applies the slowdown for us now. (1.21.11)
 
         if (button == ButtonBinding.FORWARD || button == ButtonBinding.BACK) {
             // Handle forward movement.
