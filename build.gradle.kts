@@ -114,12 +114,12 @@ loom {
 }
 
 publishMods {
-    val modrinthToken = System.getenv("MODRINTH_TOKEN")
-    val curseforgeToken = System.getenv("CURSEFORGE_TOKEN")
+    val modrinthToken = System.getenv("MODRINTH_TOKEN").orEmpty()
+    val curseforgeToken = System.getenv("CURSEFORGE_TOKEN").orEmpty()
     val githubToken = System.getenv("GITHUB_TOKEN").orEmpty()
 
     file = project.tasks.remapJar.get().archiveFile
-    dryRun = modrinthToken == null || curseforgeToken == null
+    dryRun = modrinthToken.isEmpty() || curseforgeToken.isEmpty()
 
     displayName = "${mod.name} ${mod.version} - ${loader.replaceFirstChar { it.uppercase() }} ${property("mod.mc_title")}"
     version = "${mod.version}+${property("mod.mc_title")}-${loader}"
