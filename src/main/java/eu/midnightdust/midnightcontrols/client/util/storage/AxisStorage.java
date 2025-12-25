@@ -5,6 +5,7 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import org.lwjgl.glfw.GLFW;
 
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 import static eu.midnightdust.midnightcontrols.client.MidnightInput.BUTTON_COOLDOWNS;
 import static eu.midnightdust.midnightcontrols.client.controller.InputManager.STATES;
 import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;
@@ -52,7 +53,7 @@ public class AxisStorage {
         boolean currentPlusState = value > deadZone;
         boolean currentMinusState = value < -deadZone;
         if (isTrigger) currentMinusState = false;
-        else if (!MidnightControlsConfig.analogMovement && isLeftAxis(axis)) {
+        else if (!MidnightControlsConfig.analogMovement && isLeftAxis(axis) && client.screen == null) {
             currentPlusState = buttonState == ButtonState.PRESS;
             currentMinusState = buttonState == ButtonState.RELEASE;
         }

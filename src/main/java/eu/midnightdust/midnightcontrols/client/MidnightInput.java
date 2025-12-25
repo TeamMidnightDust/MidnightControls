@@ -291,6 +291,7 @@ public class MidnightInput {
         float rightX = polarUtil.polarX;
         float rightY = polarUtil.polarY;
 
+        boolean isIngame = client.screen == null;
         boolean isRadialMenu = client.screen instanceof RingScreen || (PlatformFunctions.isModLoaded("emotecraft") && EmotecraftCompat.isEmotecraftScreen(client.screen));
 
         if (!isRadialMenu) {
@@ -300,10 +301,10 @@ public class MidnightInput {
 
                 switch (i) {
                     case GLFW_GAMEPAD_AXIS_LEFT_X -> {
-                        if (MidnightControlsConfig.analogMovement) value = leftX;
+                        if (MidnightControlsConfig.analogMovement || !isIngame) value = leftX;
                     }
                     case GLFW_GAMEPAD_AXIS_LEFT_Y -> {
-                        if (MidnightControlsConfig.analogMovement) value = leftY;
+                        if (MidnightControlsConfig.analogMovement || !isIngame) value = leftY;
                     }
                     case GLFW_GAMEPAD_AXIS_RIGHT_X -> value = rightX;
                     case GLFW_GAMEPAD_AXIS_RIGHT_Y -> value = rightY;
