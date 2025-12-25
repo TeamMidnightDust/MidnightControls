@@ -15,7 +15,6 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.mixin.MouseAccessor;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import org.aperlambda.lambdacommon.utils.function.PairPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -55,12 +54,17 @@ public class InputManager {
     }
 
     public void tick() {
-        if (MidnightControlsConfig.autoSwitchMode && !MidnightControlsConfig.isEditing && MidnightControlsConfig.controlsMode != ControlsMode.TOUCHSCREEN)
-            if (MidnightControlsConfig.getController().isConnected() && MidnightControlsConfig.getController().isGamepad())
-                 MidnightControlsConfig.controlsMode = ControlsMode.CONTROLLER;
-            else MidnightControlsConfig.controlsMode = ControlsMode.DEFAULT;
+        handleAutoSwitch();
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER) {
             this.controllerTick();
+        }
+    }
+
+    private static void handleAutoSwitch() {
+        if (MidnightControlsConfig.autoSwitchMode && !MidnightControlsConfig.isEditing && MidnightControlsConfig.controlsMode != ControlsMode.TOUCHSCREEN) {
+            if (MidnightControlsConfig.getController().isConnected() && MidnightControlsConfig.getController().isGamepad())
+                MidnightControlsConfig.controlsMode = ControlsMode.CONTROLLER;
+            else MidnightControlsConfig.controlsMode = ControlsMode.DEFAULT;
         }
     }
 
@@ -136,12 +140,13 @@ public class InputManager {
     public static boolean hasBinding(@NotNull Identifier identifier) {
         return hasBinding(identifier.getNamespace() + "." + identifier.getPath());
     }
+
     private static ButtonBinding tempBinding;
     /**
      * Returns the binding matching the given string.
      *
      * @param name the name of the binding to get
-     * @return true if the binding is registered, else false
+     * @return the found binding
      */
     public static ButtonBinding getBinding(@NotNull String name) {
         synchronized (BINDINGS) {
@@ -152,6 +157,7 @@ public class InputManager {
         }
         return tempBinding;
     }
+
     private static List<ButtonBinding> unboundBindings;
     public static List<ButtonBinding> getUnboundBindings() {
         unboundBindings = new ArrayList<>();

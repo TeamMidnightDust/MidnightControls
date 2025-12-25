@@ -125,7 +125,7 @@ public class MidnightControlsClient extends MidnightControls {
     /**
      * Shows a toast popup to notify the user about an event.
      */
-    private static void showToastMessage(Component title, Component description) {
+    public static void showToastMessage(Component title, Component description) {
         client.getToastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION, title, description));
     }
 
@@ -198,7 +198,7 @@ public class MidnightControlsClient extends MidnightControls {
                             Component.translatable("midnightcontrols.menu.title.controller")
                     ));
             MidnightControlsConfig.enableHints = false;
-            MidnightControlsConfig.save();
+            //MidnightControlsConfig.save();
         }
         TouchInput.tick();
     }
@@ -228,7 +228,7 @@ public class MidnightControlsClient extends MidnightControls {
             client.noRender = false;
             client.screen = screen;
         } else if (screen != null) {
-            MidnightControlsClient.input.onScreenOpen(client.getWindow().getScreenWidth(), client.getWindow().getScreenHeight());
+            input.onScreenOpen(client.getWindow().getScreenWidth(), client.getWindow().getScreenHeight());
         }
     }
 

@@ -1,6 +1,8 @@
 package eu.midnightdust.midnightcontrols.client.util;
 
+import net.minecraft.util.Tuple;
 import org.aperlambda.lambdacommon.utils.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
@@ -78,14 +80,14 @@ public class InventoryUtil {
             int mouseY = (int) (targetMouseY * (double) client.getWindow().getGuiScaledHeight() / (double) client.getWindow().getScreenHeight());
 
             // Finds the closest slot in the GUI within 14 pixels.
-            Optional<net.minecraft.util.Tuple<Slot, Double>> closestSlot = inventoryScreen.getMenu().slots.parallelStream()
+            Optional<Tuple<@NotNull Slot, @NotNull Double>> closestSlot = inventoryScreen.getMenu().slots.parallelStream()
                     .map(slot -> {
                         int x = guiLeft + slot.x + 8;
                         int y = guiTop + slot.y + 8;
 
                         // Distance between the slot and the cursor.
                         double distance = Math.sqrt(Math.pow(x - mouseX, 2) + Math.pow(y - mouseY, 2));
-                        return new net.minecraft.util.Tuple<>(slot, distance);
+                        return new Tuple<>(slot, distance);
                     }).filter(entry -> entry.getB() <= 14.0)
                     .min(Comparator.comparingDouble(net.minecraft.util.Tuple::getB));
 

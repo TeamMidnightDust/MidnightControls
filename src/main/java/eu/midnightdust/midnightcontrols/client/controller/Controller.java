@@ -12,7 +12,6 @@ package eu.midnightdust.midnightcontrols.client.controller;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
@@ -29,11 +28,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.showToastMessage;
 import static org.lwjgl.BufferUtils.createByteBuffer;
 
 /**
@@ -146,6 +144,7 @@ public record Controller(int id) {
     public static void updateMappings() {
         CompletableFuture.supplyAsync(Controller::updateMappingsSync);
     }
+
     private static boolean updateMappingsSync() {
         try {
             MidnightControls.log("Updating controller mappings...");
@@ -168,11 +167,7 @@ public record Controller(int id) {
             if (i != 0) {
                 long l = pointerBuffer.get();
                 var string = l == 0L ? "" : MemoryUtil.memUTF8(l);
-                var client = Minecraft.getInstance();
-                if (client != null) {
-                    client.getToastManager().addToast(SystemToast.multiline(client, SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
-                            Component.translatable("midnightcontrols.controller.mappings.error"), Component.literal(string)));
-                }
+                showToastMessage(Component.translatable("midnightcontrols.controller.mappings.error"), Component.literal(string));
                 MidnightControls.log(I18n.get("midnightcontrols.controller.mappings.error")+string);
             }
         } catch (Throwable e) {

@@ -12,18 +12,25 @@ import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_X;
 import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
 import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER;
 
+/**
+ * Stores information about the current axis state
+ */
 public class AxisStorage {
     public final int axis;
     public float value, absValue;
     public final double deadZone;
     public final Polarity polarity;
-    public final boolean isTrigger;
     public final ButtonState buttonState;
 
-    // Used for joysticks
+    /**
+     * Create an AxisStorage instance with a configured deadzone (for left/right sticks)
+     */
     public static AxisStorage of(int axis, float value) {
         return new AxisStorage(axis, value, isLeftAxis(axis) ? MidnightControlsConfig.leftDeadZone : MidnightControlsConfig.rightDeadZone);
     }
+    /**
+     * Create an AxisStorage instance with an arbitrary deadzone (for triggers and internal use)
+     */
     public static AxisStorage of(int axis, float value, double deadZone) {
         return new AxisStorage(axis, value, deadZone);
     }
@@ -32,32 +39,28 @@ public class AxisStorage {
         this.axis = axis;
         this.deadZone = deadZone;
 
-        if (axis == GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || axis == GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER
-                || axis == ButtonBinding.controller2Button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) || axis == ButtonBinding.controller2Button(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER)) {
-            this.isTrigger = true;
+        if (isTrigger(axis)) {
             if (value < -.5f) {
                 value = 0f;
             }
-            else {
-                // Fixes Triggers not working correctly on some controllers
-                if (MidnightControlsConfig.triggerFix) {
-                    value = 1.0f;
-                }
+            else if (MidnightControlsConfig.triggerFix) { // Fixes Triggers not working correctly on some controllers
+                value = 1.0f;
             }
-        } else isTrigger = false;
+        }
 
         this.value = value;
         this.buttonState = value > .5f ? ButtonState.PRESS : (value < -.5f ? ButtonState.RELEASE : ButtonState.NONE);
         this.absValue = Math.abs(value);
         boolean currentPlusState = value > deadZone;
         boolean currentMinusState = value < -deadZone;
-        if (isTrigger) currentMinusState = false;
+        if (isTrigger(axis)) currentMinusState = false;
         else if (!MidnightControlsConfig.isAnalogMovementAllowed() && isLeftAxis(axis)) {
             currentPlusState = buttonState == ButtonState.PRESS;
             currentMinusState = buttonState == ButtonState.RELEASE;
         }
         this.polarity = currentPlusState ? AxisStorage.Polarity.PLUS : currentMinusState ? AxisStorage.Polarity.MINUS : AxisStorage.Polarity.ZERO;
     }
+
     /**
      * Returns the specified axis as a button.
      *
@@ -68,6 +71,10 @@ public class AxisStorage {
         return ButtonBinding.axisAsButton(axis, positive);
     }
 
+    /**
+     * For button bindings making use of joysticks, this method updates the button values according to the axis value.
+     * Each axis has two according buttons, plus (down or right) and minus (up or left).
+     */
     public void setupButtonStates() {
         var posButton = getButtonId(true);
         var negButton = getButtonId(false);
@@ -96,11 +103,14 @@ public class AxisStorage {
             }
         }
     }
+
     public static boolean isLeftAxis(int axis) {
         return axis == GLFW_GAMEPAD_AXIS_LEFT_X || axis == GLFW_GAMEPAD_AXIS_LEFT_Y || axis == GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;
     }
-    public static boolean isRightAxis(int axis) {
-        return !isLeftAxis(axis);
+
+    public static boolean isTrigger(int axis) {
+        return axis == GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || axis == GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER ||
+               axis == ButtonBinding.controller2Button(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) || axis == ButtonBinding.controller2Button(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER);
     }
 
     public enum Polarity {
