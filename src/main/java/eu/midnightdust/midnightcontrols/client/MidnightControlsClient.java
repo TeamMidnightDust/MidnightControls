@@ -29,13 +29,11 @@ import eu.midnightdust.midnightcontrols.client.ring.MidnightRing;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.MouseClickInterceptor;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
-import eu.midnightdust.midnightcontrols.client.util.RainbowColor;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
@@ -76,9 +74,11 @@ public class MidnightControlsClient extends MidnightControls {
     public static final MidnightReacharound reacharound = new MidnightReacharound();
     public static final MouseClickInterceptor clickInterceptor = new MouseClickInterceptor();
     public static boolean isWayland;
-    private static MidnightControlsHud hud;
     private static ControlsMode previousControlsMode;
 
+    /**
+     * Initialize the mod's main client-side functionality
+     */
     public static void initClient() {
         client = Minecraft.getInstance();
         ring.registerAction("buttonbinding", ButtonBindingRingAction.FACTORY);
@@ -88,16 +88,7 @@ public class MidnightControlsClient extends MidnightControls {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                try {
-                    if (lateInitDone && client.isRunning()) {
-                        if (MidnightControlsConfig.controlsMode != ControlsMode.DEFAULT && (client.isWindowActive() || MidnightControlsConfig.unfocusedInput)) {
-                            if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER) input.tickCameraStick();
-                            input.updateCamera();
-                        }
-                    }
-                } catch (Exception | Error e) {
-                    MidnightControls.logger.error("Exception encountered in camera loop: ",e);
-                }
+                MidnightControlsClient.onCameraTick();
             }
         }, delay, period);
 
@@ -121,48 +112,59 @@ public class MidnightControlsClient extends MidnightControls {
         MidnightControlsHud.isVisible = MidnightControlsConfig.hudEnable;
         Controller.updateMappings();
         try {
-            GLFW.glfwSetJoystickCallback((jid, event) -> {
-                if (event == GLFW.GLFW_CONNECTED) {
-                    var controller = Controller.byId(jid);
-                    client.getToastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION, Component.translatable("midnightcontrols.controller.connected", jid),
-                            Component.literal(controller.getName())));
-                } else if (event == GLFW.GLFW_DISCONNECTED) {
-                    client.getToastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION, Component.translatable("midnightcontrols.controller.disconnected", jid),
-                            null));
-                }
-
-                switchControlsMode();
-            });
-        } catch (Exception e) {e.fillInStackTrace();}
+            GLFW.glfwSetJoystickCallback(MidnightControlsClient::onControllerConnectionChanged);
+        } catch (Exception e) {
+            e.fillInStackTrace();
+        }
 
         MidnightControlsCompat.init();
     }
+
     /**
-     * This method is called to initialize keybindings
+     * Shows a toast popup to notify the user about an event.
+     */
+    private static void showToastMessage(Component title, Component description) {
+        client.getToastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION, title, description));
+    }
+
+    /**
+     * This callback is executed every time a controller is connected or disconnected.
+     */
+    private static void onControllerConnectionChanged(int jid, int event) {
+        if (event == GLFW.GLFW_CONNECTED) {
+            var controller = Controller.byId(jid);
+            showToastMessage(Component.translatable("midnightcontrols.controller.connected", jid), Component.literal(controller.getName()));
+        } else if (event == GLFW.GLFW_DISCONNECTED) {
+            showToastMessage(Component.translatable("midnightcontrols.controller.disconnected", jid), null);
+        }
+
+        switchControlsMode();
+    }
+
+    /**
+     * This method is called to initialize keybindings.
+     * Due to being called every tick, we can delay keybind init by `return`-ing early, which might be required for some odd mods.
      */
     public static void initKeybindings() {
         if (lateInitDone) return;
         if (KeyBindingIDAccessor.getALL() == null || KeyBindingIDAccessor.getALL().isEmpty()) return;
         if (PlatformFunctions.isModLoaded("voxelmap") && !KeyBindingIDAccessor.getALL().containsKey("key.minimap.toggleingamewaypoints")) return;
-        if (PlatformFunctions.isModLoaded("wynntils") && KeyBindingIDAccessor.getALL().entrySet().stream().noneMatch(b -> Objects.equals(b.getValue().getCategory(), "Wynntils"))) return;
-        for (int i = 0; i < KeyBindingIDAccessor.getALL().size(); ++i) {
-            KeyMapping keyBinding = KeyBindingIDAccessor.getALL().entrySet().stream().toList().get(i).getValue();
-            if (MidnightControlsConfig.excludedKeybindings.stream().noneMatch(excluded -> keyBinding.getName().startsWith(excluded))) {
-                if (!keyBinding.getName().contains(MidnightControlsConstants.NAMESPACE)) {
-                    AtomicReference<ButtonCategory> category = new AtomicReference<>();
-                    InputManager.streamCategories().forEach(buttonCategory -> {
-                        if (buttonCategory.getIdentifier().equals(keyBinding.getCategory().id()))
-                            category.set(buttonCategory);
-                    });
-                    if (category.get() == null) {
-                        category.set(new ButtonCategory(keyBinding.getCategory().id()));
-                        InputManager.registerCategory(category.get());
-                    }
-                    ButtonBinding buttonBinding = new ButtonBinding.Builder(keyBinding.getName()).category(category.get()).linkKeybind(keyBinding).register();
-                    if (MidnightControlsConfig.debug) {
-                        MidnightControls.log(keyBinding.getName());
-                        MidnightControls.log(String.valueOf(buttonBinding));
-                    }
+        //if (PlatformFunctions.isModLoaded("wynntils") && KeyBindingIDAccessor.getALL().entrySet().stream().noneMatch(b -> Objects.equals(b.getValue().getCategory(), "Wynntils"))) return; // TODO: Check if this is still required. If so, it will need to be updated.
+        for (KeyMapping keyBinding : KeyBindingIDAccessor.getALL().values()) {
+            if (MidnightControlsConfig.excludedKeybindings.stream().noneMatch(excluded -> keyBinding.getName().startsWith(excluded)) && !keyBinding.getName().contains(MidnightControlsConstants.NAMESPACE)) {
+                AtomicReference<ButtonCategory> category = new AtomicReference<>();
+                InputManager.streamCategories().forEach(buttonCategory -> {
+                    if (buttonCategory.getIdentifier().equals(keyBinding.getCategory().id()))
+                        category.set(buttonCategory);
+                });
+                if (category.get() == null) {
+                    category.set(new ButtonCategory(keyBinding.getCategory().id()));
+                    InputManager.registerCategory(category.get());
+                }
+                ButtonBinding buttonBinding = new ButtonBinding.Builder(keyBinding.getName()).category(category.get()).linkKeybind(keyBinding).register();
+                if (MidnightControlsConfig.debug) {
+                    MidnightControls.log(keyBinding.getName());
+                    MidnightControls.log(String.valueOf(buttonBinding));
                 }
             }
         }
@@ -187,14 +189,30 @@ public class MidnightControlsClient extends MidnightControls {
             client.setScreen(new RingScreen());
         }
         if (client.level != null && MidnightControlsConfig.enableHints && !MidnightControlsConfig.autoSwitchMode && MidnightControlsConfig.controlsMode == ControlsMode.DEFAULT && MidnightControlsConfig.getController().isGamepad()) {
-            client.getToastManager().addToast(SystemToast.multiline(client, SystemToast.SystemToastId.PERIODIC_NOTIFICATION, Component.translatable("midnightcontrols.controller.tutorial.title"),
-                    Component.translatable("midnightcontrols.controller.tutorial.description", Component.translatable("options.title"), Component.translatable("controls.title"),
-                            Component.translatable("midnightcontrols.menu.title.controller"))));
+            showToastMessage(Component.translatable("midnightcontrols.controller.tutorial.title"),
+                    Component.translatable("midnightcontrols.controller.tutorial.description",
+                            Component.translatable("options.title"),
+                            Component.translatable("controls.title"),
+                            Component.translatable("midnightcontrols.menu.title.controller")
+                    ));
             MidnightControlsConfig.enableHints = false;
             MidnightControlsConfig.save();
         }
-        RainbowColor.tick();
         TouchInput.tick();
+    }
+    /**
+     * This method is called every camera tick.
+     */
+    public static void onCameraTick() {
+        try {
+            if (lateInitDone && client.isRunning() && MidnightControlsConfig.controlsMode != ControlsMode.DEFAULT && (client.isWindowActive() || MidnightControlsConfig.unfocusedInput)) {
+                if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER)
+                    input.tickCameraStick();
+                input.updateCamera();
+            }
+        } catch (Exception | Error e) {
+            MidnightControls.logger.error("Exception encountered in camera loop: %s", e);
+        }
     }
 
     /**

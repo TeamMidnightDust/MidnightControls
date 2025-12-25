@@ -550,7 +550,7 @@ public class MidnightInput {
                     tab.scroll(storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_X ? -storage.value * 1.0 : 0.0, storage.axis == GLFW_GAMEPAD_AXIS_RIGHT_Y ? -storage.value * 5.0 : 0.0);
                     return true;
                 }
-            } else if (screen != null) {
+            } else {
                 if (storage.axis == preferredAxis && !handleListWidgetScrolling(screen.children(), storage.value)) {
                     try {
                         screen.mouseScrolled(0.0, 0.0, 0, -(storage.value * 0.0175f));
@@ -683,10 +683,6 @@ public class MidnightInput {
                     return true;
                 }
             }
-//            case AlwaysSelectedEntryListWidget<?> alwaysSelectedEntryListWidget -> {
-//                //TODO ((EntryListWidgetAccessor) element).midnightcontrols$moveSelection(right ? EntryListWidget.MoveDirection.DOWN : EntryListWidget.MoveDirection.UP);
-//                return false;
-//            }
             case ContainerEventHandler entryList -> {
                 var focused = entryList.getFocused();
                 if (focused == null)
