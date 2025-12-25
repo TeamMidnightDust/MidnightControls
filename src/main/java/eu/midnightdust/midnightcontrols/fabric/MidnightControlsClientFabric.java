@@ -16,14 +16,11 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
+import net.fabricmc.fabric.api.resource.v1.pack.PackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.util.Optional;
 
@@ -65,21 +62,12 @@ public class MidnightControlsClientFabric implements ClientModInitializer {
         });
 
         FabricLoader.getInstance().getModContainer(MidnightControlsConstants.NAMESPACE).ifPresent(modContainer -> {
-            ResourceManagerHelper.registerBuiltinResourcePack(id("bedrock"), modContainer, ResourcePackActivationType.NORMAL);
-            ResourceManagerHelper.registerBuiltinResourcePack(id("legacy"), modContainer, ResourcePackActivationType.NORMAL);
+            ResourceLoader.registerBuiltinPack(id("bedrock"), modContainer, PackActivationType.NORMAL);
+            ResourceLoader.registerBuiltinPack(id("legacy"), modContainer, PackActivationType.NORMAL);
         });
         MidnightControlsClient.initClient();
 
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
-            @Override
-            public Identifier getFabricId() {
-                return id("keyboard_layouts");
-            }
-            @Override
-            public void onResourceManagerReload(ResourceManager manager) {
-                MidnightControlsReloadListener.INSTANCE.onResourceManagerReload(manager);
-            }
-        });
+        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(id("keyboard_layouts"), MidnightControlsReloadListener.INSTANCE);
     }
 }
 //?}
