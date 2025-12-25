@@ -55,8 +55,9 @@ public class MidnightControlsClientFabric implements ClientModInitializer {
             var controlsMode = MidnightControlsConfig.controlsMode.getName();
             sender.sendPacket(new HelloPayload(version, controlsMode));
             sender.sendPacket(new ControlsModePayload(controlsMode));
+            MidnightControlsClient.onJoinServer();
         });
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> MidnightControlsClient.onLeave());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> MidnightControlsClient.onLeaveServer());
 
         ClientTickEvents.START_CLIENT_TICK.register(MidnightControlsClient::onTick);
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {

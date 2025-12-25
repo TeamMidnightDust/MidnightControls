@@ -51,6 +51,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
+import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.currentServerIp;
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
@@ -481,8 +482,7 @@ public class MidnightControlsConfig extends MidnightConfig {
      * @return true if analog movement is possible, false otherwise
      */
     public static boolean isAnalogMovementAllowed() {
-        String serverIp = client.getConnection() != null ? client.getConnection().getConnection().getLoggableAddress(true) : null;
-        return client.screen != null || (analogMovement && (serverIp == null || MidnightControlsConfig.anticheatServers.stream().noneMatch(serverIp::matches)));
+        return client.screen != null || (analogMovement && (currentServerIp == null || MidnightControlsConfig.anticheatServers.stream().noneMatch(currentServerIp::matches)));
     }
 
     public static void reset() {

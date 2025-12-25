@@ -72,10 +72,11 @@ public class MidnightControlsClientNeoforge {
             var controlsMode = MidnightControlsConfig.controlsMode.getName();
             NetworkUtil.sendPayloadC2S(new HelloPayload(version, controlsMode));
             NetworkUtil.sendPayloadC2S(new ControlsModePayload(controlsMode));
+            MidnightControlsClient.onJoinServer();
         }
         @SubscribeEvent
         public static void onDisconnect(ClientPlayerNetworkEvent.LoggingOut event) {
-            MidnightControlsClient.onLeave();
+            MidnightControlsClient.onLeaveServer();
         }
         @SubscribeEvent
         public static void startClientTick(ClientTickEvent.Pre event) {

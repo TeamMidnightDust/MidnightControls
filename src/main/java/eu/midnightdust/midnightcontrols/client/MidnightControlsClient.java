@@ -31,6 +31,7 @@ import eu.midnightdust.midnightcontrols.client.virtualkeyboard.MouseClickInterce
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
@@ -74,6 +75,7 @@ public class MidnightControlsClient extends MidnightControls {
     public static final MidnightReacharound reacharound = new MidnightReacharound();
     public static final MouseClickInterceptor clickInterceptor = new MouseClickInterceptor();
     public static boolean isWayland;
+    public static @Nullable String currentServerIp;
     private static ControlsMode previousControlsMode;
 
     /**
@@ -230,11 +232,16 @@ public class MidnightControlsClient extends MidnightControls {
         }
     }
 
+    public static void onJoinServer() {
+        currentServerIp = client.getConnection() != null ? client.getConnection().getConnection().getLoggableAddress(true) : null;
+    }
+
     /**
      * Called when leaving a server.
      */
-    public static void onLeave() {
+    public static void onLeaveServer() {
         MidnightControlsFeature.resetAllAllowed();
+        currentServerIp = null;
     }
 
     /**
