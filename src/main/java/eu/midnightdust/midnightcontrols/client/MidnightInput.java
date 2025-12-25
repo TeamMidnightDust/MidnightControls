@@ -334,6 +334,7 @@ public class MidnightInput {
 
     public void handleButton(ButtonStorage storage) {
         if (this.controlsInput != null && this.controlsInput.getFocusedBinding() != null) {
+            client.getFramerateLimitTracker().onInputReceived();
             if (storage.state == ButtonState.PRESS && !this.controlsInput.getCurrentButtons().contains(storage.button)) {
                 this.controlsInput.getCurrentButtons().add(storage.button);
 
