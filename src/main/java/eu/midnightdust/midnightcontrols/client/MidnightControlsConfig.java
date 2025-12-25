@@ -34,7 +34,6 @@ import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.enums.TouchMode;
 import eu.midnightdust.midnightcontrols.client.gui.config.ControllerBindingButton;
 import eu.midnightdust.midnightcontrols.client.gui.config.ControllerSelectionButton;
-import eu.midnightdust.midnightcontrols.client.gui.config.MappingsStringInputWidget;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -189,6 +188,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry(category = MISC, name = "Ignored Unbound Keys") public static List<String> ignoredUnboundKeys = Lists.newArrayList("inventorytabs.key.next_tab");
     @Comment(category = MISC, centered = true, name="☆ Other Options") public static Comment _otherOptions;
     @Entry(category = MISC, name = "Trigger button fix") public static boolean triggerFix = true;
+    @Entry(category = MISC, name = "Anticheat Servers") public static List<String> anticheatServers = Lists.newArrayList(".*(hypixel.net)");
     @Entry(category = MISC, name = "Excluded Controllers (Name Regex)") public static List<String> excludedControllers = Lists.newArrayList(".*(Keyboard)$", ".*(Touchpad)$", ".*(Pen)$", ".*(Finger)$");
 
     // Init mapping tab (see #onTabInit())
@@ -472,6 +472,17 @@ public class MidnightControlsConfig extends MidnightConfig {
      */
     public static boolean isMovementAxis(int axis) {
         return axis == GLFW_GAMEPAD_AXIS_LEFT_Y || axis == GLFW_GAMEPAD_AXIS_LEFT_X;
+    }
+
+    /**
+     * Returns whether the left stick is allowed to use analog movement.
+     * Analog movement refers to the movement in any arbitrary angle, instead of just front, front-left, left, etc.
+     *
+     * @return true if analog movement is possible, false otherwise
+     */
+    public static boolean isAnalogMovementAllowed() {
+        String serverIp = client.getConnection() != null ? client.getConnection().getConnection().getLoggableAddress(true) : null;
+        return client.screen != null || (analogMovement && (serverIp == null || MidnightControlsConfig.anticheatServers.stream().noneMatch(serverIp::matches)));
     }
 
     public static void reset() {

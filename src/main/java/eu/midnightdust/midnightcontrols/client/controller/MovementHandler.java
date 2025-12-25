@@ -75,7 +75,7 @@ public final class MovementHandler implements PressAction {
 
         this.shouldOverrideMovement = direction != 0;
 
-        if (!MidnightControlsConfig.analogMovement) {
+        if (!MidnightControlsConfig.isAnalogMovementAllowed()) {
             value = 1.f;
         }
 

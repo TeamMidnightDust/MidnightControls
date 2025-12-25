@@ -291,7 +291,6 @@ public class MidnightInput {
         float rightX = polarUtil.polarX;
         float rightY = polarUtil.polarY;
 
-        boolean isIngame = client.screen == null;
         boolean isRadialMenu = client.screen instanceof RingScreen || (PlatformFunctions.isModLoaded("emotecraft") && EmotecraftCompat.isEmotecraftScreen(client.screen));
 
         if (!isRadialMenu) {
@@ -301,10 +300,10 @@ public class MidnightInput {
 
                 switch (i) {
                     case GLFW_GAMEPAD_AXIS_LEFT_X -> {
-                        if (MidnightControlsConfig.analogMovement || !isIngame) value = leftX;
+                        if (MidnightControlsConfig.isAnalogMovementAllowed()) value = leftX;
                     }
                     case GLFW_GAMEPAD_AXIS_LEFT_Y -> {
-                        if (MidnightControlsConfig.analogMovement || !isIngame) value = leftY;
+                        if (MidnightControlsConfig.isAnalogMovementAllowed()) value = leftY;
                     }
                     case GLFW_GAMEPAD_AXIS_RIGHT_X -> value = rightX;
                     case GLFW_GAMEPAD_AXIS_RIGHT_Y -> value = rightY;
@@ -504,7 +503,7 @@ public class MidnightInput {
 
     private void handleJoystickMovement(AxisStorage storage) {
         float axisValue = storage.absValue;
-        if (!MidnightControlsConfig.analogMovement || (client.player != null && client.player.getVehicle() instanceof Boat)) {
+        if (!MidnightControlsConfig.isAnalogMovementAllowed() || (client.player != null && client.player.getVehicle() instanceof Boat)) {
             axisValue = (float) (storage.absValue - storage.deadZone);
             axisValue /= (float) (1.0 - storage.deadZone);
             axisValue *= (float) storage.deadZone;
