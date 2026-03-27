@@ -16,10 +16,14 @@ public class MidnightControlsFabric implements ModInitializer {
     @Override
     public void onInitialize() {
         MidnightControls.init();
-        PayloadTypeRegistry.playC2S().register(HelloPayload.PACKET_ID, HelloPayload.codec);
-        PayloadTypeRegistry.playC2S().register(ControlsModePayload.PACKET_ID, ControlsModePayload.codec);
-        PayloadTypeRegistry.playS2C().register(ControlsModePayload.PACKET_ID, ControlsModePayload.codec);
-        PayloadTypeRegistry.playS2C().register(FeaturePayload.PACKET_ID, FeaturePayload.codec);
+        //~ if >= 26.1 'playC2S' -> 'serverboundPlay' {
+        //~ if >= 26.1 'playS2C' -> 'clientboundPlay' {
+        PayloadTypeRegistry.serverboundPlay().register(HelloPayload.PACKET_ID, HelloPayload.codec);
+        PayloadTypeRegistry.serverboundPlay().register(ControlsModePayload.PACKET_ID, ControlsModePayload.codec);
+        PayloadTypeRegistry.clientboundPlay().register(ControlsModePayload.PACKET_ID, ControlsModePayload.codec);
+        PayloadTypeRegistry.clientboundPlay().register(FeaturePayload.PACKET_ID, FeaturePayload.codec);
+        //~}
+        //~}
 
         ServerPlayNetworking.registerGlobalReceiver(HelloPayload.PACKET_ID, (payload, context) -> {
             ControlsMode.byId(payload.controlsMode()).ifPresent(controlsMode -> PlayerChangeControlsModeCallback.EVENT.invoker().apply(context.player(), controlsMode));

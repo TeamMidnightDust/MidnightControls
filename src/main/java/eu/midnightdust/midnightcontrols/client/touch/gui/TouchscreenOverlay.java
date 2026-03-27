@@ -27,7 +27,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.Objects;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.PauseScreen;
@@ -85,7 +85,7 @@ public class TouchscreenOverlay extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float delta) {}
+    public void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {}
 
     private void pauseGame() {
         assert this.minecraft != null;

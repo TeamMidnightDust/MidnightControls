@@ -12,7 +12,7 @@ package eu.midnightdust.midnightcontrols.client.gui;
 import eu.midnightdust.midnightcontrols.client.enums.ControllerType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
@@ -71,11 +71,11 @@ public class MidnightControlsRenderer {
         return width;
     }
 
-    public static ButtonSize drawButton(GuiGraphics context, int x, int y, @NotNull ButtonBinding button, @NotNull Minecraft client) {
+    public static ButtonSize drawButton(GuiGraphicsExtractor context, int x, int y, @NotNull ButtonBinding button, @NotNull Minecraft client) {
         return drawButton(context, x, y, button.getButton(), client);
     }
 
-    public static ButtonSize drawButton(GuiGraphics context, int x, int y, int[] buttons, @NotNull Minecraft client) {
+    public static ButtonSize drawButton(GuiGraphicsExtractor context, int x, int y, int[] buttons, @NotNull Minecraft client) {
         int height = 0;
         int length = 0;
         int currentX = x;
@@ -93,7 +93,7 @@ public class MidnightControlsRenderer {
         return new ButtonSize(length, height);
     }
 
-    public static int drawButton(GuiGraphics context, int x, int y, int button, @NotNull Minecraft client) {
+    public static int drawButton(GuiGraphicsExtractor context, int x, int y, int button, @NotNull Minecraft client) {
         boolean second = false;
         if (button == -1)
             return 0;
@@ -165,18 +165,19 @@ public class MidnightControlsRenderer {
         return ICON_SIZE;
     }
 
-    public static int drawButtonTip(GuiGraphics context, int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull Minecraft client) {
+    public static int drawButtonTip(GuiGraphicsExtractor context, int x, int y, @NotNull ButtonBinding button, boolean display, @NotNull Minecraft client) {
         return drawButtonTip(context, x, y, button.getButton(), button.getTranslationKey(), display, client);
     }
 
-    public static int drawButtonTip(GuiGraphics context, int x, int y, int[] button, @NotNull String action, boolean display, @NotNull Minecraft client) {
+    public static int drawButtonTip(GuiGraphicsExtractor context, int x, int y, int[] button, @NotNull String action, boolean display, @NotNull Minecraft client) {
         if (display) {
             int buttonWidth = drawButton(context, x, y, button, client).length();
 
             var translatedAction = I18n.get(action);
             int textY = (MidnightControlsRenderer.ICON_SIZE / 2 - client.font.lineHeight / 2) + 1;
 
-            context.drawString(client.font, translatedAction, (x + buttonWidth + 2), (y + textY), 0xFFFFFFFF);
+            //~ if >= 26.1 '.drawString(' -> '.text('
+            context.text(client.font, translatedAction, (x + buttonWidth + 2), (y + textY), 0xFFFFFFFF);
             return (x + buttonWidth + 2) + client.font.width(translatedAction);
         }
 

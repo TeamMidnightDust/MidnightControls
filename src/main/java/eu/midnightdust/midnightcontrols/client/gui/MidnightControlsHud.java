@@ -13,7 +13,7 @@ import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.enums.HudSide;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -74,7 +74,7 @@ public class MidnightControlsHud {
     /**
      * Renders the MidnightControls HUD.
      */
-    public void render(GuiGraphics context, DeltaTracker tickCounter) {
+    public void extractRenderState(GuiGraphicsExtractor context, DeltaTracker tickCounter) {
         if (this.client == null) this.client = Minecraft.getInstance();
         if (!isVisible) return;
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.screen == null) {
@@ -98,12 +98,13 @@ public class MidnightControlsHud {
             scale *= scale;
             int opacity = ((int) (255 * scale)) << 24;
 
-            context.drawString(client.font, text, (int) (window.getGuiScaledWidth() / 2.f - this.client.font.width(text) / 2.f),
+            //~ if >= 26.1 '.drawString(' -> '.text('
+            context.text(client.font, text, (int) (window.getGuiScaledWidth() / 2.f - this.client.font.width(text) / 2.f),
                     (int) (window.getGuiScaledHeight() / 2.f - 4), 0xFFCCCCCC | opacity, false);
         }
     }
 
-    public void renderFirstIcons(GuiGraphics context, int x, int y) {
+    public void renderFirstIcons(GuiGraphicsExtractor context, int x, int y) {
         int offset = 2 + this.inventoryWidth + this.inventoryButtonWidth + 4;
         int currentX = MidnightControlsConfig.hudSide == HudSide.LEFT ? x : x - this.inventoryButtonWidth;
         if (!ButtonBinding.INVENTORY.isNotBound()) this.drawButton(context, currentX, y, ButtonBinding.INVENTORY, true);
@@ -119,7 +120,7 @@ public class MidnightControlsHud {
             this.drawButton(context, currentX, y, ButtonBinding.DROP_ITEM, !this.client.player.getMainHandItem().isEmpty());
     }
 
-    public void renderSecondIcons(GuiGraphics context, int x, int y) {
+    public void renderSecondIcons(GuiGraphicsExtractor context, int x, int y) {
         int offset;
         int currentX = x;
         if (isCrammed && showSwapHandsAction && !this.client.options.showSubtitles().get() && !ButtonBinding.SWAP_HANDS.isNotBound()) {
@@ -148,7 +149,7 @@ public class MidnightControlsHud {
         if (!ButtonBinding.ATTACK.isNotBound()) this.drawButton(context, currentX, y, ButtonBinding.ATTACK, this.attackWidth != 0);
     }
 
-    public void renderFirstSection(GuiGraphics context, int x, int y) {
+    public void renderFirstSection(GuiGraphicsExtractor context, int x, int y) {
         int currentX = MidnightControlsConfig.hudSide == HudSide.LEFT ? x + this.inventoryButtonWidth + 2 : x - this.inventoryButtonWidth - 2 - this.inventoryWidth;
         if (!ButtonBinding.INVENTORY.isNotBound()) this.drawTip(context, currentX, y, ButtonBinding.INVENTORY, true);
         currentX += MidnightControlsConfig.hudSide == HudSide.LEFT ? this.inventoryWidth + 4 + this.swapHandsButtonWidth + 2
@@ -163,7 +164,7 @@ public class MidnightControlsHud {
         if (!ButtonBinding.DROP_ITEM.isNotBound() && client.player != null) this.drawTip(context, currentX, y, ButtonBinding.DROP_ITEM, !this.client.player.getMainHandItem().isEmpty());
     }
 
-    public void renderSecondSection(GuiGraphics context, int x, int y) {
+    public void renderSecondSection(GuiGraphicsExtractor context, int x, int y) {
         int currentX = x;
 
         if (isCrammed && showSwapHandsAction && !this.client.options.showSubtitles().get() && !ButtonBinding.SWAP_HANDS.isNotBound()) {
@@ -274,20 +275,21 @@ public class MidnightControlsHud {
         return this.client.font.width(I18n.get(text));
     }
 
-    private void drawButton(GuiGraphics context, int x, int y, @NotNull ButtonBinding button, boolean display) {
+    private void drawButton(GuiGraphicsExtractor context, int x, int y, @NotNull ButtonBinding button, boolean display) {
         if (display)
             MidnightControlsRenderer.drawButton(context, x, y, button, this.client);
     }
 
-    private void drawTip(GuiGraphics context, int x, int y, @NotNull ButtonBinding button, boolean display) {
+    private void drawTip(GuiGraphicsExtractor context, int x, int y, @NotNull ButtonBinding button, boolean display) {
         this.drawTip(context, x, y, button.getTranslationKey(), display);
     }
 
-    private void drawTip(GuiGraphics context, int x, int y, @NotNull String action, boolean display) {
+    private void drawTip(GuiGraphicsExtractor context, int x, int y, @NotNull String action, boolean display) {
         if (!display)
             return;
         var translatedAction = I18n.get(action);
         int textY = (MidnightControlsRenderer.ICON_SIZE / 2 - this.client.font.lineHeight / 2) + 1;
-        context.drawString(this.client.font, translatedAction, x, (y + textY), 0xFFFFFFFF, false);
+        //~ if >= 26.1 '.drawString(' -> '.text('
+        context.text(this.client.font, translatedAction, x, (y + textY), 0xFFFFFFFF, false);
     }
 }

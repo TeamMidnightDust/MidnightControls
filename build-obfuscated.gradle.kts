@@ -1,8 +1,6 @@
 plugins {
-    id("dev.architectury.loom")
-    id("architectury-plugin")
+    id("dev.architectury.loom") version "1.13-SNAPSHOT"
     id("me.modmuss50.mod-publish-plugin")
-    id("com.github.johnrengelman.shadow")
     `maven-publish`
 }
 
@@ -31,7 +29,6 @@ repositories {
     maven("https://maven.gegy.dev")
 
     // Compat
-    maven("https://server.bbkr.space/artifactory/libs-release")
     maven("https://maven.terraformersmc.com/releases/")
     maven("https://maven.kosmx.dev")
     maven("https://maven.isxander.dev/releases")
@@ -56,13 +53,15 @@ dependencies {
     modCompileOnlyApi ("com.terraformersmc:modmenu:${mod.dep("modmenu_version")}") {
         exclude(group = "net.fabricmc.fabric-api")
     }
-    modCompileOnlyApi ("io.github.cottonmc:LibGui:${mod.dep("libgui_version")}")
+    //modCompileOnlyApi ("io.github.cottonmc:LibGui:${mod.dep("libgui_version")}")
     modCompileOnlyApi ("org.quiltmc:quilt-json5:1.0.0")
     modImplementation ("maven.modrinth:sodium:${mod.dep("sodium_version")}-fabric")
     modCompileOnlyApi ("maven.modrinth:emi:${mod.dep("emi_version")}+${loader}")
     modCompileOnlyApi ("maven.modrinth:emotecraft:${mod.dep("emotecraft_version")}+${minecraft}-${loader.replace("neo","")}")
     modCompileOnlyApi ("io.github.kosmx:bendy-lib:${mod.dep("bendylib_version")}")
-    modCompileOnlyApi ("dev.isxander:yet-another-config-lib:${mod.dep("yacl_version")}+${minecraft}-${loader}")
+    modCompileOnlyApi ("dev.isxander:yet-another-config-lib:${mod.dep("yacl_version")}+${minecraft}-${loader}") {
+        exclude(group = "org.quiltmc.parser")
+    }
     modCompileOnlyApi ("maven.modrinth:inventory-tabs-updated:${mod.dep("inventorytabs_version")}")
     modCompileOnlyApi ("maven.modrinth:bedrockify:${mod.dep("bedrockify_version")}")
     // Required for Inventory Tabs
@@ -78,7 +77,7 @@ dependencies {
 
         modImplementation (spruceui)
         include (spruceui)
-        include("dev.yumi.mc.core:yumi-mc-foundation:1.0.0-beta.1+1.21.11")
+        include("dev.yumi.mc.core:yumi-mc-foundation:${mod.dep("yumimc_version")}")
         include("org.aperlambda:lambdajcommon:1.8.1")
         //modCompileOnly "maven.modrinth:emi:${mod.dep("emi_version")}"
     }
@@ -93,7 +92,7 @@ dependencies {
             }
         }
 
-        include("dev.yumi.mc.core:yumi-mc-foundation:1.0.0-beta.1+1.21.11") {
+        include("dev.yumi.mc.core:yumi-mc-foundation:${mod.dep("yumimc_version")}") {
             attributes {
                 attribute(mappingsAttribute, "mojmap")
             }
@@ -192,21 +191,11 @@ java {
     sourceCompatibility = java
 }
 
-val shadowBundle: Configuration by configurations.creating {
-    isCanBeConsumed = false
-    isCanBeResolved = true
-}
-
-tasks.shadowJar {
-    configurations = listOf(shadowBundle)
-    archiveClassifier = "dev-shadow"
-}
-
 tasks.remapJar {
     injectAccessWidener = true
-    input = tasks.shadowJar.get().archiveFile
+    input = tasks.jar.get().archiveFile
     archiveClassifier = null
-    dependsOn(tasks.shadowJar)
+    dependsOn(tasks.jar)
 }
 
 tasks.jar {

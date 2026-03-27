@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ActiveTextCollector;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
@@ -111,14 +111,18 @@ public class ControllerBindingButton extends Button implements ControlsInput {
     }
 
     @Override
-    public void renderDefaultLabel(ActiveTextCollector consumer) {
-        if (this.binding.getButton().length < 2) super.renderDefaultLabel(consumer);
+    //~ if >=26.1 'renderDefaultLabel' -> 'extractDefaultLabel' {
+    public void extractDefaultLabel(ActiveTextCollector consumer) {
+        if (this.binding.getButton().length < 2) super.extractDefaultLabel(consumer);
     }
+    //~}
 
     @Override
-    protected void renderContents(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
-        this.renderDefaultSprite(context);
-        this.renderDefaultLabel(context.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE));
+    protected void extractContents(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks) {
+        //~ if >=26.1 'renderDefault' -> 'extractDefault' {
+        this.extractDefaultSprite(context);
+        this.extractDefaultLabel(context.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE));
+        //~}
         int x = this.getX();
         if (this.binding.getButton().length > 1) {
             x += (this.width / 2 - iconWidth / 2) - 4;

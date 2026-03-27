@@ -4,7 +4,7 @@ import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsHud;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,13 +18,14 @@ public class InGameHudMixin {
         MidnightControlsHud.getInstance().init();
     }
 
+    //~ if >= 26.1 'render' -> 'extract'
     //? fabric {
-    @Inject(method = "renderHotbarAndDecorations", at = @At("HEAD"))
+    @Inject(method = "extractHotbarAndDecorations", at = @At("HEAD"))
     //?} else if neoforge {
     /*@Inject(method = "renderCrosshair", at = @At("HEAD"))
     *///?}
-    public void midnightcontrols$renderHud(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci) {
-        MidnightControlsHud.getInstance().render(context, tickCounter);
+    public void midnightcontrols$renderHud(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
+        MidnightControlsHud.getInstance().extractRenderState(context, tickCounter);
     }
 
     @Inject(method = "tick()V", at = @At("HEAD"))

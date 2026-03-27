@@ -5,7 +5,7 @@ import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.data.AtlasIds;
@@ -21,7 +21,7 @@ public class VirtualCursorRenderer extends CursorRenderer {
         return INSTANCE;
     }
 
-    public void renderCursor(@NotNull GuiGraphics context, @NotNull Minecraft client) {
+    public void renderCursor(@NotNull GuiGraphicsExtractor context, @NotNull Minecraft client) {
         if (!MidnightControlsConfig.virtualMouse || (client.screen == null
                 || MidnightInput.isScreenInteractive(client.screen)))
             return;

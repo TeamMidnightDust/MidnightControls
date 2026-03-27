@@ -45,12 +45,12 @@ public class ControllerButtonWidget extends AbstractSpruceIconButtonWidget {
     }
 
     @Override
-    protected int renderIcon(SpruceGuiGraphics spruceGuiGraphics, int mouseX, int mouseY, float delta) {
+    protected int renderIcon(SpruceGuiGraphics ctx, int mouseX, int mouseY, float delta) {
         int x = this.getX();
         if (this.binding.getButton().length > 1) {
             x += (this.width / 2 - this.iconWidth / 2) - 4;
         }
-        var size = MidnightControlsRenderer.drawButton(spruceGuiGraphics.vanilla(), x, this.getY(), this.binding, Minecraft.getInstance());
+        var size = MidnightControlsRenderer.drawButton(ctx.vanilla(), x, this.getY(), this.binding, Minecraft.getInstance());
         this.iconWidth = size.length();
         return size.height();
     }

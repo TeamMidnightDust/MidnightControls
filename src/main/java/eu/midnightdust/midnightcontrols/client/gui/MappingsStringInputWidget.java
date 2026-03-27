@@ -103,9 +103,9 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
     }
 
     @Override
-    public void renderWidget(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.renderWidget(context, mouseX, mouseY, delta);
-        context.vanilla().drawCenteredString(this.client.font, Component.translatable("midnightcontrols.menu.multiple_mapping_tip"), this.textArea.getX() + this.textArea.getWidth() / 2, this.textArea.getY() + this.textArea.getHeight() - 12, 0xFF888888);
-        context.vanilla().drawCenteredString(this.client.font, Component.translatable("midnightcontrols.menu.current_controller_guid", MidnightControlsConfig.getController().getGuid()), this.textArea.getX() + this.textArea.getWidth() / 2, this.height - 21, 0xFFFFFFFF);
+    public void extractWidgetRenderState(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
+        super.extractWidgetRenderState(context, mouseX, mouseY, delta);
+        context.vanilla().centeredText(this.client.font, Component.translatable("midnightcontrols.menu.multiple_mapping_tip"), this.textArea.getX() + this.textArea.getWidth() / 2, this.textArea.getY() + this.textArea.getHeight() - 12, 0xFF888888);
+        context.vanilla().centeredText(this.client.font, Component.translatable("midnightcontrols.menu.current_controller_guid", MidnightControlsConfig.getController().getGuid()), this.textArea.getX() + this.textArea.getWidth() / 2, this.height - 21, 0xFFFFFFFF);
     }
 }

@@ -12,7 +12,7 @@ package eu.midnightdust.midnightcontrols.client.gui;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.ring.RingButtonMode;
 import eu.midnightdust.midnightcontrols.client.ring.RingPage;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -48,11 +48,11 @@ public class RingScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
 
         RingPage page = ring.getCurrentPage();
-        page.render(context, this.font, this.width, this.height, mouseX, mouseY, delta);
+        page.extractRenderState(context, this.font, this.width, this.height, mouseX, mouseY, delta);
     }
 
     @Override

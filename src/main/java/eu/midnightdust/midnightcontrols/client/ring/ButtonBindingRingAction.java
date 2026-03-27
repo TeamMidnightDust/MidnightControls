@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -48,10 +48,10 @@ public class ButtonBindingRingAction extends RingAction {
     }
 
     @Override
-    public void drawIcon(@NotNull GuiGraphics context, @NotNull Font textRenderer, int x, int y, boolean hovered) {
+    public void drawIcon(@NotNull GuiGraphicsExtractor context, @NotNull Font textRenderer, int x, int y, boolean hovered) {
         List<FormattedCharSequence> lines = textRenderer.split(Component.translatable(this.getName()), MidnightRing.ELEMENT_SIZE);
         for (int i = 0; i < lines.size(); ++i) {
-            context.drawCenteredString(textRenderer, lines.get(i), x + MidnightRing.ELEMENT_SIZE / 2, y + MidnightRing.ELEMENT_SIZE / 2 - textRenderer.lineHeight / 2 * (lines.size()-1) - textRenderer.lineHeight / 2 + textRenderer.lineHeight * i, 0xffffff);
+            context.centeredText(textRenderer, lines.get(i), x + MidnightRing.ELEMENT_SIZE / 2, y + MidnightRing.ELEMENT_SIZE / 2 - textRenderer.lineHeight / 2 * (lines.size()-1) - textRenderer.lineHeight / 2 + textRenderer.lineHeight * i, 0xffffff);
         }
     }
 

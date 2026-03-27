@@ -11,7 +11,7 @@ package eu.midnightdust.midnightcontrols.client.ring;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -45,10 +45,10 @@ public class RingPage {
      * @param mouseY the mouse Y-coordinate
      * @param tickDelta the tick delta
      */
-    public void render(@NotNull GuiGraphics context, @NotNull Font textRenderer, int width, int height, int mouseX, int mouseY, float tickDelta) {
+    public void extractRenderState(@NotNull GuiGraphicsExtractor context, @NotNull Font textRenderer, int width, int height, int mouseX, int mouseY, float tickDelta) {
         int centerX = width / 2;
         int centerY = height / 2;
-        if (MidnightControlsClient.ring.getMaxPages() > 1) context.drawCenteredString(textRenderer, name, centerX, 5, 0xffffff);
+        if (MidnightControlsClient.ring.getMaxPages() > 1) context.centeredText(textRenderer, name, centerX, 5, 0xffffff);
 
         int offset = MidnightRing.ELEMENT_SIZE + (MidnightRing.ELEMENT_SIZE / 2) + 5;
 
@@ -57,7 +57,7 @@ public class RingPage {
         for (int i = 0; i < 3; i++) {
             var ringAction = this.actions[i];
             if (ringAction != null)
-                ringAction.render(context, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
+                ringAction.extractRenderState(context, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
             x += MidnightRing.ELEMENT_SIZE + 5;
         }
         y += MidnightRing.ELEMENT_SIZE + 5;
@@ -65,7 +65,7 @@ public class RingPage {
         for (int i = 3; i < 5; i++) {
             var ringAction = this.actions[i];
             if (ringAction != null)
-                ringAction.render(context, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
+                ringAction.extractRenderState(context, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
             x += (MidnightRing.ELEMENT_SIZE + 5) * 2;
         }
         y += MidnightRing.ELEMENT_SIZE + 5;
@@ -73,7 +73,7 @@ public class RingPage {
         for (int i = 5; i < 8; i++) {
             var ringAction = this.actions[i];
             if (ringAction != null)
-                ringAction.render(context, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
+                ringAction.extractRenderState(context, textRenderer, x, y, isHovered(x, y, mouseX, mouseY), i);
             x += MidnightRing.ELEMENT_SIZE + 5;
         }
     }

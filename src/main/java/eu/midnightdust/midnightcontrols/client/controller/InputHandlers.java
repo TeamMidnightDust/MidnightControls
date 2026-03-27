@@ -31,7 +31,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.util.Mth;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -181,7 +181,7 @@ public class InputHandlers {
             } else {
                 slotId = slot.index;
             }
-            var actionType = ClickType.PICKUP;
+            var actionType = ContainerInput.PICKUP;
             int clickData = GLFW.GLFW_MOUSE_BUTTON_1;
 
             MidnightControlsClient.input.inventoryInteractionCooldown = 5;
@@ -189,14 +189,14 @@ public class InputHandlers {
                 case "take_all" -> {
                     if (screen instanceof CreativeModeInventoryScreen) {
                         if (slot != null && (((CreativeInventoryScreenAccessor) accessor).midnightcontrols$isCreativeInventorySlot(slot) || MidnightControlsCompat.streamCompatHandlers().anyMatch(handler -> handler.isCreativeSlot(screen, slot))))
-                            actionType = ClickType.CLONE;
+                            actionType = ContainerInput.CLONE;
                     }
                 }
                 case "take" -> {
                     clickData = GLFW_MOUSE_BUTTON_2;
                 }
                 case "quick_move" -> {
-                    actionType = ClickType.QUICK_MOVE;
+                    actionType = ContainerInput.QUICK_MOVE;
                 }
                 default -> {
                     return false;
@@ -230,8 +230,9 @@ public class InputHandlers {
      */
     public static boolean handleScreenshot(@NotNull Minecraft client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action) {
         if (action == ButtonState.RELEASE)
+            //~ if >=26.1 '.addMessage' -> '.addClientSystemMessage'
             Screenshot.grab(client.gameDirectory, client.getMainRenderTarget(),
-                    text -> client.execute(() -> client.gui.getChat().addMessage(text)));
+                    text -> client.execute(() -> client.gui.getChat().addClientSystemMessage(text)));
         return true;
     }
 

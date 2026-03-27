@@ -12,7 +12,6 @@ package eu.midnightdust.midnightcontrols.client.compat;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
-import org.aperlambda.lambdacommon.utils.LambdaReflection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,10 +44,10 @@ public class MidnightControlsCompat {
             log("Adding EMI compatibility...");
             registerCompatHandler(new EMICompat());
         }
-        if (PlatformFunctions.isModLoaded("hardcorequesting") && LambdaReflection.doesClassExist(HQMCompat.GUI_BASE_CLASS_PATH)) {
-            log("Adding HQM compatibility...");
-            registerCompatHandler(new HQMCompat());
-        }
+//        if (PlatformFunctions.isModLoaded("hardcorequesting") && LambdaReflection.doesClassExist(HQMCompat.GUI_BASE_CLASS_PATH)) {
+//            log("Adding HQM compatibility...");
+//            registerCompatHandler(new HQMCompat());
+//        }
         if (PlatformFunctions.isModLoaded("bedrockify")) {
             log("Adding Bedrockify compatibility...");
             registerCompatHandler(new BedrockifyCompat());

@@ -185,16 +185,6 @@ public class InputManager {
         return binding;
     }
 
-    @Deprecated
-    public static @NotNull ButtonBinding registerBinding(@NotNull org.aperlambda.lambdacommon.Identifier id, int[] defaultButton, @NotNull List<PressAction> actions, @NotNull Predicate<ButtonBinding> filter, boolean hasCooldown) {
-        return registerBinding(Identifier.fromNamespaceAndPath(id.getNamespace(), id.getName()), defaultButton, actions, filter, hasCooldown);
-    }
-
-    @Deprecated
-    public static @NotNull ButtonBinding registerBinding(@NotNull org.aperlambda.lambdacommon.Identifier id, int[] defaultButton, boolean hasCooldown) {
-        return registerBinding(id, defaultButton, Collections.emptyList(), InputHandlers::always, hasCooldown);
-    }
-
     public static @NotNull ButtonBinding registerBinding(@NotNull Identifier id, int[] defaultButton, @NotNull List<PressAction> actions, @NotNull Predicate<ButtonBinding> filter, boolean hasCooldown) {
         return registerBinding(new ButtonBinding(id.getNamespace() + "." + id.getPath(), defaultButton, actions, filter, hasCooldown));
     }
@@ -224,13 +214,6 @@ public class InputManager {
     public static ButtonCategory registerCategory(@NotNull ButtonCategory category) {
         CATEGORIES.add(category);
         return category;
-    }
-    public static ButtonCategory registerCategory(@NotNull org.aperlambda.lambdacommon.Identifier identifier, int priority) {
-        return registerCategory(Identifier.fromNamespaceAndPath(identifier.getNamespace(), identifier.getName()), priority);
-    }
-
-    public static ButtonCategory registerCategory(@NotNull org.aperlambda.lambdacommon.Identifier identifier) {
-        return registerCategory(Identifier.fromNamespaceAndPath(identifier.getNamespace(), identifier.getName()));
     }
 
     public static ButtonCategory registerCategory(@NotNull Identifier identifier, int priority) {

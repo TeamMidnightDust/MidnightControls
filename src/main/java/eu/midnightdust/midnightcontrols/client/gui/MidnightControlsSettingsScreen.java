@@ -491,9 +491,9 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     }
 
     @Override
-    public void render(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-        context.vanilla().drawCenteredString(this.font, I18n.get("midnightcontrols.menu.title"), this.width / 2, 8, 0xFFFFFFFF);
+    public void extractRenderState(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
+        context.vanilla().centeredText(this.font, I18n.get("midnightcontrols.menu.title"), this.width / 2, 8, 0xFFFFFFFF);
     }
 
     public static class MidnightControlsBackground implements Background {
@@ -503,7 +503,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             this.transparency = transparency;
         }
         @Override
-        public void render(SpruceGuiGraphics context, SpruceWidget widget, int vOffset, int mouseX, int mouseY, float delta) {
+        public void extractRenderState(SpruceGuiGraphics context, SpruceWidget widget, int vOffset, int mouseX, int mouseY, float delta) {
             context.fill(widget.getX(), widget.getY(), widget.getX() + widget.getWidth(), widget.getY() + widget.getHeight(), ARGB.color(transparency, 0, 0, 0));
         }
     }

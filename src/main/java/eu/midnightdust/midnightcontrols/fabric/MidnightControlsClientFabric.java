@@ -11,7 +11,8 @@ import eu.midnightdust.midnightcontrols.packet.FeaturePayload;
 import eu.midnightdust.midnightcontrols.packet.HelloPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+//~ if >=26.1 'net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper' -> 'net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper'
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -34,11 +35,13 @@ import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.BIN
 public class MidnightControlsClientFabric implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        KeyBindingHelper.registerKeyBinding(BINDING_LOOK_UP);
-        KeyBindingHelper.registerKeyBinding(BINDING_LOOK_RIGHT);
-        KeyBindingHelper.registerKeyBinding(BINDING_LOOK_DOWN);
-        KeyBindingHelper.registerKeyBinding(BINDING_LOOK_LEFT);
-        KeyBindingHelper.registerKeyBinding(BINDING_RING);
+        //~ if >=26.1 'KeyBindingHelper.registerKeyBinding' -> 'KeyMappingHelper.registerKeyMapping' {
+        KeyMappingHelper.registerKeyMapping(BINDING_LOOK_UP);
+        KeyMappingHelper.registerKeyMapping(BINDING_LOOK_RIGHT);
+        KeyMappingHelper.registerKeyMapping(BINDING_LOOK_DOWN);
+        KeyMappingHelper.registerKeyMapping(BINDING_LOOK_LEFT);
+        KeyMappingHelper.registerKeyMapping(BINDING_RING);
+        //~}
         ClientPlayNetworking.registerGlobalReceiver(ControlsModePayload.PACKET_ID, (payload, context) ->
                 context.responseSender().sendPacket(new ControlsModePayload(MidnightControlsConfig.controlsMode.getName())));
         ClientPlayNetworking.registerGlobalReceiver(FeaturePayload.PACKET_ID, ((payload, context) -> {}));
@@ -67,7 +70,8 @@ public class MidnightControlsClientFabric implements ClientModInitializer {
         });
         MidnightControlsClient.initClient();
 
-        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(id("keyboard_layouts"), MidnightControlsReloadListener.INSTANCE);
+        //~ if >=26.1 '.registerReloader' -> '.registerReloadListener'
+        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(id("keyboard_layouts"), MidnightControlsReloadListener.INSTANCE);
     }
 }
 //?}

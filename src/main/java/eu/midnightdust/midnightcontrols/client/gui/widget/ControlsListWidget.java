@@ -243,14 +243,15 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         /* Rendering */
 
         @Override
-        protected void renderWidget(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
+        protected void extractWidgetRenderState(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
             boolean focused = gui.focusedBinding == this.binding;
 
             var textRenderer = ControlsListWidget.this.client.font;
             int height = this.getHeight();
             //float textX = (float) (this.getX() + 70 - ControlsListWidget.this.maxTextLength);
             int textY = this.getY() + height / 2;
-            context.drawText(textRenderer, this.bindingName, this.getX(), (textY - 9 / 2), 0xFFFFFFFF, true);
+            //~ if >= 26.1 '.drawText(' -> '.text('
+            context.text(textRenderer, this.bindingName, this.getX(), (textY - 9 / 2), 0xFFFFFFFF, true);
 
             this.resetButton.setVisible(!focused);
             this.unbindButton.setVisible(focused);
@@ -269,7 +270,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
                 this.editButton.setMessage(text.withStyle(ChatFormatting.GOLD));
             }
 
-            this.children.forEach(widget -> widget.render(context, mouseX, mouseY, delta));
+            this.children.forEach(widget -> widget.extractRenderState(context, mouseX, mouseY, delta));
         }
     }
 
@@ -306,8 +307,8 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
         /* Rendering */
 
         @Override
-        protected void renderWidget(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
-            this.separatorWidget.render(context, mouseX, mouseY, delta);
+        protected void extractWidgetRenderState(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
+            this.separatorWidget.extractRenderState(context, mouseX, mouseY, delta);
         }
 
         @Override

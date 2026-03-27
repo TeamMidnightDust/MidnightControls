@@ -14,30 +14,30 @@ import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 
 public class EMICompat implements CompatHandler {
     public static boolean handleEmiPages(boolean direction) {
-        if (isEMIEnabled() && MidnightControlsClient.input.actionGuiCooldown == 0 && EmiScreenManager.getSearchPanel() != null && EmiScreenManager.getSearchPanel().pageLeft != null && EmiScreenManager.getSearchPanel().pageRight != null) {
-            if (direction) EmiScreenManager.getSearchPanel().pageRight.onPress(MidnightInput.ENTER_KEY_INPUT);
-            else EmiScreenManager.getSearchPanel().pageLeft.onPress(MidnightInput.ENTER_KEY_INPUT);
-            MidnightControlsClient.input.actionGuiCooldown = 5;
-            return true;
-        }
+//        if (isEMIEnabled() && MidnightControlsClient.input.actionGuiCooldown == 0 && EmiScreenManager.getSearchPanel() != null && EmiScreenManager.getSearchPanel().pageLeft != null && EmiScreenManager.getSearchPanel().pageRight != null) {
+//            if (direction) EmiScreenManager.getSearchPanel().pageRight.onPress(MidnightInput.ENTER_KEY_INPUT);
+//            else EmiScreenManager.getSearchPanel().pageLeft.onPress(MidnightInput.ENTER_KEY_INPUT);
+//            MidnightControlsClient.input.actionGuiCooldown = 5;
+//            return true;
+//        }
         return false;
     }
     @Override
     public void handle() {
         ButtonCategory category = new ButtonCategory(id("category.emi"));
         InputManager.registerCategory(category);
-        new ButtonBinding.Builder("emi_page_left")
-                .buttons(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
-                .category(category)
-                .action((client,action,value,buttonState)->handleEmiPages(false)).cooldown()
-                .filter(((buttonBinding) -> EmiApi.getHandledScreen() != null))
-                .register();
-        new ButtonBinding.Builder("emi_page_right")
-                .buttons(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
-                .category(category)
-                .action((client,action,value,buttonState)->handleEmiPages(true)).cooldown()
-                .filter(((buttonBinding) -> EmiApi.getHandledScreen() != null))
-                .register();
+//        new ButtonBinding.Builder("emi_page_left")
+//                .buttons(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
+//                .category(category)
+//                .action((client,action,value,buttonState)->handleEmiPages(false)).cooldown()
+//                .filter(((buttonBinding) -> EmiApi.getHandledScreen() != null))
+//                .register();
+//        new ButtonBinding.Builder("emi_page_right")
+//                .buttons(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER, ButtonBinding.axisAsButton(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
+//                .category(category)
+//                .action((client,action,value,buttonState)->handleEmiPages(true)).cooldown()
+//                .filter(((buttonBinding) -> EmiApi.getHandledScreen() != null))
+//                .register();
     }
     public static boolean isEMIEnabled() {
         return EmiConfig.enabled;

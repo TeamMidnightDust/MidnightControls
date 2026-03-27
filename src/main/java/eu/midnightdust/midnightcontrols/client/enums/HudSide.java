@@ -9,7 +9,6 @@
 
 package eu.midnightdust.midnightcontrols.client.enums;
 
-import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

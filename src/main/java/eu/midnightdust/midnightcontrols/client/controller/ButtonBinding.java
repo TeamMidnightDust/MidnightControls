@@ -499,10 +499,6 @@ public class ButtonBinding {
         public Builder(@NotNull Identifier identifier) {
             this(identifier.getNamespace() + "." + identifier.getPath());
         }
-        @Deprecated
-        public Builder(@NotNull org.aperlambda.lambdacommon.Identifier identifier) {
-            this(identifier.getNamespace() + "." + identifier.getName());
-        }
 
         /**
          * Defines the default buttons of the {@link ButtonBinding}.

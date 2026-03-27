@@ -9,8 +9,8 @@
 
 package eu.midnightdust.midnightcontrols.client.ring;
 
+import dev.lambdaurora.spruceui.util.Nameable;
 import net.minecraft.network.chat.Component;
-import org.aperlambda.lambdacommon.utils.Nameable;
 import org.jetbrains.annotations.NotNull;
 
 /**

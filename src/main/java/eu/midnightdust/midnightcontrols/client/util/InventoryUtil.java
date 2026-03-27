@@ -1,7 +1,6 @@
 package eu.midnightdust.midnightcontrols.client.util;
 
 import net.minecraft.util.Tuple;
-import org.aperlambda.lambdacommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,9 +39,9 @@ public class InventoryUtil {
 
                     // Distance between the slot and the cursor.
                     double distance = Math.sqrt(Math.pow(posX - otherPosX, 2) + Math.pow(posY - otherPosY, 2));
-                    return Pair.of(slot, distance);
+                    return new Tuple<>(slot, distance);
                 }).filter(entry -> {
-                    var slot = entry.key;
+                    var slot = entry.getA();
                     int posX = guiLeft + slot.x + 8;
                     int posY = guiTop + slot.y + 8;
                     int otherPosX = (int) mouseX;
@@ -62,8 +61,8 @@ public class InventoryUtil {
                     else
                         return false;
                 })
-                .min(Comparator.comparingDouble(p -> p.value))
-                .map(p -> p.key);
+                .min(Comparator.comparingDouble(Tuple::getB))
+                .map(Tuple::getA);
     }
 
     private static int targetMouseX = 0;

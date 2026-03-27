@@ -225,7 +225,7 @@ public class MidnightControlsClient extends MidnightControls {
         if (screen == null && MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN) {
             screen = new TouchscreenOverlay();
             screen.init(client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());
-            client.noRender = false;
+            //client.noRender = false; TODO: Why would this be needed?
             client.screen = screen;
         } else if (screen != null) {
             input.onScreenOpen(client.getWindow().getScreenWidth(), client.getWindow().getScreenHeight());

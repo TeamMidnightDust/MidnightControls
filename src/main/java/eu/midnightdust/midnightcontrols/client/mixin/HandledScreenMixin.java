@@ -18,10 +18,10 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsRenderer;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -50,10 +50,11 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
 
 
     @Invoker("slotClicked")
-    public abstract void midnightcontrols$onMouseClick(@Nullable Slot slot, int slotId, int clickData, ClickType actionType);
+    public abstract void midnightcontrols$onMouseClick(@Nullable Slot slot, int slotId, int clickData, ContainerInput actionType);
 
-    @Inject(method = "render", at = @At("RETURN"))
-    public void onRender(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    //~ if >= 26.1 'render' -> 'extractRenderState'
+    @Inject(method = "extractRenderState", at = @At("RETURN"))
+    public void onRender(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.hudEnable) {
             var client = Minecraft.getInstance();
             int x = 2, y = client.getWindow().getGuiScaledHeight() - 2 - MidnightControlsRenderer.ICON_SIZE;

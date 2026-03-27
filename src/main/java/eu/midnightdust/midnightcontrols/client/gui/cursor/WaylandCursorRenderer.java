@@ -4,7 +4,7 @@ import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.enums.VirtualMouseSkin;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.data.AtlasIds;
@@ -35,7 +35,7 @@ public class WaylandCursorRenderer extends CursorRenderer {
         return INSTANCE;
     }
 
-    public void renderCursor(@NotNull GuiGraphics context, @NotNull Minecraft client) {
+    public void renderCursor(@NotNull GuiGraphicsExtractor context, @NotNull Minecraft client) {
         if (MidnightControlsConfig.virtualMouse || client.screen == null || MidnightControlsConfig.controlsMode != ControlsMode.CONTROLLER) return;
 
         float mouseX = (float) client.mouseHandler.xpos() * client.getWindow().getGuiScaledWidth() / client.getWindow().getScreenWidth();

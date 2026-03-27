@@ -54,7 +54,7 @@ public class TouchInput {
             firstHitResult = TouchUtils.getTargetedObject(mouseX, mouseY);
         }
         else if (result instanceof EntityHitResult entityHit && firstHitResult instanceof EntityHitResult firstEntity && entityHit.getEntity().getUUID().compareTo(firstEntity.getEntity().getUUID()) == 0) {
-            if (client.gameMode.interact(client.player, entityHit.getEntity(), client.player.getUsedItemHand()) == InteractionResult.SUCCESS) {
+            if (client.gameMode.interact(client.player, entityHit.getEntity(), /*? if >= 26.1 {*/ entityHit,/*?}*/ client.player.getUsedItemHand()) == InteractionResult.SUCCESS) {
                 client.player.swing(InteractionHand.MAIN_HAND);
             }
             firstHitResult = TouchUtils.getTargetedObject(mouseX, mouseY);

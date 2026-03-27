@@ -164,7 +164,7 @@
   "midnightcontrols.menu.invert_right_y_axis": "Invertovat pravý Y",
   "midnightcontrols.menu.joystick_as_mouse": "Vždy použít levou páčku jako myš",
   "midnightcontrols.menu.joystick_as_mouse.tooltip": "V každém menu se páčka chová jako myš.",
-  "midnightcontrols.menu.eye_tracker_as_mouse": "Použití eye trackeru jako myši"
+  "midnightcontrols.menu.eye_tracker_as_mouse": "Použití eye trackeru jako myši",
   "midnightcontrols.menu.eye_tracker_as_mouse.tooltip": "Nahraďte myš zařízením pro sledování očí (například Tobii 5).",
   "midnightcontrols.menu.eye_tracker_deadzone": "Velikost mrtvé zóny eye trackeru",
   "midnightcontrols.menu.eye_tracker_deadzone.tooltip": "Zastaví pohyb kamery při pohledu do blízkosti crosshair",

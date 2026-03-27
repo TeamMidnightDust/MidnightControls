@@ -19,10 +19,10 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.gui.config.ControlsInput;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsSettingsScreen;
-import org.aperlambda.lambdacommon.utils.function.Predicates;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import net.minecraft.client.gui.screens.options.controls.ControlsScreen;
 import net.minecraft.network.chat.Component;
@@ -55,11 +55,11 @@ public class ControllerControlsWidget extends SpruceContainerWidget implements C
     }
 
     @Override
-    public void renderWidget(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
-        context.vanilla().drawCenteredString(this.client.font, Component.translatable("midnightcontrols.menu.title.controller_controls"),
+    public void extractWidgetRenderState(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
+        context.vanilla().centeredText(this.client.font, Component.translatable("midnightcontrols.menu.title.controller_controls"),
                 this.getX() + this.width / 2, this.getY() + 4, 0xFFFFFFFF);
-        this.resetButton.setActive(InputManager.streamBindings().anyMatch(Predicates.not(ButtonBinding::isDefault)));
-        super.renderWidget(context, mouseX, mouseY, delta);
+        this.resetButton.setActive(InputManager.streamBindings().anyMatch(Predicate.not(ButtonBinding::isDefault)));
+        super.extractWidgetRenderState(context, mouseX, mouseY, delta);
     }
 
     public void finishBindingEdit(int... buttons) {
