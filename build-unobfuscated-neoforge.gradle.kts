@@ -48,11 +48,7 @@ dependencies {
     jarJar(midnightlib)
 
     // Compatibility mods
-    compileOnlyApi ("com.terraformersmc:modmenu:${mod.dep("modmenu_version")}") {
-        exclude(group = "net.fabricmc.fabric-api")
-    }
     //compileOnlyApi ("io.github.cottonmc:LibGui:${mod.dep("libgui_version")}")
-    compileOnlyApi ("org.quiltmc:quilt-json5:1.0.0")
     implementation ("maven.modrinth:sodium:${mod.dep("sodium_version")}-fabric")
     compileOnlyApi ("maven.modrinth:emi:${mod.dep("emi_version")}+${loader}")
     compileOnlyApi ("maven.modrinth:emotecraft:${mod.dep("emotecraft_version")}")
@@ -60,24 +56,25 @@ dependencies {
     compileOnlyApi ("dev.isxander:yet-another-config-lib:${mod.dep("yacl_version")}+${minecraft}-${loader}") {
         exclude(group = "org.quiltmc.parser")
     }
-    compileOnlyApi ("maven.modrinth:inventory-tabs-updated:${mod.dep("inventorytabs_version")}")
-    compileOnlyApi ("maven.modrinth:bedrockify:${mod.dep("bedrockify_version")}")
-    // Required for Inventory Tabs
-    compileOnlyApi("me.shedaniel.cloth:cloth-config-fabric:${mod.dep("clothconfig_version")}") {
-        exclude(group = "net.fabricmc.fabric-api")
+    compileOnlyApi ("maven.modrinth:inventory-tabs-updated:${mod.dep("inventorytabs_version")}") {
+        exclude(group = "me.shedaniel.cloth:cloth-config-neoforge")
+        exclude(group = "me.shedaniel.cloth:cloth-config-fabric")
     }
 
     val spruceui = "dev.lambdaurora:spruceui:${mod.dep("spruceui_version")}"
 
     if (loader == "neoforge") {
-        implementation(spruceui)
+        implementation(spruceui) {
+            exclude(group = "net.fabricmc")
+            exclude(group = "net.fabricmc.fabric-api")
+        }
 
         jarJar("dev.yumi.mc.core:yumi-mc-foundation:${mod.dep("yumimc_version")}")
         jarJar(spruceui)
     }
 }
 neoForge {
-    version = mod.dep("neoforge_loader") as String
+    version = mod.dep("neoforge_loader")
 
     runs {
         register("client") {
@@ -91,12 +88,6 @@ neoForge {
         }
     }
 }
-fletchingTable {
-    accessConverter.register(sourceSets.main) {
-        add("midnightcontrols-26.1.accesswidener")
-    }
-}
-
 
 publishMods {
     val modrinthToken = System.getenv("MODRINTH_TOKEN")

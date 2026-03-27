@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.compat;
 
+//? fabric
 import me.juancarloscp52.bedrockify.client.BedrockifyClient;
 
 /**
@@ -22,6 +23,7 @@ public class BedrockifyCompat implements CompatHandler {
 
     @Override
     public void handle() {
+        //? fabric
         BedrockifyClient.getInstance().settings.disableFlyingMomentum = false;
     }
 }

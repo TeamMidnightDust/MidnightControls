@@ -47,7 +47,8 @@ public abstract class GameRendererMixin {
     //~ if >= 26.1 'render' -> 'extractGui'
     @Inject(method = "extractGui", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;extractRenderStateWithTooltipAndSubtitles(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", shift = At.Shift.AFTER))
     //?} else if neoforge {
-    /*@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/ClientHooks;drawScreen(Lnet/minecraft/client/gui/screens/Screen;Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", shift = At.Shift.AFTER))
+    /*//~ if >= 26.1 'render' -> 'extractGui'
+    @Inject(method = "extractGui", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/ClientHooks;drawScreen(Lnet/minecraft/client/gui/screens/Screen;Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", shift = At.Shift.AFTER))
     *//*?}*/
     private void midnightcontrols$renderVirtualCursor(DeltaTracker tickCounter, boolean tick, /*? if >= 26.1 {*/final boolean resourcesLoaded, /*?}*/ CallbackInfo ci, @Local GuiGraphicsExtractor drawContext) {
         VirtualCursorRenderer.getInstance().renderCursor(drawContext,  minecraft);

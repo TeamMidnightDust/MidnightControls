@@ -18,15 +18,17 @@ public class InGameHudMixin {
         MidnightControlsHud.getInstance().init();
     }
 
-    //~ if >= 26.1 'render' -> 'extract'
+
+    //~ if >= 26.1 'render' -> 'extract' {
     //? fabric {
     @Inject(method = "extractHotbarAndDecorations", at = @At("HEAD"))
     //?} else if neoforge {
-    /*@Inject(method = "renderCrosshair", at = @At("HEAD"))
+    /*@Inject(method = "extractCrosshair", at = @At("HEAD"))
     *///?}
-    public void midnightcontrols$renderHud(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
+    public void midnightcontrols$drawHud(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
         MidnightControlsHud.getInstance().extractRenderState(context, tickCounter);
     }
+    //~}
 
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void midnightcontrols$tickHud(CallbackInfo ci) {

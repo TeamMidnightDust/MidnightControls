@@ -21,6 +21,6 @@ public abstract class CursorRenderer {
         DrawContextAccessor accessor = (DrawContextAccessor) context;
         var tex = client.getTextureManager().getTexture(texture);
         //~ if >= 26.1 '.submitGuiElement(' -> '.addGuiElement('
-        accessor.getState().addGuiElement(new UnalignedTexturedQuadGuiElementRenderState(pipeline, TextureSetup.singleTexture(tex.getTextureView(), tex.getSampler()), new Matrix3x2f(context.pose()), x1, y1, x2, y2, u1, u2, v1, v2, 0xffffffff, accessor.getScissorStack().peek()));
+        accessor.getState().addGuiElement(new UnalignedTexturedQuadGuiElementRenderState(pipeline, TextureSetup.singleTexture(tex.getTextureView(), tex.getSampler()), new Matrix3x2f(context.pose()), x1, y1, x2, y2, u1, u2, v1, v2, 0xffffffff, /*? fabric {*/ accessor.getScissorStack().peek() /*?} else {*/ /*context.peekScissorStack()*//*?}*/));
     }
 }

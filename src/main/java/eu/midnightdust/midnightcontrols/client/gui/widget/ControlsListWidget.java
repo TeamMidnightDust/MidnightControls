@@ -25,8 +25,6 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.input.KeyEvent;
