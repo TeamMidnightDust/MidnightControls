@@ -36,6 +36,7 @@ repositories {
     maven("https://jitpack.io")
     maven("https://api.modrinth.com/maven")
     maven("https://maven.quiltmc.org/repository/release")
+    strictMaven( "https://staging.alexiil.uk/maven/", "AlexIIL (LibGUI)", "io.github.cottonmc")
 }
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft")
@@ -53,7 +54,7 @@ dependencies {
     modCompileOnlyApi ("com.terraformersmc:modmenu:${mod.dep("modmenu_version")}") {
         exclude(group = "net.fabricmc.fabric-api")
     }
-    //modCompileOnlyApi ("io.github.cottonmc:LibGui:${mod.dep("libgui_version")}")
+    modCompileOnlyApi ("io.github.cottonmc:LibGui:${mod.dep("libgui_version")}")
     modCompileOnlyApi ("org.quiltmc:quilt-json5:1.0.0")
     modImplementation ("maven.modrinth:sodium:${mod.dep("sodium_version")}-fabric")
     modCompileOnlyApi ("maven.modrinth:emi:${mod.dep("emi_version")}+${loader}")

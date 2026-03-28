@@ -39,6 +39,7 @@ repositories {
     maven("https://jitpack.io")
     maven("https://api.modrinth.com/maven")
     maven("https://maven.quiltmc.org/repository/release")
+    strictMaven( "https://staging.alexiil.uk/maven/", "AlexIIL (LibGUI)", "io.github.cottonmc")
 }
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft")
@@ -52,7 +53,7 @@ dependencies {
     compileOnlyApi ("com.terraformersmc:modmenu:${mod.dep("modmenu_version")}") {
         exclude(group = "net.fabricmc.fabric-api")
     }
-    //compileOnlyApi ("io.github.cottonmc:LibGui:${mod.dep("libgui_version")}")
+    compileOnlyApi ("io.github.cottonmc:LibGui:${mod.dep("libgui_version")}")
     compileOnlyApi ("org.quiltmc:quilt-json5:1.0.0")
     implementation ("maven.modrinth:sodium:${mod.dep("sodium_version")}-fabric")
     compileOnlyApi ("maven.modrinth:emi:${mod.dep("emi_version")}+${loader}")
@@ -77,7 +78,6 @@ dependencies {
         implementation(spruceui)
         include(spruceui)
         include("dev.yumi.mc.core:yumi-mc-foundation:${mod.dep("yumimc_version")}")
-        include("org.aperlambda:lambdajcommon:1.8.1")
         //modCompileOnly "maven.modrinth:emi:${mod.dep("emi_version")}"
     }
     if (loader == "neoforge") {

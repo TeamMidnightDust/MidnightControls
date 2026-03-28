@@ -20,7 +20,9 @@ import dev.lambdaurora.spruceui.widget.container.SpruceEntryListWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceParentWidget;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.client.compat.EmotecraftCompat;
+//? fabric {
 import eu.midnightdust.midnightcontrols.client.compat.LibGuiCompat;
+//?}
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.compat.YACLCompat;
 import eu.midnightdust.midnightcontrols.client.gui.config.ControlsInput;
@@ -76,7 +78,7 @@ import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.cli
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
- * Represents the midnightcontrols' input handler.
+ * Represents the MidnightControls input handler.
  *
  * @author Motschen, LambdAurora
  * @version 1.10.0
@@ -383,6 +385,7 @@ public class MidnightInput {
                             return;
                         }
                     }
+                    //? fabric
                     else if (PlatformFunctions.isModLoaded("libgui")) LibGuiCompat.handlePress(client.screen);
                 }
             }
