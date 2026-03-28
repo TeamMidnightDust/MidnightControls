@@ -54,6 +54,7 @@ public abstract class HandledScreenMixin implements HandledScreenAccessor {
 
     //~ if >= 26.1 'render' -> 'extractRenderState'
     @Inject(method = "extractRenderState", at = @At("RETURN"))
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public void onRender(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.hudEnable) {
             var client = Minecraft.getInstance();

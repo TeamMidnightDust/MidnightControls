@@ -14,11 +14,15 @@ import net.minecraft.client.renderer.state.gui.GuiRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
+//~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
 @Mixin(GuiGraphicsExtractor.class)
 public interface DrawContextAccessor {
     @Accessor("guiRenderState")
     GuiRenderState getState();
 
+    //? if fabric {
     @Accessor("scissorStack")
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     GuiGraphicsExtractor.ScissorStack getScissorStack();
+    //?}
 }

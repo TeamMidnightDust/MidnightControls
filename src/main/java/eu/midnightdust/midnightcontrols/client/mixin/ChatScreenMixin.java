@@ -25,6 +25,7 @@ public abstract class ChatScreenMixin extends Screen {
         if (MidnightControlsConfig.moveChat) input.setY(4);
     }
     //~ if >= 26.1 'render' -> 'extractRenderState' {
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor' {
     @Inject(method = "extractRenderState", at = @At("HEAD"))
     private void midnightcontrols$moveInputFieldBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (MidnightControlsConfig.moveChat) context.pose().translate(0f, -this.height + 16);
@@ -33,5 +34,6 @@ public abstract class ChatScreenMixin extends Screen {
     private void midnightcontrols$dontMoveOtherStuff(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (MidnightControlsConfig.moveChat) context.pose().translate(0f, this.height - 16);
     }
+    //~}
     //~}
 }

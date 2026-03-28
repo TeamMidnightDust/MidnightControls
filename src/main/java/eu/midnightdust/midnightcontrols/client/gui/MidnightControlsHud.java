@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
  * @version 1.7.0
  * @since 1.0.0
  */
+//~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor' {
 public class MidnightControlsHud {
     private Minecraft client = Minecraft.getInstance();
     private int attackWidth = 0;
@@ -74,6 +75,7 @@ public class MidnightControlsHud {
     /**
      * Renders the MidnightControls HUD.
      */
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public void extractRenderState(GuiGraphicsExtractor context, DeltaTracker tickCounter) {
         if (this.client == null) this.client = Minecraft.getInstance();
         if (!isVisible) return;
@@ -293,3 +295,4 @@ public class MidnightControlsHud {
         context.text(this.client.font, translatedAction, x, (y + textY), 0xFFFFFFFF, false);
     }
 }
+//~}

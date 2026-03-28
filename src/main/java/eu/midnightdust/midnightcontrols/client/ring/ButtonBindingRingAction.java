@@ -48,6 +48,7 @@ public class ButtonBindingRingAction extends RingAction {
     }
 
     @Override
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public void drawIcon(@NotNull GuiGraphicsExtractor context, @NotNull Font textRenderer, int x, int y, boolean hovered) {
         List<FormattedCharSequence> lines = textRenderer.split(Component.translatable(this.getName()), MidnightRing.ELEMENT_SIZE);
         for (int i = 0; i < lines.size(); ++i) {

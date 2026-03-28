@@ -45,6 +45,7 @@ public class RingPage {
      * @param mouseY the mouse Y-coordinate
      * @param tickDelta the tick delta
      */
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public void extractRenderState(@NotNull GuiGraphicsExtractor context, @NotNull Font textRenderer, int width, int height, int mouseX, int mouseY, float tickDelta) {
         int centerX = width / 2;
         int centerY = height / 2;

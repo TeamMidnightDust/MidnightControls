@@ -231,8 +231,7 @@ public class InputHandlers {
     public static boolean handleScreenshot(@NotNull Minecraft client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action) {
         if (action == ButtonState.RELEASE)
             //~ if >=26.1 '.addMessage' -> '.addClientSystemMessage'
-            Screenshot.grab(client.gameDirectory, client.getMainRenderTarget(),
-                    text -> client.execute(() -> client.gui.getChat().addClientSystemMessage(text)));
+            Screenshot.grab(client.gameDirectory, client.getMainRenderTarget(), text -> client.execute(() -> client.gui.getChat().addClientSystemMessage(text)));
         return true;
     }
 

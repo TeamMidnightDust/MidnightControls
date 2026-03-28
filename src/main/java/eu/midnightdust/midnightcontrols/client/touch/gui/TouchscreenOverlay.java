@@ -85,6 +85,7 @@ public class TouchscreenOverlay extends Screen {
     }
 
     @Override
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {}
 
     private void pauseGame() {

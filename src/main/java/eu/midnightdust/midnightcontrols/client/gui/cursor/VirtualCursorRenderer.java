@@ -21,6 +21,7 @@ public class VirtualCursorRenderer extends CursorRenderer {
         return INSTANCE;
     }
 
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public void renderCursor(@NotNull GuiGraphicsExtractor context, @NotNull Minecraft client) {
         if (!MidnightControlsConfig.virtualMouse || (client.screen == null
                 || MidnightInput.isScreenInteractive(client.screen)))

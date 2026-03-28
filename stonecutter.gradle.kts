@@ -18,11 +18,7 @@ stonecutter parameters {
         }
         string {
             direction = eval(current.version, ">=26.1")
-            replace("GuiGraphics", "GuiGraphicsExtractor")
-        }
-        string {
-            direction = eval(current.version, ">=26.1")
-            replace("SpruceGuiGraphicsExtractor", "SpruceGuiGraphics")
+            replace("net.minecraft.client.gui.GuiGraphics", "net.minecraft.client.gui.GuiGraphicsExtractor")
         }
         string {
             direction = eval(current.version, ">=26.1")

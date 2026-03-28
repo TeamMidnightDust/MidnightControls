@@ -15,8 +15,10 @@ import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.cli
 public abstract class CursorRenderer {
     public static CursorType currentCursorStyle = CursorType.DEFAULT;
 
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public abstract void renderCursor(@NotNull GuiGraphicsExtractor context, @NotNull Minecraft client);
 
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public static void drawUnalignedTexturedQuad(RenderPipeline pipeline, Identifier texture, GuiGraphicsExtractor context, float x1, float x2, float y1, float y2, float u1, float u2, float v1, float v2) {
         DrawContextAccessor accessor = (DrawContextAccessor) context;
         var tex = client.getTextureManager().getTexture(texture);

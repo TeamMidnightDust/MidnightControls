@@ -14,8 +14,7 @@ import static eu.midnightdust.midnightcontrols.client.MidnightInput.ENTER_KEY_IN
 
 public class ItemGroupUtil {
     public static List<CreativeModeTab> getVisibleGroups(CreativeModeInventoryScreen screen) {
-        //~ if >= 26.1 'getItemGroupsOnPage' -> 'getTabsOnPage'
-        return /*? fabric {*/ (screen.getTabsOnPage(screen.getCurrentPage())) /*?} else {*/ /*(screen.getCurrentPage().getVisibleTabs()) *//*?}*/;
+        return /*? fabric && >= 26.1 {*/ (screen.getTabsOnPage(screen.getCurrentPage())) /*?} else if fabric {*/ /*(screen.getItemGroupsOnPage(screen.getCurrentPage())) *//*?} else {*/ /*(screen.getCurrentPage().getVisibleTabs()) *//*?}*/;
     }
 
     public static boolean cyclePage(boolean next, CreativeModeInventoryScreen screen) {

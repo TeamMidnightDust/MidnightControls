@@ -118,6 +118,7 @@ public class ControllerBindingButton extends Button implements ControlsInput {
     //~}
 
     @Override
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor' {
     protected void extractContents(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks) {
         //~ if >=26.1 'renderDefault' -> 'extractDefault' {
         this.extractDefaultSprite(context);
@@ -130,6 +131,7 @@ public class ControllerBindingButton extends Button implements ControlsInput {
         var size = MidnightControlsRenderer.drawButton(context, x, this.getY(), this.binding, Minecraft.getInstance());
         iconWidth = size.length();
     }
+    //~}
 
     @Override
     public void finishBindingEdit(int... buttons) {

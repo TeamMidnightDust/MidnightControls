@@ -48,11 +48,13 @@ public abstract class RingAction {
 
     public abstract void onAction(@NotNull RingButtonMode mode);
 
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public void extractRenderState(@NotNull GuiGraphicsExtractor context, @NotNull Font textRenderer, int x, int y, boolean hovered, int index) {
         context.fill(x, y, x + MidnightRing.ELEMENT_SIZE, y + MidnightRing.ELEMENT_SIZE, hovered || RingPage.selected == index ? 0xbb777777 : 0xbb000000);
         drawIcon(context, textRenderer, x, y, hovered);
     }
 
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public abstract void drawIcon(@NotNull GuiGraphicsExtractor context, @NotNull Font textRenderer, int x, int y, boolean hovered);
 
     /**

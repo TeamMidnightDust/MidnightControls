@@ -28,6 +28,7 @@ import org.lwjgl.glfw.GLFW;
  * @version 1.7.0
  * @since 1.2.0
  */
+//~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor' {
 public class MidnightControlsRenderer {
     public static final int ICON_SIZE = 20;
     private static final int BUTTON_SIZE = 15;
@@ -191,3 +192,4 @@ public class MidnightControlsRenderer {
     public record ButtonSize(int length, int height) {
     }
 }
+//~}

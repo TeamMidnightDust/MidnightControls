@@ -35,6 +35,7 @@ public class WaylandCursorRenderer extends CursorRenderer {
         return INSTANCE;
     }
 
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public void renderCursor(@NotNull GuiGraphicsExtractor context, @NotNull Minecraft client) {
         if (MidnightControlsConfig.virtualMouse || client.screen == null || MidnightControlsConfig.controlsMode != ControlsMode.CONTROLLER) return;
 

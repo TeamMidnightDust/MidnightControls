@@ -25,6 +25,7 @@ public class InGameHudMixin {
     //?} else if neoforge {
     /*@Inject(method = "extractCrosshair", at = @At("HEAD"))
     *///?}
+    //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public void midnightcontrols$drawHud(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
         MidnightControlsHud.getInstance().extractRenderState(context, tickCounter);
     }
