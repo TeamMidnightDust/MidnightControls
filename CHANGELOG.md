@@ -1,3 +1,7 @@
+### MidnightControls v1.12.1
+- Port to 26.1
+- Compatibility with certain mods needed to temporarily disabled until they're updated
+
 ## MidnightControls v1.12.0
 - Re-enable **NeoForge** support!
 - Switch to stonecutter build system
