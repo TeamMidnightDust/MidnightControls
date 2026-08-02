@@ -94,12 +94,12 @@ loom {
 }
 
 publishMods {
-    val modrinthToken = System.getenv("MODRINTH_TOKEN")
-    val curseforgeToken = System.getenv("CURSEFORGE_TOKEN")
+    val modrinthToken = System.getenv("MODRINTH_TOKEN").orEmpty()
+    val curseforgeToken = System.getenv("CURSEFORGE_TOKEN").orEmpty()
     val githubToken = System.getenv("GITHUB_TOKEN").orEmpty()
 
     file = project.tasks.jar.get().archiveFile
-    dryRun = modrinthToken == null || curseforgeToken == null
+    dryRun = modrinthToken.isEmpty() || curseforgeToken.isEmpty()
 
     displayName = "${mod.name} ${mod.version} - ${loader.replaceFirstChar { it.uppercase() }} ${property("mod.mc_title")}"
     version = "${mod.version}+${property("mod.mc_title")}-${loader}"
@@ -116,31 +116,27 @@ publishMods {
         projectId = property("publish.modrinth").toString()
         accessToken = modrinthToken
         targets.forEach(minecraftVersions::add)
+        requires("midnightlib")
         if (loader == "fabric") {
             requires("fabric-api")
         }
+
+        environment = CLIENT_ONLY
     }
 
     curseforge {
         projectId = property("publish.curseforge").toString()
-        accessToken = curseforgeToken.toString()
+        accessToken = curseforgeToken
         targets.forEach(minecraftVersions::add)
+        requires("midnightlib")
         if (loader == "fabric") {
             requires("fabric-api")
         }
-    }
 
-//    github {
-//        accessToken = githubToken
-//        repository = "TeamMidnightDust/MidnightLib"
-//        commitish = "multiversion" // This is the branch the release tag will be created from
-//
-//        tagName = "v" + properties["mod.version"]
-//
-//        // Allow the release to be initially created without any files.
-//        allowEmptyFiles = true
-//    }
+        client = true
+    }
 }
+
 publishing {
     repositories {
         maven {

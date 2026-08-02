@@ -140,29 +140,23 @@ publishMods {
         if (loader == "fabric") {
             requires("fabric-api")
         }
+
+        environment = CLIENT_ONLY
     }
 
     curseforge {
         projectId = property("publish.curseforge").toString()
-        accessToken = curseforgeToken.toString()
+        accessToken = curseforgeToken
         targets.forEach(minecraftVersions::add)
         requires("midnightlib")
         if (loader == "fabric") {
             requires("fabric-api")
         }
-    }
 
-//    github {
-//        accessToken = githubToken
-//        repository = "TeamMidnightDust/CullLeaves"
-//        commitish = "multiversion" // This is the branch the release tag will be created from
-//
-//        tagName = "v" + properties["mod.version"]
-//
-//        // Allow the release to be initially created without any files.
-//        allowEmptyFiles = true
-//    }
+        client = true
+    }
 }
+
 publishing {
     repositories {
         maven {
