@@ -34,7 +34,8 @@ import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 public abstract class GameOptionsScreenMixin extends Screen {
     @Shadow @Nullable protected OptionsList list;
     @Unique SpriteIconButton midnightcontrols$button = SpriteIconButton.builder(Component.translatable("midnightcontrols.menu.title.controller"),
-                    (button -> this.minecraft.setScreen(MidnightControlsConfig.getScreen(this, "midnightcontrols"))), true)
+                    //~ if >= 26.2 'minecraft.setScreen(' -> 'minecraft.gui.setScreen('
+                    (button -> this.minecraft.gui.setScreen(MidnightControlsConfig.getScreen(this, "midnightcontrols"))), true)
             .size(20,20).sprite(id("icon/controller"), 20, 20).build();
 
     protected GameOptionsScreenMixin(Component title) {

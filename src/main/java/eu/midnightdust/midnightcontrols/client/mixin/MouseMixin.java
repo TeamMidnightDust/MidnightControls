@@ -42,6 +42,7 @@ import com.mojang.blaze3d.Blaze3D;
 /**
  * Adds extra access to the mouse.
  */
+//~ if >= 26.2 'minecraft.screen' -> 'minecraft.gui.screen()' {
 @Mixin(MouseHandler.class)
 public abstract class MouseMixin implements MouseAccessor {
     @Shadow @Final private Minecraft minecraft;
@@ -69,10 +70,10 @@ public abstract class MouseMixin implements MouseAccessor {
     @Inject(method = "onButton", at = @At(value = "HEAD"), cancellable = true)
     private void midnightcontrols$onMouseButton(long window, MouseButtonInfo input, int action, CallbackInfo ci) {
         if (window != this.minecraft.getWindow().handle()) return;
-        if (action == 1 && input.button() == GLFW.GLFW_MOUSE_BUTTON_4 && minecraft.screen != null) {
-            MidnightControlsClient.input.tryGoBack(minecraft.screen);
+        if (action == 1 && input.button() == GLFW.GLFW_MOUSE_BUTTON_4 && minecraft.gui.screen() != null) {
+            MidnightControlsClient.input.tryGoBack(minecraft.gui.screen());
         }
-        else if ((minecraft.screen == null && doMixedInput() || minecraft.screen instanceof TouchscreenOverlay) && minecraft.player != null && input.button() == GLFW_MOUSE_BUTTON_1) {
+        else if ((minecraft.gui.screen() == null && doMixedInput() || minecraft.gui.screen() instanceof TouchscreenOverlay) && minecraft.player != null && input.button() == GLFW_MOUSE_BUTTON_1) {
             double mouseX = xpos / minecraft.getWindow().getGuiScale();
             double mouseY = ypos / minecraft.getWindow().getGuiScale();
             int centerX = minecraft.getWindow().getGuiScaledWidth() / 2;
@@ -90,9 +91,9 @@ public abstract class MouseMixin implements MouseAccessor {
             if (action == 1) {
                 TouchInput.clickStartTime = System.currentTimeMillis();
                 boolean bl = false;
-                if (minecraft.screen instanceof TouchscreenOverlay overlay) bl = overlay.mouseClicked(new MouseButtonEvent(mouseX, mouseY, input), false);
+                if (minecraft.gui.screen() instanceof TouchscreenOverlay overlay) bl = overlay.mouseClicked(new MouseButtonEvent(mouseX, mouseY, input), false);
                 if (!bl) TouchInput.firstHitResult = TouchUtils.getTargetedObject(mouseX, mouseY);
-                if (minecraft.screen == null) ci.cancel();
+                if (minecraft.gui.screen() == null) ci.cancel();
             }
             else if (TouchInput.mouseReleased(mouseX, mouseY, input.button())) ci.cancel();
         }
@@ -100,7 +101,7 @@ public abstract class MouseMixin implements MouseAccessor {
 
     @Inject(method = "isMouseGrabbed", at = @At("HEAD"), cancellable = true)
     private void midnightcontrols$isCursorLocked(CallbackInfoReturnable<Boolean> ci) {
-        if (this.minecraft.screen == null) {
+        if (this.minecraft.gui.screen() == null) {
             if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && MidnightControlsConfig.virtualMouse) {
                 ci.setReturnValue(true);
                 ci.cancel();
@@ -148,10 +149,12 @@ public abstract class MouseMixin implements MouseAccessor {
         if ((doMixedInput() || MidnightControlsConfig.eyeTrackerAsMouse)) {
             //In eye tracking mode, we cannot have the cursor locked to the center.
             GLFW.glfwSetInputMode(minecraft.getWindow().handle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-            minecraft.setScreen(null);
+            //~ if >= 26.2 'minecraft.setScreen(' -> 'minecraft.gui.setScreen('
+            minecraft.gui.setScreen(null);
             ignoreFirstMove = true;
             ci.cancel();
         }
     }
 
 }
+//~}

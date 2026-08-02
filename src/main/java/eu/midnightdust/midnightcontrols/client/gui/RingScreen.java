@@ -60,7 +60,8 @@ public class RingScreen extends Screen {
     public void onClose() {
         super.onClose();
         assert minecraft != null;
-        minecraft.screen = null;
+        //~ if >= 26.2 'minecraft.setScreen(' -> 'minecraft.gui.setScreen('
+        minecraft.gui.setScreen(null);
         RingPage page = ring.getCurrentPage();
         if (RingPage.selected >= 0 && page.actions[RingPage.selected] != null)
             page.actions[RingPage.selected].activate(RingButtonMode.PRESS);

@@ -25,7 +25,8 @@ import org.jetbrains.annotations.NotNull;
 @FunctionalInterface
 public interface PressAction {
     PressAction DEFAULT_ACTION = (client, button, value, action) -> {
-        if (action == ButtonState.REPEAT || client.screen != null)
+        //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
+        if (action == ButtonState.REPEAT || client.gui.screen() != null)
             return false;
         button.asKeyBinding().ifPresent(binding -> {
             if (binding instanceof ToggleKeyMapping && binding != client.options.keyAttack) // TODO: Properly fix sticky keys so the attack key doesn't need to be a hardcoded exception

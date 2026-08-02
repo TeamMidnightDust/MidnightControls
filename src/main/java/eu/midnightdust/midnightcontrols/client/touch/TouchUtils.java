@@ -1,5 +1,6 @@
 package eu.midnightdust.midnightcontrols.client.touch;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.enums.TouchMode;
@@ -17,6 +18,8 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
+
+import java.util.Arrays;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightReacharound.getPlayerRange;
 
@@ -51,7 +54,10 @@ public class TouchUtils {
         int displayHeight = client.getWindow().getGuiScaledHeight();
         int displayWidth = client.getWindow().getGuiScaledWidth();
         int[] viewport = new int[4];
-        GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
+        viewport[0] = 0;
+        viewport[1] = 0;
+        viewport[2] = 128;
+        viewport[3] = 128;
         Vector3f target = new Vector3f();
 
         Matrix4f matrixProj = new Matrix4f(lastProjMat);

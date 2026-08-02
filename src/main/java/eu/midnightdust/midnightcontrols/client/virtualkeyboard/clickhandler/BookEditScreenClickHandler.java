@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screens.inventory.BookSignScreen;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 
+//~ if >= 26.2 'client.setScreen(' -> 'client.gui.setScreen(' {
 public class BookEditScreenClickHandler extends AbstractScreenClickHandler<BookEditScreen> {
     @Override
     public void handle(BookEditScreen screen, double mouseX, double mouseY) {
@@ -20,11 +21,11 @@ public class BookEditScreenClickHandler extends AbstractScreenClickHandler<BookE
         var accessor = (BookEditScreenAccessor) screen;
 
         VirtualKeyboardScreen virtualKeyboardScreen = new VirtualKeyboardScreen(accessor.midnightcontrols$getEditBox().getValue(), (text) -> {
-            client.setScreen(screen);
+            client.gui.setScreen(screen);
             accessor.midnightcontrols$getEditBox().setValue(text);
         }, true);
 
-        client.setScreen(virtualKeyboardScreen);
+        client.gui.setScreen(virtualKeyboardScreen);
     }
     public static class Signing extends AbstractScreenClickHandler<BookSignScreen> {
         @Override
@@ -37,11 +38,12 @@ public class BookEditScreenClickHandler extends AbstractScreenClickHandler<BookE
             var accessor = (BookSigningScreenAccessor) screen;
 
             VirtualKeyboardScreen virtualKeyboardScreen = new VirtualKeyboardScreen(accessor.midnightcontrols$getBookTitleTextField().getValue(), (text) -> {
-                client.setScreen(screen);
+                client.gui.setScreen(screen);
                 accessor.midnightcontrols$getBookTitleTextField().setValue(text);
             }, false);
 
-            client.setScreen(virtualKeyboardScreen);
+            client.gui.setScreen(virtualKeyboardScreen);
         }
     }
 }
+//~}

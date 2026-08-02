@@ -41,7 +41,8 @@ public class ItemGroupUtil {
         int currentColumn = currentTab.column();
         CreativeModeTab.Row currentRow = currentTab.row();
         CreativeModeTab newTab = null;
-        List<CreativeModeTab> visibleTabs = ItemGroupUtil.getVisibleGroups((CreativeModeInventoryScreen) client.screen);
+        //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
+        List<CreativeModeTab> visibleTabs = ItemGroupUtil.getVisibleGroups((CreativeModeInventoryScreen) client.gui.screen());
         for (CreativeModeTab tab : visibleTabs) {
             if (tab.row().equals(currentRow) && ((newTab == null && ((next && tab.column() > currentColumn) ||
                     (!next && tab.column() < currentColumn))) || (newTab != null && ((next && tab.column() > currentColumn && tab.column() < newTab.column()) ||

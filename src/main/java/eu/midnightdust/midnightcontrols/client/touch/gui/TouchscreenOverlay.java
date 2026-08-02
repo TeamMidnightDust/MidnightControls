@@ -54,6 +54,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
 /**
  * Represents the touchscreen overlay
  */
+//~ if >= 26.2 'minecraft.setScreen(' -> 'minecraft.gui.setScreen(' {
 public class TouchscreenOverlay extends Screen {
     public static final Identifier WIDGETS_LOCATION = id("textures/gui/widgets.png");
     private SilentTexturedButtonWidget inventoryButton;
@@ -90,7 +91,7 @@ public class TouchscreenOverlay extends Screen {
 
     private void pauseGame() {
         assert this.minecraft != null;
-        this.minecraft.setScreen(new PauseScreen(true));
+        this.minecraft.gui.setScreen(new PauseScreen(true));
         if (this.minecraft.hasSingleplayerServer() && !Objects.requireNonNull(this.minecraft.getSingleplayerServer()).isPublished()) {
             this.minecraft.getSoundManager().pauseAllExcept();
         }
@@ -172,7 +173,7 @@ public class TouchscreenOverlay extends Screen {
             this.addRenderableWidget(emoteButton);
         }
 
-        SpriteIconButton chatButton = SpriteIconButton.builder(Component.empty(), btn -> this.minecraft.setScreen(new ChatScreen("", true)), true).width(20).sprite(id("touch/chat"), 20, 20).build();
+        SpriteIconButton chatButton = SpriteIconButton.builder(Component.empty(), btn -> this.minecraft.gui.setScreen(new ChatScreen("", true)), true).width(20).sprite(id("touch/chat"), 20, 20).build();
         chatButton.setPosition(scaledWidth / 2 - 20 + emoteOffset, 0);
         this.addRenderableWidget(chatButton);
         SpriteIconButton pauseButton = SpriteIconButton.builder(Component.empty(), btn -> this.pauseGame(), true).width(20).sprite(id("touch/pause"), 20, 20).build();
@@ -191,7 +192,7 @@ public class TouchscreenOverlay extends Screen {
                 this.minecraft.player.sendOpenInventory();
             } else {
                 this.minecraft.getTutorial().onOpenInventory();
-                this.minecraft.setScreen(new InventoryScreen(this.minecraft.player));
+                this.minecraft.gui.setScreen(new InventoryScreen(this.minecraft.player));
             }
         }, 20, 0, 20, WIDGETS_LOCATION, 256, 256));
                 ;
@@ -366,3 +367,4 @@ public class TouchscreenOverlay extends Screen {
         return super.mouseDragged(click, deltaX, deltaY);
     }
 }
+//~}

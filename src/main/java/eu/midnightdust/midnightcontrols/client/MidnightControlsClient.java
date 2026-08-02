@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.platform.InputConstants;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import eu.midnightdust.midnightcontrols.ControlsMode;
@@ -126,7 +127,8 @@ public class MidnightControlsClient extends MidnightControls {
      * Shows a toast popup to notify the user about an event.
      */
     public static void showToastMessage(Component title, Component description) {
-        client.getToastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION, title, description));
+        //~ if >= 26.2 'client.getToastManager()' -> 'client.gui.toastManager()'
+        client.gui.toastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION, title, description));
     }
 
     /**
@@ -188,7 +190,8 @@ public class MidnightControlsClient extends MidnightControls {
 
         if (BINDING_RING.consumeClick()) {
             ring.loadFromUnbound();
-            client.setScreen(new RingScreen());
+            //~ if >= 26.2 'client.setScreen' -> 'client.gui.setScreen'
+            client.gui.setScreen(new RingScreen());
         }
         if (client.level != null && MidnightControlsConfig.enableHints && !MidnightControlsConfig.autoSwitchMode && MidnightControlsConfig.controlsMode == ControlsMode.DEFAULT && MidnightControlsConfig.getController().isGamepad()) {
             showToastMessage(Component.translatable("midnightcontrols.controller.tutorial.title"),
@@ -220,16 +223,21 @@ public class MidnightControlsClient extends MidnightControls {
     /**
      * Called when opening a screen.
      */
-    public static void onScreenOpen(Screen screen) {
+    public static void onScreenOpen(Screen screen, Operation<Void> original) {
         client = Minecraft.getInstance();
         if (screen == null && MidnightControlsConfig.controlsMode == ControlsMode.TOUCHSCREEN) {
             screen = new TouchscreenOverlay();
             screen.init(client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());
-            //client.noRender = false; TODO: Why would this be needed?
-            client.screen = screen;
         } else if (screen != null) {
             input.onScreenOpen(client.getWindow().getScreenWidth(), client.getWindow().getScreenHeight());
         }
+
+        if (MidnightControlsConfig.hideNormalMouse) {
+            if (screen != null && !(screen instanceof TouchscreenOverlay)) GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
+            else GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+        }
+
+        original.call(screen);
     }
 
     public static void onJoinServer() {

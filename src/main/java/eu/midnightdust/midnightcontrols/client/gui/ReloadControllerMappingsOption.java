@@ -32,9 +32,12 @@ public class ReloadControllerMappingsOption {
             if (before != null)
                 before.accept(btn);
             Controller.updateMappings();
-            if (client.screen instanceof MidnightControlsSettingsScreen)
-                client.screen.init(client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());
-            client.getToastManager().addToast(SystemToast.multiline(client, SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+            //~ if >= 26.2 'client.screen' -> 'client.gui.screen()' {
+            if (client.gui.screen() instanceof MidnightControlsSettingsScreen)
+                client.gui.screen().init(client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());
+            //~}
+            //~ if >= 26.2 'client.getToastManager()' -> 'client.gui.toastManager()'
+            client.gui.toastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
                     Component.translatable("midnightcontrols.controller.mappings.updated"), Component.empty()));
         }, TooltipData.builder().text(Component.translatable("midnightcontrols.tooltip.reload_controller_mappings")).build());
     }

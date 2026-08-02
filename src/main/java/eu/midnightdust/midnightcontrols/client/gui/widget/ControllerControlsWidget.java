@@ -45,7 +45,8 @@ public class ControllerControlsWidget extends SpruceContainerWidget implements C
     protected void init() {
         this.addChild(new SpruceButtonWidget(Position.of(this, this.width / 2 - 155, 18), 310, 20,
                 Component.translatable("midnightcontrols.menu.keyboard_controls"),
-                btn -> this.client.setScreen(new ControlsScreen(null, this.client.options))));
+                //~ if >= 26.2 'client.setScreen(' -> 'client.gui.setScreen('
+                btn -> this.client.gui.setScreen(new ControlsScreen(null, this.client.options))));
         ControlsListWidget bindingsListWidget = new ControlsListWidget(Position.of(this, 0, 43), this.width, this.height - 43 - 35, this);
         bindingsListWidget.setBackground(new MidnightControlsSettingsScreen.MidnightControlsBackground(130));
         this.addChild(bindingsListWidget);

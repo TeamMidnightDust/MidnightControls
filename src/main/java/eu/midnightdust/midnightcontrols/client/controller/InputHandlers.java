@@ -48,6 +48,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
  * @version 1.7.0
  * @since 1.1.0
  */
+//~ if >= 26.2 'client.screen' -> 'client.gui.screen()' {
 public class InputHandlers {
     private InputHandlers() {
     }
@@ -58,7 +59,7 @@ public class InputHandlers {
                 return false;
 
             // When in-game
-            if (client.screen == null && client.player != null) {
+            if (client.gui.screen() == null && client.player != null) {
                 if (!client.player.isSpectator()) {
                     var inv = client.player.getInventory();
                     if (next)
@@ -67,27 +68,29 @@ public class InputHandlers {
                         inv.setSelectedSlot(inv.getSelectedSlot() > 0 ? inv.getSelectedSlot() - 1 : inv.getSelectedSlot() + 8);
                 }
                 else {
-                    if (client.gui.getSpectatorGui().isMenuActive()) {
-                        client.gui.getSpectatorGui().onMouseScrolled(next ? -1 : 1);
+                    //~ if >= 26.2 'client.gui.getSpectatorGui()' -> 'client.gui.hud.getSpectatorGui()' {
+                    if (client.gui.hud.getSpectatorGui().isMenuActive()) {
+                        client.gui.hud.getSpectatorGui().onMouseScrolled(next ? -1 : 1);
+                    //~}
                     } else {
                         float g = Mth.clamp(client.player.getAbilities().getFlyingSpeed() + (next ? 1 : -1) * 0.005F, 0.0F, 0.2F);
                         client.player.getAbilities().setFlyingSpeed(g);
                     }
                 }
                 return true;
-            } else if (client.screen instanceof RingScreen) {
+            } else if (client.gui.screen() instanceof RingScreen) {
                 MidnightControlsClient.ring.cyclePage(next);
-            } else if (client.screen instanceof CreativeInventoryScreenAccessor inventory) {
+            } else if (client.gui.screen() instanceof CreativeInventoryScreenAccessor inventory) {
                 inventory.midnightcontrols$setSelectedTab(ItemGroupUtil.cycleTab(next, client));
                 return true;
-            } else if (client.screen instanceof AbstractRecipeBookScreen<?> recipeBookScreen) {
+            } else if (client.gui.screen() instanceof AbstractRecipeBookScreen<?> recipeBookScreen) {
                 RecipeBookComponent<?> recipeBook = ((RecipeBookScreenAccessor) recipeBookScreen).getRecipeBook();
 
                 var recipeBookAccessor = (RecipeBookWidgetAccessor) recipeBook;
                 var tabs = recipeBookAccessor.getTabButtons();
                 var currentTab = recipeBookAccessor.getCurrentTab();
                 if (currentTab == null || !recipeBook.isVisible()) {
-                    return MidnightControlsCompat.handleTabs(client.screen, next);
+                    return MidnightControlsCompat.handleTabs(client.gui.screen(), next);
                 }
                 int nextTab = tabs.indexOf(currentTab) + (next ? 1 : -1);
                 if (nextTab < 0)
@@ -99,7 +102,7 @@ public class InputHandlers {
                 currentTab.active = true;
                 recipeBookScreen.recipesUpdated();
                 return true;
-            } else if (client.screen instanceof AdvancementsScreenAccessor screen) {
+            } else if (client.gui.screen() instanceof AdvancementsScreenAccessor screen) {
                 var tabs = screen.getTabs().values().stream().distinct().toList();
                 var tab = screen.getSelectedTab();
                 if (tab == null)
@@ -116,8 +119,8 @@ public class InputHandlers {
                     }
                 }
                 return true;
-            } else if (client.screen != null && client.screen.children().stream().anyMatch(e -> e instanceof TabNavigationBar)) {
-                return Lists.newCopyOnWriteArrayList(client.screen.children()).stream().anyMatch(e -> {
+            } else if (client.gui.screen() != null && client.gui.screen().children().stream().anyMatch(e -> e instanceof TabNavigationBar)) {
+                return Lists.newCopyOnWriteArrayList(client.gui.screen().children()).stream().anyMatch(e -> {
                     if (e instanceof TabNavigationBar tabs) {
                         TabNavigationWidgetAccessor accessor = (TabNavigationWidgetAccessor) tabs;
                         int tabIndex = accessor.getTabs().indexOf(accessor.getTabManager().getCurrentTab());
@@ -129,7 +132,7 @@ public class InputHandlers {
                     }
                     return false;
                 });
-            } else return MidnightControlsCompat.handleTabs(client.screen, next);
+            } else return MidnightControlsCompat.handleTabs(client.gui.screen(), next);
 
             return false;
         };
@@ -139,20 +142,20 @@ public class InputHandlers {
         return (client, button, value, action) -> {
             if (action == ButtonState.RELEASE)
                 return false;
-            if (client.screen instanceof CreativeModeInventoryScreen creativeScreen) {
+            if (client.gui.screen() instanceof CreativeModeInventoryScreen creativeScreen) {
                 return ItemGroupUtil.cyclePage(next, creativeScreen);
             }
 
 
-            return MidnightControlsCompat.handlePages(client.screen, next);
+            return MidnightControlsCompat.handlePages(client.gui.screen(), next);
         };
     }
     public static PressAction handleExit() {
         return (client, button, value, action) -> {
-            if (client.screen != null && client.screen.getClass() != TitleScreen.class) {
-                if (!MidnightControlsCompat.handleMenuBack(client, client.screen))
-                    if (!MidnightControlsClient.input.tryGoBack(client.screen))
-                        client.screen.onClose();
+            if (client.gui.screen() != null && client.gui.screen().getClass() != TitleScreen.class) {
+                if (!MidnightControlsCompat.handleMenuBack(client, client.gui.screen()))
+                    if (!MidnightControlsClient.input.tryGoBack(client.gui.screen()))
+                        client.gui.screen().onClose();
                 return true;
             }
             return false;
@@ -160,7 +163,7 @@ public class InputHandlers {
     }
     public static PressAction handleActions() {
         return (client, button, value, action) -> {
-            if (!(client.screen instanceof AbstractContainerScreen<?> screen)) return false;
+            if (!(client.gui.screen() instanceof AbstractContainerScreen<?> screen)) return false;
             if (client.gameMode == null || client.player == null)
                 return false;
 
@@ -210,12 +213,12 @@ public class InputHandlers {
     public static boolean handlePauseGame(@NotNull Minecraft client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action) {
         if (action == ButtonState.PRESS) {
             // If in game, then pause the game.
-            if (client.screen == null || client.screen instanceof RingScreen)
+            if (client.gui.screen() == null || client.gui.screen() instanceof RingScreen)
                 client.pauseGame(false);
-            else if (client.screen instanceof AbstractContainerScreen && client.player != null) // If the current screen is a container then close it.
+            else if (client.gui.screen() instanceof AbstractContainerScreen && client.player != null) // If the current screen is a container then close it.
                 client.player.closeContainer();
             else // Else just close the current screen.
-                client.screen.onClose();
+                client.gui.screen().onClose();
         }
         return true;
     }
@@ -231,7 +234,9 @@ public class InputHandlers {
     public static boolean handleScreenshot(@NotNull Minecraft client, @NotNull ButtonBinding binding, float value, @NotNull ButtonState action) {
         if (action == ButtonState.RELEASE)
             //~ if >=26.1 '.addMessage' -> '.addClientSystemMessage'
-            Screenshot.grab(client.gameDirectory, client.getMainRenderTarget(), text -> client.execute(() -> client.gui.getChat().addClientSystemMessage(text)));
+            //~ if >= 26.2 'client.getMainRenderTarget()' -> 'client.gameRenderer.mainRenderTarget()'
+            //~ if >= 26.2 'client.gui.getChat()' -> 'client.gui.hud.getChat()'
+            Screenshot.grab(client.gameDirectory, client.gameRenderer.mainRenderTarget(), text -> client.execute(() -> client.gui.hud.getChat().addClientSystemMessage(text)));
         return true;
     }
 
@@ -244,7 +249,7 @@ public class InputHandlers {
 
     public static PressAction handleInventorySlotPad(int direction) {
         return (client, binding, value, action) -> {
-            if (!(client.screen instanceof AbstractContainerScreen<?> inventory && action != ButtonState.RELEASE))
+            if (!(client.gui.screen() instanceof AbstractContainerScreen<?> inventory && action != ButtonState.RELEASE))
                 return false;
 
             var accessor = (HandledScreenAccessor) inventory;
@@ -280,7 +285,7 @@ public class InputHandlers {
      * @return true if the client is in game, else false
      */
     public static boolean inGame(@NotNull ButtonBinding binding) {
-        return (client.screen == null && MidnightControlsClient.input.screenCloseCooldown <= 0) || client.screen instanceof TouchscreenOverlay || client.screen instanceof RingScreen;
+        return (client.gui.screen() == null && MidnightControlsClient.input.screenCloseCooldown <= 0) || client.gui.screen() instanceof TouchscreenOverlay || client.gui.screen() instanceof RingScreen;
     }
 
     /**
@@ -290,9 +295,9 @@ public class InputHandlers {
      * @return true if the client is in a non-interactive screen, else false
      */
     public static boolean inNonInteractiveScreens(@NotNull ButtonBinding binding) {
-        if (client.screen == null)
+        if (client.gui.screen() == null)
             return false;
-        return !MidnightInput.isScreenInteractive(client.screen);
+        return !MidnightInput.isScreenInteractive(client.gui.screen());
     }
 
     /**
@@ -302,7 +307,7 @@ public class InputHandlers {
      * @return true if the client is in an inventory, else false
      */
     public static boolean inInventory(@NotNull ButtonBinding binding) {
-        return client.screen instanceof AbstractContainerScreen;
+        return client.gui.screen() instanceof AbstractContainerScreen;
     }
 
     /**
@@ -312,6 +317,7 @@ public class InputHandlers {
      * @return true if the client is in the advancements screen, else false
      */
     public static boolean inAdvancements(@NotNull ButtonBinding binding) {
-        return client.screen instanceof AdvancementsScreen;
+        return client.gui.screen() instanceof AdvancementsScreen;
     }
 }
+//~}

@@ -21,10 +21,11 @@ public class VirtualCursorRenderer extends CursorRenderer {
         return INSTANCE;
     }
 
+    //~ if >= 26.2 'client.screen' -> 'client.gui.screen()' {
     //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public void renderCursor(@NotNull GuiGraphicsExtractor context, @NotNull Minecraft client) {
-        if (!MidnightControlsConfig.virtualMouse || (client.screen == null
-                || MidnightInput.isScreenInteractive(client.screen)))
+        if (!MidnightControlsConfig.virtualMouse || (client.gui.screen() == null
+                || MidnightInput.isScreenInteractive(client.gui.screen())))
             return;
 
         float mouseX = (float) client.mouseHandler.xpos() * client.getWindow().getGuiScaledWidth() / client.getWindow().getScreenWidth();
@@ -32,7 +33,7 @@ public class VirtualCursorRenderer extends CursorRenderer {
 
         boolean hoverSlot = false;
 
-        if (client.screen instanceof HandledScreenAccessor inventoryScreen) {
+        if (client.gui.screen() instanceof HandledScreenAccessor inventoryScreen) {
             int guiLeft = inventoryScreen.getX();
             int guiTop = inventoryScreen.getY();
 
@@ -45,8 +46,8 @@ public class VirtualCursorRenderer extends CursorRenderer {
             }
         }
 
-        if (!hoverSlot && client.screen != null) {
-            var slot = MidnightControlsCompat.getSlotAt(client.screen, (int) mouseX, (int) mouseY);
+        if (!hoverSlot && client.gui.screen() != null) {
+            var slot = MidnightControlsCompat.getSlotAt(client.gui.screen(), (int) mouseX, (int) mouseY);
 
             if (slot != null) {
                 mouseX = slot.x();
@@ -65,4 +66,5 @@ public class VirtualCursorRenderer extends CursorRenderer {
             drawUnalignedTexturedQuad(RenderPipelines.GUI_TEXTURED, sprite.atlasLocation(), context, mouseX, mouseX + 16, mouseY, mouseY + 16, sprite.getU0(), sprite.getU1(), sprite.getV0(), sprite.getV1());
         } catch (IllegalStateException ignored) {}
     }
+    //~}
 }

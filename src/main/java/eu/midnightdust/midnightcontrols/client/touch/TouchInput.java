@@ -23,7 +23,8 @@ public class TouchInput {
     public static boolean isDragging = false;
 
     public static void tick() {
-        if ((client.screen == null && doMixedInput()) || client.screen instanceof TouchscreenOverlay) {
+        //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
+        if ((client.gui.screen() == null && doMixedInput()) || client.gui.screen() instanceof TouchscreenOverlay) {
             double scaleFactor = client.getWindow().getGuiScale();
             if (clickStartTime > 0 && System.currentTimeMillis() - clickStartTime >= MidnightControlsConfig.touchBreakDelay) {
                 mouseHeldDown(client.mouseHandler.xpos() / scaleFactor, client.mouseHandler.ypos() / scaleFactor);
@@ -64,7 +65,8 @@ public class TouchInput {
         isDragging = false;
         firstHitResult = null;
         if (client.gameMode != null) client.gameMode.stopDestroyBlock();
-        if ((client.screen == null || !client.screen.mouseReleased(new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0)))) && System.currentTimeMillis() - clickStartTime < MidnightControlsConfig.touchBreakDelay) {
+        //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
+        if ((client.gui.screen() == null || !client.gui.screen().mouseReleased(new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0)))) && System.currentTimeMillis() - clickStartTime < MidnightControlsConfig.touchBreakDelay) {
             assert client.player != null;
             assert client.level != null;
             assert client.gameMode != null;

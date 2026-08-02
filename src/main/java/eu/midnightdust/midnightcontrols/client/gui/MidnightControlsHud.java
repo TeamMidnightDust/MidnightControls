@@ -79,7 +79,8 @@ public class MidnightControlsHud {
     public void extractRenderState(GuiGraphicsExtractor context, DeltaTracker tickCounter) {
         if (this.client == null) this.client = Minecraft.getInstance();
         if (!isVisible) return;
-        if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.screen == null) {
+        //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
+        if (MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER && this.client.gui.screen() == null) {
             isCrammed = client.getWindow().getGuiScaledWidth() < 520;
             int y = bottom(2);
             Matrix3x2fStack matrices = context.pose();

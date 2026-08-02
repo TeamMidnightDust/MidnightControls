@@ -3,21 +3,24 @@ package eu.midnightdust.midnightcontrols.client.mixin;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsHud;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//? if >= 26.2 {
+import net.minecraft.client.gui.Hud;
+@Mixin(Hud.class)
+//?} else {
+/*import net.minecraft.client.gui.Gui;
 @Mixin(Gui.class)
+*///?}
 public class InGameHudMixin {
-
     @Inject(method = "<init>", at = @At("TAIL"))
     private static void midnightcontrols$initHud(Minecraft client, CallbackInfo ci) {
         MidnightControlsHud.getInstance().init();
     }
-
 
     //~ if >= 26.1 'render' -> 'extract' {
     //? fabric {

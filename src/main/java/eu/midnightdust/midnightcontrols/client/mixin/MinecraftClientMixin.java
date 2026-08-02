@@ -12,10 +12,8 @@ package eu.midnightdust.midnightcontrols.client.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
-import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
@@ -30,7 +28,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -41,6 +38,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.reacharound;
+
+//? if < 26.2 {
+/*import net.minecraft.client.gui.screens.Screen;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+*///?}
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftClientMixin {
@@ -54,9 +57,7 @@ public abstract class MinecraftClientMixin {
 
     @Shadow private int rightClickDelay;
 
-    @Shadow public abstract void setScreen(Screen screen);
-
-    @Shadow protected int missTime;
+    @Shadow public int missTime;
 
     @Shadow protected abstract void handleKeybinds();
 
@@ -109,14 +110,13 @@ public abstract class MinecraftClientMixin {
         this.midnightcontrols$lastPos = this.player.position();
     }
 
-    @Inject(at = @At("TAIL"), method = "setScreen")
-    private void setScreen(Screen screen, CallbackInfo info) {
-        if (MidnightControlsConfig.hideNormalMouse){
-            if (screen != null && !(screen instanceof TouchscreenOverlay)) GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
-            else GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
-        }
-        MidnightControlsClient.onScreenOpen(screen);
+    //? if < 26.2 {
+    /*@WrapMethod(method = "setScreen")
+    private void setScreen(Screen screen, Operation<Void> original) {
+        MidnightControlsClient.onScreenOpen(screen, original);
     }
+    *///?}
+
 
     @Inject(method = "startUseItem()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/HitResult;getType()Lnet/minecraft/world/phys/HitResult$Type;"), cancellable = true)
     private void onItemUse(CallbackInfo ci, @Local InteractionHand hand, @Local ItemStack stackInHand) {
@@ -150,10 +150,12 @@ public abstract class MinecraftClientMixin {
             }
         }
     }
-    // TODO: Replace this with MixinExtras' Expressions once that's officially released
-    @Inject(method = "tick", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/gui/components/DebugScreenOverlay;showDebugScreen()Z"))
+
+    //~ if >= 26.2 'Lnet/minecraft/client/gui/components/DebugScreenOverlay;showDebugScreen()Z' -> 'Lnet/minecraft/client/gui/Gui;tick()V'
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;tick()V"))
     private void midnightcontrols$handleKeybindsWithTouchOverlay(CallbackInfo ci, @Local ProfilerFiller profiler) {
-        if (client.screen instanceof TouchscreenOverlay) {
+        //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
+        if (client.gui.screen() instanceof TouchscreenOverlay) {
             profiler.popPush("Keybindings");
             this.handleKeybinds();
             if (this.missTime > 0) {
@@ -165,6 +167,7 @@ public abstract class MinecraftClientMixin {
     // Needed, as it will cause item actions not to work in touchscreen mode otherwise with the above method
     @Inject(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z"), cancellable = true)
     private void midnightcontrols$dontHandleItemAndBlockInteractions(CallbackInfo ci) {
-        if (client.screen instanceof TouchscreenOverlay) ci.cancel();
+        //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
+        if (client.gui.screen() instanceof TouchscreenOverlay) ci.cancel();
     }
 }

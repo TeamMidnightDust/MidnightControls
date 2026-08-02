@@ -21,6 +21,7 @@ public class DefaultScreenClickHandler extends AbstractScreenClickHandler<Screen
     private Screen parentScreen;
     private List<Integer> textFieldElementPath;
 
+    //~ if >= 26.2 'client.setScreen(' -> 'client.gui.setScreen(' {
     @Override
     public void handle(Screen screen, double mouseX, double mouseY) {
         var textField = findClickedTextField(screen.children(), mouseX, mouseY);
@@ -32,7 +33,7 @@ public class DefaultScreenClickHandler extends AbstractScreenClickHandler<Screen
         this.textFieldElementPath = calculatePathToElement(screen, textField.asElement());
 
         var virtualKeyboardScreen = new VirtualKeyboardScreen(textField.getText(), this::handleKeyboardClose, false);
-        client.setScreen(virtualKeyboardScreen);
+        client.gui.setScreen(virtualKeyboardScreen);
     }
 
     private void handleKeyboardClose(String newText) {
@@ -40,7 +41,7 @@ public class DefaultScreenClickHandler extends AbstractScreenClickHandler<Screen
             return;
         }
 
-        client.setScreen(this.parentScreen);
+        client.gui.setScreen(this.parentScreen);
         TextFieldWrapper textField = findTextFieldByPath(this.parentScreen, this.textFieldElementPath);
         if (textField == null) {
             return;
@@ -61,7 +62,7 @@ public class DefaultScreenClickHandler extends AbstractScreenClickHandler<Screen
             }
         }
     }
-
+    //~}
 
     private TextFieldWrapper findClickedTextField(List<? extends GuiEventListener> elements, double mouseX, double mouseY) {
         for (GuiEventListener element : elements) {

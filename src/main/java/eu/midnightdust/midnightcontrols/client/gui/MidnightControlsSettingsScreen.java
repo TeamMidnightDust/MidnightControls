@@ -350,7 +350,8 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         this.buildTabs();
 
         this.addRenderableWidget(this.resetOption.createWidget(Position.of(this.width / 2 - 155, this.height - 29), 150));
-        this.addRenderableWidget(Button.builder(SpruceTexts.GUI_DONE, btn -> this.minecraft.setScreen(this.parent))
+        //~ if >= 26.2 'minecraft.setScreen(' -> 'minecraft.gui.setScreen('
+        this.addRenderableWidget(Button.builder(SpruceTexts.GUI_DONE, btn -> this.minecraft.gui.setScreen(this.parent))
                 .bounds(this.width / 2 - 155 + 160, this.height - 29, 150, 20).build());
     }
 

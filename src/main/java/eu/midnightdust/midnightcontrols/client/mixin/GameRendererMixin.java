@@ -29,7 +29,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? if >= 26.1 {
-import net.minecraft.client.renderer.state.GameRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 //?}
 
@@ -37,31 +36,37 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 public abstract class GameRendererMixin {
     @Shadow @Final private Minecraft minecraft;
 
-    //~ if >= 26.1 'render' -> 'extractGui'
+    //? if < 26.2 {
+    /*//~ if >= 26.1 'render' -> 'extractGui'
     @Inject(method = "extractGui", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHandler;getScaledXPos(Lcom/mojang/blaze3d/platform/Window;)D", shift = At.Shift.BEFORE))
-    private void midnightcontrols$onRender(DeltaTracker tickCounter, boolean tick, /*? if >= 26.1 {*/final boolean resourcesLoaded, /*?}*/ CallbackInfo ci) {
+    private void midnightcontrols$onRender(DeltaTracker tickCounter, boolean tick, /^? if >= 26.1 {^/final boolean resourcesLoaded, /^?}^/ CallbackInfo ci) {
         if (this.minecraft.screen != null && MidnightControlsConfig.controlsMode == ControlsMode.CONTROLLER)
             MidnightControlsClient.input.onPreRenderScreen(this.minecraft.screen);
     }
+
     //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor' {
     //? fabric {
     //~ if >= 26.1 'Lnet/minecraft/client/gui/screens/Screen;renderWithTooltipAndSubtitles(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V' -> 'Lnet/minecraft/client/gui/screens/Screen;extractRenderStateWithTooltipAndSubtitles(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V'
     //~ if >= 26.1 'render' -> 'extractGui'
     @Inject(method = "extractGui", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;extractRenderStateWithTooltipAndSubtitles(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", shift = At.Shift.AFTER))
     //?} else if neoforge {
-    /*//~ if >= 26.1 'render' -> 'extractGui'
+    /^//~ if >= 26.1 'render' -> 'extractGui'
     @Inject(method = "extractGui", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/ClientHooks;drawScreen(Lnet/minecraft/client/gui/screens/Screen;Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", shift = At.Shift.AFTER))
-    *//*?}*/
-    private void midnightcontrols$renderVirtualCursor(DeltaTracker tickCounter, boolean tick, /*? if >= 26.1 {*/final boolean resourcesLoaded, /*?}*/ CallbackInfo ci, @Local GuiGraphicsExtractor drawContext) {
+    ^//^?}^/
+    private void midnightcontrols$renderVirtualCursor(DeltaTracker tickCounter, boolean tick, /^? if >= 26.1 {^/final boolean resourcesLoaded, /^?}^/ CallbackInfo ci, @Local GuiGraphicsExtractor drawContext) {
         VirtualCursorRenderer.getInstance().renderCursor(drawContext,  minecraft);
         if (MidnightControlsClient.isWayland) WaylandCursorRenderer.getInstance().renderCursor(drawContext, minecraft);
     }
     //~}
+    *///?}
+
     //~ if >= 26.1 'Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(FZLorg/joml/Matrix4f;)V' -> 'Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lnet/minecraft/client/renderer/state/level/CameraRenderState;FLorg/joml/Matrix4fc;)V'
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lnet/minecraft/client/renderer/state/level/CameraRenderState;FLorg/joml/Matrix4fc;)V"), method = "renderLevel")
+    @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lnet/minecraft/client/renderer/state/level/CameraRenderState;FLorg/joml/Matrix4fc;)V"))
     private void midnigtcontrols$captureMatrices(DeltaTracker tickCounter, CallbackInfo ci, @Local(ordinal = 0) Matrix4f projectionMatrix, /*? if >= 26.1 {*/@Local CameraRenderState camState/*?} else {*/ /*@Local(ordinal = 1) Matrix4f worldSpaceMatrix*//*?}*/) {
         TouchUtils.lastProjMat.set(projectionMatrix);
-        TouchUtils.lastModMat.set(RenderSystem.getModelViewMatrix());
-        TouchUtils.lastWorldSpaceMatrix.set(/*? if >= 26.1 {*/ camState.viewRotationMatrix /*?} else {*/ /*worldSpaceMatrix *//*?}*/);
+        //~ if >= 26.2 'RenderSystem.getModelViewMatrix()' -> 'RenderSystem.getModelViewMatrixCopy()'
+        TouchUtils.lastModMat.set(RenderSystem.getModelViewMatrixCopy());
+        //~ if >= 26.1 'worldSpaceMatrix' -> 'camState.viewRotationMatrix'
+        TouchUtils.lastWorldSpaceMatrix.set(camState.viewRotationMatrix);
     }
 }

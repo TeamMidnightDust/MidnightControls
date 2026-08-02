@@ -61,7 +61,8 @@ public final class MovementHandler implements PressAction {
 
     @Override
     public boolean press(@NotNull Minecraft client, @NotNull ButtonBinding button, float value, @NotNull ButtonState action) {
-        if (client.screen != null || client.player == null)
+        //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
+        if (client.gui.screen() != null || client.player == null)
             return this.shouldOverrideMovement = false;
 
         int direction = 0;

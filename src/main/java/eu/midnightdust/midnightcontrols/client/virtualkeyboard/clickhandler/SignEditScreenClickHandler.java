@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screens.inventory.SignEditScreen;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 
+//~ if >= 26.2 'client.setScreen(' -> 'client.gui.setScreen(' {
 public class SignEditScreenClickHandler extends AbstractScreenClickHandler<SignEditScreen>  {
     @Override
     public void handle(SignEditScreen screen, double mouseX, double mouseY) {
@@ -25,12 +26,13 @@ public class SignEditScreenClickHandler extends AbstractScreenClickHandler<SignE
         }
 
         VirtualKeyboardScreen virtualKeyboardScreen = new VirtualKeyboardScreen(linesToString.toString(), (text) -> {
-            client.setScreen(screen);
+            client.gui.setScreen(screen);
             String[] lines = text.split("\n");
             for (int i = 0; i < 4; i++) accessor.midnightcontrols$setMessage(i, lines.length > i ? lines[i] : "");
             accessor.midnightcontrols$writeToBlockEntity();
         }, true);
 
-        client.setScreen(virtualKeyboardScreen);
+        client.gui.setScreen(virtualKeyboardScreen);
     }
 }
+//~}

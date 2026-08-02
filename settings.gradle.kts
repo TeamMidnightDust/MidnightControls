@@ -27,8 +27,8 @@ stonecutter {
                 version("$version-$loader", version).buildscript(buildscript)
             }
         }
-        mc("fabric", "1.21.11", "26.1")
-        mc("neoforge", "1.21.11", "26.1")
+        mc("fabric", "1.21.11", "26.1", "26.2")
+        mc("neoforge", "1.21.11", "26.1", "26.2")
     }
     create(rootProject)
 }

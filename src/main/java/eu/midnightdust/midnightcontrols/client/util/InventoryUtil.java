@@ -1,6 +1,7 @@
 package eu.midnightdust.midnightcontrols.client.util;
 
-import net.minecraft.util.Tuple;
+//import net.minecraft.util.Tuple;
+import com.mojang.datafixers.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,9 +40,9 @@ public class InventoryUtil {
 
                     // Distance between the slot and the cursor.
                     double distance = Math.sqrt(Math.pow(posX - otherPosX, 2) + Math.pow(posY - otherPosY, 2));
-                    return new Tuple<>(slot, distance);
+                    return new Pair<Slot, Double>(slot, distance);
                 }).filter(entry -> {
-                    var slot = entry.getA();
+                    var slot = entry.getFirst();
                     int posX = guiLeft + slot.x + 8;
                     int posY = guiTop + slot.y + 8;
                     int otherPosX = (int) mouseX;
@@ -61,8 +62,8 @@ public class InventoryUtil {
                     else
                         return false;
                 })
-                .min(Comparator.comparingDouble(Tuple::getB))
-                .map(Tuple::getA);
+                .min(Comparator.comparingDouble(Pair<Slot, Double>::getSecond))
+                .map(Pair::getFirst);
     }
 
     private static int targetMouseX = 0;
@@ -79,19 +80,19 @@ public class InventoryUtil {
             int mouseY = (int) (targetMouseY * (double) client.getWindow().getGuiScaledHeight() / (double) client.getWindow().getScreenHeight());
 
             // Finds the closest slot in the GUI within 14 pixels.
-            Optional<Tuple<@NotNull Slot, @NotNull Double>> closestSlot = inventoryScreen.getMenu().slots.parallelStream()
+            Optional<Pair<@NotNull Slot, @NotNull Double>> closestSlot = inventoryScreen.getMenu().slots.parallelStream()
                     .map(slot -> {
                         int x = guiLeft + slot.x + 8;
                         int y = guiTop + slot.y + 8;
 
                         // Distance between the slot and the cursor.
                         double distance = Math.sqrt(Math.pow(x - mouseX, 2) + Math.pow(y - mouseY, 2));
-                        return new Tuple<>(slot, distance);
-                    }).filter(entry -> entry.getB() <= 14.0)
-                    .min(Comparator.comparingDouble(net.minecraft.util.Tuple::getB));
+                        return new Pair<Slot, Double>(slot, distance);
+                    }).filter(entry -> entry.getSecond() <= 14.0)
+                    .min(Comparator.comparingDouble(Pair<Slot, Double>::getSecond));
 
             if (closestSlot.isPresent() && client.player != null) {
-                var slot = closestSlot.get().getA();
+                var slot = closestSlot.get().getFirst();
                 if (slot.hasItem() || !client.player.getInventory().getSelectedItem().isEmpty()) {
                     int slotCenterXScaled = guiLeft + slot.x + 8;
                     int slotCenterYScaled = guiTop + slot.y + 8;

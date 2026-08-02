@@ -16,6 +16,7 @@
     "DrawContextAccessor",
     "GameOptionsScreenMixin",
     "GameRendererMixin",
+    "GuiMixin",
     "HandledScreenMixin",
     "InGameHudMixin",
     "InputAccessor",

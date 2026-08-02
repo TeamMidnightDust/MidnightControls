@@ -37,7 +37,8 @@ public class WaylandCursorRenderer extends CursorRenderer {
 
     //~ if >= 26.1 'GuiGraphics' -> 'GuiGraphicsExtractor'
     public void renderCursor(@NotNull GuiGraphicsExtractor context, @NotNull Minecraft client) {
-        if (MidnightControlsConfig.virtualMouse || client.screen == null || MidnightControlsConfig.controlsMode != ControlsMode.CONTROLLER) return;
+        //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
+        if (MidnightControlsConfig.virtualMouse || client.gui.screen() == null || MidnightControlsConfig.controlsMode != ControlsMode.CONTROLLER) return;
 
         float mouseX = (float) client.mouseHandler.xpos() * client.getWindow().getGuiScaledWidth() / client.getWindow().getScreenWidth();
         float mouseY = (float) client.mouseHandler.ypos() * client.getWindow().getGuiScaledHeight() / client.getWindow().getScreenHeight();

@@ -66,7 +66,9 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
                 fw.close();
             } catch (IOException e) {
                 if (this.client != null)
-                    this.client.getToastManager().addToast(SystemToast.multiline(this.client, SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+                    //~ if >= 26.2 'client.getToastManager()' -> 'client.gui.toastManager()'
+                    //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
+                    this.client.gui.toastManager().addToast(new SystemToast(SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
                             Component.translatable("midnightcontrols.controller.mappings.error.write"), Component.empty()));
                 e.fillInStackTrace();
             }

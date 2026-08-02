@@ -13,6 +13,7 @@ import com.google.common.base.Predicates;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
+import net.minecraft.locale.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +37,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * @version 1.7.0
  * @since 1.0.0
  */
+//~ if >= 26.2 'client.screen' -> 'client.gui.screen()' {
 public class ButtonBinding {
     public static final ButtonCategory MOVEMENT_CATEGORY;
     public static final ButtonCategory GAMEPLAY_CATEGORY;
@@ -51,9 +53,10 @@ public class ButtonBinding {
             .action((client, button1, value, action) -> {
                 if (action.isPressed()) {
                     MidnightControlsClient.ring.loadFromUnbound();
-                    client.setScreen(new RingScreen());
+                    //~ if >= 26.2 'client.setScreen' -> 'client.gui.setScreen'
+                    client.gui.setScreen(new RingScreen());
                 }
-                if (action.isUnpressed() && client.screen != null) client.screen.onClose();
+                if (action.isUnpressed() && client.gui.screen() != null) client.gui.screen().onClose();
                 return true;
             }).register();
     public static final ButtonBinding DROP_ITEM = new Builder("drop_item").buttons(GLFW_GAMEPAD_BUTTON_B).onlyInGame().cooldown().register();
@@ -64,7 +67,7 @@ public class ButtonBinding {
     public static final ButtonBinding HOTBAR_RIGHT = new Builder("hotbar_right").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
             .action(InputHandlers.handleHotbar(true)).onlyInGame().cooldown().register();
     public static final ButtonBinding INVENTORY = new Builder("inventory").buttons(GLFW_GAMEPAD_BUTTON_Y).onlyInGame().cooldown().register();
-    public static final ButtonBinding EXIT = new Builder("exit").buttons(GLFW_GAMEPAD_BUTTON_B).filter((buttonBinding) -> client.screen != null && buttonBinding.cooldown == 0 && INVENTORY.cooldown == 0)
+    public static final ButtonBinding EXIT = new Builder("exit").buttons(GLFW_GAMEPAD_BUTTON_B).filter((buttonBinding) -> client.gui.screen() != null && buttonBinding.cooldown == 0 && INVENTORY.cooldown == 0)
             .action(InputHandlers.handleExit()).cooldown().register();
     public static final ButtonBinding JUMP = new Builder("jump").buttons(GLFW_GAMEPAD_BUTTON_A).onlyInGame().register();
     public static final ButtonBinding LEFT = new Builder("left").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, false))
@@ -92,9 +95,9 @@ public class ButtonBinding {
             .actions(InputHandlers::handleToggleSprint).onlyInGame().cooldown().register();
     public static final ButtonBinding SWAP_HANDS = new Builder("swap_hands").buttons(GLFW_GAMEPAD_BUTTON_X).onlyInGame().cooldown().register();
     public static final ButtonBinding TAB_LEFT = new Builder("tab_back").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
-            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((binding) -> client.screen != null)).cooldown().register();
+            .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((binding) -> client.gui.screen() != null)).cooldown().register();
     public static final ButtonBinding TAB_RIGHT = new Builder("tab_next").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
-            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((binding) -> client.screen != null)).cooldown().register();
+            .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((binding) -> client.gui.screen() != null)).cooldown().register();
     public static final ButtonBinding PAGE_LEFT = new Builder("page_back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
             .action(InputHandlers.handlePage(false)).filter(InputHandlers::inInventory).cooldown(30).register();
     public static final ButtonBinding PAGE_RIGHT = new Builder("page_next").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
@@ -107,6 +110,7 @@ public class ButtonBinding {
             .action(InputHandlers.handleActions()).filter(InputHandlers::inInventory).cooldown().register();
     public static final ButtonBinding TOGGLE_PERSPECTIVE = new Builder("toggle_perspective").filter(InputHandlers::inGame).buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_Y).cooldown().register();
     public static final ButtonBinding USE = new Builder("use").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true)).register();
+    //~}
 
     private int[] button;
     private final int[] defaultButton;
@@ -295,7 +299,7 @@ public class ButtonBinding {
      * @return the translation key
      */
     public @NotNull String getTranslationKey() {
-        return I18n.exists("midnightcontrols.action." + this.getName()) ? "midnightcontrols.action." + this.getName() : this.getName();
+        return Language.getInstance().has("midnightcontrols.action." + this.getName()) ? "midnightcontrols.action." + this.getName() : this.getName();
     }
 
     public @NotNull Component getText() {

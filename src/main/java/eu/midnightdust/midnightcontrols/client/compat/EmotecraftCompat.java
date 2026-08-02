@@ -13,7 +13,8 @@ public class EmotecraftCompat {
     private static final Minecraft client = Minecraft.getInstance();
 
     public static void openEmotecraftScreen(Screen parent) {
-        client.setScreen(new FastMenuScreen(parent));
+        //~ if >= 26.2 'client.setScreen(' -> 'client.gui.setScreen('
+        client.gui.setScreen(new FastMenuScreen(parent));
     }
     public static boolean isEmotecraftScreen(Screen screen) {
         return screen instanceof FastMenuScreen;
@@ -22,7 +23,8 @@ public class EmotecraftCompat {
     static int prevIndex = -1;
     public static void handleEmoteSelector(int index) {
         try {
-            if (client.screen instanceof FastMenuScreen) {
+            //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
+            if (client.gui.screen() instanceof FastMenuScreen) {
                 boolean stickReleased = index == -1 && prevIndex != -1;
                 var pos = calcMousePos(stickReleased ? prevIndex : index);
                 InputManager.queueMousePosition(pos.x, pos.y);

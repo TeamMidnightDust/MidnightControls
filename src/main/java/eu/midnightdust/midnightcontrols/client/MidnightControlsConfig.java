@@ -249,7 +249,9 @@ public class MidnightControlsConfig extends MidnightConfig {
 
             Button editButton = Button.builder(Component.nullToEmpty("OPEN"),
                     button -> {
-                        client.setScreen(new MidnightControlsSettingsScreen(client.screen, false));
+                        //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
+                        //~ if >= 26.2 'client.setScreen(' -> 'client.gui.setScreen('
+                        client.gui.setScreen(new MidnightControlsSettingsScreen(client.gui.screen(), false));
                     }).bounds(screen.width - 185, 0, 175, 20).build();
             list.addButton(List.of(editButton), Component.nullToEmpty("Legacy Config UI"), new EntryInfo(null, screen.modid));
         }
@@ -482,7 +484,8 @@ public class MidnightControlsConfig extends MidnightConfig {
      * @return true if analog movement is possible, false otherwise
      */
     public static boolean isAnalogMovementAllowed() {
-        return client.screen != null || (analogMovement && (currentServerIp == null || MidnightControlsConfig.anticheatServers.stream().noneMatch(currentServerIp::matches)));
+        //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
+        return client.gui.screen() != null || (analogMovement && (currentServerIp == null || MidnightControlsConfig.anticheatServers.stream().noneMatch(currentServerIp::matches)));
     }
 
     public static void reset() {
