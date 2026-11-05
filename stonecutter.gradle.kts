@@ -6,10 +6,22 @@ stonecutter active "26.2-fabric" /* [SC] DO NOT EDIT */
 
 // See https://stonecutter.kikugie.dev/wiki/config/params
 stonecutter parameters {
-    swaps["mod_version"] = "\"" + property("mod.version") + "\";"
-    swaps["minecraft"] = "\"" + node.metadata.version + "\";"
-    constants["release"] = property("mod.id") != "template"
-    dependencies["fapi"] = node.project.property("deps.fabric_version") as String
+    val (version, loader) = current.project.split('-', limit = 2)
+
+    // Makes version- and loader-specific properties apply from `stoncutter.properties.toml`
+    properties {
+        tags(version, loader)
+    }
+
+    // Adds constants to Stonecutter comments (i.e. for `//? if fabric {...`)
+    constants {
+        match(loader, "fabric", "neoforge", "forge")
+    }
+
+    swaps["mod_version"] = "\"${properties.get<String>("mod.version")}\";"
+    swaps["minecraft"] = "\"${node.metadata.version}\";"
+    constants["release"] = properties.get<String>("mod.id") != "template"
+    dependencies["fapi"] = properties.getOrNull<String>("deps.fabric_api") ?: "0"
 
     replacements {
         string {

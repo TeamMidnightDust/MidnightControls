@@ -8,6 +8,7 @@ modId = "midnightcontrols"
 version = "${version}"
 displayName = "MidnightControls"
 logoFile = "icon.png"
+iconFile = "icon.png"
 authors = "Motschen, LambdAurora"
 contributors = "akemin-dayo, DioEgizio, dogtopus, egeesin, EnnuiL, FlashyReese, gyular, Hambaka, Ivanoks, joaoh1, KiskaUWU, Madis0, RaptaG, ronniedude, spudpiggy, TrueHorse"
 description = '''
