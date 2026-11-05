@@ -23,7 +23,6 @@ import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.ThrowablePotionItem;
 import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
-import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -35,7 +34,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import eu.midnightdust.midnightcontrols.client.mouse.EyeTrackerHandler;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsConfig.doMixedInput;
-import static org.lwjgl.glfw.GLFW.*;
+import static eu.midnightdust.midnightcontrols.client.sdl.ButtonCodes.MOUSE_BUTTON_BACK;
+import static eu.midnightdust.midnightcontrols.client.sdl.ButtonCodes.MOUSE_BUTTON_LEFT;
 
 import com.mojang.blaze3d.Blaze3D;
 
@@ -70,10 +70,10 @@ public abstract class MouseMixin implements MouseAccessor {
     @Inject(method = "onButton", at = @At(value = "HEAD"), cancellable = true)
     private void midnightcontrols$onMouseButton(long window, MouseButtonInfo input, int action, CallbackInfo ci) {
         if (window != this.minecraft.getWindow().handle()) return;
-        if (action == 1 && input.button() == GLFW.GLFW_MOUSE_BUTTON_4 && minecraft.gui.screen() != null) {
+        if (action == 1 && input.button() == MOUSE_BUTTON_BACK && minecraft.gui.screen() != null) {
             MidnightControlsClient.input.tryGoBack(minecraft.gui.screen());
         }
-        else if ((minecraft.gui.screen() == null && doMixedInput() || minecraft.gui.screen() instanceof TouchscreenOverlay) && minecraft.player != null && input.button() == GLFW_MOUSE_BUTTON_1) {
+        else if ((minecraft.gui.screen() == null && doMixedInput() || minecraft.gui.screen() instanceof TouchscreenOverlay) && minecraft.player != null && input.button() == MOUSE_BUTTON_LEFT) {
             double mouseX = xpos / minecraft.getWindow().getGuiScale();
             double mouseY = ypos / minecraft.getWindow().getGuiScale();
             int centerX = minecraft.getWindow().getGuiScaledWidth() / 2;

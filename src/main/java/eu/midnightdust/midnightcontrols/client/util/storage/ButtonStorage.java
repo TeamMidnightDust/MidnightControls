@@ -2,8 +2,8 @@ package eu.midnightdust.midnightcontrols.client.util.storage;
 
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 
-import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP;
+import static eu.midnightdust.midnightcontrols.client.sdl.ButtonCodes.GAMEPAD_BUTTON_DPAD_LEFT;
+import static eu.midnightdust.midnightcontrols.client.sdl.ButtonCodes.GAMEPAD_BUTTON_DPAD_UP;
 
 public class ButtonStorage {
     public final int button;
@@ -18,6 +18,6 @@ public class ButtonStorage {
         this.state = state;
     }
     public boolean isDpad() {
-        return button >= GLFW_GAMEPAD_BUTTON_DPAD_UP && button <= GLFW_GAMEPAD_BUTTON_DPAD_LEFT;
+        return button >= GAMEPAD_BUTTON_DPAD_UP && button <= GAMEPAD_BUTTON_DPAD_LEFT;
     }
 }

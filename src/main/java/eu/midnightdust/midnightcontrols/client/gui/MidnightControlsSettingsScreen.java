@@ -40,7 +40,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Util;
-import org.lwjgl.glfw.GLFW;
+
+import static eu.midnightdust.midnightcontrols.client.sdl.AxisCodes.*;
 
 /**
  * Represents the midnightcontrols settings screen.
@@ -127,10 +128,10 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption rightDeadZoneOption;
     private final SpruceOption leftDeadZoneOption;
     private final SpruceOption[] maxAnalogValueOptions = new SpruceOption[]{
-            maxAnalogValueOption("midnightcontrols.menu.max_left_x_value", GLFW.GLFW_GAMEPAD_AXIS_LEFT_X),
-            maxAnalogValueOption("midnightcontrols.menu.max_left_y_value", GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y),
-            maxAnalogValueOption("midnightcontrols.menu.max_right_x_value", GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X),
-            maxAnalogValueOption("midnightcontrols.menu.max_right_y_value", GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y)
+            maxAnalogValueOption("midnightcontrols.menu.max_left_x_value", GAMEPAD_AXIS_LEFT_X),
+            maxAnalogValueOption("midnightcontrols.menu.max_left_y_value", GAMEPAD_AXIS_LEFT_Y),
+            maxAnalogValueOption("midnightcontrols.menu.max_right_x_value", GAMEPAD_AXIS_RIGHT_X),
+            maxAnalogValueOption("midnightcontrols.menu.max_right_y_value", GAMEPAD_AXIS_RIGHT_Y)
     };
     // Controller options
     public final static SpruceOption virtualKeyboardLayoutOption =

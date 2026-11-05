@@ -52,7 +52,7 @@ import net.minecraft.resources.Identifier;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.currentServerIp;
-import static org.lwjgl.glfw.GLFW.*;
+import static eu.midnightdust.midnightcontrols.client.sdl.AxisCodes.*;
 
 /**
  * Represents MidnightControls configuration.
@@ -370,19 +370,20 @@ public class MidnightControlsConfig extends MidnightConfig {
 
     public static double getAxisMaxValue(int axis) {
         return switch (axis) {
-            case GLFW_GAMEPAD_AXIS_LEFT_X -> MidnightControlsConfig.maxAnalogValueLeftX;
-            case GLFW_GAMEPAD_AXIS_LEFT_Y -> MidnightControlsConfig.maxAnalogValueLeftY;
-            case GLFW_GAMEPAD_AXIS_RIGHT_X -> MidnightControlsConfig.maxAnalogValueRightX;
-            default -> MidnightControlsConfig.maxAnalogValueRightY;
+            case GAMEPAD_AXIS_LEFT_X -> MidnightControlsConfig.maxAnalogValueLeftX;
+            case GAMEPAD_AXIS_LEFT_Y -> MidnightControlsConfig.maxAnalogValueLeftY;
+            case GAMEPAD_AXIS_RIGHT_X -> MidnightControlsConfig.maxAnalogValueRightX;
+            case GAMEPAD_AXIS_RIGHT_Y -> MidnightControlsConfig.maxAnalogValueRightY;
+            default -> throw new IllegalStateException("Unexpected value: " + axis);
         };
     }
 
     public static void setAxisMaxValue(int axis, double value) {
         switch (axis) {
-            case GLFW_GAMEPAD_AXIS_LEFT_X -> MidnightControlsConfig.maxAnalogValueLeftX = value;
-            case GLFW_GAMEPAD_AXIS_LEFT_Y -> MidnightControlsConfig.maxAnalogValueLeftY = value;
-            case GLFW_GAMEPAD_AXIS_RIGHT_X -> MidnightControlsConfig.maxAnalogValueRightX = value;
-            default -> MidnightControlsConfig.maxAnalogValueRightY = value;
+            case GAMEPAD_AXIS_LEFT_X -> MidnightControlsConfig.maxAnalogValueLeftX = value;
+            case GAMEPAD_AXIS_LEFT_Y -> MidnightControlsConfig.maxAnalogValueLeftY = value;
+            case GAMEPAD_AXIS_RIGHT_X -> MidnightControlsConfig.maxAnalogValueRightX = value;
+            case GAMEPAD_AXIS_RIGHT_Y -> MidnightControlsConfig.maxAnalogValueRightY = value;
         };
     }
 
@@ -446,25 +447,25 @@ public class MidnightControlsConfig extends MidnightConfig {
     public static boolean isBackButton(int btn, boolean isBtn, ButtonState state) {
         if (!isBtn && state == ButtonState.NONE)
             return false;
-        return ButtonBinding.axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, false) == ButtonBinding.axisAsButton(btn, state == ButtonState.PRESS);
+        return ButtonBinding.axisAsButton(GAMEPAD_AXIS_LEFT_Y, false) == ButtonBinding.axisAsButton(btn, state == ButtonState.PRESS);
     }
 
     public static boolean isForwardButton(int btn, boolean isBtn, ButtonState state) {
         if (!isBtn && state == ButtonState.NONE)
             return false;
-        return ButtonBinding.axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, true) == ButtonBinding.axisAsButton(btn, state == ButtonState.PRESS);
+        return ButtonBinding.axisAsButton(GAMEPAD_AXIS_LEFT_Y, true) == ButtonBinding.axisAsButton(btn, state == ButtonState.PRESS);
     }
 
     public static boolean isLeftButton(int btn, boolean isBtn, ButtonState state) {
         if (!isBtn && state == ButtonState.NONE)
             return false;
-        return ButtonBinding.axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, false) == ButtonBinding.axisAsButton(btn, state == ButtonState.PRESS);
+        return ButtonBinding.axisAsButton(GAMEPAD_AXIS_LEFT_X, false) == ButtonBinding.axisAsButton(btn, state == ButtonState.PRESS);
     }
 
     public static boolean isRightButton(int btn, boolean isBtn, ButtonState state) {
         if (!isBtn && state == ButtonState.NONE)
             return false;
-        return ButtonBinding.axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, true) == ButtonBinding.axisAsButton(btn, state == ButtonState.PRESS);
+        return ButtonBinding.axisAsButton(GAMEPAD_AXIS_LEFT_X, true) == ButtonBinding.axisAsButton(btn, state == ButtonState.PRESS);
     }
 
     /**
@@ -474,7 +475,7 @@ public class MidnightControlsConfig extends MidnightConfig {
      * @return true if the axis is used for movements, else false
      */
     public static boolean isMovementAxis(int axis) {
-        return axis == GLFW_GAMEPAD_AXIS_LEFT_Y || axis == GLFW_GAMEPAD_AXIS_LEFT_X;
+        return axis == GAMEPAD_AXIS_LEFT_Y || axis == GAMEPAD_AXIS_LEFT_X;
     }
 
     /**

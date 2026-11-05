@@ -8,7 +8,6 @@ import eu.midnightdust.midnightcontrols.client.MidnightInput;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
-import org.lwjgl.glfw.GLFW;
 
 import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 

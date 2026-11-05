@@ -23,6 +23,7 @@ import eu.midnightdust.midnightcontrols.client.controller.Controller;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsHud;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
+import eu.midnightdust.midnightcontrols.client.sdl.ButtonCodes;
 import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.mixin.KeyBindingIDAccessor;
 import eu.midnightdust.midnightcontrols.client.ring.ButtonBindingRingAction;
@@ -33,9 +34,9 @@ import eu.midnightdust.midnightcontrols.client.touch.TouchInput;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
@@ -45,6 +46,14 @@ import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+//? if >= 26.3 {
+import org.lwjgl.sdl.SDL;
+import org.lwjgl.sdl.SDLJoystick;
+import org.lwjgl.sdl.SDLKeycode;
+import org.lwjgl.sdl.SDLPlatform;
+//?} else {
+//import org.lwjgl.glfw.GLFW;
+//?}
 
 /**
  * Represents the midnightcontrols client mod.
@@ -56,16 +65,18 @@ import net.minecraft.resources.Identifier;
 public class MidnightControlsClient extends MidnightControls {
     public static boolean lateInitDone = false;
     public static final KeyMapping.Category MIDNIGHTCONTROLS_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("midnightcontrols", "keybinds"));
+    //~ if >= 26.3 'Type.KEYSYM' -> 'Type.KEYBOARD' {
     public static final KeyMapping BINDING_LOOK_UP = InputManager.makeKeyBinding(id("look_up"),
-            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_KP_8, MIDNIGHTCONTROLS_CATEGORY);
+            InputConstants.Type.KEYBOARD, ButtonCodes.KEYBOARD_KP_8, MIDNIGHTCONTROLS_CATEGORY);
     public static final KeyMapping BINDING_LOOK_RIGHT = InputManager.makeKeyBinding(id("look_right"),
-            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_KP_6, MIDNIGHTCONTROLS_CATEGORY);
+            InputConstants.Type.KEYBOARD, ButtonCodes.KEYBOARD_KP_6, MIDNIGHTCONTROLS_CATEGORY);
     public static final KeyMapping BINDING_LOOK_DOWN = InputManager.makeKeyBinding(id("look_down"),
-            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_KP_2, MIDNIGHTCONTROLS_CATEGORY);
+            InputConstants.Type.KEYBOARD, ButtonCodes.KEYBOARD_KP_2, MIDNIGHTCONTROLS_CATEGORY);
     public static final KeyMapping BINDING_LOOK_LEFT = InputManager.makeKeyBinding(id("look_left"),
-            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_KP_4, MIDNIGHTCONTROLS_CATEGORY);
+            InputConstants.Type.KEYBOARD, ButtonCodes.KEYBOARD_KP_4, MIDNIGHTCONTROLS_CATEGORY);
     public static final KeyMapping BINDING_RING = InputManager.makeKeyBinding(id("ring"),
-            InputConstants.Type.KEYSYM, InputConstants.UNKNOWN.getValue(), MIDNIGHTCONTROLS_CATEGORY);
+            InputConstants.Type.KEYBOARD, InputConstants.UNKNOWN.getValue(), MIDNIGHTCONTROLS_CATEGORY);
+    //~}
     public static final Identifier CONTROLLER_BUTTONS = id("textures/gui/controller_buttons.png");
     public static final Identifier CONTROLLER_EXPANDED = id("textures/gui/controller_expanded.png");
     public static final Identifier CONTROLLER_AXIS = id("textures/gui/controller_axis.png");
@@ -95,7 +106,11 @@ public class MidnightControlsClient extends MidnightControls {
             }
         }, delay, period);
 
-        isWayland = GLFW.glfwGetVersionString().contains("Wayland");
+        //? if >= 26.3 {
+            isWayland = Objects.equals(SDLPlatform.SDL_GetPlatform(), "wayland");
+        //?} else {
+            //isWayland = GLFW.glfwGetVersionString().contains("Wayland");
+        //?}
     }
 
     /**
@@ -114,11 +129,13 @@ public class MidnightControlsClient extends MidnightControls {
         }
         MidnightControlsHud.isVisible = MidnightControlsConfig.hudEnable;
         Controller.updateMappings();
-        try {
-            GLFW.glfwSetJoystickCallback(MidnightControlsClient::onControllerConnectionChanged);
-        } catch (Exception e) {
-            e.fillInStackTrace();
-        }
+        //? if < 26.3 {
+//        try {
+//            GLFW.glfwSetJoystickCallback(MidnightControlsClient::onControllerConnectionChanged);
+//        } catch (Exception e) {
+//            e.fillInStackTrace();
+//        }
+        //?}
 
         MidnightControlsCompat.init();
     }
@@ -134,7 +151,7 @@ public class MidnightControlsClient extends MidnightControls {
     /**
      * This callback is executed every time a controller is connected or disconnected.
      */
-    private static void onControllerConnectionChanged(int jid, int event) {
+    public static void onControllerConnectionChanged(int jid, int event) {
         if (event == GLFW.GLFW_CONNECTED) {
             var controller = Controller.byId(jid);
             showToastMessage(Component.translatable("midnightcontrols.controller.connected", jid), Component.literal(controller.getName()));

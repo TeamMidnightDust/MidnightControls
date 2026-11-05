@@ -35,11 +35,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import static eu.midnightdust.midnightcontrols.client.sdl.ButtonCodes.MOUSE_BUTTON_LEFT;
 
 /**
  * Represents a control list widget.
@@ -178,7 +179,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
             } while (!element.mouseClicked(click, false));
 
             this.setFocused(element);
-            if (click.button() == GLFW.GLFW_MOUSE_BUTTON_1)
+            if (click.button() == MOUSE_BUTTON_LEFT)
                 this.dragging = true;
 
             return true;
@@ -192,7 +193,7 @@ public class ControlsListWidget extends SpruceEntryListWidget<ControlsListWidget
 
         @Override
         protected boolean onMouseDrag(@NotNull MouseButtonEvent click, double deltaX, double deltaY) {
-            return this.getFocused() != null && this.dragging && click.button() == GLFW.GLFW_MOUSE_BUTTON_1
+            return this.getFocused() != null && this.dragging && click.button() == MOUSE_BUTTON_LEFT
                     && this.getFocused().mouseDragged(click, deltaX, deltaY);
         }
 

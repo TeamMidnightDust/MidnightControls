@@ -2,12 +2,12 @@ package eu.midnightdust.midnightcontrols.client.compat;
 
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.mixin.MouseAccessor;
+import eu.midnightdust.midnightcontrols.client.sdl.ButtonCodes;
 import io.github.kosmx.emotes.arch.screen.ingame.FastMenuScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonInfo;
 import org.joml.Vector2i;
-import org.lwjgl.glfw.GLFW;
 
 public class EmotecraftCompat {
     private static final Minecraft client = Minecraft.getInstance();
@@ -31,7 +31,7 @@ public class EmotecraftCompat {
                 InputManager.INPUT_MANAGER.updateMousePosition(client);
 
                 if (stickReleased) {
-                    ((MouseAccessor) client.mouseHandler).midnightcontrols$onMouseButton(client.getWindow().handle(), new MouseButtonInfo(GLFW.GLFW_MOUSE_BUTTON_LEFT, 0), GLFW.GLFW_PRESS);
+                    ((MouseAccessor) client.mouseHandler).midnightcontrols$onMouseButton(client.getWindow().handle(), new MouseButtonInfo(ButtonCodes.MOUSE_BUTTON_LEFT, 0), GLFW.GLFW_PRESS);
                     prevIndex = -1;
                 }
                 else prevIndex = index;

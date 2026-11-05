@@ -23,7 +23,6 @@ import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.touch.TouchUtils;
 import eu.midnightdust.midnightcontrols.client.util.KeyBindingAccessor;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.Objects;
@@ -48,8 +47,9 @@ import net.minecraft.world.item.ItemUseAnimation;
 
 import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.input;
-import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X;
-import static org.lwjgl.glfw.GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
+import static eu.midnightdust.midnightcontrols.client.sdl.AxisCodes.GAMEPAD_AXIS_RIGHT_X;
+import static eu.midnightdust.midnightcontrols.client.sdl.AxisCodes.GAMEPAD_AXIS_RIGHT_Y;
+import static eu.midnightdust.midnightcontrols.client.sdl.ButtonCodes.MOUSE_BUTTON_LEFT;
 
 /**
  * Represents the touchscreen overlay
@@ -353,14 +353,14 @@ public class TouchscreenOverlay extends Screen {
 
     @Override
     public boolean mouseDragged(MouseButtonEvent click, double deltaX, double deltaY) {
-        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_1 && this.minecraft != null) {
+        if (click.button() == MOUSE_BUTTON_LEFT && this.minecraft != null) {
             if (TouchInput.isDragging) {
                 if (!MidnightControlsConfig.invertTouch) {
                     deltaX = -deltaX;
                     deltaY = -deltaY;
                 }
-                input.handleTouchscreenLook(AxisStorage.of(GLFW_GAMEPAD_AXIS_RIGHT_Y, (float) deltaY, 0.25d));
-                input.handleTouchscreenLook(AxisStorage.of(GLFW_GAMEPAD_AXIS_RIGHT_X, (float) deltaX, 0.25d));
+                input.handleTouchscreenLook(AxisStorage.of(GAMEPAD_AXIS_RIGHT_Y, (float) deltaY, 0.25d));
+                input.handleTouchscreenLook(AxisStorage.of(GAMEPAD_AXIS_RIGHT_X, (float) deltaX, 0.25d));
             }
             else TouchInput.isDragging = true;
         }

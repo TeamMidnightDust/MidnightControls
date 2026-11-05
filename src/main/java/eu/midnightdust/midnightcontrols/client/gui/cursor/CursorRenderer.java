@@ -1,6 +1,5 @@
 package eu.midnightdust.midnightcontrols.client.gui.cursor;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import eu.midnightdust.midnightcontrols.client.mixin.DrawContextAccessor;
 import net.minecraft.client.Minecraft;
@@ -9,6 +8,11 @@ import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
+//? if >= 26.3 {
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+//?} else {
+//import com.mojang.blaze3d.pipeline.RenderPipeline;
+//?}
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 

@@ -23,12 +23,12 @@ import java.util.stream.Collectors;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
-import static org.lwjgl.glfw.GLFW.*;
+import static eu.midnightdust.midnightcontrols.client.sdl.AxisCodes.*;
+import static eu.midnightdust.midnightcontrols.client.sdl.ButtonCodes.*;
 
 /**
  * Represents a button binding.
@@ -45,11 +45,11 @@ public class ButtonBinding {
     public static final ButtonCategory MULTIPLAYER_CATEGORY;
     public static final ButtonCategory MISC_CATEGORY;
 
-    public static final ButtonBinding ATTACK = new Builder("attack").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true)).onlyInGame().register();
-    public static final ButtonBinding BACK = new Builder("back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, false))
+    public static final ButtonBinding ATTACK = new Builder("attack").buttons(axisAsButton(GAMEPAD_AXIS_RIGHT_TRIGGER, true)).onlyInGame().register();
+    public static final ButtonBinding BACK = new Builder("back").buttons(axisAsButton(GAMEPAD_AXIS_LEFT_Y, false))
             .action(MovementHandler.HANDLER).onlyInGame().register();
-    public static final ButtonBinding CHAT = new Builder("chat").buttons(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT).onlyInGame().cooldown().register();
-    public static final ButtonBinding CONTROLS_RING = new Builder("controls_ring").buttons(GLFW_GAMEPAD_BUTTON_GUIDE).onlyInGame().cooldown()
+    public static final ButtonBinding CHAT = new Builder("chat").buttons(GAMEPAD_BUTTON_DPAD_RIGHT).onlyInGame().cooldown().register();
+    public static final ButtonBinding CONTROLS_RING = new Builder("controls_ring").buttons(GAMEPAD_BUTTON_GUIDE).onlyInGame().cooldown()
             .action((client, button1, value, action) -> {
                 if (action.isPressed()) {
                     MidnightControlsClient.ring.loadFromUnbound();
@@ -59,57 +59,57 @@ public class ButtonBinding {
                 if (action.isUnpressed() && client.gui.screen() != null) client.gui.screen().onClose();
                 return true;
             }).register();
-    public static final ButtonBinding DROP_ITEM = new Builder("drop_item").buttons(GLFW_GAMEPAD_BUTTON_B).onlyInGame().cooldown().register();
-    public static final ButtonBinding FORWARD = new Builder("forward").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_Y, true))
+    public static final ButtonBinding DROP_ITEM = new Builder("drop_item").buttons(GAMEPAD_BUTTON_EAST).onlyInGame().cooldown().register();
+    public static final ButtonBinding FORWARD = new Builder("forward").buttons(axisAsButton(GAMEPAD_AXIS_LEFT_Y, true))
             .action(MovementHandler.HANDLER).onlyInGame().register();
-    public static final ButtonBinding HOTBAR_LEFT = new Builder("hotbar_left").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
+    public static final ButtonBinding HOTBAR_LEFT = new Builder("hotbar_left").buttons(GAMEPAD_BUTTON_LEFT_SHOULDER)
             .action(InputHandlers.handleHotbar(false)).onlyInGame().cooldown().register();
-    public static final ButtonBinding HOTBAR_RIGHT = new Builder("hotbar_right").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
+    public static final ButtonBinding HOTBAR_RIGHT = new Builder("hotbar_right").buttons(GAMEPAD_BUTTON_RIGHT_SHOULDER)
             .action(InputHandlers.handleHotbar(true)).onlyInGame().cooldown().register();
-    public static final ButtonBinding INVENTORY = new Builder("inventory").buttons(GLFW_GAMEPAD_BUTTON_Y).onlyInGame().cooldown().register();
-    public static final ButtonBinding EXIT = new Builder("exit").buttons(GLFW_GAMEPAD_BUTTON_B).filter((buttonBinding) -> client.gui.screen() != null && buttonBinding.cooldown == 0 && INVENTORY.cooldown == 0)
+    public static final ButtonBinding INVENTORY = new Builder("inventory").buttons(GAMEPAD_BUTTON_DPAD_UP).onlyInGame().cooldown().register();
+    public static final ButtonBinding EXIT = new Builder("exit").buttons(GAMEPAD_BUTTON_EAST).filter((buttonBinding) -> client.gui.screen() != null && buttonBinding.cooldown == 0 && INVENTORY.cooldown == 0)
             .action(InputHandlers.handleExit()).cooldown().register();
-    public static final ButtonBinding JUMP = new Builder("jump").buttons(GLFW_GAMEPAD_BUTTON_A).onlyInGame().register();
-    public static final ButtonBinding LEFT = new Builder("left").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, false))
+    public static final ButtonBinding JUMP = new Builder("jump").buttons(GAMEPAD_BUTTON_SOUTH).onlyInGame().register();
+    public static final ButtonBinding LEFT = new Builder("left").buttons(axisAsButton(GAMEPAD_AXIS_LEFT_X, false))
             .action(MovementHandler.HANDLER).onlyInGame().register();
-    public static final ButtonBinding PAUSE_GAME = new Builder("pause_game").buttons(GLFW_GAMEPAD_BUTTON_START).action(InputHandlers::handlePauseGame).cooldown().register();
-    public static final ButtonBinding PICK_BLOCK = new Builder("pick_block").buttons(GLFW_GAMEPAD_BUTTON_DPAD_LEFT).onlyInGame().cooldown().register();
-    public static final ButtonBinding PLAYER_LIST = new Builder("player_list").buttons(GLFW_GAMEPAD_BUTTON_BACK).onlyInGame().register();
-    public static final ButtonBinding RIGHT = new Builder("right").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_X, true))
+    public static final ButtonBinding PAUSE_GAME = new Builder("pause_game").buttons(GAMEPAD_BUTTON_START).action(InputHandlers::handlePauseGame).cooldown().register();
+    public static final ButtonBinding PICK_BLOCK = new Builder("pick_block").buttons(GAMEPAD_BUTTON_DPAD_LEFT).onlyInGame().cooldown().register();
+    public static final ButtonBinding PLAYER_LIST = new Builder("player_list").buttons(GAMEPAD_BUTTON_BACK).onlyInGame().register();
+    public static final ButtonBinding RIGHT = new Builder("right").buttons(axisAsButton(GAMEPAD_AXIS_LEFT_X, true))
             .action(MovementHandler.HANDLER).onlyInGame().register();
-    public static final ButtonBinding SCREENSHOT = new Builder("screenshot").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_A)
+    public static final ButtonBinding SCREENSHOT = new Builder("screenshot").buttons(GAMEPAD_BUTTON_DPAD_UP, GAMEPAD_BUTTON_SOUTH)
             .action(InputHandlers::handleScreenshot).cooldown().register();
-    public static final ButtonBinding DEBUG_SCREEN = new Builder("debug_screen").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_B)
+    public static final ButtonBinding DEBUG_SCREEN = new Builder("debug_screen").buttons(GAMEPAD_BUTTON_DPAD_UP, GAMEPAD_BUTTON_EAST)
             .action((client,binding,value,action) -> {if (action == ButtonState.PRESS) client.debugEntries.setOverlayVisible(!client.debugEntries.isOverlayVisible()); return true;}).cooldown().register();
-    public static final ButtonBinding SLOT_DOWN = new Builder("slot_down").buttons(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)
+    public static final ButtonBinding SLOT_DOWN = new Builder("slot_down").buttons(GAMEPAD_BUTTON_DPAD_DOWN)
             .action(InputHandlers.handleInventorySlotPad(1)).onlyInInventory().cooldown().register();
-    public static final ButtonBinding SLOT_LEFT = new Builder("slot_left").buttons(GLFW_GAMEPAD_BUTTON_DPAD_LEFT)
+    public static final ButtonBinding SLOT_LEFT = new Builder("slot_left").buttons(GAMEPAD_BUTTON_DPAD_LEFT)
             .action(InputHandlers.handleInventorySlotPad(3)).onlyInInventory().cooldown().register();
-    public static final ButtonBinding SLOT_RIGHT = new Builder("slot_right").buttons(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT)
+    public static final ButtonBinding SLOT_RIGHT = new Builder("slot_right").buttons(GAMEPAD_BUTTON_DPAD_RIGHT)
             .action(InputHandlers.handleInventorySlotPad(2)).onlyInInventory().cooldown().register();
-    public static final ButtonBinding SLOT_UP = new Builder("slot_up").buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP)
+    public static final ButtonBinding SLOT_UP = new Builder("slot_up").buttons(GAMEPAD_BUTTON_DPAD_UP)
             .action(InputHandlers.handleInventorySlotPad(0)).onlyInInventory().cooldown().register();
-    public static final ButtonBinding SNEAK = new Builder("sneak").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_THUMB)
+    public static final ButtonBinding SNEAK = new Builder("sneak").buttons(GAMEPAD_BUTTON_RIGHT_STICK)
             .actions(InputHandlers::handleToggleSneak).onlyInGame().cooldown().register();
-    public static final ButtonBinding SPRINT = new Builder("sprint").buttons(GLFW_GAMEPAD_BUTTON_LEFT_THUMB)
+    public static final ButtonBinding SPRINT = new Builder("sprint").buttons(GAMEPAD_BUTTON_LEFT_STICK)
             .actions(InputHandlers::handleToggleSprint).onlyInGame().cooldown().register();
-    public static final ButtonBinding SWAP_HANDS = new Builder("swap_hands").buttons(GLFW_GAMEPAD_BUTTON_X).onlyInGame().cooldown().register();
-    public static final ButtonBinding TAB_LEFT = new Builder("tab_back").buttons(GLFW_GAMEPAD_BUTTON_LEFT_BUMPER)
+    public static final ButtonBinding SWAP_HANDS = new Builder("swap_hands").buttons(GAMEPAD_BUTTON_WEST).onlyInGame().cooldown().register();
+    public static final ButtonBinding TAB_LEFT = new Builder("tab_back").buttons(GAMEPAD_BUTTON_LEFT_SHOULDER)
             .action(InputHandlers.handleHotbar(false)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((binding) -> client.gui.screen() != null)).cooldown().register();
-    public static final ButtonBinding TAB_RIGHT = new Builder("tab_next").buttons(GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER)
+    public static final ButtonBinding TAB_RIGHT = new Builder("tab_next").buttons(GAMEPAD_BUTTON_RIGHT_SHOULDER)
             .action(InputHandlers.handleHotbar(true)).filter(Predicates.or(InputHandlers::inInventory, InputHandlers::inAdvancements).or((binding) -> client.gui.screen() != null)).cooldown().register();
-    public static final ButtonBinding PAGE_LEFT = new Builder("page_back").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true))
+    public static final ButtonBinding PAGE_LEFT = new Builder("page_back").buttons(axisAsButton(GAMEPAD_AXIS_LEFT_TRIGGER, true))
             .action(InputHandlers.handlePage(false)).filter(InputHandlers::inInventory).cooldown(30).register();
-    public static final ButtonBinding PAGE_RIGHT = new Builder("page_next").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, true))
+    public static final ButtonBinding PAGE_RIGHT = new Builder("page_next").buttons(axisAsButton(GAMEPAD_AXIS_RIGHT_TRIGGER, true))
             .action(InputHandlers.handlePage(true)).filter(InputHandlers::inInventory).cooldown(30).register();
-    public static final ButtonBinding TAKE = new Builder("take").buttons(GLFW_GAMEPAD_BUTTON_X)
+    public static final ButtonBinding TAKE = new Builder("take").buttons(GAMEPAD_BUTTON_WEST)
             .action(InputHandlers.handleActions()).filter(InputHandlers::inInventory).cooldown().register();
-    public static final ButtonBinding TAKE_ALL = new Builder("take_all").buttons(GLFW_GAMEPAD_BUTTON_A)
+    public static final ButtonBinding TAKE_ALL = new Builder("take_all").buttons(GAMEPAD_BUTTON_SOUTH)
             .action(InputHandlers.handleActions()).filter(InputHandlers::inInventory).cooldown().register();
-    public static final ButtonBinding QUICK_MOVE = new Builder("quick_move").buttons(GLFW_GAMEPAD_BUTTON_Y)
+    public static final ButtonBinding QUICK_MOVE = new Builder("quick_move").buttons(GAMEPAD_BUTTON_NORTH)
             .action(InputHandlers.handleActions()).filter(InputHandlers::inInventory).cooldown().register();
-    public static final ButtonBinding TOGGLE_PERSPECTIVE = new Builder("toggle_perspective").filter(InputHandlers::inGame).buttons(GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_Y).cooldown().register();
-    public static final ButtonBinding USE = new Builder("use").buttons(axisAsButton(GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, true)).register();
+    public static final ButtonBinding TOGGLE_PERSPECTIVE = new Builder("toggle_perspective").filter(InputHandlers::inGame).buttons(GAMEPAD_BUTTON_DPAD_UP, GAMEPAD_BUTTON_NORTH).cooldown().register();
+    public static final ButtonBinding USE = new Builder("use").buttons(axisAsButton(GAMEPAD_AXIS_LEFT_TRIGGER, true)).register();
     //~}
 
     private int[] button;
@@ -383,21 +383,21 @@ public class ButtonBinding {
     public static @NotNull Component getLocalizedButtonName(int button) {
         return switch (button % 500) {
             case -1 -> Component.translatable("key.keyboard.unknown");
-            case GLFW_GAMEPAD_BUTTON_A -> Component.translatable("midnightcontrols.button.a");
-            case GLFW_GAMEPAD_BUTTON_B -> Component.translatable("midnightcontrols.button.b");
-            case GLFW_GAMEPAD_BUTTON_X -> Component.translatable("midnightcontrols.button.x");
-            case GLFW_GAMEPAD_BUTTON_Y -> Component.translatable("midnightcontrols.button.y");
-            case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER -> Component.translatable("midnightcontrols.button.left_bumper");
-            case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER -> Component.translatable("midnightcontrols.button.right_bumper");
-            case GLFW_GAMEPAD_BUTTON_BACK -> Component.translatable("midnightcontrols.button.back");
-            case GLFW_GAMEPAD_BUTTON_START -> Component.translatable("midnightcontrols.button.start");
-            case GLFW_GAMEPAD_BUTTON_GUIDE -> Component.translatable("midnightcontrols.button.guide");
-            case GLFW_GAMEPAD_BUTTON_LEFT_THUMB -> Component.translatable("midnightcontrols.button.left_thumb");
-            case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB -> Component.translatable("midnightcontrols.button.right_thumb");
-            case GLFW_GAMEPAD_BUTTON_DPAD_UP -> Component.translatable("midnightcontrols.button.dpad_up");
-            case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT -> Component.translatable("midnightcontrols.button.dpad_right");
-            case GLFW_GAMEPAD_BUTTON_DPAD_DOWN -> Component.translatable("midnightcontrols.button.dpad_down");
-            case GLFW_GAMEPAD_BUTTON_DPAD_LEFT -> Component.translatable("midnightcontrols.button.dpad_left");
+            case GAMEPAD_BUTTON_SOUTH -> Component.translatable("midnightcontrols.button.a");
+            case GAMEPAD_BUTTON_EAST -> Component.translatable("midnightcontrols.button.b");
+            case GAMEPAD_BUTTON_WEST -> Component.translatable("midnightcontrols.button.x");
+            case GAMEPAD_BUTTON_NORTH -> Component.translatable("midnightcontrols.button.y");
+            case GAMEPAD_BUTTON_LEFT_SHOULDER -> Component.translatable("midnightcontrols.button.left_bumper");
+            case GAMEPAD_BUTTON_RIGHT_SHOULDER -> Component.translatable("midnightcontrols.button.right_bumper");
+            case GAMEPAD_BUTTON_BACK -> Component.translatable("midnightcontrols.button.back");
+            case GAMEPAD_BUTTON_START -> Component.translatable("midnightcontrols.button.start");
+            case GAMEPAD_BUTTON_GUIDE -> Component.translatable("midnightcontrols.button.guide");
+            case GAMEPAD_BUTTON_LEFT_STICK -> Component.translatable("midnightcontrols.button.left_thumb");
+            case GAMEPAD_BUTTON_RIGHT_STICK -> Component.translatable("midnightcontrols.button.right_thumb");
+            case GAMEPAD_BUTTON_DPAD_UP -> Component.translatable("midnightcontrols.button.dpad_up");
+            case GAMEPAD_BUTTON_DPAD_RIGHT -> Component.translatable("midnightcontrols.button.dpad_right");
+            case GAMEPAD_BUTTON_DPAD_DOWN -> Component.translatable("midnightcontrols.button.dpad_down");
+            case GAMEPAD_BUTTON_DPAD_LEFT -> Component.translatable("midnightcontrols.button.dpad_left");
             case 100 -> Component.translatable("midnightcontrols.axis.left_x+");
             case 101 -> Component.translatable("midnightcontrols.axis.left_y+");
             case 102 -> Component.translatable("midnightcontrols.axis.right_x+");

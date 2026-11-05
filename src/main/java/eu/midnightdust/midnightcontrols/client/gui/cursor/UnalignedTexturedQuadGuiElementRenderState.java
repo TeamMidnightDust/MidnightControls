@@ -1,12 +1,16 @@
 package eu.midnightdust.midnightcontrols.client.gui.cursor;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
+//? if >= 26.3 {
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+//?} else {
+//import com.mojang.blaze3d.pipeline.RenderPipeline;
+//?}
 
 public record UnalignedTexturedQuadGuiElementRenderState(RenderPipeline pipeline, TextureSetup textureSetup, Matrix3x2f pose, float x1, float y1, float x2, float y2, float u1, float u2, float v1, float v2, int color, @Nullable ScreenRectangle scissorArea, @Nullable ScreenRectangle bounds) implements GuiElementRenderState {
     public UnalignedTexturedQuadGuiElementRenderState(RenderPipeline pipeline, TextureSetup textureSetup, Matrix3x2f pose, float x1, float y1, float x2, float y2, float u1, float u2, float v1, float v2, int color, @Nullable ScreenRectangle scissorArea) {

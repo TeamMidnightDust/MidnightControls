@@ -6,7 +6,6 @@ import eu.midnightdust.lib.config.MidnightConfigListWidget;
 import eu.midnightdust.lib.config.MidnightConfigScreen;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.controller.Controller;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import net.minecraft.ChatFormatting;
