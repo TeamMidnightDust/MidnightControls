@@ -5,9 +5,11 @@ import eu.midnightdust.lib.config.EntryInfo;
 import eu.midnightdust.lib.config.MidnightConfigListWidget;
 import eu.midnightdust.lib.config.MidnightConfigScreen;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import eu.midnightdust.midnightcontrols.client.controller.Controller;
+import eu.midnightdust.midnightcontrols.client.controller.Gamepad;
 
 import java.util.List;
+
+import eu.midnightdust.midnightcontrols.client.controller.Joystick;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
@@ -27,31 +29,31 @@ public class ControllerSelectionButton {
         resetButton.setPosition(screen.width - 205 + 150 + 25, 0);
         Button editButton = Button.builder(getControllerName(second),
                 button -> {
-                    int id = second ? MidnightControlsConfig.getSecondController().map(Controller::id).orElse(-1) : MidnightControlsConfig.getController().id();
+                    int id = second ? MidnightControlsConfig.getSecondJoystick().map(Joystick::getId).orElse(-1) : MidnightControlsConfig.getJoystick().getId();
                     id += 1;
                     if (id > GLFW.GLFW_JOYSTICK_LAST)
                         id = GLFW.GLFW_JOYSTICK_1;
                     id = searchNextAvailableController(id, second);
                     if (second) {
-                        MidnightControlsConfig.setSecondController(Controller.byId(id));
+                        MidnightControlsConfig.setSecondJoystick(Gamepad.byId(id));
                     } else {
-                        MidnightControlsConfig.setController(Controller.byId(id));
+                        MidnightControlsConfig.setJoystick(Gamepad.byId(id));
                     }
-                    if (MidnightControlsConfig.debug && id != -1) System.out.println(Controller.byId(id).getName() + "'s Controller GUID: " + Controller.byId(id).getGuid());
+                    if (MidnightControlsConfig.debug && id != -1) System.out.println(Gamepad.byId(id).getName() + "'s Controller GUID: " + Gamepad.byId(id).getGuid());
 
-                    resetButton.active = second ? MidnightControlsConfig.getSecondController().isPresent() : false;
+                    resetButton.active = second ? MidnightControlsConfig.getSecondJoystick().isPresent() : false;
                     button.setMessage(getControllerName(second));
                 }).bounds(screen.width - 185, 0, 150, 20).build();
-        resetButton.active = second ? MidnightControlsConfig.getSecondController().isPresent() : false;
+        resetButton.active = second ? MidnightControlsConfig.getSecondJoystick().isPresent() : false;
         if (second) editButton.setTooltip(Tooltip.create(Component.translatable("midnightcontrols.menu.controller2.tooltip")));
 
         list.addButton(List.of(editButton, resetButton), Component.translatable(second ? "midnightcontrols.menu.controller2" : "midnightcontrols.menu.controller"), new EntryInfo(null, screen.modid));
     }
 
     private static Component getControllerName(boolean second) {
-        if (second && MidnightControlsConfig.getSecondController().isEmpty()) return SpruceTexts.OPTIONS_OFF.plainCopy().withStyle(ChatFormatting.RED);
+        if (second && MidnightControlsConfig.getSecondJoystick().isEmpty()) return SpruceTexts.OPTIONS_OFF.plainCopy().withStyle(ChatFormatting.RED);
 
-        var controller = second ? MidnightControlsConfig.getSecondController().get() : MidnightControlsConfig.getController();
+        var controller = second ? MidnightControlsConfig.getSecondJoystick().get() : MidnightControlsConfig.getJoystick();
         var controllerName = controller.getName();
         if (!controller.isConnected())
             return Component.literal(controllerName).withStyle(ChatFormatting.RED);

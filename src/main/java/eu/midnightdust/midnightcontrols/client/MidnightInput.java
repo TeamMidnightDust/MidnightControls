@@ -34,15 +34,13 @@ import eu.midnightdust.midnightcontrols.client.util.InventoryUtil;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
 import eu.midnightdust.midnightcontrols.client.util.storage.ButtonStorage;
 import eu.midnightdust.midnightcontrols.MidnightControls;
-import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
-import eu.midnightdust.midnightcontrols.client.controller.Controller;
+import eu.midnightdust.midnightcontrols.client.controller.Gamepad;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.enums.CameraMode;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
 import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.ring.RingPage;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
-import eu.midnightdust.midnightcontrols.client.util.MathUtil;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import org.jetbrains.annotations.NotNull;
 
@@ -142,21 +140,10 @@ public class MidnightInput {
 
         InputManager.updateStates();
 
-        var controller = MidnightControlsConfig.getController();
-
-        if (controller.isConnected()) {
-            var state = controller.getState();
-            this.fetchButtonInput(state, false);
-            this.fetchTriggerInput(state, false);
-            this.fetchJoystickInput(state, false, false);
-        }
-        MidnightControlsConfig.getSecondController().filter(Controller::isConnected)
-                .ifPresent(joycon -> {
-                    var state = joycon.getState();
-                    this.fetchButtonInput(state, true);
-                    this.fetchTriggerInput(state, true);
-                    this.fetchJoystickInput(state, true, false);
-                });
+        MidnightControlsConfig.getGamepad()
+                .ifPresent(controller -> controller.fetchAll(false));
+        MidnightControlsConfig.getSecondGamepad()
+                .ifPresent(joycon -> joycon.fetchAll(false));
 
         boolean allowInput = this.controlsInput == null || this.controlsInput.getFocusedBinding() == null;
 
@@ -186,13 +173,10 @@ public class MidnightInput {
      * This method is called 1000 times a second for smooth camera input
      */
     public void tickCameraStick() {
-        var controller = MidnightControlsConfig.getController();
-
-        if (controller.isConnected()) {
-            this.fetchJoystickInput(controller.getState(), false, true);
-        }
-        MidnightControlsConfig.getSecondController().filter(Controller::isConnected)
-                .ifPresent(joycon -> this.fetchJoystickInput(joycon.getState(), true, true));
+        MidnightControlsConfig.getGamepad()
+                .ifPresent(gamepad -> gamepad.fetchJoystickInput(false, true));
+        MidnightControlsConfig.getSecondGamepad()
+                .ifPresent(joycon -> joycon.fetchJoystickInput(true, true));
     }
 
     /**
@@ -253,83 +237,6 @@ public class MidnightInput {
         if (widget != null) {
             this.controlsInput.getCurrentButtons().clear();
             this.controlsInput.setWaiting(true);
-        }
-    }
-
-    private void fetchButtonInput(@NotNull GLFWGamepadState gamepadState, boolean leftJoycon) {
-        var buffer = gamepadState.buttons();
-        for (int i = 0; i < buffer.limit(); i++) {
-            int btn = leftJoycon ? ButtonBinding.controller2Button(i) : i;
-            boolean pressed = buffer.get() == (byte) 1;
-            var state = ButtonState.NONE;
-            var previousState = InputManager.STATES.getOrDefault(btn, ButtonState.NONE);
-
-            if (pressed != previousState.isPressed()) {
-                state = pressed ? ButtonState.PRESS : ButtonState.RELEASE;
-                this.handleButton(ButtonStorage.of(btn, state));
-                if (pressed)
-                    BUTTON_COOLDOWNS.put(btn, 5);
-            } else if (pressed) {
-                state = ButtonState.REPEAT;
-                if (BUTTON_COOLDOWNS.getOrDefault(btn, 0) == 0) {
-                    BUTTON_COOLDOWNS.put(btn, 5);
-                    this.handleButton(ButtonStorage.of(btn, state));
-                }
-            }
-
-            InputManager.STATES.put(btn, state);
-        }
-    }
-    final MathUtil.PolarUtil polarUtil = new MathUtil.PolarUtil();
-
-    private void fetchJoystickInput(@NotNull GLFWGamepadState gamepadState, boolean leftJoycon, boolean cameraTick) {
-        var buffer = gamepadState.axes();
-
-        polarUtil.calculate(buffer.get(GAMEPAD_AXIS_LEFT_X), buffer.get(GAMEPAD_AXIS_LEFT_Y), 1, MidnightControlsConfig.leftDeadZone);
-        float leftX = polarUtil.polarX;
-        float leftY = polarUtil.polarY;
-        polarUtil.calculate(buffer.get(GAMEPAD_AXIS_RIGHT_X), buffer.get(GAMEPAD_AXIS_RIGHT_Y), 1, MidnightControlsConfig.rightDeadZone);
-        float rightX = polarUtil.polarX;
-        float rightY = polarUtil.polarY;
-
-        boolean isRadialMenu = client.gui.screen() instanceof RingScreen || (PlatformFunctions.isModLoaded("emotecraft") && EmotecraftCompat.isEmotecraftScreen(client.gui.screen()));
-
-        if (!isRadialMenu) {
-            for (int i = cameraTick ? GAMEPAD_AXIS_RIGHT_X : 0; i < (cameraTick ? GAMEPAD_AXIS_LEFT_TRIGGER : GAMEPAD_AXIS_RIGHT_X); i++) {
-                int axis = leftJoycon ? ButtonBinding.controller2Button(i) : i;
-                float value = buffer.get(i);
-
-                switch (i) {
-                    case GAMEPAD_AXIS_LEFT_X -> {
-                        if (MidnightControlsConfig.isAnalogMovementAllowed()) value = leftX;
-                    }
-                    case GAMEPAD_AXIS_LEFT_Y -> {
-                        if (MidnightControlsConfig.isAnalogMovementAllowed()) value = leftY;
-                    }
-                    case GAMEPAD_AXIS_RIGHT_X -> value = rightX;
-                    case GAMEPAD_AXIS_RIGHT_Y -> value = rightY;
-                }
-
-                if (i == GAMEPAD_AXIS_LEFT_Y)
-                    value *= -1.0F;
-
-                this.handleJoystickAxis(AxisStorage.of(axis, value));
-            }
-        }
-        else {
-            boolean leftStickActive = leftX != 0 || leftY != 0;
-            handleRadialMenu(leftStickActive ? leftX : rightX, leftStickActive ? leftY : rightY);
-        }
-    }
-
-    private void fetchTriggerInput(@NotNull GLFWGamepadState gamepadState, boolean leftJoycon) {
-        var buffer = gamepadState.axes();
-
-        for (int i = GAMEPAD_AXIS_LEFT_TRIGGER; i <= GAMEPAD_AXIS_RIGHT_TRIGGER; i++) {
-            int axis = leftJoycon ? ButtonBinding.controller2Button(i) : i;
-            float value = buffer.get(i);
-
-            this.handleTriggerAxis(AxisStorage.of(axis, value, MidnightControlsConfig.triggerDeadZone));
         }
     }
 
@@ -427,11 +334,11 @@ public class MidnightInput {
             }
         }
     }
-    private void handleTriggerAxis(AxisStorage storage) {
+    public void handleTriggerAxis(AxisStorage storage) {
         storage.setupButtonStates();
     }
 
-    private void handleJoystickAxis(AxisStorage storage) {
+    public void handleJoystickAxis(AxisStorage storage) {
         storage.setupButtonStates();
 
         this.handleJoystickMovement(storage);

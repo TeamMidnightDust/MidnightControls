@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.mixin;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
@@ -144,7 +145,11 @@ public abstract class MouseMixin implements MouseAccessor {
                         stack.getUseAnimation() == ItemUseAnimation.SPEAR || stack.getItem() instanceof ThrowablePotionItem));
     }
 
-    @Inject(method = "grabMouse", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;grabOrReleaseMouse(Lcom/mojang/blaze3d/platform/Window;IDD)V",shift = At.Shift.BEFORE), cancellable = true)
+    //? if >= 26.3 {
+    @Inject(method = "grabMouse", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;grabMouse(Lcom/mojang/blaze3d/platform/Window;DD)V", shift = At.Shift.BEFORE), cancellable = true)
+    //?} else {
+    //@Inject(method = "grabMouse", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;grabOrReleaseMouse(Lcom/mojang/blaze3d/platform/Window;IDD)V",shift = At.Shift.BEFORE), cancellable = true)
+    //?}
     private void midnightcontrols$lockCursor(CallbackInfo ci) {
         if ((doMixedInput() || MidnightControlsConfig.eyeTrackerAsMouse)) {
             //In eye tracking mode, we cannot have the cursor locked to the center.

@@ -17,6 +17,8 @@ stonecutter parameters {
     constants {
         match(loader, "fabric", "neoforge", "forge")
     }
+    constants["sdl"] = current.parsed >= "26.3"
+    constants["glfw"] = current.parsed < "26.3"
 
     swaps["mod_version"] = "\"${properties.get<String>("mod.version")}\";"
     swaps["minecraft"] = "\"${node.metadata.version}\";"

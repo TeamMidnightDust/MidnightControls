@@ -6,7 +6,6 @@ public class MathUtil {
     public static class PolarUtil {
         public float polarX;
         public float polarY;
-        public PolarUtil() {}
 
         public void calculate(float x, float y, float speedFactor) {
             calculate(x, y, speedFactor, 0);

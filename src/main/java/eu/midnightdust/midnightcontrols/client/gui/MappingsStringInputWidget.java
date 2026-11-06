@@ -17,7 +17,7 @@ import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
 import dev.lambdaurora.spruceui.widget.text.SpruceTextAreaWidget;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import eu.midnightdust.midnightcontrols.client.controller.Controller;
+import eu.midnightdust.midnightcontrols.client.controller.Gamepad;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -43,14 +43,14 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
         this.reloadMappingsOption = ReloadControllerMappingsOption.newOption(btn -> {
             this.writeMappings();
         });
-        this.copyGuidOption = SpruceSimpleActionOption.of("midnightcontrols.menu.copy_controller_guid", button -> client.keyboardHandler.setClipboard(MidnightControlsConfig.getController().getGuid()));
+        this.copyGuidOption = SpruceSimpleActionOption.of("midnightcontrols.menu.copy_controller_guid", button -> client.keyboardHandler.setClipboard(MidnightControlsConfig.getJoystick().getGuid()));
 
         this.init();
     }
 
     public void removed() {
         this.writeMappings();
-        Controller.updateMappings();
+        Gamepad.updateMappings();
     }
 
     public void onClose() {
@@ -108,6 +108,6 @@ public class MappingsStringInputWidget extends SpruceContainerWidget {
     public void extractWidgetRenderState(SpruceGuiGraphics context, int mouseX, int mouseY, float delta) {
         super.extractWidgetRenderState(context, mouseX, mouseY, delta);
         context.vanilla().centeredText(this.client.font, Component.translatable("midnightcontrols.menu.multiple_mapping_tip"), this.textArea.getX() + this.textArea.getWidth() / 2, this.textArea.getY() + this.textArea.getHeight() - 12, 0xFF888888);
-        context.vanilla().centeredText(this.client.font, Component.translatable("midnightcontrols.menu.current_controller_guid", MidnightControlsConfig.getController().getGuid()), this.textArea.getX() + this.textArea.getWidth() / 2, this.height - 21, 0xFFFFFFFF);
+        context.vanilla().centeredText(this.client.font, Component.translatable("midnightcontrols.menu.current_controller_guid", MidnightControlsConfig.getJoystick().getGuid()), this.textArea.getX() + this.textArea.getWidth() / 2, this.height - 21, 0xFFFFFFFF);
     }
 }

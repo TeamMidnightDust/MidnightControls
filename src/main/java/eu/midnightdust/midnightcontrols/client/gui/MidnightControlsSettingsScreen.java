@@ -22,13 +22,13 @@ import dev.lambdaurora.spruceui.widget.SpruceWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceContainerWidget;
 import dev.lambdaurora.spruceui.widget.container.SpruceOptionListWidget;
 import dev.lambdaurora.spruceui.widget.container.tabbed.SpruceTabbedWidget;
-import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+import eu.midnightdust.midnightcontrols.client.controller.Joystick;
 import eu.midnightdust.midnightcontrols.client.util.platform.NetworkUtil;
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutManager;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
-import eu.midnightdust.midnightcontrols.client.controller.Controller;
+import eu.midnightdust.midnightcontrols.client.controller.Gamepad;
 import eu.midnightdust.midnightcontrols.client.gui.widget.ControllerControlsWidget;
 import eu.midnightdust.midnightcontrols.packet.ControlsModePayload;
 import net.minecraft.ChatFormatting;
@@ -83,16 +83,16 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption controllerOption =
             new SpruceCyclingOption("midnightcontrols.menu.controller",
                     amount -> {
-                        int id = MidnightControlsConfig.getController().id();
+                        int id = MidnightControlsConfig.getJoystick().id();
                         id += amount;
                         if (id > GLFW.GLFW_JOYSTICK_LAST)
                             id = GLFW.GLFW_JOYSTICK_1;
                         id = searchNextAvailableController(id, false);
-                        MidnightControlsConfig.setController(Controller.byId(id));
-                        if (MidnightControlsConfig.debug) System.out.println(Controller.byId(id).getName() + "'s Controller GUID: " + Controller.byId(id).getGuid());
+                        MidnightControlsConfig.setJoystick(Gamepad.byId(id));
+                        if (MidnightControlsConfig.debug) System.out.println(Gamepad.byId(id).getName() + "'s Controller GUID: " + Gamepad.byId(id).getGuid());
                     },
                     option -> {
-                        var controller = MidnightControlsConfig.getController();
+                        var controller = MidnightControlsConfig.getJoystick();
                         var controllerName = controller.getName();
                         if (!controller.isConnected())
                             return option.getDisplayText(Component.literal(controllerName).withStyle(ChatFormatting.RED));
@@ -103,14 +103,14 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
                     }, TooltipData.EMPTY);
     private final SpruceOption secondControllerOption = new SpruceCyclingOption("midnightcontrols.menu.controller2",
             amount -> {
-                int id = MidnightControlsConfig.getSecondController().map(Controller::id).orElse(-1);
+                int id = MidnightControlsConfig.getSecondJoystick().map(Joystick::getId).orElse(-1);
                 id += amount;
                 if (id > GLFW.GLFW_JOYSTICK_LAST)
                     id = -1;
                 id = searchNextAvailableController(id, true);
-                MidnightControlsConfig.setSecondController(id == -1 ? null : Controller.byId(id));
+                MidnightControlsConfig.setSecondJoystick(id == -1 ? null : Joystick.byId(id));
             },
-            option -> MidnightControlsConfig.getSecondController().map(controller -> {
+            option -> MidnightControlsConfig.getSecondJoystick().map(controller -> {
                 var controllerName = controller.getName();
                 if (!controller.isConnected())
                     return option.getDisplayText(Component.literal(controllerName).withStyle(ChatFormatting.RED));
@@ -166,7 +166,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     public static int searchNextAvailableController(int newId, boolean allowNone) {
         if ((allowNone && newId == -1) || newId == 0) return newId;
 
-        Controller candidate = Controller.byId(newId);
+        Gamepad candidate = Gamepad.byId(newId);
         boolean connected = candidate.isConnected();
         if (MidnightControlsConfig.excludedControllers.stream().anyMatch(exclusion -> candidate.getName().matches(exclusion))) connected = false;
         if (!connected) {
@@ -265,15 +265,13 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         this.moveChatOption = new SpruceToggleBooleanOption("midnightcontrols.menu.move_chat", () -> MidnightControlsConfig.moveChat,
                 value -> MidnightControlsConfig.moveChat = value, TooltipData.builder().text(Component.translatable("midnightcontrols.menu.move_chat.tooltip")).build());
         // Controller options
-        this.toggleControllerProfileOption = new SpruceToggleBooleanOption("midnightcontrols.menu.separate_controller_profile", () -> MidnightControlsConfig.controllerBindingProfiles.containsKey(MidnightControlsConfig.getController().getGuid()), value -> {
+        this.toggleControllerProfileOption = new SpruceToggleBooleanOption("midnightcontrols.menu.separate_controller_profile", () -> MidnightControlsConfig.controllerBindingProfiles.containsKey(MidnightControlsConfig.getJoystick().getGuid()), value -> {
             if (value) {
-                MidnightControlsConfig.controllerBindingProfiles.put(MidnightControlsConfig.getController().getGuid(), MidnightControlsConfig.getBindingsForController());
-                MidnightControlsConfig.updateBindingsForController(MidnightControlsConfig.getController());
+                MidnightControlsConfig.controllerBindingProfiles.put(MidnightControlsConfig.getJoystick().getGuid(), MidnightControlsConfig.getBindingsForController());
             } else {
-                MidnightControlsConfig.controllerBindingProfiles.remove(MidnightControlsConfig.getController().getGuid());
-                MidnightControlsConfig.updateBindingsForController(MidnightControlsConfig.getController());
+                MidnightControlsConfig.controllerBindingProfiles.remove(MidnightControlsConfig.getJoystick().getGuid());
             }
-
+            MidnightControlsConfig.getGamepad().ifPresent(MidnightControlsConfig::updateBindingsForController);
         }, TooltipData.EMPTY);
         this.cameraModeOption = new SpruceCyclingOption("midnightcontrols.menu.camera_mode",
                 amount -> MidnightControlsConfig.cameraMode = MidnightControlsConfig.cameraMode.next(),

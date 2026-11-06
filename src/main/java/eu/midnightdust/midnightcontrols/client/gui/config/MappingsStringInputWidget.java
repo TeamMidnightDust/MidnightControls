@@ -51,9 +51,9 @@ public class MappingsStringInputWidget {
         //list.addButton();
 
         Button copyButton = SpriteIconButton.builder(Component.nullToEmpty("Copy GUID"), widget -> {
-            client.keyboardHandler.setClipboard(MidnightControlsConfig.getController().getGuid());
+            client.keyboardHandler.setClipboard(MidnightControlsConfig.getJoystick().getGuid());
         }).bounds(screen.width - 185, 0, 150, 20).build();
 
-        list.addButton(List.of(copyButton), Component.translatable("midnightcontrols.menu.current_controller_guid", MidnightControlsConfig.getController().getGuid()), new EntryInfo(null, screen.modid));
+        list.addButton(List.of(copyButton), Component.translatable("midnightcontrols.menu.current_controller_guid", MidnightControlsConfig.getJoystick().getGuid()), new EntryInfo(null, screen.modid));
     }
 }

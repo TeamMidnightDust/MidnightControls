@@ -20,10 +20,7 @@ import eu.midnightdust.midnightcontrols.ControlsMode;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.MidnightControlsConstants;
 import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
-import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
-import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
-import eu.midnightdust.midnightcontrols.client.controller.Controller;
-import eu.midnightdust.midnightcontrols.client.controller.InputManager;
+import eu.midnightdust.midnightcontrols.client.controller.*;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
 import eu.midnightdust.midnightcontrols.client.enums.CameraMode;
 import eu.midnightdust.midnightcontrols.client.enums.ControllerType;
@@ -37,8 +34,8 @@ import eu.midnightdust.midnightcontrols.client.gui.config.ControllerSelectionBut
 import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
+import org.lwjgl.glfw.GLFW;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -198,7 +195,7 @@ public class MidnightControlsConfig extends MidnightConfig {
     @Entry @Hidden public static Map<String, Map<String, String>> controllerBindingProfiles = new HashMap<>();
 
     private static Map<String, String> currentBindingProfile = new HashMap<>();
-    private static Controller prevController;
+    private static Gamepad prevGamepad;
 
     public void onTabInit(String tabName, MidnightConfigListWidget list, MidnightConfigScreen screen) {
         EntryInfo centeredComment = new EntryInfo(null, "midnightcontrols");
@@ -278,50 +275,66 @@ public class MidnightControlsConfig extends MidnightConfig {
         MidnightControls.log("Configuration saved.");
         MidnightControlsFeature.refreshEnabled();
     }
-    public static void updateBindingsForController(Controller controller) {
-        if (controller.isConnected() && controller.isGamepad() && controllerBindingProfiles.containsKey(controller.getGuid()))
-            currentBindingProfile = controllerBindingProfiles.get(controller.getGuid());
+
+    public static void updateBindingsForController(Gamepad gamepad) {
+        if (gamepad.isConnected() && gamepad.isGamepad() && controllerBindingProfiles.containsKey(gamepad.getGuid()))
+            currentBindingProfile = controllerBindingProfiles.get(gamepad.getGuid());
         else currentBindingProfile = Maps.newHashMap(BINDING);
         InputManager.loadButtonBindings();
     }
+
     public static Map<String, String> getBindingsForController() {
         return currentBindingProfile;
     }
+
     /**
      * Gets the used controller.
      *
      * @return the controller
      */
-    public static Controller getController() {
+    public static Joystick getJoystick() {
         var raw = MidnightControlsConfig.controllerID;
-        Controller controller = Controller.byId(GLFW.GLFW_JOYSTICK_1);
+        Joystick joystick = Joystick.byId(GLFW.GLFW_JOYSTICK_1);
         if (raw instanceof Number) {
-            controller = Controller.byId(((Number) raw).intValue());
+            joystick = Joystick.byId(((Number) raw).intValue());
         } else if (raw instanceof String) {
-            controller = Controller.byGuid((String) raw).orElse(Controller.byId(GLFW.GLFW_JOYSTICK_1));
+            joystick = Joystick.byGuid((String) raw).orElse(Joystick.byId(GLFW.GLFW_JOYSTICK_1));
         }
-        if ((!controller.isConnected() || !controller.isGamepad()) && MidnightControlsConfig.autoSwitchMode && !isEditing) {
+        if ((!joystick.isConnected() || !joystick.isGamepad()) && MidnightControlsConfig.autoSwitchMode && !isEditing) {
             for (int i = 0; i < GLFW.GLFW_JOYSTICK_LAST; ++i) {
-                Controller gamepad = Controller.byId(i);
-                if (gamepad.isConnected() && gamepad.isGamepad()) {
-                    controller = gamepad;
+                Joystick replacement = Joystick.byId(i);
+                if (replacement.isConnected() && replacement.isGamepad()) {
+                    joystick = replacement;
                     i = GLFW_JOYSTICK_LAST;
                 }
             }
         }
-        if (controller.isConnected() && controller.isGamepad() && MidnightControlsConfig.autoSwitchMode && !isEditing) MidnightControlsConfig.controlsMode = ControlsMode.CONTROLLER;
-        if (prevController != controller) updateBindingsForController(controller);
-        prevController = controller;
-        return controller;
+
+        return joystick;
     }
+
+    public static Optional<Gamepad> getGamepad() {
+        Optional<Gamepad> gamepad = getJoystick().asGamepad();
+        if (gamepad.isPresent()) {
+            if (MidnightControlsConfig.autoSwitchMode && !isEditing)
+                MidnightControlsConfig.controlsMode = ControlsMode.CONTROLLER;
+            if (prevGamepad != gamepad.get()) {
+                updateBindingsForController(gamepad.get());
+                prevGamepad = gamepad.get();
+            }
+        }
+        return gamepad;
+    }
+
+
 
     /**
      * Sets the used controller.
      *
-     * @param controller the controller
+     * @param joystick the controller
      */
-    public static void setController(Controller controller) {
-        MidnightControlsConfig.controllerID = controller.id();
+    public static void setJoystick(Joystick joystick) {
+        MidnightControlsConfig.controllerID = joystick.getId();
         MidnightControlsConfig.write(MidnightControlsConstants.NAMESPACE);
     }
 
@@ -330,25 +343,29 @@ public class MidnightControlsConfig extends MidnightConfig {
      *
      * @return the second controller
      */
-    public static Optional<Controller> getSecondController() {
+    public static Optional<Joystick> getSecondJoystick() {
         var raw = MidnightControlsConfig.secondControllerID;
         if (raw instanceof Number) {
             if (((Number) raw).intValue() == -1)
                 return Optional.empty();
-            return Optional.of(Controller.byId(((Number) raw).intValue()));
+            return Optional.of(Gamepad.byId(((Number) raw).intValue()));
         } else if (raw instanceof String) {
-            return Optional.of(Controller.byGuid((String) raw).orElse(Controller.byId(GLFW.GLFW_JOYSTICK_1)));
+            return Optional.of(Gamepad.byGuid((String) raw).orElse(Gamepad.byId(GLFW.GLFW_JOYSTICK_1)));
         }
         return Optional.empty();
+    }
+
+    public static Optional<Gamepad> getSecondGamepad() {
+        return getSecondJoystick().flatMap(Joystick::asGamepad);
     }
 
     /**
      * Sets the second controller.
      *
-     * @param controller the second controller
+     * @param joystick the second controller
      */
-    public static void setSecondController(@Nullable Controller controller) {
-        MidnightControlsConfig.secondControllerID = controller == null ? -1 : controller.id();
+    public static void setSecondJoystick(@Nullable Joystick joystick) {
+        MidnightControlsConfig.secondControllerID = joystick == null ? -1 : joystick.getId();
     }
     /**
      * Gets the right X axis sign.
@@ -440,8 +457,11 @@ public class MidnightControlsConfig extends MidnightConfig {
     public static void setButtonBinding(@NotNull ButtonBinding binding, int[] button) {
         binding.setButton(button);
         getBindingsForController().put("controller.controls." + binding.getName(), binding.getButtonCode());
-        if (controllerBindingProfiles.containsKey(getController().getGuid())) controllerBindingProfiles.get(getController().getGuid()).put("controller.controls." + binding.getName(), binding.getButtonCode());
-        else BINDING.put("controller.controls." + binding.getName(), binding.getButtonCode());
+
+        if (controllerBindingProfiles.containsKey(getJoystick().getGuid()))
+            controllerBindingProfiles.get(getJoystick().getGuid()).put("controller.controls." + binding.getName(), binding.getButtonCode());
+        else
+            BINDING.put("controller.controls." + binding.getName(), binding.getButtonCode());
     }
 
     public static boolean isBackButton(int btn, boolean isBtn, ButtonState state) {
@@ -540,7 +560,7 @@ public class MidnightControlsConfig extends MidnightConfig {
      * @return the controller name matches a type, else empty
      */
     public static @NotNull ControllerType matchControllerToType() {
-        String name = getController().getName().toLowerCase();
+        String name = getJoystick().getName().toLowerCase();
         if (containsAny(name, "xbox 360")) return ControllerType.XBOX_360;
         else if (containsAny(name, "xbox") || name.contains("afterglow")) return ControllerType.XBOX;
         else if (containsAny(name, "steam") && GLX._getCpuInfo().contains("AMD Custom APU")) return ControllerType.STEAM_DECK;

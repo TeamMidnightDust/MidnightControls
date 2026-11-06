@@ -12,7 +12,7 @@ package eu.midnightdust.midnightcontrols.client.gui;
 import dev.lambdaurora.spruceui.option.SpruceSimpleActionOption;
 import dev.lambdaurora.spruceui.tooltip.TooltipData;
 import dev.lambdaurora.spruceui.widget.SpruceButtonWidget;
-import eu.midnightdust.midnightcontrols.client.controller.Controller;
+import eu.midnightdust.midnightcontrols.client.controller.Gamepad;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -31,7 +31,7 @@ public class ReloadControllerMappingsOption {
             var client = Minecraft.getInstance();
             if (before != null)
                 before.accept(btn);
-            Controller.updateMappings();
+            Gamepad.updateMappings();
             //~ if >= 26.2 'client.screen' -> 'client.gui.screen()' {
             if (client.gui.screen() instanceof MidnightControlsSettingsScreen)
                 client.gui.screen().init(client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());

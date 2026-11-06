@@ -14,7 +14,7 @@ public class SDLEventHandlerMixin {
     @Inject(method = "pollEvents", at = @At(value = "INVOKE", target = "Lorg/lwjgl/sdl/SDL_Event;type()I"))
     private void midnightcontrols$listenToControllerConnection(CallbackInfo ci, @Local(name = "event") SDL_Event event) {
         if (event.type() == SDL_Event.JDEVICE) {
-            MidnightControlsClient.onControllerConnectionChanged(event.jdevice().which(), event.type());
+            MidnightControlsClient.onControllerConnectionChanged(event.jdevice().which(), event.jdevice().type());
         }
     }
 }

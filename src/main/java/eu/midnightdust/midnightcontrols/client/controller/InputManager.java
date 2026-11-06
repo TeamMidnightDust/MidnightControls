@@ -31,6 +31,9 @@ import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.cli
 
 import com.mojang.blaze3d.platform.InputConstants;
 
+//? sdl
+import org.lwjgl.sdl.SDLMouse;
+
 /**
  * Represents an input manager for controllers.
  *
@@ -61,7 +64,7 @@ public class InputManager {
 
     private static void handleAutoSwitch() {
         if (MidnightControlsConfig.autoSwitchMode && !MidnightControlsConfig.isEditing && MidnightControlsConfig.controlsMode != ControlsMode.TOUCHSCREEN) {
-            if (MidnightControlsConfig.getController().isConnected() && MidnightControlsConfig.getController().isGamepad())
+            if (MidnightControlsConfig.getGamepad().isPresent())
                 MidnightControlsConfig.controlsMode = ControlsMode.CONTROLLER;
             else MidnightControlsConfig.controlsMode = ControlsMode.DEFAULT;
         }
@@ -80,10 +83,14 @@ public class InputManager {
     public void updateMousePosition(@NotNull Minecraft client) {
         Objects.requireNonNull(client, "Client instance cannot be null.");
         if (this.prevTargetMouseX != this.targetMouseX || this.prevTargetMouseY != this.targetMouseY) {
-            double mouseX = this.prevTargetMouseX + (this.targetMouseX - this.prevTargetMouseX) * client.getDeltaTracker().getGameTimeDeltaPartialTick(true) + 0.5;
-            double mouseY = this.prevTargetMouseY + (this.targetMouseY - this.prevTargetMouseY) * client.getDeltaTracker().getGameTimeDeltaPartialTick(true) + 0.5;
-            if (!MidnightControlsConfig.virtualMouse)
-                GLFW.glfwSetCursorPos(client.getWindow().handle(), mouseX, mouseY);
+            float mouseX = this.prevTargetMouseX + (this.targetMouseX - this.prevTargetMouseX) * client.getDeltaTracker().getGameTimeDeltaPartialTick(true) + 0.5f;
+            float mouseY = this.prevTargetMouseY + (this.targetMouseY - this.prevTargetMouseY) * client.getDeltaTracker().getGameTimeDeltaPartialTick(true) + 0.5f;
+            if (!MidnightControlsConfig.virtualMouse) {
+                //? sdl
+                SDLMouse.SDL_WarpMouseInWindow(client.getWindow().handle(), mouseX, mouseY);
+                //? glfw
+                //GLFW.glfwSetCursorPos(client.getWindow().handle(), mouseX, mouseY);
+            }
             ((MouseAccessor) client.mouseHandler).midnightcontrols$onCursorPos(client.getWindow().handle(), mouseX, mouseY);
         }
     }

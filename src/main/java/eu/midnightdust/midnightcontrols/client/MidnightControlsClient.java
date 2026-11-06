@@ -19,7 +19,7 @@ import eu.midnightdust.midnightcontrols.MidnightControlsFeature;
 import eu.midnightdust.midnightcontrols.client.compat.MidnightControlsCompat;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonBinding;
 import eu.midnightdust.midnightcontrols.client.controller.ButtonCategory;
-import eu.midnightdust.midnightcontrols.client.controller.Controller;
+import eu.midnightdust.midnightcontrols.client.controller.Gamepad;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.gui.MidnightControlsHud;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
@@ -47,9 +47,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 //? if >= 26.3 {
-import org.lwjgl.sdl.SDL;
-import org.lwjgl.sdl.SDLJoystick;
-import org.lwjgl.sdl.SDLKeycode;
+import org.lwjgl.sdl.SDLMouse;
 import org.lwjgl.sdl.SDLPlatform;
 //?} else {
 //import org.lwjgl.glfw.GLFW;
@@ -128,7 +126,7 @@ public class MidnightControlsClient extends MidnightControls {
             MidnightControlsConfig.write(MidnightControlsConstants.NAMESPACE);
         }
         MidnightControlsHud.isVisible = MidnightControlsConfig.hudEnable;
-        Controller.updateMappings();
+        Gamepad.updateMappings();
         //? if < 26.3 {
 //        try {
 //            GLFW.glfwSetJoystickCallback(MidnightControlsClient::onControllerConnectionChanged);
@@ -152,12 +150,14 @@ public class MidnightControlsClient extends MidnightControls {
      * This callback is executed every time a controller is connected or disconnected.
      */
     public static void onControllerConnectionChanged(int jid, int event) {
-        if (event == GLFW.GLFW_CONNECTED) {
-            var controller = Controller.byId(jid);
-            showToastMessage(Component.translatable("midnightcontrols.controller.connected", jid), Component.literal(controller.getName()));
-        } else if (event == GLFW.GLFW_DISCONNECTED) {
-            showToastMessage(Component.translatable("midnightcontrols.controller.disconnected", jid), null);
-        }
+        System.out.println("Event type: " + event);
+        //TODO
+//        if (event == GLFW.GLFW_CONNECTED) {
+//            var controller = Gamepad.byId(jid);
+//            showToastMessage(Component.translatable("midnightcontrols.controller.connected", jid), Component.literal(controller.getName()));
+//        } else if (event == GLFW.GLFW_DISCONNECTED) {
+//            showToastMessage(Component.translatable("midnightcontrols.controller.disconnected", jid), null);
+//        }
 
         switchControlsMode();
     }
@@ -210,7 +210,7 @@ public class MidnightControlsClient extends MidnightControls {
             //~ if >= 26.2 'client.setScreen' -> 'client.gui.setScreen'
             client.gui.setScreen(new RingScreen());
         }
-        if (client.level != null && MidnightControlsConfig.enableHints && !MidnightControlsConfig.autoSwitchMode && MidnightControlsConfig.controlsMode == ControlsMode.DEFAULT && MidnightControlsConfig.getController().isGamepad()) {
+        if (client.level != null && MidnightControlsConfig.enableHints && !MidnightControlsConfig.autoSwitchMode && MidnightControlsConfig.controlsMode == ControlsMode.DEFAULT && MidnightControlsConfig.getJoystick().isGamepad()) {
             showToastMessage(Component.translatable("midnightcontrols.controller.tutorial.title"),
                     Component.translatable("midnightcontrols.controller.tutorial.description",
                             Component.translatable("options.title"),
@@ -250,11 +250,20 @@ public class MidnightControlsClient extends MidnightControls {
         }
 
         if (MidnightControlsConfig.hideNormalMouse) {
-            if (screen != null && !(screen instanceof TouchscreenOverlay)) GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
-            else GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+            if (screen != null && !(screen instanceof TouchscreenOverlay)) setMouseMode(MouseMode.INVISIBLE);
+            else setMouseMode(MouseMode.DISABLED);
         }
 
         original.call(screen);
+    }
+    enum MouseMode {
+        DISABLED,
+        INVISIBLE,
+        VISIBLE
+    }
+    private static void setMouseMode(MouseMode mouseMode) {
+        //? glfw
+        //GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
     }
 
     public static void onJoinServer() {
@@ -274,7 +283,7 @@ public class MidnightControlsClient extends MidnightControls {
      */
     public static void switchControlsMode() {
         if (MidnightControlsConfig.autoSwitchMode) {
-            if (MidnightControlsConfig.getController().isGamepad()) {
+            if (MidnightControlsConfig.getJoystick().isGamepad()) {
                 previousControlsMode = MidnightControlsConfig.controlsMode;
                 MidnightControlsConfig.controlsMode = ControlsMode.CONTROLLER;
             } else {
