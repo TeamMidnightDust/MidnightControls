@@ -31,10 +31,11 @@ public abstract class GuiMixin {
     @Shadow
     public abstract Screen screen();
 
-    @WrapMethod(method = "setScreen")
-    private void midnightcontrols$onSetScreen(Screen screen, Operation<Void> original) {
-        MidnightControlsClient.onScreenOpen(screen, original);
-    }
+    //TODO
+//    @WrapMethod(method = "setScreen")
+//    private void midnightcontrols$onSetScreen(Screen screen, Operation<Void> original) {
+//        MidnightControlsClient.onScreenOpen(screen, original);
+//    }
 
     @Inject(method = "extractRenderState", at = @At("HEAD"))
     private void midnightcontrols$onRender(DeltaTracker deltaTracker, final boolean shouldRenderLevel, final boolean resourcesLoaded, CallbackInfo ci) {

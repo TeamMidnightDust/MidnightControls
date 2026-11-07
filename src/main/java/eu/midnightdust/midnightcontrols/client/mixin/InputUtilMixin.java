@@ -10,15 +10,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(InputConstants.class)
 public abstract class InputUtilMixin {
 
-    /**
-     * @author kabliz
-     * @reason This method is static, and there is a terrible UX issue if raw input is turned on at the same time as
-     * eye tracking. Raw input only tracks literal mice and not other devices, leading to the game appearing to be
-     * unresponsive and the player not understanding why. This overwrite preserves the user's mouse preferences,
-     * while not interfering with eye tracking, and the two modes can be switched between during a play session.
-     */
-    @Inject(method = "isRawMouseInputSupported", at = @At("HEAD"), cancellable = true)
-    private static void setRawMouseMotionSupported(CallbackInfoReturnable<Boolean> cir) {
-        if (MidnightControlsConfig.eyeTrackerAsMouse) cir.setReturnValue(false);
-    }
+    //? if < 26.3 {
+//    /**
+//     * @author kabliz
+//     * @reason This method is static, and there is a terrible UX issue if raw input is turned on at the same time as
+//     * eye tracking. Raw input only tracks literal mice and not other devices, leading to the game appearing to be
+//     * unresponsive and the player not understanding why. This overwrite preserves the user's mouse preferences,
+//     * while not interfering with eye tracking, and the two modes can be switched between during a play session.
+//     */
+//    @Inject(method = "isRawMouseInputSupported", at = @At("HEAD"), cancellable = true)
+//    private static void setRawMouseMotionSupported(CallbackInfoReturnable<Boolean> cir) {
+//        if (MidnightControlsConfig.eyeTrackerAsMouse) cir.setReturnValue(false);
+//    }
+    //?}
 }

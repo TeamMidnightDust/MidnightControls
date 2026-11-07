@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -50,13 +51,13 @@ public class TouchInput {
             if (MidnightControlsConfig.debug) System.out.println(blockHit.getBlockPos().toString());
             if (client.gameMode.continueDestroyBlock(blockHit.getBlockPos(), blockHit.getDirection())) {
                 //client.particleManager.addBlockBreakingParticles(blockHit.getBlockPos(), blockHit.getSide()); // TODO Re-implement block breaking particles!!!
-                client.player.swing(InteractionHand.MAIN_HAND);
+                swingHand(InteractionHand.MAIN_HAND);
             } else client.gameMode.stopDestroyBlock();
             firstHitResult = TouchUtils.getTargetedObject(mouseX, mouseY);
         }
         else if (result instanceof EntityHitResult entityHit && firstHitResult instanceof EntityHitResult firstEntity && entityHit.getEntity().getUUID().compareTo(firstEntity.getEntity().getUUID()) == 0) {
             if (client.gameMode.interact(client.player, entityHit.getEntity(), /*? if >= 26.1 {*/ entityHit,/*?}*/ client.player.getUsedItemHand()) == InteractionResult.SUCCESS) {
-                client.player.swing(InteractionHand.MAIN_HAND);
+                swingHand(InteractionHand.MAIN_HAND);
             }
             firstHitResult = TouchUtils.getTargetedObject(mouseX, mouseY);
         }
@@ -90,9 +91,11 @@ public class TouchInput {
                     var interaction = client.gameMode.useItemOn(client.player, client.player.getUsedItemHand(), blockHit);
                     if (interaction.consumesAction()) {
                         //if (interaction.shouldSwingHand()) {
-                            client.player.swing(client.player.swingingArm);
+                            swingHand(client.player.getUsedItemHand());
+
                             if (!stackInHand.isEmpty() && (stackInHand.getCount() != previousStackCount || client.player.hasInfiniteMaterials())) {
-                                client.gameRenderer.itemInHandRenderer.itemUsed(client.player.swingingArm);
+                                //? if < 26.3
+                                //client.gameRenderer.itemInHandRenderer.itemUsed(client.player.swingingArm);
                             }
                         //}
                         return true;
@@ -101,11 +104,19 @@ public class TouchInput {
             }
             if (result instanceof EntityHitResult entityHit) {
                 client.gameMode.attack(client.player, entityHit.getEntity());
-                client.player.swing(InteractionHand.MAIN_HAND);
+                swingHand(InteractionHand.MAIN_HAND);
                 return true;
             }
         }
         clickStartTime = -1;
         return false;
+    }
+
+    public static void swingHand(InteractionHand hand) {
+        //? if >= 26.3 {
+        client.player.swing(hand, SwingAnimation.DEFAULT, true);
+        //?} else {
+        //client.player.swing(hand);
+        //?}
     }
 }

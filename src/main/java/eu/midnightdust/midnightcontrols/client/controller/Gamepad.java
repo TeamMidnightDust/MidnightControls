@@ -58,7 +58,7 @@ public final class Gamepad extends Joystick {
 
     public Gamepad(int id, long instancePointer) {
         super(id, instancePointer);
-        this.instancePointer = instancePointer;
+        this.instancePointer = SDLGamepad.SDL_OpenGamepad(id);
     }
     //?} else if glfw {
 //    private final GLFWGamepadState gamepadState;
@@ -111,7 +111,7 @@ public final class Gamepad extends Joystick {
 
     public void fetchJoystickInput(boolean leftJoycon, boolean cameraTick) {
         //? if sdl {
-        Function<Integer, Short> getAxisValue = (axis) -> SDLGamepad.SDL_GetGamepadAxis(instancePointer, axis);
+        Function<Integer, Float> getAxisValue = (axis) -> SDLGamepad.SDL_GetGamepadAxis(instancePointer, axis) / 32767f;
         //?} else if glfw {
 //        var buffer = gamepadState.axes();
 //        Function<Integer, Float> getAxisValue = (axis) -> buffer.get(axis);
@@ -169,6 +169,10 @@ public final class Gamepad extends Joystick {
         }
     }
 
+    public String getMapping() {
+        return SDLGamepad.SDL_GetGamepadMapping(instancePointer);
+    }
+
     /**
      * Reads the specified resource and returns the raw data as a ByteBuffer.
      *
@@ -215,6 +219,7 @@ public final class Gamepad extends Joystick {
             var buffer = ioResourceToBuffer(MidnightControlsClient.MAPPINGS_FILE.getPath());
             //? sdl
             if (buffer != null) SDLGamepad.SDL_AddGamepadMappingsFromFile(buffer);
+            SDLGamepad.SDL_ReloadGamepadMappings();
             //? glfw
             //if (buffer != null) GLFW.glfwUpdateGamepadMappings(buffer);
         } catch (IOException e) {

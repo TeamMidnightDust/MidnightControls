@@ -1,3 +1,4 @@
 accessWidener   v1  official
 
 accessible class net/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack
+accessible method com/mojang/blaze3d/platform/InputConstants$Key <init> (Ljava/lang/String;Lcom/mojang/blaze3d/platform/InputConstants$Type;I)V

@@ -106,8 +106,13 @@ dependencies {
     //modCompileOnly "maven.modrinth:emi:${property("emi_version")}"
 }
 
+val accesswidener = when {
+    stonecutter.eval(sc.current.version, ">=26.1") -> "midnightcontrols-26.1.accesswidener"
+    else -> "midnightcontrols.accesswidener"
+}
 loom {
     fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json") // Useful for interface injection
+    accessWidenerPath = rootProject.file("src/main/resources/$accesswidener")
 
     decompilerOptions.named("vineflower") {
         options.put("mark-corresponding-synthetics", "1") // Adds names to lambdas - useful for mixins
@@ -145,6 +150,7 @@ tasks {
             register("name", "mod.name")
             register("version", "mod.version")
             register("minecraft", "mod.fabric_mc_range")
+            set("aw_file", accesswidener)
         }
 
         filesMatching("fabric.mod.json") { expand(props) }

@@ -24,6 +24,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -134,9 +135,14 @@ public abstract class MinecraftClientMixin {
                     var result = this.gameMode.useItemOn(this.player, hand, hitResult);
                     if (result.consumesAction()) {
                         //if (result.shouldSwingHand()) {
-                            this.player.swing(hand);
+                            //? if >= 26.3 {
+                            this.player.swing(hand, SwingAnimation.DEFAULT, true);
+                            //?} else {
+                            //this.player.swing(hand);
+                            //?}
                             if (!stackInHand.isEmpty() && (stackInHand.getCount() != previousStackCount || this.player.hasInfiniteMaterials())) {
-                                this.gameRenderer.itemInHandRenderer.itemUsed(hand);
+                                //? < 26.3
+                                //this.gameRenderer.itemInHandRenderer.itemUsed(hand);
                             }
                         //}
 

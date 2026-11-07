@@ -30,6 +30,7 @@
     "MouseMixin",
     "RecipeBookScreenAccessor",
     "RecipeBookWidgetAccessor",
+    "RenderSystemMixin",
     "ScreenMixin",
     "SDLEventHandlerMixin",
     "TabNavigationWidgetAccessor",

@@ -11,7 +11,6 @@ package eu.midnightdust.midnightcontrols.client;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mojang.blaze3d.platform.GLX;
 import eu.midnightdust.lib.config.EntryInfo;
 import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.lib.config.MidnightConfigListWidget;
@@ -35,7 +34,6 @@ import eu.midnightdust.midnightcontrols.client.virtualkeyboard.KeyboardLayoutMan
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import org.lwjgl.glfw.GLFW;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -50,6 +48,18 @@ import net.minecraft.resources.Identifier;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.currentServerIp;
 import static eu.midnightdust.midnightcontrols.client.sdl.AxisCodes.*;
+
+//? if >= 26.3 {
+import net.minecraft.client.gui.components.debug.DebugEntrySystemSpecs;
+//?} else {
+//import com.mojang.blaze3d.platform.GLX;
+//?}
+
+//? sdl {
+import org.lwjgl.sdl.SDLJoystick;
+//?} else if glfw {
+//import org.lwjgl.glfw.GLFW;
+//?}
 
 /**
  * Represents MidnightControls configuration.
@@ -261,7 +271,7 @@ public class MidnightControlsConfig extends MidnightConfig {
      * Loads the configuration
      */
     public static void load() {
-        MidnightControlsConfig.init(MidnightControlsConstants.NAMESPACE, MidnightControlsConfig.class);
+        MidnightControlsConfig.register(MidnightControlsConstants.NAMESPACE, MidnightControlsConfig.class);
         MidnightControls.log("Configuration loaded.");
         // Controller controls.
         InputManager.loadButtonBindings();
@@ -294,18 +304,25 @@ public class MidnightControlsConfig extends MidnightConfig {
      */
     public static Joystick getJoystick() {
         var raw = MidnightControlsConfig.controllerID;
-        Joystick joystick = Joystick.byId(GLFW.GLFW_JOYSTICK_1);
+        Joystick joystick = Joystick.NONE;
         if (raw instanceof Number) {
             joystick = Joystick.byId(((Number) raw).intValue());
         } else if (raw instanceof String) {
-            joystick = Joystick.byGuid((String) raw).orElse(Joystick.byId(GLFW.GLFW_JOYSTICK_1));
+            joystick = Joystick.byGuid((String) raw).orElse(joystick);
         }
         if ((!joystick.isConnected() || !joystick.isGamepad()) && MidnightControlsConfig.autoSwitchMode && !isEditing) {
-            for (int i = 0; i < GLFW.GLFW_JOYSTICK_LAST; ++i) {
+            //? sdl {
+            var joysticks = SDLJoystick.SDL_GetJoysticks();
+            if (joysticks == null) return joystick;
+            while (joysticks.hasRemaining()) {
+                int i = joysticks.get();
+            //?} else if glfw {
+            //for (int i = 0; i < GLFW.GLFW_JOYSTICK_LAST; ++i) {
+            //?}
                 Joystick replacement = Joystick.byId(i);
                 if (replacement.isConnected() && replacement.isGamepad()) {
                     joystick = replacement;
-                    i = GLFW_JOYSTICK_LAST;
+                    break;
                 }
             }
         }
@@ -350,7 +367,7 @@ public class MidnightControlsConfig extends MidnightConfig {
                 return Optional.empty();
             return Optional.of(Gamepad.byId(((Number) raw).intValue()));
         } else if (raw instanceof String) {
-            return Optional.of(Gamepad.byGuid((String) raw).orElse(Gamepad.byId(GLFW.GLFW_JOYSTICK_1)));
+            return Gamepad.byGuid((String) raw);
         }
         return Optional.empty();
     }
@@ -560,10 +577,11 @@ public class MidnightControlsConfig extends MidnightConfig {
      * @return the controller name matches a type, else empty
      */
     public static @NotNull ControllerType matchControllerToType() {
+        String cpuInfo = /*? if >= 26.3 {*/ DebugEntrySystemSpecs.getCpuInfo(); /*?} else {*//*GLX._getCpuInfo()*//*?}*/
         String name = getJoystick().getName().toLowerCase();
         if (containsAny(name, "xbox 360")) return ControllerType.XBOX_360;
         else if (containsAny(name, "xbox") || name.contains("afterglow")) return ControllerType.XBOX;
-        else if (containsAny(name, "steam") && GLX._getCpuInfo().contains("AMD Custom APU")) return ControllerType.STEAM_DECK;
+        else if (containsAny(name, "steam") && cpuInfo.contains("AMD Custom APU")) return ControllerType.STEAM_DECK;
         else if (containsAny(name, "steam")) return ControllerType.STEAM_CONTROLLER;
         else if (containsAny(name, "dualsense", "ps5")) return ControllerType.DUALSENSE;
         else if (containsAny(name, "dualshock", "ps4", "sony")) return ControllerType.DUALSHOCK;

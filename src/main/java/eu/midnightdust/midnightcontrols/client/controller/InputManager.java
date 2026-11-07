@@ -15,6 +15,7 @@ import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import eu.midnightdust.midnightcontrols.client.mixin.MouseAccessor;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.client.MouseHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -91,7 +92,7 @@ public class InputManager {
                 //? glfw
                 //GLFW.glfwSetCursorPos(client.getWindow().handle(), mouseX, mouseY);
             }
-            ((MouseAccessor) client.mouseHandler).midnightcontrols$onCursorPos(client.getWindow().handle(), mouseX, mouseY);
+            moveMouse(mouseX, mouseY);
         }
     }
 
@@ -420,5 +421,19 @@ public class InputManager {
      */
     public static @NotNull KeyMapping makeKeyBinding(@NotNull Identifier id, InputConstants.Type type, int code, @NotNull KeyMapping.Category category) {
         return new KeyMapping(String.format("key.%s.%s", id.getNamespace(), id.getPath()), type, code, category);
+    }
+
+    public static void moveMouse(double xpos, double ypos) {
+        var accessor = (MouseAccessor) client.mouseHandler;
+        //? if >= 26.3 {
+        accessor.midnightcontrols$onCursorPos(
+                client.getWindow().handle(),
+                xpos,
+                ypos,
+                MouseHandler.getScaledXPos(client.getWindow(), xpos),
+                MouseHandler.getScaledYPos(client.getWindow(), ypos));
+        //?} else {
+        //accessor.midnightcontrols$onCursorPos(client.getWindow().handle(), xpos, ypos);
+        //?}
     }
 }

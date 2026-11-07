@@ -9,6 +9,7 @@
 
 package eu.midnightdust.midnightcontrols.client.gui;
 
+import com.mojang.blaze3d.Blaze3D;
 import dev.lambdaurora.spruceui.Position;
 import dev.lambdaurora.spruceui.SpruceTexts;
 import dev.lambdaurora.spruceui.background.Background;
@@ -41,6 +42,9 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Util;
 
+import java.net.URI;
+
+import static eu.midnightdust.midnightcontrols.client.controller.Joystick.searchNextAvailableJoystick;
 import static eu.midnightdust.midnightcontrols.client.sdl.AxisCodes.*;
 
 /**
@@ -83,11 +87,9 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final SpruceOption controllerOption =
             new SpruceCyclingOption("midnightcontrols.menu.controller",
                     amount -> {
-                        int id = MidnightControlsConfig.getJoystick().id();
+                        int id = MidnightControlsConfig.getJoystick().getId();
                         id += amount;
-                        if (id > GLFW.GLFW_JOYSTICK_LAST)
-                            id = GLFW.GLFW_JOYSTICK_1;
-                        id = searchNextAvailableController(id, false);
+                        id = searchNextAvailableJoystick(id+1, false);
                         MidnightControlsConfig.setJoystick(Gamepad.byId(id));
                         if (MidnightControlsConfig.debug) System.out.println(Gamepad.byId(id).getName() + "'s Controller GUID: " + Gamepad.byId(id).getGuid());
                     },
@@ -105,9 +107,7 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
             amount -> {
                 int id = MidnightControlsConfig.getSecondJoystick().map(Joystick::getId).orElse(-1);
                 id += amount;
-                if (id > GLFW.GLFW_JOYSTICK_LAST)
-                    id = -1;
-                id = searchNextAvailableController(id, true);
+                id = searchNextAvailableJoystick(id+1, true);
                 MidnightControlsConfig.setSecondJoystick(id == -1 ? null : Joystick.byId(id));
             },
             option -> MidnightControlsConfig.getSecondJoystick().map(controller -> {
@@ -162,22 +162,6 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
     private final MutableComponent controllerMappingsUrlText = Component.literal("(")
             .append(Component.literal(GAMEPAD_TOOL_URL).withStyle(ChatFormatting.GOLD))
             .append("),");
-
-    public static int searchNextAvailableController(int newId, boolean allowNone) {
-        if ((allowNone && newId == -1) || newId == 0) return newId;
-
-        Gamepad candidate = Gamepad.byId(newId);
-        boolean connected = candidate.isConnected();
-        if (MidnightControlsConfig.excludedControllers.stream().anyMatch(exclusion -> candidate.getName().matches(exclusion))) connected = false;
-        if (!connected) {
-            newId++;
-        }
-
-        if (newId > GLFW.GLFW_JOYSTICK_LAST)
-            newId = allowNone ? -1 : GLFW.GLFW_JOYSTICK_1;
-
-        return connected ? newId : searchNextAvailableController(newId, allowNone);
-    }
 
     public MidnightControlsSettingsScreen(Screen parent, boolean hideControls) {
         super(Component.translatable("midnightcontrols.title.settings"));
@@ -439,8 +423,14 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
 
         var gamepadToolUrlLabel = new SpruceLabelWidget(Position.of(0, aboutMappings1.getHeight() + 4),
                 this.controllerMappingsUrlText, width,
-                label -> Util.getPlatform().openUri(GAMEPAD_TOOL_URL));
+                label ->
+                        //? if >= 26.3
+                        Blaze3D.openUri(URI.create(GAMEPAD_TOOL_URL)));
+                        //?} else {
+                        //Util.getPlatform().openUri(GAMEPAD_TOOL_URL));
+                        //?}
         gamepadToolUrlLabel.setTooltip(Component.translatable("chat.link.open"));
+
 
         var aboutMappings3 = new SpruceLabelWidget(Position.of(0,
                 aboutMappings1.getHeight() + gamepadToolUrlLabel.getHeight() + 6),

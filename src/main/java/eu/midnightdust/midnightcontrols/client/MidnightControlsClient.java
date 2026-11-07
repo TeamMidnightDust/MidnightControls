@@ -47,6 +47,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 //? if >= 26.3 {
+import org.lwjgl.sdl.SDLEvents;
 import org.lwjgl.sdl.SDLMouse;
 import org.lwjgl.sdl.SDLPlatform;
 //?} else {
@@ -150,14 +151,20 @@ public class MidnightControlsClient extends MidnightControls {
      * This callback is executed every time a controller is connected or disconnected.
      */
     public static void onControllerConnectionChanged(int jid, int event) {
-        System.out.println("Event type: " + event);
-        //TODO
-//        if (event == GLFW.GLFW_CONNECTED) {
-//            var controller = Gamepad.byId(jid);
-//            showToastMessage(Component.translatable("midnightcontrols.controller.connected", jid), Component.literal(controller.getName()));
-//        } else if (event == GLFW.GLFW_DISCONNECTED) {
-//            showToastMessage(Component.translatable("midnightcontrols.controller.disconnected", jid), null);
-//        }
+        //? sdl
+        if (event == SDLEvents.SDL_EVENT_JOYSTICK_ADDED) {
+        //? glfw
+        //if (event == GLFW.GLFW_CONNECTED) {
+            var controller = Gamepad.byId(jid);
+            showToastMessage(Component.translatable("midnightcontrols.controller.connected", jid), Component.literal(controller.getName()));
+            MidnightControls.log(controller.getName() + " " + controller.getGuid() + " " + controller.isConnected() + " " + controller.isGamepad());
+            if (MidnightControlsConfig.getGamepad().isPresent()) MidnightControls.log(MidnightControlsConfig.getGamepad().get().getMapping());
+        //? sdl
+        } else if (event == SDLEvents.SDL_EVENT_JOYSTICK_REMOVED) {
+        //? glfw
+        //} else if (event == GLFW.GLFW_DISCONNECTED) {
+            showToastMessage(Component.translatable("midnightcontrols.controller.disconnected", jid), null);
+        }
 
         switchControlsMode();
     }

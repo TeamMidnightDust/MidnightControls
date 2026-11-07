@@ -64,7 +64,7 @@ dependencies {
     compileOnlyApi ("maven.modrinth:emi:${property("deps.emi")}+neoforge")
     compileOnlyApi ("maven.modrinth:emotecraft:${property("deps.emotecraft")}")
     compileOnlyApi ("io.github.kosmx:bendy-lib:${property("deps.bendylib")}")
-    compileOnlyApi ("dev.isxander:yet-another-config-lib:${property("deps.yacl")}+${sc.current.version}-neoforge") {
+    compileOnlyApi ("dev.isxander:yet-another-config-lib:${property("deps.yacl")}") {
         exclude(group = "org.quiltmc.parser")
     }
     compileOnlyApi ("maven.modrinth:inventory-tabs-updated:${property("deps.inventorytabs")}") {

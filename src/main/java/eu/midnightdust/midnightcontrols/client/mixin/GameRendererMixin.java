@@ -60,13 +60,14 @@ public abstract class GameRendererMixin {
     //~}
     *///?}
 
-    //~ if >= 26.1 'Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(FZLorg/joml/Matrix4f;)V' -> 'Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lnet/minecraft/client/renderer/state/level/CameraRenderState;FLorg/joml/Matrix4fc;)V'
-    @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lnet/minecraft/client/renderer/state/level/CameraRenderState;FLorg/joml/Matrix4fc;)V"))
-    private void midnigtcontrols$captureMatrices(DeltaTracker tickCounter, CallbackInfo ci, @Local(ordinal = 0) Matrix4f projectionMatrix, /*? if >= 26.1 {*/@Local CameraRenderState camState/*?} else {*/ /*@Local(ordinal = 1) Matrix4f worldSpaceMatrix*//*?}*/) {
-        TouchUtils.lastProjMat.set(projectionMatrix);
-        //~ if >= 26.2 'RenderSystem.getModelViewMatrix()' -> 'RenderSystem.getModelViewMatrixCopy()'
-        TouchUtils.lastModMat.set(RenderSystem.getModelViewMatrixCopy());
-        //~ if >= 26.1 'worldSpaceMatrix' -> 'camState.viewRotationMatrix'
-        TouchUtils.lastWorldSpaceMatrix.set(camState.viewRotationMatrix);
-    }
+    //TODO
+//    //~ if >= 26.1 'Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(FZLorg/joml/Matrix4f;)V' -> 'Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lnet/minecraft/client/renderer/state/level/CameraRenderState;FLorg/joml/Matrix4fc;)V'
+//    @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lnet/minecraft/client/renderer/state/level/CameraRenderState;FLorg/joml/Matrix4fc;)V"))
+//    private void midnigtcontrols$captureMatrices(DeltaTracker tickCounter, CallbackInfo ci, @Local(ordinal = 0) Matrix4f projectionMatrix, /*? if >= 26.1 {*/@Local CameraRenderState camState/*?} else {*/ /*@Local(ordinal = 1) Matrix4f worldSpaceMatrix*//*?}*/) {
+//        TouchUtils.lastProjMat.set(projectionMatrix);
+//        //~ if >= 26.2 'RenderSystem.getModelViewMatrix()' -> 'RenderSystem.getModelViewMatrixCopy()'
+//        TouchUtils.lastModMat.set(RenderSystem.getModelViewMatrixCopy());
+//        //~ if >= 26.1 'worldSpaceMatrix' -> 'camState.viewRotationMatrix'
+//        TouchUtils.lastWorldSpaceMatrix.set(camState.viewRotationMatrix);
+//    }
 }

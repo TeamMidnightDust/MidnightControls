@@ -153,7 +153,8 @@ public abstract class MouseMixin implements MouseAccessor {
     private void midnightcontrols$lockCursor(CallbackInfo ci) {
         if ((doMixedInput() || MidnightControlsConfig.eyeTrackerAsMouse)) {
             //In eye tracking mode, we cannot have the cursor locked to the center.
-            GLFW.glfwSetInputMode(minecraft.getWindow().handle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            //TODO
+            //GLFW.glfwSetInputMode(minecraft.getWindow().handle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
             //~ if >= 26.2 'minecraft.setScreen(' -> 'minecraft.gui.setScreen('
             minecraft.gui.setScreen(null);
             ignoreFirstMove = true;

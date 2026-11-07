@@ -34,7 +34,6 @@ import eu.midnightdust.midnightcontrols.client.util.InventoryUtil;
 import eu.midnightdust.midnightcontrols.client.util.storage.AxisStorage;
 import eu.midnightdust.midnightcontrols.client.util.storage.ButtonStorage;
 import eu.midnightdust.midnightcontrols.MidnightControls;
-import eu.midnightdust.midnightcontrols.client.controller.Gamepad;
 import eu.midnightdust.midnightcontrols.client.controller.InputManager;
 import eu.midnightdust.midnightcontrols.client.enums.CameraMode;
 import eu.midnightdust.midnightcontrols.client.gui.RingScreen;
@@ -42,6 +41,7 @@ import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.ring.RingPage;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
+import net.minecraft.client.MouseHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -71,6 +71,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.vehicle.boat.Boat;
 
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.client;
+import static eu.midnightdust.midnightcontrols.client.controller.InputManager.moveMouse;
 import static eu.midnightdust.midnightcontrols.client.sdl.AxisCodes.*;
 import static eu.midnightdust.midnightcontrols.client.sdl.ButtonCodes.*;
 
@@ -226,7 +227,7 @@ public class MidnightInput {
             this.mouseSpeedX = this.mouseSpeedY = 0.0F;
             InputManager.INPUT_MANAGER.resetMousePosition(windowWidth, windowHeight);
         } else if (isScreenInteractive(client.gui.screen()) && MidnightControlsConfig.virtualMouse) {
-            ((MouseAccessor) client.mouseHandler).midnightcontrols$onCursorPos(client.getWindow().handle(), 0, 0);
+            moveMouse(0, 0);
             InputManager.INPUT_MANAGER.resetMouseTarget(client);
         }
         this.inventoryInteractionCooldown = 5;
@@ -303,8 +304,8 @@ public class MidnightInput {
                     client.mouseHandler.xpos() * (double) client.getWindow().getGuiScaledWidth() / (double) client.getWindow().getScreenWidth(),
                     client.mouseHandler.ypos() * (double) client.getWindow().getGuiScaledHeight() / (double) client.getWindow().getScreenHeight()) != null) return;
             if (!this.ignoreNextARelease && client.gui.screen() != null) {
+                moveMouse(client.mouseHandler.xpos(), client.mouseHandler.ypos());
                 var accessor = (MouseAccessor) client.mouseHandler;
-                accessor.midnightcontrols$onCursorPos(client.getWindow().handle(), client.mouseHandler.xpos(), client.mouseHandler.ypos());
                 switch (storage.state) {
                     // Button pressed
                     case PRESS -> accessor.midnightcontrols$onMouseButton(client.getWindow().handle(), new MouseButtonInfo(MOUSE_BUTTON_LEFT, 0), 1);
