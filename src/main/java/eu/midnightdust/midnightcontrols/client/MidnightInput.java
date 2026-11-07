@@ -681,10 +681,10 @@ public class MidnightInput {
                 return true;
             }
             switch (direction) {
-                case UP -> pressKeyboardKey(screen, KEYBOARD_UP);
-                case DOWN -> pressKeyboardKey(screen, KEYBOARD_DOWN);
-                case LEFT -> pressKeyboardKey(screen, KEYBOARD_LEFT);
-                case RIGHT -> pressKeyboardKey(screen, KEYBOARD_RIGHT);
+                case UP -> pressKeyboardKey(screen, KEYBOARD_UP, KEYCODE_UP);
+                case DOWN -> pressKeyboardKey(screen, KEYBOARD_DOWN, KEYCODE_DOWN);
+                case LEFT -> pressKeyboardKey(screen, KEYBOARD_LEFT, KEYCODE_LEFT);
+                case RIGHT -> pressKeyboardKey(screen, KEYBOARD_RIGHT, KEYCODE_RIGHT);
             }
             this.actionGuiCooldown = 5;
             return true;
@@ -726,7 +726,10 @@ public class MidnightInput {
         ((KeyboardAccessor) client.keyboardHandler).midnightcontrols$onKey(client.getWindow().handle(), 1, new KeyEvent(key, 0, 0));
     }
     public void pressKeyboardKey(Screen screen, int key) {
-        screen.keyPressed(new KeyEvent(key, 0, 0));
+        pressKeyboardKey(screen, key, 0);
+    }
+    public void pressKeyboardKey(Screen screen, int key, int keycode) {
+        screen.keyPressed(new KeyEvent(key, keycode, 0));
     }
 }
 //~}

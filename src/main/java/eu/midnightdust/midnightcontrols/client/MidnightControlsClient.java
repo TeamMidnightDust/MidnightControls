@@ -66,13 +66,13 @@ public class MidnightControlsClient extends MidnightControls {
     public static final KeyMapping.Category MIDNIGHTCONTROLS_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("midnightcontrols", "keybinds"));
     //~ if >= 26.3 'Type.KEYSYM' -> 'Type.KEYBOARD' {
     public static final KeyMapping BINDING_LOOK_UP = InputManager.makeKeyBinding(id("look_up"),
-            InputConstants.Type.KEYBOARD, ButtonCodes.KEYBOARD_KP_8, MIDNIGHTCONTROLS_CATEGORY);
+            InputConstants.Type.KEYBOARD, ButtonCodes.KEYBOARD_NUMPAD8, MIDNIGHTCONTROLS_CATEGORY);
     public static final KeyMapping BINDING_LOOK_RIGHT = InputManager.makeKeyBinding(id("look_right"),
-            InputConstants.Type.KEYBOARD, ButtonCodes.KEYBOARD_KP_6, MIDNIGHTCONTROLS_CATEGORY);
+            InputConstants.Type.KEYBOARD, ButtonCodes.KEYBOARD_NUMPAD6, MIDNIGHTCONTROLS_CATEGORY);
     public static final KeyMapping BINDING_LOOK_DOWN = InputManager.makeKeyBinding(id("look_down"),
-            InputConstants.Type.KEYBOARD, ButtonCodes.KEYBOARD_KP_2, MIDNIGHTCONTROLS_CATEGORY);
+            InputConstants.Type.KEYBOARD, ButtonCodes.KEYBOARD_NUMPAD2, MIDNIGHTCONTROLS_CATEGORY);
     public static final KeyMapping BINDING_LOOK_LEFT = InputManager.makeKeyBinding(id("look_left"),
-            InputConstants.Type.KEYBOARD, ButtonCodes.KEYBOARD_KP_4, MIDNIGHTCONTROLS_CATEGORY);
+            InputConstants.Type.KEYBOARD, ButtonCodes.KEYBOARD_NUMPAD4, MIDNIGHTCONTROLS_CATEGORY);
     public static final KeyMapping BINDING_RING = InputManager.makeKeyBinding(id("ring"),
             InputConstants.Type.KEYBOARD, InputConstants.UNKNOWN.getValue(), MIDNIGHTCONTROLS_CATEGORY);
     //~}

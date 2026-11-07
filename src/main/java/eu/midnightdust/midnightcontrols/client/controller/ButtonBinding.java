@@ -66,7 +66,7 @@ public class ButtonBinding {
             .action(InputHandlers.handleHotbar(false)).onlyInGame().cooldown().register();
     public static final ButtonBinding HOTBAR_RIGHT = new Builder("hotbar_right").buttons(GAMEPAD_BUTTON_RIGHT_SHOULDER)
             .action(InputHandlers.handleHotbar(true)).onlyInGame().cooldown().register();
-    public static final ButtonBinding INVENTORY = new Builder("inventory").buttons(GAMEPAD_BUTTON_DPAD_UP).onlyInGame().cooldown().register();
+    public static final ButtonBinding INVENTORY = new Builder("inventory").buttons(GAMEPAD_BUTTON_NORTH).onlyInGame().cooldown().register();
     public static final ButtonBinding EXIT = new Builder("exit").buttons(GAMEPAD_BUTTON_EAST).filter((buttonBinding) -> client.gui.screen() != null && buttonBinding.cooldown == 0 && INVENTORY.cooldown == 0)
             .action(InputHandlers.handleExit()).cooldown().register();
     public static final ButtonBinding JUMP = new Builder("jump").buttons(GAMEPAD_BUTTON_SOUTH).onlyInGame().register();
