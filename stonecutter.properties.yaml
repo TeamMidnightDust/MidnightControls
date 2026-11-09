@@ -1,6 +1,6 @@
 mod:
   name: MidnightControls
-  version: 1.12.1
+  version: 1.12.1-dev.1
   group: eu.midnightdust
   id: midnightcontrols
 
@@ -42,10 +42,9 @@ deps:
   inventorytabs: inventorytabs-0.9.beta-1.19.x
   clothconfig: 7.0.72
   bedrockify: 1.9+mc1.20
-  # Version-specific dependencies
-  # SpruceUI: https://maven.gegy.dev/#/releases/dev/lambdaurora/spruceui
-  # YumiMC: https://github.com/YumiProject/yumi-minecraft-foundation-library/tags
-  # LibGUI: https://github.com/CottonMC/LibGui/releases
+  # >> spruceui: https://maven.gegy.dev/#/releases/dev/lambdaurora/spruceui
+  # >> yumimc: https://github.com/YumiProject/yumi-minecraft-foundation-library/tags
+  # >> libgui: https://github.com/CottonMC/LibGui/releases
   "1.21.11":
     spruceui: 9.1.0+1.21.11
     yumimc: 1.0.0-beta.1+1.21.11
@@ -67,6 +66,7 @@ loomx.loom_version: "1.18-SNAPSHOT"
 
 # Loader-specific dependencies
 fabric:deps: # https://fabricmc.net/develop/
+  # >> yacl: https://modrinth.com/mod/yacl/versions
   fabric_loader: 0.19.5
   "1.21.11":
     fabric_api: 0.141.6+1.21.11
@@ -94,6 +94,7 @@ fabric:deps: # https://fabricmc.net/develop/
 
 
 neoforge:deps: # https://neoforged.net/
+  # >> yacl: https://modrinth.com/mod/yacl/versions
   "1.21.11":
     neoforge_loader: 21.11.3-beta
     sodium: 0.8.0+mc1.21.11
