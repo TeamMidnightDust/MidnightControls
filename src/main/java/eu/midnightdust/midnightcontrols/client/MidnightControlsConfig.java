@@ -52,14 +52,14 @@ import static eu.midnightdust.midnightcontrols.client.sdl.AxisCodes.*;
 //? if >= 26.3 {
 import net.minecraft.client.gui.components.debug.DebugEntrySystemSpecs;
 //?} else {
-//import com.mojang.blaze3d.platform.GLX;
-//?}
+/*import com.mojang.blaze3d.platform.GLX;
+*///?}
 
 //? sdl {
 import org.lwjgl.sdl.SDLJoystick;
 //?} else if glfw {
-//import org.lwjgl.glfw.GLFW;
-//?}
+/*import org.lwjgl.glfw.GLFW;
+*///?}
 
 /**
  * Represents MidnightControls configuration.
@@ -317,8 +317,8 @@ public class MidnightControlsConfig extends MidnightConfig {
             while (joysticks.hasRemaining()) {
                 int i = joysticks.get();
             //?} else if glfw {
-            //for (int i = 0; i < GLFW.GLFW_JOYSTICK_LAST; ++i) {
-            //?}
+            /*for (int i = 0; i < GLFW.GLFW_JOYSTICK_LAST; ++i) {
+            *///?}
                 Joystick replacement = Joystick.byId(i);
                 if (replacement.isConnected() && replacement.isGamepad()) {
                     joystick = replacement;
@@ -577,7 +577,7 @@ public class MidnightControlsConfig extends MidnightConfig {
      * @return the controller name matches a type, else empty
      */
     public static @NotNull ControllerType matchControllerToType() {
-        String cpuInfo = /*? if >= 26.3 {*/ DebugEntrySystemSpecs.getCpuInfo(); /*?} else {*//*GLX._getCpuInfo()*//*?}*/
+        String cpuInfo = /*? if >= 26.3 {*/ DebugEntrySystemSpecs.getCpuInfo(); /*?} else {*//*GLX._getCpuInfo();*//*?}*/
         String name = getJoystick().getName().toLowerCase();
         if (containsAny(name, "xbox 360")) return ControllerType.XBOX_360;
         else if (containsAny(name, "xbox") || name.contains("afterglow")) return ControllerType.XBOX;

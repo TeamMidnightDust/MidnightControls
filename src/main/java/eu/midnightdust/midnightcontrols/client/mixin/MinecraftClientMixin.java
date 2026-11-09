@@ -138,8 +138,8 @@ public abstract class MinecraftClientMixin {
                             //? if >= 26.3 {
                             this.player.swing(hand, SwingAnimation.DEFAULT, true);
                             //?} else {
-                            //this.player.swing(hand);
-                            //?}
+                            /*this.player.swing(hand);
+                            *///?}
                             if (!stackInHand.isEmpty() && (stackInHand.getCount() != previousStackCount || this.player.hasInfiniteMaterials())) {
                                 //? < 26.3
                                 //this.gameRenderer.itemInHandRenderer.itemUsed(hand);

@@ -41,7 +41,6 @@ import eu.midnightdust.midnightcontrols.client.touch.gui.TouchscreenOverlay;
 import eu.midnightdust.midnightcontrols.client.ring.RingPage;
 import eu.midnightdust.midnightcontrols.client.util.HandledScreenAccessor;
 import eu.midnightdust.midnightcontrols.client.enums.ButtonState;
-import net.minecraft.client.MouseHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;

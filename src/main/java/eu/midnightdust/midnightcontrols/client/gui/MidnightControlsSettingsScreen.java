@@ -424,11 +424,11 @@ public class MidnightControlsSettingsScreen extends SpruceScreen {
         var gamepadToolUrlLabel = new SpruceLabelWidget(Position.of(0, aboutMappings1.getHeight() + 4),
                 this.controllerMappingsUrlText, width,
                 label ->
-                        //? if >= 26.3
+                        //? if >= 26.3 {
                         Blaze3D.openUri(URI.create(GAMEPAD_TOOL_URL)));
                         //?} else {
-                        //Util.getPlatform().openUri(GAMEPAD_TOOL_URL));
-                        //?}
+                        /*Util.getPlatform().openUri(GAMEPAD_TOOL_URL));
+                        *///?}
         gamepadToolUrlLabel.setTooltip(Component.translatable("chat.link.open"));
 
 

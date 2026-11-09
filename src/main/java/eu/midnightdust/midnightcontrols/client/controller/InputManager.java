@@ -34,6 +34,8 @@ import com.mojang.blaze3d.platform.InputConstants;
 
 //? sdl
 import org.lwjgl.sdl.SDLMouse;
+//? glfw
+//import org.lwjgl.glfw.GLFW;
 
 /**
  * Represents an input manager for controllers.
@@ -433,7 +435,7 @@ public class InputManager {
                 MouseHandler.getScaledXPos(client.getWindow(), xpos),
                 MouseHandler.getScaledYPos(client.getWindow(), ypos));
         //?} else {
-        //accessor.midnightcontrols$onCursorPos(client.getWindow().handle(), xpos, ypos);
-        //?}
+        /*accessor.midnightcontrols$onCursorPos(client.getWindow().handle(), xpos, ypos);
+        *///?}
     }
 }

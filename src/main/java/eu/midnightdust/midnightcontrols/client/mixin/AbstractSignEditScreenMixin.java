@@ -19,9 +19,9 @@ public class AbstractSignEditScreenMixin implements AbstractSignEditScreenAccess
     @Shadow @Final private SignText.Mutable text;
     @Shadow @Final private SignTextSlot slot;
     //?} else {
-    //@Shadow private SignText text;
-    //@Shadow @Final private boolean isFrontText;
-    //?}
+    /*@Shadow private SignText text;
+    @Shadow @Final private boolean isFrontText;
+    *///?}
 
     @Override
     public String[] midnightcontrols$getMessages() {
@@ -34,8 +34,8 @@ public class AbstractSignEditScreenMixin implements AbstractSignEditScreenAccess
         //? if >= 26.3 {
         this.text.setLine(line, Component.literal(text));
         //?} else {
-        //this.text = this.text.setMessage(line, Component.literal(text));
-        //?}
+        /*this.text = this.text.setMessage(line, Component.literal(text));
+        *///?}
     }
 
     @Override
@@ -43,7 +43,7 @@ public class AbstractSignEditScreenMixin implements AbstractSignEditScreenAccess
         //? if >= 26.3 {
         this.sign.setText(this.text.asImmutable(), this.slot);
         //?} else {
-        //this.sign.setText(this.text, this.isFrontText);
-        //?}
+        /*this.sign.setText(this.text, this.isFrontText);
+        *///?}
     }
 }

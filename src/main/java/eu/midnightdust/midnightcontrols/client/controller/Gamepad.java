@@ -41,9 +41,9 @@ import static org.lwjgl.BufferUtils.createByteBuffer;
 import org.lwjgl.sdl.SDLGamepad;
 import org.lwjgl.sdl.SDLJoystick;
 //?} glfw {
-//import org.lwjgl.glfw.GLFW;
-//import org.lwjgl.glfw.GLFWGamepadState;
-//?}
+/*import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWGamepadState;
+*///?}
 
 /**
  * Represents a controller.
@@ -61,14 +61,14 @@ public final class Gamepad extends Joystick {
         this.instancePointer = SDLGamepad.SDL_OpenGamepad(id);
     }
     //?} else if glfw {
-//    private final GLFWGamepadState gamepadState;
-//    public Gamepad(int id) {
-//        super(id);
-//        gamepadState = GLFWGamepadState.create();
-//        if (this.isGamepad())
-//            GLFW.glfwGetGamepadState(getId(), gamepadState);
-//    }
-    //?}
+    /*private final GLFWGamepadState gamepadState;
+    public Gamepad(int id) {
+        super(id);
+        gamepadState = GLFWGamepadState.create();
+        if (this.isGamepad())
+            GLFW.glfwGetGamepadState(getId(), gamepadState);
+    }
+    *///?}
 
     public void fetchAll(boolean leftJoycon) {
         this.fetchButtonInput(leftJoycon);
@@ -82,10 +82,10 @@ public final class Gamepad extends Joystick {
             if (!SDLGamepad.SDL_GamepadHasButton(instancePointer, i)) continue;
             boolean pressed = SDLGamepad.SDL_GetGamepadButton(instancePointer, i);
         //?} else if glfw {
-//        var buffer = gamepadState.buttons();
-//        for (int i = 0; i < buffer.limit(); i++) {
-//            boolean pressed = buffer.get() == (byte) 1;
-        //?}
+        /*var buffer = gamepadState.buttons();
+        for (int i = 0; i < buffer.limit(); i++) {
+            boolean pressed = buffer.get() == (byte) 1;
+        *///?}
             int btn = leftJoycon ? ButtonBinding.controller2Button(i) : i;
             var state = ButtonState.NONE;
             var previousState = InputManager.STATES.getOrDefault(btn, ButtonState.NONE);
@@ -113,9 +113,9 @@ public final class Gamepad extends Joystick {
         //? if sdl {
         Function<Integer, Float> getAxisValue = (axis) -> SDLGamepad.SDL_GetGamepadAxis(instancePointer, axis) / 32767f;
         //?} else if glfw {
-//        var buffer = gamepadState.axes();
-//        Function<Integer, Float> getAxisValue = (axis) -> buffer.get(axis);
-        //?}
+        /*var buffer = gamepadState.axes();
+        Function<Integer, Float> getAxisValue = buffer::get;
+        *///?}
 
         polarUtil.calculate(getAxisValue.apply(GAMEPAD_AXIS_LEFT_X), getAxisValue.apply(GAMEPAD_AXIS_LEFT_Y), 1, MidnightControlsConfig.leftDeadZone);
         float leftX = polarUtil.polarX;
@@ -157,9 +157,9 @@ public final class Gamepad extends Joystick {
         //? if sdl {
         Function<Integer, Short> getAxisValue = (axis) -> SDLGamepad.SDL_GetGamepadAxis(instancePointer, axis);
         //?} else if glfw {
-//        var buffer = gamepadState.axes();
-//        Function<Integer, Float> getAxisValue = (axis) -> buffer.get(axis);
-        //?}
+        /*var buffer = gamepadState.axes();
+        Function<Integer, Float> getAxisValue = buffer::get;
+        *///?}
 
         for (int i = GAMEPAD_AXIS_LEFT_TRIGGER; i <= GAMEPAD_AXIS_RIGHT_TRIGGER; i++) {
             int axis = leftJoycon ? ButtonBinding.controller2Button(i) : i;
@@ -167,10 +167,6 @@ public final class Gamepad extends Joystick {
 
             input.handleTriggerAxis(AxisStorage.of(axis, value, MidnightControlsConfig.triggerDeadZone));
         }
-    }
-
-    public String getMapping() {
-        return SDLGamepad.SDL_GetGamepadMapping(instancePointer);
     }
 
     /**
@@ -217,11 +213,12 @@ public final class Gamepad extends Joystick {
             if (!MidnightControlsClient.MAPPINGS_FILE.exists())
                 return false;
             var buffer = ioResourceToBuffer(MidnightControlsClient.MAPPINGS_FILE.getPath());
-            //? sdl
+            //? sdl{
             if (buffer != null) SDLGamepad.SDL_AddGamepadMappingsFromFile(buffer);
             SDLGamepad.SDL_ReloadGamepadMappings();
-            //? glfw
-            //if (buffer != null) GLFW.glfwUpdateGamepadMappings(buffer);
+            //?} else if glfw{
+            /*if (buffer != null) GLFW.glfwUpdateGamepadMappings(buffer);
+            *///?}
         } catch (IOException e) {
             e.fillInStackTrace();
         }
@@ -246,8 +243,8 @@ public final class Gamepad extends Joystick {
             while (joysticks.hasRemaining()) {
                 int i = joysticks.get();
                 //?} else if glfw {
-                //for (int i = GLFW.GLFW_JOYSTICK_1; i <= GLFW.GLFW_JOYSTICK_16; i++) {
-                //?}
+                /*for (int i = GLFW.GLFW_JOYSTICK_1; i <= GLFW.GLFW_JOYSTICK_16; i++) {
+                *///?}
                 var joystick = byId(i);
 
                 if (!joystick.isConnected())

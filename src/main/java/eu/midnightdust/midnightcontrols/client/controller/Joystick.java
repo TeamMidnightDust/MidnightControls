@@ -1,7 +1,12 @@
 package eu.midnightdust.midnightcontrols.client.controller;
 
+import eu.midnightdust.midnightcontrols.MidnightControls;
 import eu.midnightdust.midnightcontrols.client.MidnightControlsConfig;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
+
+//? if sdl {
 import org.lwjgl.sdl.SDLGUID;
 import org.lwjgl.sdl.SDLGamepad;
 import org.lwjgl.sdl.SDLJoystick;
@@ -9,7 +14,10 @@ import org.lwjgl.sdl.SDL_GUID;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+//?} else if glfw {
+/*import org.lwjgl.glfw.GLFW;
+*///?}
+
 
 public class Joystick {
     private static final Map<Integer, Joystick> JOYSTICKS = new HashMap<>();
@@ -20,6 +28,7 @@ public class Joystick {
 
     private Joystick() {
         id = -1;
+        //? sdl
         instancePointer = -1;
     }
 
@@ -39,7 +48,7 @@ public class Joystick {
     public Optional<Gamepad> asGamepad() {
         if (JOYSTICKS.get(id) instanceof Gamepad gamepad) return Optional.of(gamepad);
         if (isGamepad()) {
-            Gamepad gamepad = new Gamepad(this.getId(), instancePointer);
+            Gamepad gamepad = new Gamepad(this.getId()/*? sdl {*/, instancePointer/*?}*/);
             JOYSTICKS.put(id, gamepad);
             return Optional.of(gamepad);
         }
@@ -61,11 +70,11 @@ public class Joystick {
             return NONE;
         }
         //?} else if glfw {
-//        if (id > GLFW.GLFW_JOYSTICK_LAST) {
-//            MidnightControls.log("Controller '" + id + "' doesn't exist.");
-//            id = GLFW.GLFW_JOYSTICK_LAST;
-//        }
-        //?}
+        /*if (id > GLFW.GLFW_JOYSTICK_LAST) {
+            MidnightControls.log("Controller '" + id + "' doesn't exist.");
+            id = GLFW.GLFW_JOYSTICK_LAST;
+        }
+        *///?}
         Joystick joystick;
         if (JOYSTICKS.containsKey(id))
             return JOYSTICKS.get(id);
@@ -99,9 +108,9 @@ public class Joystick {
             if (joysticks.get() == newId && !joysticks.hasRemaining()) newId = joysticks.get(0);
         }
         //?} else if glfw {
-//        if (newId > GLFW.GLFW_JOYSTICK_LAST)
-//            newId = allowNone ? -1 : GLFW.GLFW_JOYSTICK_1;
-        //?}
+        /*if (newId > GLFW.GLFW_JOYSTICK_LAST)
+            newId = allowNone ? -1 : GLFW.GLFW_JOYSTICK_1;
+        *///?}
 
         return connected ? newId : searchNextAvailableJoystick(newId, allowNone);
     }
@@ -128,8 +137,8 @@ public class Joystick {
         } catch (Exception ignored) {}
 
         //?} else {
-        //String guid = GLFW.glfwGetJoystickGUID(this.id);
-        //?}
+        /*String guid = GLFW.glfwGetJoystickGUID(this.id);
+        *///?}
         return guid == null ? "" : guid;
     }
 
@@ -143,8 +152,8 @@ public class Joystick {
         //? if >=26.3 {
         return SDLJoystick.SDL_JoystickConnected(this.instancePointer);
         //?} else {
-        //return GLFW.glfwJoystickPresent(this.id);
-        //?}
+        /*return GLFW.glfwJoystickPresent(this.id);
+        *///?}
     }
 
     /**
@@ -157,8 +166,8 @@ public class Joystick {
         //? if >=26.3 {
         return this.isConnected() && SDLGamepad.SDL_IsGamepad(this.getId());
         //?} else {
-        //return this.isConnected() && GLFW.glfwJoystickIsGamepad(this.id);
-        //?}
+        /*return this.isConnected() && GLFW.glfwJoystickIsGamepad(this.id);
+        *///?}
     }
 
     /**
@@ -171,8 +180,8 @@ public class Joystick {
         //? if >=26.3 {
         var name = SDLJoystick.SDL_GetJoystickName(this.instancePointer);
         //?} else {
-        //var name = this.isGamepad() ? GLFW.glfwGetGamepadName(this.id) : GLFW.glfwGetJoystickName(this.id);
-        //?}
+        /*var name = this.isGamepad() ? GLFW.glfwGetGamepadName(this.id) : GLFW.glfwGetJoystickName(this.id);
+        *///?}
         return name == null ? String.valueOf(this.getId()) : name;
     }
 

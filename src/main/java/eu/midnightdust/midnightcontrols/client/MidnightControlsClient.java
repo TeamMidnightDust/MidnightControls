@@ -51,8 +51,8 @@ import org.lwjgl.sdl.SDLEvents;
 import org.lwjgl.sdl.SDLMouse;
 import org.lwjgl.sdl.SDLPlatform;
 //?} else {
-//import org.lwjgl.glfw.GLFW;
-//?}
+/*import org.lwjgl.glfw.GLFW;
+*///?}
 
 /**
  * Represents the midnightcontrols client mod.
@@ -108,8 +108,8 @@ public class MidnightControlsClient extends MidnightControls {
         //? if >= 26.3 {
             isWayland = Objects.equals(SDLPlatform.SDL_GetPlatform(), "wayland");
         //?} else {
-            //isWayland = GLFW.glfwGetVersionString().contains("Wayland");
-        //?}
+            /*isWayland = GLFW.glfwGetVersionString().contains("Wayland");
+        *///?}
     }
 
     /**
@@ -129,12 +129,12 @@ public class MidnightControlsClient extends MidnightControls {
         MidnightControlsHud.isVisible = MidnightControlsConfig.hudEnable;
         Gamepad.updateMappings();
         //? if < 26.3 {
-//        try {
-//            GLFW.glfwSetJoystickCallback(MidnightControlsClient::onControllerConnectionChanged);
-//        } catch (Exception e) {
-//            e.fillInStackTrace();
-//        }
-        //?}
+        /*try {
+            GLFW.glfwSetJoystickCallback(MidnightControlsClient::onControllerConnectionChanged);
+        } catch (Exception e) {
+            e.fillInStackTrace();
+        }
+        *///?}
 
         MidnightControlsCompat.init();
     }
@@ -158,7 +158,6 @@ public class MidnightControlsClient extends MidnightControls {
             var controller = Gamepad.byId(jid);
             showToastMessage(Component.translatable("midnightcontrols.controller.connected", jid), Component.literal(controller.getName()));
             MidnightControls.log(controller.getName() + " " + controller.getGuid() + " " + controller.isConnected() + " " + controller.isGamepad());
-            if (MidnightControlsConfig.getGamepad().isPresent()) MidnightControls.log(MidnightControlsConfig.getGamepad().get().getMapping());
         //? sdl
         } else if (event == SDLEvents.SDL_EVENT_JOYSTICK_REMOVED) {
         //? glfw

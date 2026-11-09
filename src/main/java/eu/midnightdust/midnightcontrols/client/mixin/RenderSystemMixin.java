@@ -1,6 +1,8 @@
 package eu.midnightdust.midnightcontrols.client.mixin;
 
+//? if sdl {
 import com.mojang.blaze3d.systems.RenderSystem;
+import eu.midnightdust.core.MidnightLib;
 import eu.midnightdust.midnightcontrols.MidnightControls;
 import net.minecraft.util.TimeSource;
 import org.lwjgl.sdl.SDLInit;
@@ -21,3 +23,9 @@ public class RenderSystemMixin {
         }
     }
 }
+//?} else {
+/*import org.spongepowered.asm.mixin.Mixin;
+import eu.midnightdust.core.MidnightLib;
+@Mixin(MidnightLib.class)
+public class RenderSystemMixin {}
+*///?}

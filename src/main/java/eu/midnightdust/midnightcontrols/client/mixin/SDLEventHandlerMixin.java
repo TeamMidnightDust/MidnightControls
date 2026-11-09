@@ -1,7 +1,9 @@
 package eu.midnightdust.midnightcontrols.client.mixin;
 
+//? if >= 26.3 {
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.SDLEventHandler;
+
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
 import org.lwjgl.sdl.SDLEvents;
 import org.lwjgl.sdl.SDL_Event;
@@ -19,3 +21,9 @@ public class SDLEventHandlerMixin {
         }
     }
 }
+//?} else {
+/*import org.spongepowered.asm.mixin.Mixin;
+import eu.midnightdust.core.MidnightLib;
+@Mixin(MidnightLib.class)
+public class SDLEventHandlerMixin {}
+*///?}

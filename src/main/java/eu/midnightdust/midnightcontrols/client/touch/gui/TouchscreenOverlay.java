@@ -41,17 +41,20 @@ import net.minecraft.data.AtlasIds;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemUseAnimation;
-import net.minecraft.world.item.component.SwingAnimation;
 
 import static eu.midnightdust.midnightcontrols.MidnightControls.id;
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsClient.input;
 import static eu.midnightdust.midnightcontrols.client.sdl.AxisCodes.GAMEPAD_AXIS_RIGHT_X;
 import static eu.midnightdust.midnightcontrols.client.sdl.AxisCodes.GAMEPAD_AXIS_RIGHT_Y;
 import static eu.midnightdust.midnightcontrols.client.sdl.ButtonCodes.MOUSE_BUTTON_LEFT;
+
+//? if >= 26.3 {
+import net.minecraft.util.Prediction;
+import net.minecraft.world.item.component.SwingAnimation;
+//?}
 
 /**
  * Represents the touchscreen overlay
@@ -224,14 +227,14 @@ public class TouchscreenOverlay extends Screen {
                     //? if >= 26.3 {
                     minecraft.player.drop(minecraft.player.getActiveItem(), true, Prediction.PREDICTED) != null
                     //?} else {
-                    //minecraft.player.drop(false)
-                    //?}
+                    /*minecraft.player.drop(false)
+                    *///?}
             ) {
                 //? if >= 26.3 {
                 minecraft.player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
                 //?} else {
-                //minecraft.player.swing(InteractionHand.MAIN_HAND);
-                //?}
+                /*minecraft.player.swing(InteractionHand.MAIN_HAND);
+                *///?}
             }
         }, 20, 160, 20, WIDGETS_LOCATION));
         // Use

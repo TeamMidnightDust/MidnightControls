@@ -52,7 +52,7 @@ public class ButtonBindingRingAction extends RingAction {
     public void drawIcon(@NotNull GuiGraphicsExtractor context, @NotNull Font textRenderer, int x, int y, boolean hovered) {
         List<FormattedCharSequence> lines = textRenderer.split(Component.translatable(this.getName()), MidnightRing.ELEMENT_SIZE);
         for (int i = 0; i < lines.size(); ++i) {
-            context.centeredText(textRenderer, lines.get(i), x + MidnightRing.ELEMENT_SIZE / 2, y + MidnightRing.ELEMENT_SIZE / 2 - textRenderer.lineHeight / 2 * (lines.size()-1) - textRenderer.lineHeight / 2 + textRenderer.lineHeight * i, 0xffffff);
+            context.centeredText(textRenderer, lines.get(i), x + MidnightRing.ELEMENT_SIZE / 2, y + MidnightRing.ELEMENT_SIZE / 2 - textRenderer.lineHeight / 2 * (lines.size()-1) - textRenderer.lineHeight / 2 + textRenderer.lineHeight * i, 0xffffffff);
         }
     }
 

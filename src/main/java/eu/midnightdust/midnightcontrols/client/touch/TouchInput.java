@@ -116,7 +116,7 @@ public class TouchInput {
         //? if >= 26.3 {
         client.player.swing(hand, SwingAnimation.DEFAULT, true);
         //?} else {
-        //client.player.swing(hand);
-        //?}
+        /*client.player.swing(hand);
+        *///?}
     }
 }

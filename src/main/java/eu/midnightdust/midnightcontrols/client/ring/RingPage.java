@@ -49,7 +49,7 @@ public class RingPage {
     public void extractRenderState(@NotNull GuiGraphicsExtractor context, @NotNull Font textRenderer, int width, int height, int mouseX, int mouseY, float tickDelta) {
         int centerX = width / 2;
         int centerY = height / 2;
-        if (MidnightControlsClient.ring.getMaxPages() > 1) context.centeredText(textRenderer, name, centerX, 5, 0xffffff);
+        if (MidnightControlsClient.ring.getMaxPages() > 1) context.centeredText(textRenderer, name, centerX, 5, 0xffffffff);
 
         int offset = MidnightRing.ELEMENT_SIZE + (MidnightRing.ELEMENT_SIZE / 2) + 5;
 
