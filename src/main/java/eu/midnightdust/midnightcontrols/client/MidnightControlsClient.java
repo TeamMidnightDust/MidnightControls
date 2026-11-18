@@ -226,7 +226,7 @@ public class MidnightControlsClient extends MidnightControls {
             MidnightControlsConfig.enableHints = false;
             //MidnightControlsConfig.save();
         }
-        TouchInput.tick();
+        TouchInput.forMouse().tick();
     }
     /**
      * This method is called every camera tick.

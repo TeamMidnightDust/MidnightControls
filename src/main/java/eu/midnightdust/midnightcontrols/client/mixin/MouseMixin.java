@@ -83,20 +83,20 @@ public abstract class MouseMixin implements MouseAccessor {
                     int slotX = centerX - 90 + slot * 20 + 2;
                     if (mouseX >= (double) slotX && mouseX <= (double) (slotX + 20)) {
                         minecraft.player.getInventory().setSelectedSlot(slot);
-                        TouchInput.clickStartTime = -1;
+                        TouchInput.forMouse().clickStartTime = -1;
                         ci.cancel();
                         return;
                     }
                 }
             }
             if (action == 1) {
-                TouchInput.clickStartTime = System.currentTimeMillis();
+                TouchInput.forMouse().clickStartTime = System.currentTimeMillis();
                 boolean bl = false;
                 if (minecraft.gui.screen() instanceof TouchscreenOverlay overlay) bl = overlay.mouseClicked(new MouseButtonEvent(mouseX, mouseY, input), false);
-                if (!bl) TouchInput.firstHitResult = TouchUtils.getTargetedObject(mouseX, mouseY);
+                if (!bl) TouchInput.forMouse().firstHitResult = TouchUtils.getTargetedObject(mouseX, mouseY);
                 if (minecraft.gui.screen() == null) ci.cancel();
             }
-            else if (TouchInput.mouseReleased(mouseX, mouseY, input.button())) ci.cancel();
+            else if (TouchInput.forMouse().mouseReleased(mouseX, mouseY, input.button())) ci.cancel();
         }
     }
 

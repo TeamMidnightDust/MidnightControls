@@ -97,9 +97,9 @@ public abstract class WorldRendererMixin {
     //~ if >= 26.2 'MultiBufferSource.BufferSource bufferSource' -> 'SubmitNodeCollector submitNodeCollector' {
     @Unique
     private void midnightcontrols$renderFingerOutline(SubmitNodeCollector submitNodeCollector, PoseStack poseStack, Camera camera) {
-        if (TouchInput.firstHitResult == null || TouchInput.firstHitResult.getType() != HitResult.Type.BLOCK)
+        if (TouchInput.forMouse().firstHitResult == null || TouchInput.forMouse().firstHitResult.getType() != HitResult.Type.BLOCK)
             return;
-        BlockHitResult result = (BlockHitResult) TouchInput.firstHitResult;
+        BlockHitResult result = (BlockHitResult) TouchInput.forMouse().firstHitResult;
         var blockPos = result.getBlockPos();
         if (camera.entity() != null && Minecraft.getInstance().level != null && Minecraft.getInstance().player != null
                 && Minecraft.getInstance().level.getWorldBorder().isWithinBounds(blockPos)) {

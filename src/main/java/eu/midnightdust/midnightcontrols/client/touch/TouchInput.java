@@ -15,15 +15,39 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static eu.midnightdust.midnightcontrols.client.MidnightControlsConfig.doMixedInput;
 
 public class TouchInput {
     private static final Minecraft client = Minecraft.getInstance();
-    public static long clickStartTime;
-    public static HitResult firstHitResult = null;
-    public static boolean isDragging = false;
+    private static final TouchInput MOUSEEMU = new TouchInput();
+    private static final Map<Long, TouchInput> INSTANCES = new HashMap<>();
+    public long clickStartTime;
+    public HitResult firstHitResult = null;
+    public boolean isDragging = false;
 
-    public static void tick() {
+    private TouchInput() {
+    }
+
+    public static TouchInput forMouse() {
+        return MOUSEEMU;
+    }
+
+    public static TouchInput forFinger(long fingerId) {
+        if (fingerId == 0) return MOUSEEMU;
+
+        if (INSTANCES.containsKey(fingerId)) {
+            return INSTANCES.get(fingerId);
+        } else {
+            TouchInput input = new TouchInput();
+            INSTANCES.put(fingerId, input);
+            return input;
+        }
+    }
+
+    public void tick() {
         //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
         if ((client.gui.screen() == null && doMixedInput()) || client.gui.screen() instanceof TouchscreenOverlay) {
             double scaleFactor = client.getWindow().getGuiScale();
@@ -32,7 +56,8 @@ public class TouchInput {
             }
         }
     }
-    public static void mouseHeldDown(double mouseX, double mouseY) {
+
+    public void mouseHeldDown(double mouseX, double mouseY) {
         assert client != null;
         assert client.player != null;
         assert client.gameMode != null;
@@ -62,7 +87,7 @@ public class TouchInput {
             firstHitResult = TouchUtils.getTargetedObject(mouseX, mouseY);
         }
     }
-    public static boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
         isDragging = false;
         firstHitResult = null;
         if (client.gameMode != null) client.gameMode.stopDestroyBlock();

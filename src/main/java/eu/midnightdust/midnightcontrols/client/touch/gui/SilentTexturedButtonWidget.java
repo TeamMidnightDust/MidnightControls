@@ -35,7 +35,7 @@ public class SilentTexturedButtonWidget extends SpruceTexturedButtonWidget {
     public void onClick(double mouseX, double mouseY) {
         this.setActive(true);
         super.onClick(mouseX, mouseY);
-        TouchInput.clickStartTime = -1;
+        TouchInput.forMouse().clickStartTime = -1;
         this.setActive(false);
     }
 }

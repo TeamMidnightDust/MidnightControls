@@ -67,7 +67,9 @@ loomx.loom_version: "1.18-SNAPSHOT"
 # Loader-specific dependencies
 fabric:deps: # https://fabricmc.net/develop/
   # >> yacl: https://modrinth.com/mod/yacl/versions
-  fabric_loader: 0.19.5
+  # >> sodium: https://modrinth.com/mod/sodium/versions
+  # >> emotecraft: https://modrinth.com/plugin/emotecraft
+  fabric_loader: 0.20.1
   "1.21.11":
     fabric_api: 0.141.6+1.21.11
     sodium: mc1.21.11-0.8.0-fabric
@@ -92,9 +94,10 @@ fabric:deps: # https://fabricmc.net/develop/
     emotecraft: 3.5.0-b.build.179
     yacl: 3.9.7+26.3-fabric
 
-
 neoforge:deps: # https://neoforged.net/
   # >> yacl: https://modrinth.com/mod/yacl/versions
+  # >> sodium: https://maven.caffeinemc.net/#/releases/net/caffeinemc/sodium-neoforge-mod
+  # >> emotecraft: https://modrinth.com/plugin/emotecraft
   "1.21.11":
     neoforge_loader: 21.11.3-beta
     sodium: 0.8.0+mc1.21.11

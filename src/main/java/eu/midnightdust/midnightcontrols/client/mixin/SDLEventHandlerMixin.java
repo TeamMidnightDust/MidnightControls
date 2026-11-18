@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.SDLEventHandler;
 
 import eu.midnightdust.midnightcontrols.client.MidnightControlsClient;
+import eu.midnightdust.midnightcontrols.client.touch.MultitouchInput;
 import org.lwjgl.sdl.SDLEvents;
 import org.lwjgl.sdl.SDL_Event;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,6 +19,9 @@ public class SDLEventHandlerMixin {
     private void midnightcontrols$listenToControllerConnection(CallbackInfo ci, @Local(name = "event") SDL_Event event) {
         if (event.type() == SDLEvents.SDL_EVENT_JOYSTICK_ADDED || event.type() == SDLEvents.SDL_EVENT_JOYSTICK_REMOVED) {
             MidnightControlsClient.onControllerConnectionChanged(event.jdevice().which(), event.type());
+        }
+        if (event.type() == SDLEvents.SDL_EVENT_FINGER_DOWN || event.type() == SDLEvents.SDL_EVENT_FINGER_MOTION || event.type() == SDLEvents.SDL_EVENT_FINGER_UP || event.type() == SDLEvents.SDL_EVENT_FINGER_CANCELED) {
+            MultitouchInput.onFingerEvent(event.tfinger(), event.type());
         }
     }
 }

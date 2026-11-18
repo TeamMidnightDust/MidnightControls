@@ -369,7 +369,7 @@ public class TouchscreenOverlay extends Screen {
     @Override
     public boolean mouseDragged(MouseButtonEvent click, double deltaX, double deltaY) {
         if (click.button() == MOUSE_BUTTON_LEFT && this.minecraft != null) {
-            if (TouchInput.isDragging) {
+            if (TouchInput.forMouse().isDragging) {
                 if (!MidnightControlsConfig.invertTouch) {
                     deltaX = -deltaX;
                     deltaY = -deltaY;
@@ -377,7 +377,7 @@ public class TouchscreenOverlay extends Screen {
                 input.handleTouchscreenLook(AxisStorage.of(GAMEPAD_AXIS_RIGHT_Y, (float) deltaY, 0.25d));
                 input.handleTouchscreenLook(AxisStorage.of(GAMEPAD_AXIS_RIGHT_X, (float) deltaX, 0.25d));
             }
-            else TouchInput.isDragging = true;
+            else TouchInput.forMouse().isDragging = true;
         }
         return super.mouseDragged(click, deltaX, deltaY);
     }

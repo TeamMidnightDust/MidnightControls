@@ -21,6 +21,12 @@ public class RenderSystemMixin {
         else {
             MidnightControls.warn("Could not initialize SDL subsystems for Joystick and Gamepad support.\nController support will not work!");
         }
+        if (SDLInit.SDL_InitSubSystem(SDLInit.SDL_INIT_SENSOR)) {
+            MidnightControls.log("Successfully initialized SDL subsystem for multitouch support.");
+        }
+        else {
+            MidnightControls.warn("Could not initialize SDL subsystem for multitouch support.\nTouch controls will only register one finger!");
+        }
     }
 }
 //?} else {
